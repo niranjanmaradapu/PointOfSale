@@ -8,6 +8,7 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.5.2</version>
 		<relativePath /> <!-- lookup parent from repository -->
+		<packaging>war</packaging>
 	</parent>
 	<groupId>com.otsi.kalamandir</groupId>
 	<artifactId>pos-daycloser</artifactId>
@@ -42,7 +43,18 @@
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
-
+	<distributionManagement>
+		<dependencies>
+                <dependency>
+	              <repository>
+                         <id>github</id>
+                         <name>Internal Releases</name>
+                         <url>https://maven.pkg.github.com/niranjanmaradapu/PointOfSale</url>
+	                 <type>pom</type>
+                        </repository>
+		</dependency>
+                </dependencies>
+	</distributionManagement>	
 	<build>
 		<plugins>
 			<plugin>
