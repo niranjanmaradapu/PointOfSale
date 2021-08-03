@@ -1,51 +1,59 @@
 package com.newsaleapi.Entity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import javax.persistence.Column;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+
 import lombok.Data;
 
 @Data
 @Entity
 @Table(name = "delivery_slip")
-public class DeliverySlipEntity implements Serializable {
+public class DeliverySlipEntity  {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
+	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue
 	private Long dsId;
-	/*
-	 * @SequenceGenerator(initialValue = 1, name = "ds_seq", sequenceName =
-	 * "ds_sequence")
-	 * 
-	 * @Column(name = "ds_id")
-	 */
 
+	private String dsNumber;
+	
 	private int qty;
 
 	private String type;
 
+	private Long mrp;
+
+	private Long promoDisc;
+
+	private Long netAmount;
+
+	private String status;
+	
 	private Long salesMan;
 
-	@OneToMany(mappedBy = "delivery_slip")
+	private LocalDate createdDate;
+
+	private LocalDateTime lastModified;
+
+	@OneToMany(targetEntity = BarcodeEntity.class, mappedBy = "deliverySlip", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<BarcodeEntity> barcodes;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "newsale_id", nullable = false)
+	@ManyToOne
+	@JoinColumn(name = "newsale_id")
 	private NewSaleEntity newsale;
+	
 
 }

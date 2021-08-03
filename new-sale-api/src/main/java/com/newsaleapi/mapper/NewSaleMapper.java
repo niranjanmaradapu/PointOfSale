@@ -2,6 +2,7 @@ package com.newsaleapi.mapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,33 +51,12 @@ public class NewSaleMapper {
 		return vo;
 	}
 
-	public DeliverySlipEntity convertDsVoToEntity(DeliverySlipVo vo) {
-
-		DeliverySlipEntity entity = new DeliverySlipEntity();
-
-		entity.setQty(vo.getQty());
-		entity.setSalesMan(vo.getSalesMan());
-		entity.setType(vo.getType());
-		entity.setDsId(10l);
-		List<BarcodeEntity> bcEntity = new ArrayList<>();
-
-		for (BarcodeVo bc : vo.getBarcode()) {
-
-			BarcodeEntity ds = new BarcodeEntity();
-			ds.setBarcode(bc.getBarcode());
-			ds.setBarcodIid(20l);
-			ds.setItemDesc(bc.getItemDesc());
-			ds.setMrp(bc.getMrp());
-			ds.setNetAmount(bc.getNetAmount());
-			ds.setPromoDisc(bc.getPromoDisc());
-			ds.setQty(bc.getQty());
-			ds.setSalesMan(bc.getSalesMan());
-
-			bcEntity.add(ds);
-		}
-		entity.setBarcodes(bcEntity);
-
-		return entity;
+	public DeliverySlipEntity convertDSVoToEntity(DeliverySlipVo vo) {
+		
+		
+		
+		return null;
 	}
+
 
 }
