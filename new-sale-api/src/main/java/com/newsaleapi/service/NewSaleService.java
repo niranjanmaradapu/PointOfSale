@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 import com.newsaleapi.vo.BarcodeVo;
 import com.newsaleapi.vo.DeliverySlipVo;
+import com.newsaleapi.vo.ListOfDeliverySlipVo;
+import com.newsaleapi.vo.ListOfSaleBillsVo;
 import com.newsaleapi.vo.NewSaleVo;
 
 
@@ -20,5 +22,8 @@ public interface NewSaleService {
 	ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo);
 
 	ResponseEntity<?> getDeliverySlipDetails(String dsNumber);
+	ResponseEntity<?> getListOfSaleBills(ListOfSaleBillsVo svo);
+
+	ResponseEntity<?> getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo);
 
 }

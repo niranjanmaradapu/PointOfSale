@@ -52,8 +52,20 @@ public class NewSaleEntity {
 	private Long taxAmount;
 
 	private String billNumber;
+    
+	private String biller;
+	
+	private String billStatus;
+	
+	private Long invoiceNumber;
 
 	private LocalDate createdDate;
+	
+	private Long offlineNumber;
+	
+	private String approvedBy;
+	
+	private String reason;
 
 	@OneToMany(targetEntity = DeliverySlipEntity.class, mappedBy = "newsale", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<DeliverySlipEntity> dlSlip;

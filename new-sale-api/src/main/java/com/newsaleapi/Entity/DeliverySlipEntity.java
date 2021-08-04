@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.newsaleapi.common.DSStatus;
 
 import lombok.Data;
 
@@ -40,7 +41,7 @@ public class DeliverySlipEntity  {
 
 	private Long netAmount;
 
-	private String status;
+	private DSStatus status;
 	
 	private Long salesMan;
 

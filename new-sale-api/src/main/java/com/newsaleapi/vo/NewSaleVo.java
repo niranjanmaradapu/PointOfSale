@@ -1,5 +1,6 @@
 package com.newsaleapi.vo;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -16,6 +17,10 @@ public class NewSaleVo {
 	private CustomerDetails customerDetails;
 
 	private SaleNature natureOfSale;
+    
+	private Long invoiceNumber;
+	
+	private String biller;
 
 	private PaymentType payType;
 
@@ -30,8 +35,16 @@ public class NewSaleVo {
 	private float roundOff;
 
 	private Long netPayableAmount;
+	
+	private LocalDate createdDate;
 
 	private Long taxAmount;
+    
+	private Long offlineNumber;
+	
+	private String approvedBy;
+	
+	private String reason;
 
 	private List<DeliverySlipVo> dlSlip;
 

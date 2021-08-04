@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.newsaleapi.Entity.BarcodeEntity;
 import com.newsaleapi.Entity.DeliverySlipEntity;
+import com.newsaleapi.common.DSStatus;
 import com.newsaleapi.vo.BarcodeVo;
 import com.newsaleapi.vo.DeliverySlipVo;
 
@@ -28,7 +29,7 @@ public class DeliverySlipMapper {
 		entity.setType(vo.getType());
 		entity.setCreatedDate(LocalDate.now());
 		entity.setLastModified(LocalDateTime.now());
-		entity.setStatus("Pending");
+		entity.setStatus(DSStatus.Pending);
 
 		return entity;
 	}

@@ -20,6 +20,8 @@ import com.newsaleapi.service.NewSaleService;
 import com.newsaleapi.vo.BarcodeVo;
 import com.newsaleapi.vo.CustomerDetails;
 import com.newsaleapi.vo.DeliverySlipVo;
+import com.newsaleapi.vo.ListOfDeliverySlipVo;
+import com.newsaleapi.vo.ListOfSaleBillsVo;
 import com.newsaleapi.vo.NewSaleVo;
 
 /**
@@ -111,6 +113,23 @@ public class NewSaleController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
+
+	}
+	
+	@GetMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
+	public ResponseEntity<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo){
+		
+		ResponseEntity<?> listOfSaleBills= newSaleService.getListOfSaleBills(svo);
+		return new ResponseEntity<>(listOfSaleBills, HttpStatus.OK);
+	}
+	@GetMapping(CommonRequestMappigs.GET_LISTOF_DS)
+	public ResponseEntity<?> getlistofDeliverySlips(@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo) {
+
+		// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+		ResponseEntity<?> getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo);
+		
+		return new ResponseEntity<>(getDs, HttpStatus.OK);
 
 	}
 }

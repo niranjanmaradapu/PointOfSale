@@ -12,8 +12,12 @@ import org.springframework.stereotype.Component;
 
 import com.newsaleapi.Entity.BarcodeEntity;
 import com.newsaleapi.Entity.DeliverySlipEntity;
+import com.newsaleapi.Entity.NewSaleEntity;
 import com.newsaleapi.vo.BarcodeVo;
 import com.newsaleapi.vo.DeliverySlipVo;
+import com.newsaleapi.vo.ListOfDeliverySlipVo;
+import com.newsaleapi.vo.ListOfSaleBillsVo;
+import com.newsaleapi.vo.NewSaleVo;
 
 @Component
 public class NewSaleMapper {
@@ -52,11 +56,62 @@ public class NewSaleMapper {
 	}
 
 	public DeliverySlipEntity convertDSVoToEntity(DeliverySlipVo vo) {
-		
-		
-		
+
 		return null;
 	}
 
+	public ListOfSaleBillsVo convertlistSalesEntityToVo(List<NewSaleEntity> saleDetails) {
+
+		ListOfSaleBillsVo lsvo = new ListOfSaleBillsVo();
+		List<NewSaleVo> sVoList = new ArrayList<>();
+
+		saleDetails.stream().forEach(x -> {
+
+			NewSaleVo nsvo = new NewSaleVo();
+
+			//BeanUtils.copyProperties(x, nsvo);
+			
+			  nsvo.setInvoiceNumber(x.getInvoiceNumber()); 
+			  nsvo.setBiller(x.getBiller());
+			  nsvo.setCreatedDate(x.getCreatedDate());
+			  nsvo.setTotalManualDisc(x.getTotalManualDisc());
+			  nsvo.setApprovedBy(x.getApprovedBy());
+			  nsvo.setReason(x.getReason());
+			  nsvo.setOfflineNumber(x.getOfflineNumber());
+			 
+
+			sVoList.add(nsvo);
+
+		});
+		lsvo.setAmount(saleDetails.stream().mapToLong(i -> i.getNetPayableAmount()).sum());
+
+		lsvo.setNewSaleVo(sVoList);
+		return lsvo;
+	}
+
+	public ListOfDeliverySlipVo convertListDSToVo(List<DeliverySlipEntity> dsDetails) {
+
+		ListOfDeliverySlipVo vo = new ListOfDeliverySlipVo();
+
+		List<DeliverySlipVo> dsVoList = new ArrayList<>();
+
+		dsDetails.stream().forEach(x -> {
+
+			DeliverySlipVo dsvo = new DeliverySlipVo();
+
+			BeanUtils.copyProperties(x, dsvo);
+			
+
+			dsVoList.add(dsvo);
+
+		});
+
+		vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i -> i.getPromoDisc()).sum());
+		vo.setTotalNetAmount(dsDetails.stream().mapToLong(i -> i.getNetAmount()).sum());
+		vo.setTotalGrossAmount(dsDetails.stream().mapToLong(i -> i.getMrp()).sum());
+		vo.setDeliverySlipVo(dsVoList);
+
+		return vo;
+	}
 
 }

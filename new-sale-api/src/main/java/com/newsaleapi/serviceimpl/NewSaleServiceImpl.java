@@ -2,7 +2,9 @@ package com.newsaleapi.serviceimpl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -15,17 +17,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.newsaleapi.Entity.BarcodeEntity;
+import com.newsaleapi.Entity.CustomerDetailsEntity;
 import com.newsaleapi.Entity.DeliverySlipEntity;
 import com.newsaleapi.Entity.NewSaleEntity;
 import com.newsaleapi.mapper.DeliverySlipMapper;
 import com.newsaleapi.mapper.NewSaleMapper;
 import com.newsaleapi.repository.BarcodeRepository;
+import com.newsaleapi.repository.CustomerDetailsRepo;
 import com.newsaleapi.repository.DeliverySlipRepository;
 import com.newsaleapi.repository.NewSaleRepository;
 import com.newsaleapi.service.CustomerService;
 import com.newsaleapi.service.NewSaleService;
 import com.newsaleapi.vo.BarcodeVo;
 import com.newsaleapi.vo.DeliverySlipVo;
+import com.newsaleapi.vo.ListOfDeliverySlipVo;
+import com.newsaleapi.vo.ListOfSaleBillsVo;
 import com.newsaleapi.vo.MessageVo;
 import com.newsaleapi.vo.NewSaleVo;
 
@@ -54,6 +60,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private CustomerService customerService;
+	@Autowired
+	private CustomerDetailsRepo customerRepo;
 
 	@Autowired
 	private NewSaleRepository newSaleRepository;
@@ -157,9 +165,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			Random ran = new Random();
 			DeliverySlipEntity entity = dsMapper.convertDsVoToEntity(vo);
-			
-			entity.setDsNumber("DS/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
 
+			entity.setDsNumber(
+					"DS/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
 
 			DeliverySlipEntity savedEntity = dsRepo.save(entity);
 
@@ -209,4 +217,229 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	}
 
+	@Override
+	public ResponseEntity<?> getListOfSaleBills(ListOfSaleBillsVo svo) {
+
+		List<NewSaleEntity> saleDetails = new ArrayList<>();
+
+		/*
+		 * getting the data using between dates and bill status or custMobileNumber or
+		 * barCode or billNumber or invoiceNumber or dsNumber
+		 */
+		if (svo.getDateFrom() != null && svo.getDateTo() != null) {
+			if (svo.getBillStatus() != null && svo.getCustMobileNumber() == null && svo.getBillNumber() == null
+					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
+
+				saleDetails = newSaleRepository.findByCreatedDateBetweenAndBillStatus(svo.getDateFrom(),
+						svo.getDateTo(), svo.getBillStatus());
+			}
+			/*
+			 * getting the record using custmobilenumber
+			 */
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() != null && svo.getBillNumber() == null
+					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
+
+				Optional<CustomerDetailsEntity> customer = customerRepo.findByMobileNumber(svo.getCustMobileNumber());
+				if (customer.isPresent()) {
+					saleDetails = newSaleRepository.findByNewsaleId(customer.get().getNewsale().get(0).getNewsaleId());
+
+				} else {
+					return new ResponseEntity<>("No record found with given mobilenumber", HttpStatus.BAD_REQUEST);
+				}
+
+			}
+			/*
+			 * getting the record using barcode
+			 */
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getBillNumber() == null
+					&& svo.getBarcode() != null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
+
+				BarcodeEntity bar = barcodeRepository.findByBarcode(svo.getBarcode());
+				if (bar != null) {
+
+					saleDetails = newSaleRepository.findByNewsaleId(bar.getDeliverySlip().getNewsale().getNewsaleId());
+
+				} else {
+					return new ResponseEntity<>("No record found with given barcode", HttpStatus.BAD_REQUEST);
+				}
+
+			}
+			/*
+			 * getting the record using billNumber
+			 */
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getBillNumber() != null
+					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
+				saleDetails = newSaleRepository.findByBillNumber(svo.getBillNumber());
+			}
+			/*
+			 * getting the record using invoice number
+			 */
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getBillNumber() == null
+					&& svo.getBarcode() == null && svo.getInvoiceNumber() != null && svo.getDsNumber() == null) {
+				saleDetails = newSaleRepository.findByInvoiceNumber(svo.getInvoiceNumber());
+			}
+			/*
+			 * getting the record using dsNumber
+			 */
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getBillNumber() == null
+					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() != null) {
+				DeliverySlipEntity ds = dsRepo.findByDsNumber(svo.getDsNumber());
+
+				if (ds != null) {
+					saleDetails = newSaleRepository.findByNewsaleId(ds.getNewsale().getNewsaleId());
+				}
+			} else
+				saleDetails = newSaleRepository.findByCreatedDateBetween(svo.getDateFrom(), svo.getDateTo());
+
+			if (saleDetails != null) {
+
+				ListOfSaleBillsVo lsvo = newSaleMapper.convertlistSalesEntityToVo(saleDetails);
+				return new ResponseEntity<>(lsvo, HttpStatus.OK);
+
+			}
+
+			else {
+
+				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+			}
+
+		}
+		return new ResponseEntity<>("sucessfully getting the records", HttpStatus.OK);
+
+	}
+
+	@Override
+	public ResponseEntity<?> getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) {
+
+		List<DeliverySlipEntity> dsDetails = new ArrayList<DeliverySlipEntity>();
+		/*
+		 * getting the record using barcode
+		 */
+
+		if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
+				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
+				&& listOfDeliverySlipVo.getBarcode() != null) {
+
+			BarcodeEntity bar = barcodeRepository.findByBarcode(listOfDeliverySlipVo.getBarcode());
+
+			if (bar != null) {
+				dsDetails = dsRepo.findByDsId(bar.getDeliverySlip().getDsId());
+
+			} else {
+				return new ResponseEntity<>("No record found with given barcode", HttpStatus.BAD_REQUEST);
+			}
+		}
+		/*
+		 * getting the record using barcode and dates
+		 */
+
+		if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
+				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
+				&& listOfDeliverySlipVo.getBarcode() != null) {
+
+			BarcodeEntity bar = barcodeRepository.findByBarcode(listOfDeliverySlipVo.getBarcode());
+
+			if (bar != null) {
+				dsDetails = dsRepo.findByCreatedDateBetweenAndDsId(listOfDeliverySlipVo.getDateFrom(),
+						listOfDeliverySlipVo.getDateTo(), bar.getDeliverySlip().getDsId());
+
+			} else {
+				return new ResponseEntity<>("No record found with given barcode", HttpStatus.BAD_REQUEST);
+			}
+		}
+		/*
+		 * getting the record using dsNumber and dates
+		 */
+		if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
+				&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() == null
+				&& listOfDeliverySlipVo.getBarcode() == null) {
+
+			dsDetails = dsRepo.findByCreatedDateBetweenAndDsNumber(listOfDeliverySlipVo.getDateFrom(),
+					listOfDeliverySlipVo.getDateTo(), listOfDeliverySlipVo.getDsNumber());
+
+			if (dsDetails == null) {
+
+				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+			}
+
+		}
+		/*
+		 * getting the record using status and dates
+		 */
+		if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
+				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
+				&& listOfDeliverySlipVo.getBarcode() == null) {
+
+			dsDetails = dsRepo.findByCreatedDateBetweenAndStatus(listOfDeliverySlipVo.getDateFrom(),
+					listOfDeliverySlipVo.getDateTo(), listOfDeliverySlipVo.getStatus());
+
+			if (dsDetails == null) {
+
+				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+			}
+
+		}
+
+		/*
+		 * getting the record using dsNumber
+		 */
+
+		if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
+				&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() == null
+				&& listOfDeliverySlipVo.getBarcode() == null) {
+
+			// List<String> dlsList = listOfDeliverySlipVo.stream().map(x ->
+			// x.getDsNumber()).collect(Collectors.toList());
+			List<String> dsList = new ArrayList<>();
+			dsList.add(listOfDeliverySlipVo.getDsNumber());
+			dsDetails = dsRepo.findByDsNumberIn(dsList);
+
+			if (dsDetails.isEmpty()) {
+
+				/*
+				 * throw new RuntimeException( "No record found with giver DS Number :" +
+				 * listOfDeliverySlipVo.getDsNumber());
+				 */
+				return new ResponseEntity<>("No record found with giver DS Number", HttpStatus.BAD_REQUEST);
+			}
+
+		}
+
+		/*
+		 * getting the record using status
+		 */
+
+		if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
+				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
+				&& listOfDeliverySlipVo.getBarcode() == null) {
+
+			dsDetails = dsRepo.findByStatus(listOfDeliverySlipVo.getStatus());
+
+			if (dsDetails == null) {
+
+				return new ResponseEntity<>("No record found with giver DS Number", HttpStatus.BAD_REQUEST);
+			}
+
+		}
+		/*
+		 * getting the record using dates
+		 */
+		if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
+				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
+				&& listOfDeliverySlipVo.getBarcode() == null) {
+
+			dsDetails = dsRepo.findByCreatedDateBetween(listOfDeliverySlipVo.getDateFrom(),
+					listOfDeliverySlipVo.getDateTo());
+
+			if (dsDetails == null) {
+
+				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+			}
+
+		}
+
+		ListOfDeliverySlipVo mapper = newSaleMapper.convertListDSToVo(dsDetails);
+		return new ResponseEntity<>(mapper, HttpStatus.OK);
+
+	}
 }
