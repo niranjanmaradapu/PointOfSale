@@ -115,21 +115,48 @@ public class NewSaleController {
 		}
 
 	}
-	
+
+	// Method for getting list of sale bills
 	@GetMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
-	public ResponseEntity<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo){
-		
-		ResponseEntity<?> listOfSaleBills= newSaleService.getListOfSaleBills(svo);
-		return new ResponseEntity<>(listOfSaleBills, HttpStatus.OK);
+	public ResponseEntity<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo) {
+		try {
+
+			ResponseEntity<?> listOfSaleBills = newSaleService.getListOfSaleBills(svo);
+			return new ResponseEntity<>(listOfSaleBills, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+		}
 	}
+
+	// Method for getting list of delivery slips
+
 	@GetMapping(CommonRequestMappigs.GET_LISTOF_DS)
 	public ResponseEntity<?> getlistofDeliverySlips(@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo) {
 
 		// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		try {
 
-		ResponseEntity<?> getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo);
-		
-		return new ResponseEntity<>(getDs, HttpStatus.OK);
+			ResponseEntity<?> getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo);
+
+			return new ResponseEntity<>(getDs, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+		}
+
+	}
+	// Method for day closer
+
+	@GetMapping(value = "daycloser")
+	public ResponseEntity<?> dayclose() {
+		try {
+			ResponseEntity<?> dayclose = newSaleService.posDayClose();
+			return new ResponseEntity<>(dayclose, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+		}
 
 	}
 }

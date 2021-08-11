@@ -1,6 +1,7 @@
 package com.newsaleapi.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,6 +28,8 @@ public interface DeliverySlipRepository extends JpaRepository<DeliverySlipEntity
 	List<DeliverySlipEntity> findByStatus(DSStatus status);
 
 	List<DeliverySlipEntity> findByCreatedDateBetween(LocalDate dateFrom, LocalDate dateTo);
+
+	List<DeliverySlipEntity> findByStatusAndCreatedDate(DSStatus completed, LocalDate now);
 
 	// List<DeliverySlipEntity> findByDsNumberIn(List<DeliverySlipVo> dlSlips);
 

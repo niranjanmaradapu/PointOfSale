@@ -20,6 +20,7 @@ import com.newsaleapi.Entity.BarcodeEntity;
 import com.newsaleapi.Entity.CustomerDetailsEntity;
 import com.newsaleapi.Entity.DeliverySlipEntity;
 import com.newsaleapi.Entity.NewSaleEntity;
+import com.newsaleapi.common.DSStatus;
 import com.newsaleapi.mapper.DeliverySlipMapper;
 import com.newsaleapi.mapper.NewSaleMapper;
 import com.newsaleapi.repository.BarcodeRepository;
@@ -34,6 +35,7 @@ import com.newsaleapi.vo.ListOfDeliverySlipVo;
 import com.newsaleapi.vo.ListOfSaleBillsVo;
 import com.newsaleapi.vo.MessageVo;
 import com.newsaleapi.vo.NewSaleVo;
+
 
 /**
  * Service class contains all bussiness logics related to new sale , create
@@ -441,5 +443,18 @@ public class NewSaleServiceImpl implements NewSaleService {
 		ListOfDeliverySlipVo mapper = newSaleMapper.convertListDSToVo(dsDetails);
 		return new ResponseEntity<>(mapper, HttpStatus.OK);
 
+	}
+
+	@Override
+	public ResponseEntity<?> posDayClose() {
+		
+		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDate(DSStatus.Pending,LocalDate.now());
+
+		if (DsList.isEmpty()) {
+			return new ResponseEntity<>("successfully we can close the day of pos " + " uncleared delivery Slips count :  "+ DsList.size(),HttpStatus.OK);
+
+		} else
+			return new ResponseEntity<>("to  close the day of pos please clear pending  delivery Slips"
+					+ " uncleared delivery Slips count   " + DsList.size(),HttpStatus.BAD_REQUEST);
 	}
 }

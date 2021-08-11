@@ -26,4 +26,6 @@ public interface NewSaleService {
 
 	ResponseEntity<?> getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo);
 
+	ResponseEntity<?> posDayClose();
+
 }
