@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,12 +19,13 @@ import com.otsi.mapping.vo.UserVo;
 
 
 @RestController
+@RequestMapping("/stores")
 public class StoreController {
 	@Autowired
 	private StoreService storeService;
 	
     //create new store and save the details into DB
-	@RequestMapping("/store")
+	@PostMapping("/store")
 	public ResponseEntity<?> addStore(@RequestBody StoreModel storeModel) {
 		return storeService.save(storeModel);
 

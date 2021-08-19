@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.otsi.mapping.exceptions.DuplicateRecordException;
@@ -18,13 +19,14 @@ import com.otsi.mapping.service.UserService;
 import com.otsi.mapping.vo.UserVo;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
 	@Autowired
 	private UserService userService;
 
 	// create user by giving userVo object
 
-	@PostMapping("/user")
+	@PostMapping("/createuser")
 	public ResponseEntity<?> createUser(@RequestBody UserVo userVo) throws DuplicateRecordException {
 		ResponseEntity<?> user = userService.addUser(userVo);
 		return new ResponseEntity<>(user, HttpStatus.CREATED);
@@ -32,7 +34,7 @@ public class UserController {
 
 	// update the existing user with the help of id
 
-	@PutMapping("/user/{id}")
+	@PutMapping("/updateuser/{id}")
 	public ResponseEntity<?> updateExistingUser(@PathVariable(name = "id") Long id, @RequestBody UserVo userVo) {
 
 		ResponseEntity<?> user = userService.updateuser(id, userVo);
