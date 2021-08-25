@@ -1,0 +1,27 @@
+server:
+ port: 8082
+ 
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost
+  
+spring:
+ application:
+    name: new-sale
+ datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 1234 
+ jpa:
+   hibernate:
+    ddl-auto: create
+   database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+   show-sql: true
+   springdoc:
+    packagesToScan: com.newsaleapi
