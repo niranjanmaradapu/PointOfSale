@@ -97,7 +97,7 @@ public class PoolServiceImpl implements PoolService {
 
 			Optional<PoolEntity> pool = poolRepo.findById(vo.getPoolId());
 
-			if (!pool.isEmpty()) {
+			if (!pool.isPresent()) {
 
 				PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
 

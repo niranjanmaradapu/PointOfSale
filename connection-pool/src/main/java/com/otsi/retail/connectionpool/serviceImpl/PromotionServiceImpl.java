@@ -22,7 +22,7 @@ import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
 
 /**
- * This class contains all Bussiness logics regarding promotions
+ * This class contains all Bussiness logics regarding promotions and their management
  * 
  * @author Manikanta Guptha
  *
