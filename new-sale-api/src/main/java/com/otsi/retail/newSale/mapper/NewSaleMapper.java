@@ -6,8 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
@@ -17,10 +19,16 @@ import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
+import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
 
 @Component
 public class NewSaleMapper {
+	
+	@Autowired
+	private CustomerMapper customerMapper;
+
 
 	public BarcodeEntity convertBarcodeVoToEntity(BarcodeVo vo) {
 
@@ -113,5 +121,51 @@ public class NewSaleMapper {
 
 		return vo;
 	}
+	
+	public NewSaleVo entityToVo(NewSaleEntity dto) {
+		NewSaleVo vo = new NewSaleVo();
+		vo.setNewsaleId(dto.getNewsaleId());
+		vo.setInvoiceNumber(dto.getInvoiceNumber());
+		vo.setNetPayableAmount(dto.getNetPayableAmount());
+		vo.setRecievedAmount(dto.getRecievedAmount());
+		vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
+		return vo;
+	}
+
+	/*
+	 * to convert list dto's to vo's
+	 */
+
+	public List<NewSaleVo> entityToVo(List<NewSaleEntity> dtos) {
+		return dtos.stream().map(dto -> entityToVo(dto)).collect(Collectors.toList());
+
+	}
+
+	public List<NewSaleResponseVo> entityToResVo(List<NewSaleEntity> dtos) {
+		return dtos.stream().map(dto -> entityToResVo(dto)).collect(Collectors.toList());
+
+	}
+
+	public NewSaleResponseVo entityToResVo(NewSaleEntity dto) {
+		NewSaleResponseVo vo = new NewSaleResponseVo();
+		List<PaymentAmountTypeVo> payVos = new ArrayList<>();
+		vo.setCustomerId(dto.getCustomerDetails().getCustomerId());
+		vo.setCustomerName(dto.getCustomerDetails().getName());
+		vo.setMobileNumber(dto.getCustomerDetails().getMobileNumber());
+		vo.setNewsaleId(dto.getNewsaleId());
+		dto.getPaymentType().forEach(p->{
+			PaymentAmountTypeVo payVo =new PaymentAmountTypeVo();
+			payVo.setId(p.getId());
+			payVo.setPaymentAmount(p.getPaymentAmount()); 
+			payVo.setPaymentType(p.getPaymentType());
+			payVos.add(payVo);
+		});
+		vo.setPaymentAmountTypeId(payVos);
+		vo.setAmount(dto.getNetPayableAmount() - dto.getRecievedAmount());
+		vo.setInvoiceNumber(dto.getInvoiceNumber());
+		return vo;
+	}
+
+
 
 }

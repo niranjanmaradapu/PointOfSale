@@ -19,8 +19,15 @@ public class CommonRequestMappigs {
 	public static final String SAVE_CUSTOMERDETAILS = "savecustomerdetails";
 
 	public static final String GET_CUSTOMERDETAILS_BY_MOBILENUMBER = "getcustomerdetailsbymobilenuber";
+	
 	public static final String GET_LISTOF_SALEBILLS = "getlistofsalebills";
 
 	public static final String GET_LISTOF_DS = "getlistofdeliveryslips";
+	
+	public static final String GET_HSN_DETAILS = "getHsnDetails";
+
+	public static final String UPDATE_NEWSALE = "updateNewsale";
+
+	public static final String GET_NEWSALEBYCUSTOMERID = "getNewsaleByCustomerId";
 
 }

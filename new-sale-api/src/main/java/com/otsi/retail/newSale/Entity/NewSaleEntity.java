@@ -37,8 +37,6 @@ public class NewSaleEntity {
 
 	private PaymentType payType;
 
-	private String custmerId;
-
 	private Long grossAmount;
 
 	private Long totalPromoDisc;
@@ -65,13 +63,18 @@ public class NewSaleEntity {
 	
 	private String approvedBy;
 	
+	private Long recievedAmount;
+	
 	private String reason;
 
 	@OneToMany(targetEntity = DeliverySlipEntity.class, mappedBy = "newsale", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<DeliverySlipEntity> dlSlip;
 
 	@ManyToOne
-	@JoinColumn(name = "customer_id")
+	@JoinColumn(name = "customerId")
 	private CustomerDetailsEntity customerDetails;
+	
+	@OneToMany(targetEntity = PaymentAmountType.class, mappedBy = "newsaleId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<PaymentAmountType> paymentType;
 
 }

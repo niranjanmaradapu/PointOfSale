@@ -3,15 +3,15 @@ package com.otsi.retail.newSale.service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.otsi.retail.newSale.vo.CustomerDetails;
+import com.otsi.retail.newSale.vo.CustomerVo;
 
 
 @Component
 public interface CustomerService {
 
-	ResponseEntity<?> saveCustomerDetails(CustomerDetails details) throws Exception;
+	ResponseEntity<?> saveCustomerDetails(CustomerVo details) throws Exception;
 
-	ResponseEntity<?> getCustomerByMobileNumber(String mobileNumber);
+	CustomerVo getCustomerByMobileNumber(String mobileNumber);
 
 }
 

@@ -14,17 +14,19 @@ import lombok.Data;
 @Component
 public class NewSaleVo {
 
-	private CustomerDetails customerDetails;
+	private Long newsaleId;
+
+	private CustomerVo customerDetails;
 
 	private SaleNature natureOfSale;
-    
+
 	private Long invoiceNumber;
-	
+
 	private String biller;
+	
+	private List<PaymentAmountTypeVo> paymentAmountType;
 
-	private PaymentType payType;
-
-	private String custmerId;
+	private Long recievedAmount;
 
 	private Long grossAmount;
 
@@ -35,15 +37,15 @@ public class NewSaleVo {
 	private float roundOff;
 
 	private Long netPayableAmount;
-	
+
 	private LocalDate createdDate;
 
 	private Long taxAmount;
-    
+
 	private Long offlineNumber;
-	
+
 	private String approvedBy;
-	
+
 	private String reason;
 
 	private List<DeliverySlipVo> dlSlip;

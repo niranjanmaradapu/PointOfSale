@@ -12,7 +12,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import lombok.Data;
 
 @Data
-public class CustomerDetails {
+public class CustomerVo {
+	
+	private Long customerId;
 
 	@Pattern(regexp = "[a-zA-Z]+")
 	@NotBlank(message = "Name must be filled")

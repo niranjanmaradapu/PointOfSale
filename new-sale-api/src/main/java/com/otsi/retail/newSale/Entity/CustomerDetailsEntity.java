@@ -28,7 +28,7 @@ public class CustomerDetailsEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Long customer_id;
+	private Long customerId;
 
 	private String name;
 

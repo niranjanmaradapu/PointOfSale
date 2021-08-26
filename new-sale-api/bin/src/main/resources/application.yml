@@ -1,5 +1,5 @@
 server:
- port: 8082
+ port: 0
  
 spring:
  application:
@@ -8,7 +8,7 @@ spring:
     platform: postgres
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
-    password: Vasavi 
+    password: 12345 
  jpa:
    hibernate:
     ddl-auto: update
@@ -24,16 +24,9 @@ eureka:
   instance:
     instance-id: ${spring.application.name}:${random.int}
     hostname: localhost
-logging:
-    file:
-      name: C:/Users/ADMIN/Desktop/logs/newsale.log    
-    level:
-      com.otsi.retail.newSale.serviceimpl: DEBUG   
+  
 springdoc:
   packagesToScan: com.otsi.retail.newSale
   
 savecustomer:
   url: http://localhost:8081/customer/savecustomerdetails
-  
-getNewSaleWithHsn: 
-  url: http://localhost:8083/hsnDetails/getHsnDetails

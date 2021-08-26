@@ -3,12 +3,12 @@ package com.otsi.retail.newSale.mapper;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
-import com.otsi.retail.newSale.vo.CustomerDetails;
+import com.otsi.retail.newSale.vo.CustomerVo;
 
 @Component
 public class CustomerMapper {
 
-	public CustomerDetailsEntity convertVoToEntity(CustomerDetails details) {
+	public CustomerDetailsEntity convertVoToEntity(CustomerVo details) {
 		CustomerDetailsEntity entity = new CustomerDetailsEntity();
 
 		entity.setName(details.getName());
@@ -24,9 +24,9 @@ public class CustomerMapper {
 		return entity;
 	}
 
-	public CustomerDetails convertEntityToVo(CustomerDetailsEntity customerDetailsEntity) {
+	public CustomerVo convertEntityToVo(CustomerDetailsEntity customerDetailsEntity) {
 
-		CustomerDetails vo = new CustomerDetails();
+		CustomerVo vo = new CustomerVo();
 
 		vo.setMobileNumber(customerDetailsEntity.getMobileNumber());
 		vo.setAltMobileNo(customerDetailsEntity.getAltMobileNo());
