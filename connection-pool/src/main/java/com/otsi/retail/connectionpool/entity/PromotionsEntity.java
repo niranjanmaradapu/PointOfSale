@@ -16,9 +16,13 @@ import javax.persistence.Table;
 import com.otsi.retail.connectionpool.common.Applicability;
 import com.otsi.retail.connectionpool.common.PromoApplyType;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "promotion")
 public class PromotionsEntity {

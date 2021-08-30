@@ -1,7 +1,5 @@
 package com.otsi.retail.connectionpool.controller;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +36,7 @@ public class PromotionController {
 	public ResponseEntity<?> addPromotion(@RequestBody PromotionsVo vo) {
 
 		try {
-			Map<String, Object> savePromo = promoService.addPromotion(vo);
+			ResponseEntity<?> savePromo = promoService.addPromotion(vo);
 			return new ResponseEntity<>(savePromo, HttpStatus.OK);
 
 		} catch (Exception e) {
@@ -58,13 +56,13 @@ public class PromotionController {
 			return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	//Method for modifying/editing Promotion
+
+	// Method for modifying/editing Promotion
 	@PostMapping(CommonRequestMappigs.EDIT_PROMO)
 	public ResponseEntity<?> editPromotion(@RequestBody PromotionsVo vo) {
 
 		try {
-			String result = promoService.editPromotion(vo);
+			ResponseEntity<?> result = promoService.editPromotion(vo);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 
 		} catch (Exception e) {

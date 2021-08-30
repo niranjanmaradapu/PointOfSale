@@ -35,7 +35,7 @@ public class PoolController {
 
 		try {
 
-			String savePool = poolService.savePool(vo);
+			ResponseEntity<?> savePool = poolService.savePool(vo);
 			return new ResponseEntity<>(savePool, HttpStatus.OK);
 
 		} catch (Exception e) {
@@ -62,7 +62,7 @@ public class PoolController {
 	public ResponseEntity<?> modifyPool(@RequestBody ConnectionPoolVo vo) {
 
 		try {
-			String message = poolService.modifyPool(vo);
+			ResponseEntity<?> message = poolService.modifyPool(vo);
 			return new ResponseEntity<>(message, HttpStatus.OK);
 
 		} catch (Exception e) {

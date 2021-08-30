@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 import com.otsi.retail.connectionpool.common.Applicability;
 import com.otsi.retail.connectionpool.common.PromoApplyType;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * This VO class contains all the inputs of Promotions
@@ -18,6 +20,8 @@ import lombok.Data;
  */
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Component
 public class PromotionsVo {
 

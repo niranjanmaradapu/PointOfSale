@@ -9,9 +9,13 @@ import javax.persistence.ManyToOne;
 import com.otsi.retail.connectionpool.common.ColumnName;
 import com.otsi.retail.connectionpool.common.Operator;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 //@Table(name = "poolRule")
 public class RuleEntity {

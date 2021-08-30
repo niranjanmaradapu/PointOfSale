@@ -5,10 +5,14 @@ import org.springframework.stereotype.Component;
 import com.otsi.retail.connectionpool.common.ColumnName;
 import com.otsi.retail.connectionpool.common.Operator;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Component
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RuleVo {
 
 	private ColumnName columnName;

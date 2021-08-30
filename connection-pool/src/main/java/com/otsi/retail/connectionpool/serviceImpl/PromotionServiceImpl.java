@@ -1,9 +1,7 @@
 package com.otsi.retail.connectionpool.serviceImpl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -22,7 +20,8 @@ import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
 
 /**
- * This class contains all Bussiness logics regarding promotions and their management
+ * This class contains all Bussiness logics regarding promotions and their
+ * management
  * 
  * @author Manikanta Guptha
  *
@@ -42,9 +41,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 	// Method for adding promotion to pools
 	@Override
-	public Map<String, Object> addPromotion(PromotionsVo vo) {
-
-		Map<String, Object> result = new HashMap<>();
+	public ResponseEntity<?> addPromotion(PromotionsVo vo) {
 
 		List<ConnectionPoolVo> poolVo = vo.getPoolVo();
 
@@ -59,12 +56,9 @@ public class PromotionServiceImpl implements PromotionService {
 			PromotionsEntity savedPromo = promoRepo.save(entity);
 
 		} else {
-			result.put("message", "Please give valid/active pools");
-			return result;
+			return new ResponseEntity<>("Please give valid/active pools", HttpStatus.BAD_REQUEST);
 		}
-
-		result.put("message", "Promotion mapped succesfully...");
-		return result;
+		return new ResponseEntity<>("Promotion mapped succesfully...", HttpStatus.OK);
 	}
 
 	// Method for getting list of Promotions by using flag(Status)
@@ -96,7 +90,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 	// Method for modifying/editing Promotion
 	@Override
-	public String editPromotion(PromotionsVo vo) {
+	public ResponseEntity<?> editPromotion(PromotionsVo vo) {
 
 		try {
 			Optional<PromotionsEntity> promotion = promoRepo.findById(vo.getPromoId());
@@ -114,15 +108,15 @@ public class PromotionServiceImpl implements PromotionService {
 					PromotionsEntity savedPromo = promoRepo.save(entity);
 
 				} else {
-					return "Please give valid/active pools";
+					return new ResponseEntity<>("Please give valid/active pools", HttpStatus.BAD_REQUEST);
 				}
-				return "Promotion Modified succesfully";
+				return new ResponseEntity<>("Promotion Modified succesfully", HttpStatus.OK);
 
 			} else {
-				return "please give valid Promotion Id";
+				return new ResponseEntity<>("please give valid Promotion Id", HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
-			return "Exception occurs while modifying Promotion";
+			return new ResponseEntity<>("Exception occurs while modifying Promotion", HttpStatus.BAD_REQUEST);
 		}
 	}
 }

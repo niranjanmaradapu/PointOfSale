@@ -7,10 +7,14 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.retail.connectionpool.common.PoolType;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Component
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ConnectionPoolVo {
 
 	private String poolName;

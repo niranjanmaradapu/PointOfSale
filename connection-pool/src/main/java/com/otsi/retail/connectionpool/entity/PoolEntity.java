@@ -14,9 +14,13 @@ import javax.persistence.Table;
 
 import com.otsi.retail.connectionpool.common.PoolType;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "pool")
 public class PoolEntity {

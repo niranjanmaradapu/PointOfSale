@@ -14,10 +14,10 @@ import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 @Component
 public interface PoolService {
 
-	String savePool(ConnectionPoolVo vo);
+	ResponseEntity<?> savePool(ConnectionPoolVo vo);
 
 	ResponseEntity<?> getListOfPools(String isActive);
 
-	String modifyPool(ConnectionPoolVo vo);
+	ResponseEntity<?> modifyPool(ConnectionPoolVo vo);
 
 }

@@ -37,7 +37,7 @@ public class PoolServiceImpl implements PoolService {
 
 	// Method for saving pools from Connection VO
 	@Override
-	public String savePool(ConnectionPoolVo vo) {
+	public ResponseEntity<?> savePool(ConnectionPoolVo vo) {
 
 		try {
 			PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
@@ -50,10 +50,10 @@ public class PoolServiceImpl implements PoolService {
 				ruleRepo.save(x);
 			});
 
-			return "Pool saved Successfully";
+			return new ResponseEntity<>("Pool saved Successfully", HttpStatus.OK);
 
 		} catch (Exception e) {
-			return "Exception occurs while saving the Pool";
+			return new ResponseEntity<>("Exception occurs while saving the Pool", HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -91,13 +91,13 @@ public class PoolServiceImpl implements PoolService {
 
 	// Method for Modifying/Edit the existing pool details
 	@Override
-	public String modifyPool(ConnectionPoolVo vo) {
+	public ResponseEntity<?> modifyPool(ConnectionPoolVo vo) {
 
 		try {
 
 			Optional<PoolEntity> pool = poolRepo.findById(vo.getPoolId());
 
-			if (!pool.isPresent()) {
+			if (pool.isPresent()) {
 
 				PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
 
@@ -107,11 +107,11 @@ public class PoolServiceImpl implements PoolService {
 				PoolEntity savedPool = poolRepo.save(poolEntity);
 
 			} else {
-				return "Invalid Pool Id";
+				return new ResponseEntity<>("Invalid Pool Id", HttpStatus.BAD_REQUEST);
 			}
-			return "Pool Modified Successfully...";
+			return new ResponseEntity<>("Pool Modified Successfully...", HttpStatus.OK);
 		} catch (Exception e) {
-			return "Exception occurs while modifying the record.";
+			return new ResponseEntity<>("Exception occurs while modifying the record.", HttpStatus.BAD_REQUEST);
 		}
 	}
 }
