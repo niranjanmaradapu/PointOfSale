@@ -61,7 +61,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: connection-pool/Dockerfile
+          file: debit-notes/Dockerfile #we can edit dockerfile path
           platforms: linux/amd64
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME_R }}/debit-notes:v1
