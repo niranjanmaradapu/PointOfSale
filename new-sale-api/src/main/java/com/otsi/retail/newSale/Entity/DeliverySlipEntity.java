@@ -49,7 +49,7 @@ public class DeliverySlipEntity  {
 
 	private LocalDateTime lastModified;
 
-	@OneToMany(targetEntity = BarcodeEntity.class, mappedBy = "deliverySlip", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany( mappedBy = "deliverySlip", cascade = CascadeType.ALL)
 	private List<BarcodeEntity> barcodes;
 
 	@ManyToOne

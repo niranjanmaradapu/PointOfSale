@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 
 @Repository
@@ -23,5 +24,11 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 	List<NewSaleEntity> findByCreatedDateBetween(LocalDate dateFrom, LocalDate dateTo);
 	
 	List<NewSaleEntity> findByCustomerDetailsCustomerId(Long customerId);
+
+	List<NewSaleEntity> findByCustomerDetailsMobileNumberAndCreatedDateBetween(String mobileNo, LocalDate fromDate, LocalDate toDate);
+
+	Optional<CustomerDetailsEntity> findByCustomerDetailsMobileNumber(String mobileNo);
+
+	
 
 }

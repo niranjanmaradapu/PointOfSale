@@ -66,7 +66,8 @@ public class CustomerServiceImpl implements CustomerService {
 			log.info("after getting CustomerByMobileNumber :" + details);
 			return details;
 
-		}
+			
+		} 
 	}
 
 }

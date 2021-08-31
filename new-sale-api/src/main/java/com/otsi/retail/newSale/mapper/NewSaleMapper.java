@@ -29,6 +29,11 @@ public class NewSaleMapper {
 	@Autowired
 	private CustomerMapper customerMapper;
 
+@Autowired
+private PaymentAmountTypeMapper paymentAmountTypeMapper;
+
+@Autowired
+private DeliverySlipMapper deliverySlipMapper;
 
 	public BarcodeEntity convertBarcodeVoToEntity(BarcodeVo vo) {
 
@@ -167,5 +172,32 @@ public class NewSaleMapper {
 	}
 
 
+
+	public NewSaleVo convertNewSaleDtoToVo(NewSaleEntity dto) {
+		NewSaleVo vo=new NewSaleVo();
+		vo.setApprovedBy(dto.getApprovedBy());
+		vo.setBiller(dto.getBiller());
+		vo.setCreatedDate(dto.getCreatedDate());
+		vo.setDlSlip(deliverySlipMapper.convertDsEntityListToVoList(dto.getDlSlip()));
+		vo.setGrossAmount(dto.getGrossAmount());
+		vo.setInvoiceNumber(dto.getInvoiceNumber());
+		vo.setNatureOfSale(dto.getNatureOfSale());
+		vo.setNetPayableAmount(dto.getNetPayableAmount());
+		vo.setOfflineNumber(dto.getOfflineNumber());
+		vo.setPaymentAmountType(paymentAmountTypeMapper.EntityToVo(dto.getPaymentType()));
+		vo.setRoundOff(dto.getRoundOff());
+		vo.setTaxAmount(dto.getTaxAmount());
+		vo.setTotalManualDisc(dto.getTotalManualDisc());
+		vo.setTotalPromoDisc(dto.getTotalPromoDisc());
+		vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
+
+
+		
+		
+
+		return vo;
+		// TODO Auto-generated method stub
+		
+	}
 
 }

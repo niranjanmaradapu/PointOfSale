@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -51,7 +52,7 @@ public class DeliverySlipMapper {
 
 		barEnt.stream().forEach(x -> {
 			BarcodeVo barvo = new BarcodeVo();
-
+			barvo.setBarcode(x.getBarcode());
 			barvo.setSalesMan(x.getSalesMan());
 			barvo.setQty(x.getQty());
 			barvo.setPromoDisc(x.getPromoDisc());
@@ -64,6 +65,11 @@ public class DeliverySlipMapper {
 		vo.setBarcode(listBarVo);
 
 		return vo;
+	}
+
+	public List<DeliverySlipVo> convertDsEntityListToVoList(List<DeliverySlipEntity> dlSlip) {
+		List<DeliverySlipVo> dsSlipList=new ArrayList<>();
+		return dlSlip.stream().map(dto->convertDsEntityToVo(dto)).collect(Collectors.toList());
 	}
 
 }

@@ -29,12 +29,15 @@ public class CustomerMapper {
 		CustomerVo vo = new CustomerVo();
 
 		vo.setMobileNumber(customerDetailsEntity.getMobileNumber());
+		System.out.println(customerDetailsEntity.getMobileNumber());
 		vo.setAltMobileNo(customerDetailsEntity.getAltMobileNo());
 		vo.setAddress(customerDetailsEntity.getAddress());
 		vo.setDob(customerDetailsEntity.getDob());
 		vo.setGender(customerDetailsEntity.getGender());
 		vo.setGstNumber(customerDetailsEntity.getGstNumber());
 		vo.setName(customerDetailsEntity.getName());
+		System.out.println(vo.getName());
+
 
 		// BeanUtils.copyProperties(customerDetailsEntity, vo);
 

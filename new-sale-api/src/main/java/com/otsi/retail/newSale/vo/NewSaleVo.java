@@ -8,10 +8,14 @@ import org.springframework.stereotype.Component;
 import com.otsi.retail.newSale.common.PaymentType;
 import com.otsi.retail.newSale.common.SaleNature;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Component
+@AllArgsConstructor
+@NoArgsConstructor
 public class NewSaleVo {
 
 	private Long newsaleId;
