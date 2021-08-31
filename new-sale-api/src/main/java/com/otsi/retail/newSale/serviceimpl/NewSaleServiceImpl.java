@@ -27,13 +27,10 @@ import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.common.DSStatus;
-<<<<<<< .mine
 import com.otsi.retail.newSale.common.PaymentType;
 import com.otsi.retail.newSale.gatewayresponse.GateWayResponse;
-=======
 import com.otsi.retail.newSale.mapper.CustomerMapper;
 
->>>>>>> .theirs
 import com.otsi.retail.newSale.mapper.DeliverySlipMapper;
 import com.otsi.retail.newSale.mapper.NewSaleMapper;
 import com.otsi.retail.newSale.mapper.PaymentAmountTypeMapper;
@@ -45,21 +42,15 @@ import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.service.CustomerService;
 import com.otsi.retail.newSale.service.NewSaleService;
 import com.otsi.retail.newSale.vo.BarcodeVo;
-import com.otsi.retail.newSale.vo.CustomerDetails;
+import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
-<<<<<<< .mine
 import com.otsi.retail.newSale.vo.HsnDetailsVo;
-=======
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
->>>>>>> .theirs
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.MessageVo;
-<<<<<<< .mine
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
-=======
 import com.otsi.retail.newSale.vo.NewSaleList;
->>>>>>> .theirs
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
 
@@ -532,43 +523,30 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Override
 	public ResponseEntity<?> posDayClose() {
-<<<<<<< .mine
 		log.debug(" debugging posDayClose");
-		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDate(DSStatus.Pending, LocalDate.now());
-=======
 
 
->>>>>>> .theirs
 
 		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDate(DSStatus.Pending, LocalDate.now());
 
 		if (DsList.isEmpty()) {
-<<<<<<< .mine
 			log.info("successfully we can close the day of pos " + " uncleared delivery Slips count :" + DsList.size());
 			return new ResponseEntity<>(
 					"successfully we can close the day of pos " + " uncleared delivery Slips count :  " + DsList.size(),
 					HttpStatus.OK);
-=======
-			return new ResponseEntity<>(
-					"successfully we can close the day of pos " + " uncleared delivery Slips count :  " + DsList.size(),
-					HttpStatus.OK);
+			
 
->>>>>>> .theirs
 
 		} else
-<<<<<<< .mine
 			log.error("to  close the day of pos please clear pending  delivery Slips"
 					+ " uncleared delivery Slips count   " + DsList.size());
 		return new ResponseEntity<>("to  close the day of pos please clear pending  delivery Slips"
 				+ " uncleared delivery Slips count   " + DsList.size(), HttpStatus.BAD_REQUEST);
-=======
-			return new ResponseEntity<>("to  close the day of pos please clear pending  delivery Slips"
-					+ " uncleared delivery Slips count   " + DsList.size(), HttpStatus.BAD_REQUEST);
 
 
->>>>>>> .theirs
+
 	}
-<<<<<<< .mine
+
 
 	/*
 	 * getting getNewSaleWithHsn
@@ -645,7 +623,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		return newsaleVo;
 	}
 
-=======
+
 
 	@Override
 	public NewSaleList getInvoicDetails(InvoiceRequestVo vo) {
@@ -679,7 +657,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public CustomerDetails getCustomerFromNewSale(String mobileNo) throws Exception {
+	public CustomerVo getCustomerFromNewSale(String mobileNo) throws Exception {
 		try {
 		Optional<CustomerDetailsEntity> responce=	newSaleRepository.findByCustomerDetailsMobileNumber(mobileNo);
 		if(responce.isPresent()==Boolean.TRUE) {
@@ -722,5 +700,4 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 
 
->>>>>>> .theirs
 }
