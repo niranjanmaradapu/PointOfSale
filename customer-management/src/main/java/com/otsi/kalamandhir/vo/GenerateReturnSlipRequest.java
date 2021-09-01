@@ -25,4 +25,6 @@ public class GenerateReturnSlipRequest {
 	private LocalDate createdDate;
 	private LocalDate modifiedDate;
 	private long amount;
+	private boolean isUserTagged;
+	private String mobileNumber;
 }

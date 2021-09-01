@@ -4,6 +4,7 @@
 package com.otsi.kalamandhir.serviceimpl;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -58,8 +59,9 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	private RestTemplate restTemplate;
-	private final static String NEW_SALE_GET_INVOICEDETAILS_URL = "http://localhost:9097/new-sale/newsale/getInvoiceDetails";
-	private final static String GET_CUSTOMER_FROM_NEWSALE_URL = "http://localhost:9097/new-sale/newsale/getCustomerFromNewSale";
+	private final static String NEW_SALE_GET_INVOICEDETAILS_URL = "http://localhost:8081/newsale/getInvoiceDetails";
+	private final static String GET_CUSTOMER_FROM_NEWSALE_URL = "http://localhost:8081/newsale/getCustomerFromNewSale";
+	private final static String TAG_CUSTOMER_TO_INVOICE = "http://localhost:8081/newsale/tagCustomerToInvoice";
 
 	@Override
 	public List<ListOfReturnSlipsVo> getListOfReturnSlips(ListOfReturnSlipsVo vo) {
@@ -219,6 +221,10 @@ public class CustomerServiceImpl implements CustomerService {
 	public String createReturnSlip(GenerateReturnSlipRequest request) throws Exception {
 		try {
 
+			if(request.isUserTagged()==Boolean.FALSE) {
+				tagUserToInvoice(request.getMobileNumber(),request.getInvoiceNo());
+			}
+			
 			ReturnSlip returnSlipDto = new ReturnSlip();
 			returnSlipDto.setCrNo(generateCrNumber());
 			returnSlipDto.setRtNo(generateRtNumber());
@@ -235,6 +241,22 @@ public class CustomerServiceImpl implements CustomerService {
 			throw new Exception(e.getMessage());
 		}
 
+	}
+
+	private void tagUserToInvoice(String mobileNumber, long invoiceNo) throws Exception {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity entity = new HttpEntity(headers);
+		URI uri = null;
+		try {
+			uri = UriComponentsBuilder.fromUri(new URI(TAG_CUSTOMER_TO_INVOICE  + "/" + mobileNumber +"/"+invoiceNo)).build().encode()
+					.toUri();
+			
+			ResponseEntity<String> res = restTemplate.exchange(uri, HttpMethod.GET, entity,
+					String.class);
+		} catch (URISyntaxException e) {
+			throw new Exception(e.getMessage());
+		}
 	}
 
 	@Override
