@@ -83,7 +83,7 @@
 
 	</dependencies>
         <distributionManagement>
-		<dependencies>
+		<!-- <dependencies> -->
                 <dependency>
 	              <repository>
                          <id>github</id>
@@ -92,7 +92,7 @@
 	                 <type>pom</type>
                         </repository>
 		</dependency>
-                </dependencies>
+               <!-- </dependencies> -->
 	</distributionManagement>	
 	
 	<build>
