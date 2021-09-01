@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
+import com.otsi.retail.newSale.controller.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.mapper.CustomerMapper;
 import com.otsi.retail.newSale.repository.CustomerDetailsRepo;
 import com.otsi.retail.newSale.service.CustomerService;
@@ -51,13 +52,13 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public CustomerVo getCustomerByMobileNumber(String mobileNumber) {
+	public CustomerVo getCustomerByMobileNumber(String mobileNumber) throws CustomerNotFoundExcecption {
 		log.debug("deugging getCustomerByMobileNumber:" + mobileNumber);
 		Optional<CustomerDetailsEntity> customerDetails = customerRepo.findByMobileNumber(mobileNumber);
 		if (!customerDetails.isPresent()) {
 			log.error(
 					"Customer is with mobile number " + mobileNumber + " not exists. So please fill all the details..");
-			throw new RuntimeException(
+			throw new CustomerNotFoundExcecption(
 					"Customer is with mobile number " + mobileNumber + " not exists. So please fill all the details.."+
 					HttpStatus.BAD_REQUEST);
 		} else {

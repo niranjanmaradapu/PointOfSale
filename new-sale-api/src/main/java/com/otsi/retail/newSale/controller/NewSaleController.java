@@ -46,9 +46,8 @@ import com.otsi.retail.newSale.vo.NewSaleVo;
 @CrossOrigin
 @RequestMapping(CommonRequestMappigs.NEW_SALE)
 public class NewSaleController {
-	
-	private Logger log = LoggerFactory.getLogger(NewSaleController.class);
 
+	private Logger log = LoggerFactory.getLogger(NewSaleController.class);
 
 	@Autowired
 	private NewSaleService newSaleService;
@@ -65,7 +64,7 @@ public class NewSaleController {
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (Exception e) {
 			log.error("exception :" + e);
-	return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -73,8 +72,16 @@ public class NewSaleController {
 	@GetMapping(path = CommonRequestMappigs.GET_CUSTOMERDETAILS_BY_MOBILENUMBER)
 	public ResponseEntity<?> getCustomerByMobileNumber(@RequestParam String mobileNumber) {
 		log.info("Received Request to getCustomerByMobileNumber :" + mobileNumber);
-		CustomerVo customer = service.getCustomerByMobileNumber(mobileNumber);
-		return new ResponseEntity<>(customer, HttpStatus.OK);
+		CustomerVo customer;
+		try {
+			customer = service.getCustomerByMobileNumber(mobileNumber);
+			return new ResponseEntity<>(customer, HttpStatus.OK);
+		} catch (CustomerNotFoundExcecption e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+
 	}
 
 	// Method for saving new sale items...
@@ -168,7 +175,7 @@ public class NewSaleController {
 	}
 	// Method for day closer
 
-	@GetMapping(CommonRequestMappigs.DAY_CLOSER)
+	@GetMapping(value = "daycloser")
 	public ResponseEntity<?> dayclose() {
 		log.info("Recieved request to dayclose()");
 		try {
@@ -181,17 +188,6 @@ public class NewSaleController {
 		}
 
 	}
-	@GetMapping(value = "posclose")
-	public ResponseEntity<?> posclose(@RequestParam Boolean posclose) {
-		try {
-			ResponseEntity<?> dayclose = newSaleService.posClose(posclose);
-			return new ResponseEntity<>(dayclose, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-
-		}
-
-}
 
 	@GetMapping(CommonRequestMappigs.GET_NEWSALEBYCUSTOMERID)
 	public ResponseEntity<?> getNewsaleByCustomerId(@RequestParam Long customerId) {
@@ -206,7 +202,6 @@ public class NewSaleController {
 		NewSaleVo message = newSaleService.updateNewSale(vo);
 		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
-
 
 	@PostMapping(value = "getInvoiceDetails", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getInvoiceDetails(@RequestBody InvoiceRequestVo vo) {
@@ -223,12 +218,13 @@ public class NewSaleController {
 		try {
 			CustomerVo customer = service.getCustomerByMobileNumber(mobileNo);
 			return new ResponseEntity<>(customer, HttpStatus.OK);
+		} catch (CustomerNotFoundExcecption ce) {
+			return new ResponseEntity<>(ce.getMessage(), HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	
+
 	@GetMapping("/getHsnDetails/{netAmt}")
 	public ResponseEntity<?> getHsnDetails(@PathVariable double netAmt) {
 		try {
@@ -245,4 +241,15 @@ public class NewSaleController {
 		throw new RuntimeException("hsn details not found");
 	}
 
+	@GetMapping("/tagCustomerToInvoice/{mobileNo}/{invoiceNo}")
+	public ResponseEntity<?> tagCustomerToInvoice(@PathVariable String mobileNo, @PathVariable String invoiceNo) {
+		try {
+			newSaleService.tagCustomerToExisitingNewSale(mobileNo,Long.parseLong(invoiceNo));
+		} catch (CustomerNotFoundExcecption e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+
+	}
 }

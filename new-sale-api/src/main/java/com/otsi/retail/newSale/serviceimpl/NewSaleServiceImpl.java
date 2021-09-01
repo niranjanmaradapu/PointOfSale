@@ -27,6 +27,7 @@ import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.PaymentType;
+import com.otsi.retail.newSale.controller.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.mapper.CustomerMapper;
 import com.otsi.retail.newSale.mapper.DeliverySlipMapper;
 import com.otsi.retail.newSale.mapper.NewSaleMapper;
@@ -105,7 +106,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private HSNVoService hsnService;
-	
 
 	@Override
 	public ResponseEntity<?> saveNewSaleRequest(NewSaleVo vo) {
@@ -542,6 +542,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				+ " uncleared delivery Slips count   " + DsList.size(), HttpStatus.BAD_REQUEST);
 
 	}
+
 	@Override
 	public ResponseEntity<?> posClose(Boolean posclose) {
 		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDate(DSStatus.Pending, LocalDate.now());
@@ -553,8 +554,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 			return new ResponseEntity<>("to  close the day of pos please clear pending  delivery Slips"
 					+ " uncleared delivery Slips count   " + DsList.size(), HttpStatus.BAD_REQUEST);
 	}
-
-
 
 	@Override
 	public List<NewSaleResponseVo> getNewsaleByCustomerId(Long customerId) {
@@ -615,6 +614,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		NewSaleList newSaleList1 = new NewSaleList();
 		List<NewSaleVo> newSaleList = new ArrayList<>();
 		if (vo.getInvoiceNo() != 0) {
+			
 			List<NewSaleEntity> newSaleEntity = newSaleRepository.findByInvoiceNumber(vo.getInvoiceNo());
 			newSaleList = newSaleEntity.stream().map(dto -> newSaleMapper.convertNewSaleDtoToVo(dto))
 					.collect(Collectors.toList());
@@ -680,6 +680,36 @@ public class NewSaleServiceImpl implements NewSaleService {
 		log.info("after getting new sale with hsn:" + vo);
 
 		return result;
+	}
+
+	@Override
+	public void tagCustomerToExisitingNewSale(String mobileNo, Long invoiceNo) throws CustomerNotFoundExcecption {
+		Optional<CustomerDetailsEntity> custmoreOptional = customerRepo.findByMobileNumber(mobileNo);
+
+		if (custmoreOptional.isPresent()) {
+			CustomerDetailsEntity customer = custmoreOptional.get();
+			List<NewSaleEntity> newSaleList = newSaleRepository.findByInvoiceNumber(invoiceNo);
+			newSaleList.stream().forEach(newSale -> {
+				try {
+					String message = setCustomerToNewSale(newSale, customer);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			});
+		} else {
+			throw new CustomerNotFoundExcecption("No Customer Found with " + mobileNo);
+		}
+	}
+
+	private String setCustomerToNewSale(NewSaleEntity newSale, CustomerDetailsEntity customer) throws Exception {
+		newSale.setCustomerDetails(customer);
+		try {
+			NewSaleEntity responce = newSaleRepository.save(newSale);
+			return "Succesfully Tagged Customer";
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
 	}
 
 }

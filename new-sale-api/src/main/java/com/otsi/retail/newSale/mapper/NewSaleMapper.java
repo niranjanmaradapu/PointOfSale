@@ -25,15 +25,15 @@ import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
 
 @Component
 public class NewSaleMapper {
-	
+
 	@Autowired
 	private CustomerMapper customerMapper;
 
-@Autowired
-private PaymentAmountTypeMapper paymentAmountTypeMapper;
+	@Autowired
+	private PaymentAmountTypeMapper paymentAmountTypeMapper;
 
-@Autowired
-private DeliverySlipMapper deliverySlipMapper;
+	@Autowired
+	private DeliverySlipMapper deliverySlipMapper;
 
 	public BarcodeEntity convertBarcodeVoToEntity(BarcodeVo vo) {
 
@@ -82,16 +82,15 @@ private DeliverySlipMapper deliverySlipMapper;
 
 			NewSaleVo nsvo = new NewSaleVo();
 
-			//BeanUtils.copyProperties(x, nsvo);
-			
-			  nsvo.setInvoiceNumber(x.getInvoiceNumber()); 
-			  nsvo.setBiller(x.getBiller());
-			  nsvo.setCreatedDate(x.getCreatedDate());
-			  nsvo.setTotalManualDisc(x.getTotalManualDisc());
-			  nsvo.setApprovedBy(x.getApprovedBy());
-			  nsvo.setReason(x.getReason());
-			  nsvo.setOfflineNumber(x.getOfflineNumber());
-			 
+			// BeanUtils.copyProperties(x, nsvo);
+
+			nsvo.setInvoiceNumber(x.getInvoiceNumber());
+			nsvo.setBiller(x.getBiller());
+			nsvo.setCreatedDate(x.getCreatedDate());
+			nsvo.setTotalManualDisc(x.getTotalManualDisc());
+			nsvo.setApprovedBy(x.getApprovedBy());
+			nsvo.setReason(x.getReason());
+			nsvo.setOfflineNumber(x.getOfflineNumber());
 
 			sVoList.add(nsvo);
 
@@ -113,7 +112,6 @@ private DeliverySlipMapper deliverySlipMapper;
 			DeliverySlipVo dsvo = new DeliverySlipVo();
 
 			BeanUtils.copyProperties(x, dsvo);
-			
 
 			dsVoList.add(dsvo);
 
@@ -126,7 +124,7 @@ private DeliverySlipMapper deliverySlipMapper;
 
 		return vo;
 	}
-	
+
 	public NewSaleVo entityToVo(NewSaleEntity dto) {
 		NewSaleVo vo = new NewSaleVo();
 		vo.setNewsaleId(dto.getNewsaleId());
@@ -158,10 +156,10 @@ private DeliverySlipMapper deliverySlipMapper;
 		vo.setCustomerName(dto.getCustomerDetails().getName());
 		vo.setMobileNumber(dto.getCustomerDetails().getMobileNumber());
 		vo.setNewsaleId(dto.getNewsaleId());
-		dto.getPaymentType().forEach(p->{
-			PaymentAmountTypeVo payVo =new PaymentAmountTypeVo();
+		dto.getPaymentType().forEach(p -> {
+			PaymentAmountTypeVo payVo = new PaymentAmountTypeVo();
 			payVo.setId(p.getId());
-			payVo.setPaymentAmount(p.getPaymentAmount()); 
+			payVo.setPaymentAmount(p.getPaymentAmount());
 			payVo.setPaymentType(p.getPaymentType());
 			payVos.add(payVo);
 		});
@@ -171,33 +169,35 @@ private DeliverySlipMapper deliverySlipMapper;
 		return vo;
 	}
 
-
-
 	public NewSaleVo convertNewSaleDtoToVo(NewSaleEntity dto) {
-		NewSaleVo vo=new NewSaleVo();
+		NewSaleVo vo = new NewSaleVo();
 		vo.setApprovedBy(dto.getApprovedBy());
 		vo.setBiller(dto.getBiller());
 		vo.setCreatedDate(dto.getCreatedDate());
-		vo.setDlSlip(deliverySlipMapper.convertDsEntityListToVoList(dto.getDlSlip()));
+		if (dto.getDlSlip() != null) {
+			vo.setDlSlip(deliverySlipMapper.convertDsEntityListToVoList(dto.getDlSlip()));
+		}
 		vo.setGrossAmount(dto.getGrossAmount());
 		vo.setInvoiceNumber(dto.getInvoiceNumber());
 		vo.setNatureOfSale(dto.getNatureOfSale());
 		vo.setNetPayableAmount(dto.getNetPayableAmount());
 		vo.setOfflineNumber(dto.getOfflineNumber());
-		vo.setPaymentAmountType(paymentAmountTypeMapper.EntityToVo(dto.getPaymentType()));
+		if (dto.getPaymentType() != null) {
+			vo.setPaymentAmountType(paymentAmountTypeMapper.EntityToVo(dto.getPaymentType()));
+
+		}
 		vo.setRoundOff(dto.getRoundOff());
 		vo.setTaxAmount(dto.getTaxAmount());
 		vo.setTotalManualDisc(dto.getTotalManualDisc());
 		vo.setTotalPromoDisc(dto.getTotalPromoDisc());
-		vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
+		if (dto.getCustomerDetails() != null) {
+			vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
 
-
-		
-		
+		}
 
 		return vo;
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

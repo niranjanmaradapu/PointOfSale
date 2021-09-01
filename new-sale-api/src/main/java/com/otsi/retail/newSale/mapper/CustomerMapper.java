@@ -27,17 +27,34 @@ public class CustomerMapper {
 	public CustomerVo convertEntityToVo(CustomerDetailsEntity customerDetailsEntity) {
 
 		CustomerVo vo = new CustomerVo();
+		if (customerDetailsEntity.getMobileNumber() != null) {
+			vo.setMobileNumber(customerDetailsEntity.getMobileNumber());
 
-		vo.setMobileNumber(customerDetailsEntity.getMobileNumber());
-		System.out.println(customerDetailsEntity.getMobileNumber());
-		vo.setAltMobileNo(customerDetailsEntity.getAltMobileNo());
-		vo.setAddress(customerDetailsEntity.getAddress());
-		vo.setDob(customerDetailsEntity.getDob());
-		vo.setGender(customerDetailsEntity.getGender());
-		vo.setGstNumber(customerDetailsEntity.getGstNumber());
-		vo.setName(customerDetailsEntity.getName());
-		System.out.println(vo.getName());
+		}
+		if (customerDetailsEntity.getAltMobileNo() != null) {
+			vo.setAltMobileNo(customerDetailsEntity.getAltMobileNo());
 
+		}
+		if (customerDetailsEntity.getAddress() != null) {
+			vo.setAddress(customerDetailsEntity.getAddress());
+
+		}
+		if (customerDetailsEntity.getDob() != null) {
+			vo.setDob(customerDetailsEntity.getDob());
+
+		}
+		if (customerDetailsEntity.getGender() != null) {
+			vo.setGender(customerDetailsEntity.getGender());
+
+		}
+		if (customerDetailsEntity.getGstNumber() != null) {
+			vo.setGstNumber(customerDetailsEntity.getGstNumber());
+
+		}
+		if (customerDetailsEntity.getName() != null) {
+			vo.setName(customerDetailsEntity.getName());
+
+		}
 
 		// BeanUtils.copyProperties(customerDetailsEntity, vo);
 

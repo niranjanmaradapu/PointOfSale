@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.otsi.retail.newSale.controller.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
@@ -49,6 +50,8 @@ public interface NewSaleService {
 	CustomerVo getCustomerFromNewSale(String mobileNo) throws Exception;
 
 	ResponseEntity<?> posClose(Boolean posclose);
+
+	void tagCustomerToExisitingNewSale(String mobileNo, Long invoiceNo) throws CustomerNotFoundExcecption;
 
 
 }
