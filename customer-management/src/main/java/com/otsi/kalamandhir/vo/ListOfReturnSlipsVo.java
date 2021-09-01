@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.otsi.kalamandhir.model.Barcode;
+import com.otsi.kalamandhir.model.TaggedItems;
 
 import lombok.Data;
 
@@ -29,17 +30,17 @@ public class ListOfReturnSlipsVo {
 	private String rtNumber;
 
 	private String creditNote;
-
-	private String rtReviewStatus;
+	private String createdBy;
+	private Boolean rtReviewStatus;
 
 	// private List<Barcode> barcode;
 
-	private Long amount;
+	private long amount;
 
 	private LocalDate createdInfo;
 
 	private String settelmentInfo;
 
-	private List<BarcodeVo> barcodeVo;
+	private List<TaggedItems> barcodes;
 
 }

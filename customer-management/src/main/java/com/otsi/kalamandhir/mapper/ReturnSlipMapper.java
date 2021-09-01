@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.kalamandhir.model.Barcode;
 
-import com.otsi.kalamandhir.model.listOfReturnSlipsModel;
+import com.otsi.kalamandhir.model.ReturnSlip;
+import com.otsi.kalamandhir.model.TaggedItems;
+import com.otsi.kalamandhir.utils.ReturnSlipStatus;
 import com.otsi.kalamandhir.vo.BarcodeVo;
 import com.otsi.kalamandhir.vo.ListOfReturnSlipsVo;
 
@@ -24,45 +26,21 @@ public class ReturnSlipMapper {
 
 	
 	
-	public List<ListOfReturnSlipsVo> mapEntityToVo(List<listOfReturnSlipsModel> dtos) {
+	public List<ListOfReturnSlipsVo> mapEntityToVo(List<ReturnSlip> dtos) {
 		return dtos.stream().map(dto -> mapEntityToVo(dto)).collect(Collectors.toList());
 
 	}
 
-	private ListOfReturnSlipsVo mapEntityToVo(listOfReturnSlipsModel dto) {
+	private ListOfReturnSlipsVo mapEntityToVo(ReturnSlip dto) {
 		
 		ListOfReturnSlipsVo vo=new ListOfReturnSlipsVo();
-		
-		BeanUtils.copyProperties(dto, vo);
-		/*
-		 * vo.setRtNumber(dto.getRtNumber()); vo.setCreditNote(dto.getCreditNote());
-		 * //vo.setAmount(dto.getBarcode().get(0).getAmount()); z
-		 * vo.setCreatedInfo(dto.getCreatedInfo());
-		 * vo.setSettelmentInfo(dto.getSettelmentInfo());
-		 * //vo.setBarcodeVo(dto.getBarcode());
-		 */		
-		List<Barcode> barEnt = dto.getBarcode();
-		
-
-		List<BarcodeVo> listBarVo = new ArrayList<>();
-
-		barEnt.stream().forEach(x -> {
-			BarcodeVo barvo = new BarcodeVo();
-			
-			//barvo.setBarcode(x.getBarcode());
-			//barvo.setAmount(x.getAmount());
-			BeanUtils.copyProperties(x, barvo);
-
-			/*
-			 * barvo.setSalesMan(x.getSalesMan()); barvo.setQty(x.getQty());
-			 * barvo.setPromoDisc(x.getPromoDisc()); barvo.setNetAmount(x.getNetAmount());
-			 * barvo.setMrp(x.getMrp()); barvo.setItemDesc(x.getItemDesc());
-			 */
-
-			listBarVo.add(barvo);
-		});
-		vo.setBarcodeVo(listBarVo);
-
+        vo.setCreditNote(dto.getCrNo());
+        vo.setRtNumber(dto.getRtNo());
+        vo.setAmount(dto.getAmount());
+        vo.setBarcodes(dto.getTaggedItems());
+        vo.setRtReviewStatus(dto.getIsReviewed());
+        vo.setCreatedInfo(dto.getCreatedDate());
+        vo.setCreatedBy(dto.getCreatedBy());
 		return vo;
 	}
 

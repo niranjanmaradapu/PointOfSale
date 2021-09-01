@@ -1,14 +1,14 @@
 package com.otsi.kalamandhir.model;
 
 import java.time.LocalDate;
-
 import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -25,25 +25,23 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class listOfReturnSlipsModel {
+public class ReturnSlip {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int rsId;
-
-	private LocalDate createdInfo;
-
-	private String rtNumber;
-
+	private String rtNo;
 	private String crNo;
-
 	private String settelmentInfo;
-	private String creditNote;
-
-	private String rtReviewStatus;
-	private String rtStatus;
-
-	@OneToMany(targetEntity = Barcode.class, mappedBy = "returnSlips", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<Barcode> barcode;
+	private long amount;
+	private Boolean isReviewed;
+	private int rtStatus;
+	private LocalDate createdDate;
+	private LocalDate modifiedDate;
+	private String reviewedBy;
+	private String createdBy;
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "rs_id")
+	private List<TaggedItems> taggedItems;
 
 }

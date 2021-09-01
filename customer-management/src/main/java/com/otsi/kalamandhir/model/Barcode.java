@@ -54,6 +54,6 @@ public class Barcode implements Serializable {
 	private String reason;
 	@ManyToOne
 	@JoinColumn(name = "rs_id")
-	private listOfReturnSlipsModel returnSlips;
+	private ReturnSlip returnSlips;
 
 }
