@@ -7,20 +7,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
@@ -28,9 +27,7 @@ import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.PaymentType;
-import com.otsi.retail.newSale.gatewayresponse.GateWayResponse;
 import com.otsi.retail.newSale.mapper.CustomerMapper;
-
 import com.otsi.retail.newSale.mapper.DeliverySlipMapper;
 import com.otsi.retail.newSale.mapper.NewSaleMapper;
 import com.otsi.retail.newSale.mapper.PaymentAmountTypeMapper;
@@ -40,6 +37,7 @@ import com.otsi.retail.newSale.repository.DeliverySlipRepository;
 import com.otsi.retail.newSale.repository.NewSaleRepository;
 import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.service.CustomerService;
+import com.otsi.retail.newSale.service.HSNVoService;
 import com.otsi.retail.newSale.service.NewSaleService;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
@@ -49,8 +47,8 @@ import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.MessageVo;
-import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
+import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
 
@@ -92,7 +90,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private DeliverySlipMapper dsMapper;
-	
+
 	@Autowired
 	private CustomerMapper customerMapper;
 
@@ -104,6 +102,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Value("${getNewSaleWithHsn.url}")
 	private String HsnUrl;
+
+	@Autowired
+	private HSNVoService hsnService;
+	
 
 	@Override
 	public ResponseEntity<?> saveNewSaleRequest(NewSaleVo vo) {
@@ -525,8 +527,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 	public ResponseEntity<?> posDayClose() {
 		log.debug(" debugging posDayClose");
 
-
-
 		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDate(DSStatus.Pending, LocalDate.now());
 
 		if (DsList.isEmpty()) {
@@ -534,8 +534,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 			return new ResponseEntity<>(
 					"successfully we can close the day of pos " + " uncleared delivery Slips count :  " + DsList.size(),
 					HttpStatus.OK);
-			
-
 
 		} else
 			log.error("to  close the day of pos please clear pending  delivery Slips"
@@ -543,30 +541,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 		return new ResponseEntity<>("to  close the day of pos please clear pending  delivery Slips"
 				+ " uncleared delivery Slips count   " + DsList.size(), HttpStatus.BAD_REQUEST);
 
-
-
-	}
-
-
-	/*
-	 * getting getNewSaleWithHsn
-	 */
-	@Override
-	public List<HsnDetailsVo> getNewSaleWithHsn() throws JsonMappingException, JsonProcessingException {
-
-		log.debug(" debugging getNewSaleWithHsn");
-		ResponseEntity<?> hsnResponse = template.exchange(HsnUrl, HttpMethod.GET, null, GateWayResponse.class);
-		log.debug(" debugging getNewSaleWithHsn()");
-		ObjectMapper mapper = new ObjectMapper();
-
-		GateWayResponse<?> gatewayResponse = mapper.convertValue(hsnResponse.getBody(), GateWayResponse.class);
-
-		List<HsnDetailsVo> vo = mapper.convertValue(gatewayResponse.getResult(),
-				new TypeReference<List<HsnDetailsVo>>() {
-				});
-		log.warn("we are testing is fetching new sale with hsn");
-		log.info("after getting new sale with hsn:" + vo);
-		return vo;
 	}
 
 	@Override
@@ -623,11 +597,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 		return newsaleVo;
 	}
 
-
-
 	@Override
 	public NewSaleList getInvoicDetails(InvoiceRequestVo vo) {
-		NewSaleList newSaleList1=new NewSaleList();
+		NewSaleList newSaleList1 = new NewSaleList();
 		List<NewSaleVo> newSaleList = new ArrayList<>();
 		if (vo.getInvoiceNo() != 0) {
 			List<NewSaleEntity> newSaleEntity = newSaleRepository.findByInvoiceNumber(vo.getInvoiceNo());
@@ -659,45 +631,42 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public CustomerVo getCustomerFromNewSale(String mobileNo) throws Exception {
 		try {
-		Optional<CustomerDetailsEntity> responce=	newSaleRepository.findByCustomerDetailsMobileNumber(mobileNo);
-		if(responce.isPresent()==Boolean.TRUE) {
-			return customerMapper.convertEntityToVo(responce.get());	 
-		}else {
-			throw new Exception("No Customer Found");
-		}
-		}catch (Exception e) {
+			Optional<CustomerDetailsEntity> responce = newSaleRepository.findByCustomerDetailsMobileNumber(mobileNo);
+			if (responce.isPresent() == Boolean.TRUE) {
+				return customerMapper.convertEntityToVo(responce.get());
+			} else {
+				throw new Exception("No Customer Found");
+			}
+		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
 	}
 
+	/*
+	 * getting getNewSaleWithHsn
+	 */
+	double result = 0.0;
 
+	@Override
+	public double getNewSaleWithHsn(double netAmt) throws JsonMappingException, JsonProcessingException {
 
+		List<HsnDetailsVo> vo = hsnService.getHsn();
 
+		vo.stream().forEach(x -> {
 
+			x.getSlabVos().stream().forEach(a -> {
 
+				if (a.getPriceFrom() <= netAmt && netAmt <= a.getPriceTo()) {
 
+					result = (a.getTaxVo().getSgst() * netAmt) / 100;
+					// System.out.println("Value Sgst " + a.getTaxVo().getSgst());
+				}
+			});
+		});
+		log.warn("we are testing is fetching new sale with hsn");
+		log.info("after getting new sale with hsn:" + vo);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		return result;
+	}
 
 }

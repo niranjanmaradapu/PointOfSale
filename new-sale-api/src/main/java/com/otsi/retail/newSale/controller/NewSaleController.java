@@ -181,22 +181,6 @@ public class NewSaleController {
 		}
 
 	}
-	
-	@GetMapping(CommonRequestMappigs.GET_HSN_DETAILS)
-	public ResponseEntity<?> getHsnDetails() {
-		try {
-			log.info("Recieved request to getNewSaleWithHsn()");
-			return new ResponseEntity<>(newSaleService.getNewSaleWithHsn(), HttpStatus.OK);
-		} catch (JsonMappingException e) {
-
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-
-			e.printStackTrace();
-		}
-		log.error("hsn details not found");
-		throw new RuntimeException("hsn details not found");
-	}
 
 	@GetMapping(CommonRequestMappigs.GET_NEWSALEBYCUSTOMERID)
 	public ResponseEntity<?> getNewsaleByCustomerId(@RequestParam Long customerId) {
@@ -232,4 +216,22 @@ public class NewSaleController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
 		}
 	}
+	
+	
+	@GetMapping("/getHsnDetails/{netAmt}")
+	public ResponseEntity<?> getHsnDetails(@PathVariable double netAmt) {
+		try {
+			log.info("Recieved request to getNewSaleWithHsn()");
+			return new ResponseEntity<>(newSaleService.getNewSaleWithHsn(netAmt), HttpStatus.OK);
+		} catch (JsonMappingException e) {
+
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+
+			e.printStackTrace();
+		}
+		log.error("hsn details not found");
+		throw new RuntimeException("hsn details not found");
+	}
+
 }
