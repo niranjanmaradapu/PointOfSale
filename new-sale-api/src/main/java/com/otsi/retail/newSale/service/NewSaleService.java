@@ -39,7 +39,7 @@ public interface NewSaleService {
 
 	ResponseEntity<?> posDayClose();
 
-	List<HsnDetailsVo> getNewSaleWithHsn() throws JsonMappingException, JsonProcessingException;
+	double getNewSaleWithHsn(double netAmt) throws JsonMappingException, JsonProcessingException;
 
 	List<NewSaleResponseVo> getNewsaleByCustomerId(Long customerId);
 
