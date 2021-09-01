@@ -48,5 +48,7 @@ public interface NewSaleService {
 
 	CustomerVo getCustomerFromNewSale(String mobileNo) throws Exception;
 
+	ResponseEntity<?> posClose(Boolean posclose);
+
 
 }

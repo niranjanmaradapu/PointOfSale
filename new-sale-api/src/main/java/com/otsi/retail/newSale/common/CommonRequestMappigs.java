@@ -29,5 +29,8 @@ public class CommonRequestMappigs {
 	public static final String UPDATE_NEWSALE = "updateNewsale";
 
 	public static final String GET_NEWSALEBYCUSTOMERID = "getNewsaleByCustomerId";
+	
+	public static final String  DAY_CLOSER  =  "daycloser";
+
 
 }

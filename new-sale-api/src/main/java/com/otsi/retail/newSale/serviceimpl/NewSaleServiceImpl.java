@@ -542,6 +542,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 				+ " uncleared delivery Slips count   " + DsList.size(), HttpStatus.BAD_REQUEST);
 
 	}
+	@Override
+	public ResponseEntity<?> posClose(Boolean posclose) {
+		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDate(DSStatus.Pending, LocalDate.now());
+
+		if (DsList.isEmpty() && (posclose == true)) {
+			return new ResponseEntity<>("successfully we can close the day of pos ", HttpStatus.OK);
+
+		} else
+			return new ResponseEntity<>("to  close the day of pos please clear pending  delivery Slips"
+					+ " uncleared delivery Slips count   " + DsList.size(), HttpStatus.BAD_REQUEST);
+	}
+
+
 
 	@Override
 	public List<NewSaleResponseVo> getNewsaleByCustomerId(Long customerId) {
