@@ -63,7 +63,7 @@ public class CustomerController {
 
 	}
 
-	@GetMapping("/getInvoiceDetails")
+	@PostMapping("/getInvoiceDetails")
 	public GateWayResponse<?> getInvoiceDetails(@RequestBody InvoiceRequestVo searchVo) {
 
 		try {
