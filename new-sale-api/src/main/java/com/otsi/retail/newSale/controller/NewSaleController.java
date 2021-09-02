@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,8 +31,8 @@ import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
-import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
+import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 
 /**
@@ -104,9 +104,9 @@ public class NewSaleController {
 
 	// Method for getting Barcode details from Barcode table using Barcode number
 	@GetMapping(CommonRequestMappigs.GET_BARCODE_DETAILS)
-	public ResponseEntity<?> getBarcodeDetails(@RequestParam String barCode) {
+	public ResponseEntity<?> getBarcodeDetails(@RequestParam String barCode, @RequestParam String smId) {
 		log.info("Received Request to getBarcodeDetails:" + barCode);
-		ResponseEntity<?> barCodeDetails = newSaleService.getBarcodeDetails(barCode);
+		ResponseEntity<?> barCodeDetails = newSaleService.getBarcodeDetails(barCode, smId);
 
 		return new ResponseEntity<>(barCodeDetails, HttpStatus.OK);
 
@@ -175,7 +175,7 @@ public class NewSaleController {
 	}
 	// Method for day closer
 
-	@GetMapping(CommonRequestMappigs. DAY_CLOSER)
+	@GetMapping(CommonRequestMappigs.DAY_CLOSER)
 	public ResponseEntity<?> dayclose() {
 		log.info("Recieved request to dayclose()");
 		try {
@@ -188,7 +188,8 @@ public class NewSaleController {
 		}
 
 	}
-	@GetMapping(CommonRequestMappigs. POS_CLOSEDAY)
+
+	@GetMapping(CommonRequestMappigs.POS_CLOSEDAY)
 	public ResponseEntity<?> posclose(@RequestParam Boolean posclose) {
 		try {
 			ResponseEntity<?> dayclose = newSaleService.posClose(posclose);
@@ -254,12 +255,26 @@ public class NewSaleController {
 	@GetMapping("/tagCustomerToInvoice/{mobileNo}/{invoiceNo}")
 	public ResponseEntity<?> tagCustomerToInvoice(@PathVariable String mobileNo, @PathVariable String invoiceNo) {
 		try {
-			newSaleService.tagCustomerToExisitingNewSale(mobileNo,Long.parseLong(invoiceNo));
+			newSaleService.tagCustomerToExisitingNewSale(mobileNo, Long.parseLong(invoiceNo));
 		} catch (CustomerNotFoundExcecption e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
 
+	}
+
+	@GetMapping("/discTypes")
+	public List<String> getDiscountsTypes() {
+
+		List<String> discTypes = new ArrayList<>();
+
+		discTypes.add("Promotion not applied");
+		discTypes.add("RT return discount");
+		discTypes.add("Mgnt. SPL Discount");
+		discTypes.add("Management discount");
+		discTypes.add("DMG Discount");
+		discTypes.add("Other");
+
+		return discTypes;
 	}
 }

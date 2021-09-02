@@ -28,7 +28,7 @@ public interface NewSaleService {
 
 	ResponseEntity<?> saveBarcode(BarcodeVo vo);
 
-	ResponseEntity<?> getBarcodeDetails(String barCode);
+	ResponseEntity<?> getBarcodeDetails(String barCode, String smId);
 
 	ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo);
 

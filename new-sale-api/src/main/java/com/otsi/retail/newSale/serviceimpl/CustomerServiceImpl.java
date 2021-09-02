@@ -37,7 +37,8 @@ public class CustomerServiceImpl implements CustomerService {
 			if (!list.isPresent()) {
 
 				CustomerDetailsEntity entity = customerMapper.convertVoToEntity(details);// mapper for VO to DTO
-				details=customerMapper.convertEntityToVo(customerRepo.save(entity));
+				// details = customerMapper.convertEntityToVo(customerRepo.save(entity));
+				CustomerDetailsEntity savedDetails = customerRepo.save(entity);
 				log.warn("we are testing customer is saved succesfully..");
 				log.info("customer details saved succesfully..." + details);
 				return new ResponseEntity<>("Customer details saved successfully..", HttpStatus.OK);

@@ -39,6 +39,8 @@ public class CustomerDetailsEntity {
 	private String gstNumber;
 
 	private String address;
+	
+	private String email;
 
 	@DateTimeFormat(pattern = "MM/dd/yyyy")
 	private LocalDate dob;
