@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
-import com.otsi.retail.newSale.controller.CustomerNotFoundExcecption;
+import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.mapper.CustomerMapper;
 import com.otsi.retail.newSale.repository.CustomerDetailsRepo;
 import com.otsi.retail.newSale.service.CustomerService;

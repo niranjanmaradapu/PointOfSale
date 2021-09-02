@@ -1,4 +1,4 @@
-package com.otsi.retail.newSale.controller;
+package com.otsi.retail.newSale.Exceptions;
 
 public class CustomerNotFoundExcecption extends Exception {
 

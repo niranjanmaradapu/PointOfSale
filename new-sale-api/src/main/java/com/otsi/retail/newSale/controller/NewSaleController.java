@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.common.CommonRequestMappigs;
 import com.otsi.retail.newSale.service.CustomerService;
 import com.otsi.retail.newSale.service.NewSaleService;
@@ -43,7 +44,6 @@ import com.otsi.retail.newSale.vo.NewSaleVo;
  */
 
 @RestController
-@CrossOrigin
 @RequestMapping(CommonRequestMappigs.NEW_SALE)
 public class NewSaleController {
 
