@@ -56,4 +56,5 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 	List<ReturnSlip> findByCreatedDateBetweenAndCrNo(LocalDate dateFrom, LocalDate dateTo, String creditNote);
 
 	List<ReturnSlip> findByCrNo(String creditNote);
+
 }
