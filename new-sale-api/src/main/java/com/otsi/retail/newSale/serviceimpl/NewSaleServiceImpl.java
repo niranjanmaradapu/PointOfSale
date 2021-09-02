@@ -629,7 +629,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			newSaleList1.setNewSaleVo(newSaleList);
 			return newSaleList1;
 		}
-		if (!vo.getMobileNo().isEmpty() && vo.getMobileNo() == null) {
+		if (!vo.getMobileNo().isEmpty() && vo.getMobileNo() != null) {
 
 			List<NewSaleEntity> newSaleEntity = newSaleRepository
 					.findByCustomerDetailsMobileNumberAndCreatedDateBetween(vo.getMobileNo(), vo.getFromDate(),
