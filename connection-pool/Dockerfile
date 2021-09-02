@@ -1,5 +1,5 @@
 FROM openjdk:8
-ARG JAR_FILE=connection-pool/target/*.jar 
-COPY  ${JAR_FILE} connection-pool.jar
+#ARG JAR_FILE=connection-pool/target/*.jar 
+COPY  connection-pool/target/  target/
 EXPOSE 8083
-ENTRYPOINT ["java", "-jar", "connection-pool.jar"]
+ENTRYPOINT ["java", "-jar", "target/connection-pool.jar"]
