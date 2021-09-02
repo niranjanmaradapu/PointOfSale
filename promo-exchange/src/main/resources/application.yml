@@ -1,0 +1,39 @@
+server:
+ port: 8080
+spring:
+ application:
+    name: promo-exchange
+ datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/promo-exchange
+    username: postgres
+    password: root
+
+  
+ jpa:
+   hibernate:
+    ddl-auto: update
+   database-platform: org.hibernate.dialect.PostgreSQL81Dialect
+   show-sql: true
+
+
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${random.int}
+    hostname: localhost
+  
+springdoc:
+  packagesToScan: com.promoexchangeapi
+  
+savecustomer:
+  url: http://localhost:8081/customer/savecustomerdetails
+getdeliveryslip:
+  url: http://localhost:8081/newsale/getdeliveryslip
+getreturnslip:
+  url: http://localhost:8085/customer/getAllListOfReturnSlips
