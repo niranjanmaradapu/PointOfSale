@@ -43,6 +43,10 @@ public class NewSaleEntity {
 
 	private Long totalManualDisc;
 
+	private String discType;
+
+	private String discApprovedBy;
+
 	private float roundOff;
 
 	private Long netPayableAmount;
@@ -50,21 +54,21 @@ public class NewSaleEntity {
 	private Long taxAmount;
 
 	private String billNumber;
-    
+
 	private String biller;
-	
+
 	private String billStatus;
-	
+
 	private Long invoiceNumber;
 
 	private LocalDate createdDate;
-	
+
 	private Long offlineNumber;
-	
+
 	private String approvedBy;
-	
+
 	private Long recievedAmount;
-	
+
 	private String reason;
 
 	@OneToMany(targetEntity = DeliverySlipEntity.class, mappedBy = "newsale", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -73,7 +77,7 @@ public class NewSaleEntity {
 	@ManyToOne
 	@JoinColumn(name = "customerId")
 	private CustomerDetailsEntity customerDetails;
-	
+
 	@OneToMany(targetEntity = PaymentAmountType.class, mappedBy = "newsaleId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<PaymentAmountType> paymentType;
 

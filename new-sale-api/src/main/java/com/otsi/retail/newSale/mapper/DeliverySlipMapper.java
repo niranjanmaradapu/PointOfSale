@@ -45,6 +45,7 @@ public class DeliverySlipMapper {
 		vo.setPromoDisc(ent.getPromoDisc());
 		vo.setQty(ent.getQty());
 		vo.setType(ent.getType());
+		vo.setSalesMan(ent.getSalesMan());
 
 		List<BarcodeEntity> barEnt = ent.getBarcodes();
 

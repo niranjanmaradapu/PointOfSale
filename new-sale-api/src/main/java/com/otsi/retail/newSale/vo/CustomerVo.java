@@ -28,6 +28,8 @@ public class CustomerVo {
 
 	private String address;
 
+	private String email;
+	
 	// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
 	@DateTimeFormat(pattern = "MM/dd/yyyy")

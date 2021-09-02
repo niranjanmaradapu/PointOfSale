@@ -27,7 +27,7 @@ public class NewSaleVo {
 	private Long invoiceNumber;
 
 	private String biller;
-	
+
 	private List<PaymentAmountTypeVo> paymentAmountType;
 
 	private Long recievedAmount;
@@ -37,6 +37,10 @@ public class NewSaleVo {
 	private Long totalPromoDisc;
 
 	private Long totalManualDisc;
+
+	private String discType;
+
+	private String discApprovedBy;
 
 	private float roundOff;
 

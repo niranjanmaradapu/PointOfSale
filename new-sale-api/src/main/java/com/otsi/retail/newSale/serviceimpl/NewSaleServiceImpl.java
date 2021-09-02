@@ -120,18 +120,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 				customerService.saveCustomerDetails(vo.getCustomerDetails());
 			} catch (Exception e) {
 
-				e.printStackTrace();
 			}
 
 			List<DeliverySlipVo> dlSlips = vo.getDlSlip();
 			List<PaymentAmountTypeVo> paymentAmountTypeVos = vo.getPaymentAmountType();
 			entity.setNatureOfSale(vo.getNatureOfSale());
-			// entity.setPayType(vo.getPayType());
 			entity.setPaymentType(paymentAmountTypeMapper.VoToEntity(vo.getPaymentAmountType()));
 			entity.setRecievedAmount(paymentAmountTypeVos.stream().mapToLong(i -> i.getPaymentAmount()).sum());
 			entity.setGrossAmount(dlSlips.stream().mapToLong(i -> i.getMrp()).sum());
 			entity.setTotalPromoDisc(dlSlips.stream().mapToLong(i -> i.getPromoDisc()).sum());
 			entity.setTotalManualDisc(vo.getTotalManualDisc());
+			entity.setApprovedBy(vo.getApprovedBy());
+			entity.setDiscApprovedBy(vo.getDiscApprovedBy());
+			entity.setDiscType(vo.getDiscType());
 			entity.setCreatedDate(LocalDate.now());
 
 			Long net = dlSlips.stream().mapToLong(i -> i.getNetAmount()).sum() - vo.getTotalManualDisc();
@@ -193,7 +194,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public ResponseEntity<?> getBarcodeDetails(String barCode) {
+	public ResponseEntity<?> getBarcodeDetails(String barCode, String smId) {
 		log.debug("deugging getBarcodeDetails" + barCode);
 		BarcodeEntity barcodeDetails = barcodeRepository.findByBarcode(barCode);
 

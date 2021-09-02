@@ -18,6 +18,7 @@ public class CustomerMapper {
 		entity.setAltMobileNo(details.getAltMobileNo());
 		entity.setDob(details.getDob());
 		entity.setGstNumber(details.getGstNumber());
+		entity.setEmail(details.getEmail());
 
 		// BeanUtils.copyProperties(details, entity);
 
@@ -54,6 +55,9 @@ public class CustomerMapper {
 		if (customerDetailsEntity.getName() != null) {
 			vo.setName(customerDetailsEntity.getName());
 
+		}
+		if (customerDetailsEntity.getEmail() != null) {
+			vo.setEmail(customerDetailsEntity.getEmail());
 		}
 
 		// BeanUtils.copyProperties(customerDetailsEntity, vo);
