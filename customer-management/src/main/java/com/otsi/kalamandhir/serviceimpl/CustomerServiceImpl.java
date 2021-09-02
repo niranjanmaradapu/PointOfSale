@@ -25,8 +25,10 @@ import com.otsi.kalamandhir.gatewayresponse.GateWayResponse;
 import com.otsi.kalamandhir.mapper.ReturnSlipMapper;
 import com.otsi.kalamandhir.model.Barcode;
 import com.otsi.kalamandhir.model.ReturnSlip;
+import com.otsi.kalamandhir.model.TaggedItems;
 import com.otsi.kalamandhir.repo.BarcodeRepo;
 import com.otsi.kalamandhir.repo.ReturnSlipRepo;
+import com.otsi.kalamandhir.repo.TaggedItemsRepo;
 import com.otsi.kalamandhir.service.CustomerService;
 import com.otsi.kalamandhir.utils.ReturnSlipStatus;
 import com.otsi.kalamandhir.vo.CustomerDetailsVo;
@@ -41,21 +43,16 @@ import com.otsi.kalamandhir.vo.NewSaleList;
 @Component
 public class CustomerServiceImpl implements CustomerService {
 
-
-
-
-
-	
-
+	/*
+	 * @Autowired private BarcodeRepo barCodeRepo;
+	 */
 	@Autowired
-	private BarcodeRepo barCodeRepo;
-
+	private TaggedItemsRepo taggeditemsRepo;
 	@Autowired
 	private ReturnSlipRepo returnSlipRepo;
 
 	@Autowired
 	private ReturnSlipMapper returnSlipMapper;
-
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -111,18 +108,14 @@ public class CustomerServiceImpl implements CustomerService {
 			 * getting the record using dates and barcode
 			 *
 			 */
+
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() != null) {
-				Barcode bar = barCodeRepo.findByBarcode(vo.getBarcode());
-				if (bar != null) {
-					retunSlipdetails = returnSlipRepo.findByRsId(bar.getReturnSlips().getRsId());
-				} else {
-					// return new GateWayResponse<>(HttpStatus.OK, "no records found with the given
-					// information ") ;
-					throw new RuntimeException("no record found with the given barcode");
 
-				}
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCode(vo.getDateFrom(),
+						vo.getDateTo(), vo.getBarcode());
 			}
+
 			/**
 			 * getting the record using dates only
 			 *
@@ -165,16 +158,9 @@ public class CustomerServiceImpl implements CustomerService {
 
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() != null) {
-				Barcode bar = barCodeRepo.findByBarcode(vo.getBarcode());
-				if (bar != null) {
-					retunSlipdetails = returnSlipRepo.findByRsId(bar.getReturnSlips().getRsId());
-				} else { // return
 
-					new GateWayResponse<>(HttpStatus.OK, "no records found with the given //information ");
+				retunSlipdetails = returnSlipRepo.findByTaggedItems_barCode(vo.getBarcode());
 
-					throw new RuntimeException("no record found with the given barcode");
-
-				}
 			}
 
 			/**
@@ -221,10 +207,10 @@ public class CustomerServiceImpl implements CustomerService {
 	public String createReturnSlip(GenerateReturnSlipRequest request) throws Exception {
 		try {
 
-			if(request.isUserTagged()==Boolean.FALSE) {
-				tagUserToInvoice(request.getMobileNumber(),request.getInvoiceNo());
+			if (request.isUserTagged() == Boolean.FALSE) {
+				tagUserToInvoice(request.getMobileNumber(), request.getInvoiceNo());
 			}
-			
+
 			ReturnSlip returnSlipDto = new ReturnSlip();
 			returnSlipDto.setCrNo(generateCrNumber());
 			returnSlipDto.setRtNo(generateRtNumber());
@@ -249,11 +235,10 @@ public class CustomerServiceImpl implements CustomerService {
 		HttpEntity entity = new HttpEntity(headers);
 		URI uri = null;
 		try {
-			uri = UriComponentsBuilder.fromUri(new URI(TAG_CUSTOMER_TO_INVOICE  + "/" + mobileNumber +"/"+invoiceNo)).build().encode()
-					.toUri();
-			
-			ResponseEntity<String> res = restTemplate.exchange(uri, HttpMethod.GET, entity,
-					String.class);
+			uri = UriComponentsBuilder.fromUri(new URI(TAG_CUSTOMER_TO_INVOICE + "/" + mobileNumber + "/" + invoiceNo))
+					.build().encode().toUri();
+
+			ResponseEntity<String> res = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
 		} catch (URISyntaxException e) {
 			throw new Exception(e.getMessage());
 		}
@@ -298,11 +283,8 @@ public class CustomerServiceImpl implements CustomerService {
 	public List<ListOfReturnSlipsVo> getAllListOfReturnSlips() {
 		List<ReturnSlip> rmodel = returnSlipRepo.findAll();
 		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapEntityToVo(rmodel);
-		
+
 		return rvo;
-	} 
-
-
-	
+	}
 
 }

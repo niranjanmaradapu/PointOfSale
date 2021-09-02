@@ -14,4 +14,5 @@ public class TaggedItems {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long taggedItemId;
 	private String barCode;
+	
 	}
