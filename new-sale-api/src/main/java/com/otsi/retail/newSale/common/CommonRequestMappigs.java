@@ -31,6 +31,7 @@ public class CommonRequestMappigs {
 	public static final String GET_NEWSALEBYCUSTOMERID = "getNewsaleByCustomerId";
 	
 	public static final String  DAY_CLOSER  =  "daycloser";
-
+	
+	public static final String  POS_CLOSEDAY  =  "poscloseday";
 
 }

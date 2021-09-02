@@ -175,7 +175,7 @@ public class NewSaleController {
 	}
 	// Method for day closer
 
-	@GetMapping(value = "daycloser")
+	@GetMapping(CommonRequestMappigs. DAY_CLOSER)
 	public ResponseEntity<?> dayclose() {
 		log.info("Recieved request to dayclose()");
 		try {
@@ -187,6 +187,16 @@ public class NewSaleController {
 
 		}
 
+	}
+	@GetMapping(CommonRequestMappigs. POS_CLOSEDAY)
+	public ResponseEntity<?> posclose(@RequestParam Boolean posclose) {
+		try {
+			ResponseEntity<?> dayclose = newSaleService.posClose(posclose);
+			return new ResponseEntity<>(dayclose, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+		}
 	}
 
 	@GetMapping(CommonRequestMappigs.GET_NEWSALEBYCUSTOMERID)
