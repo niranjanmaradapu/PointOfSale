@@ -110,11 +110,16 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 			entity.setCreatedDate(LocalDate.now());
             entity.setNetPayableAmount(dlSlips.stream().mapToLong(i->i.getNetAmount()).sum());
             entity.setRecievedAmount(returnSlips.stream().mapToLong(r->r.getAmount()).sum());
-		    Long balanceAmount=entity.getNetPayableAmount()-entity.getRecievedAmount();              
+		    Long balanceAmount=entity.getNetPayableAmount()-entity.getRecievedAmount();  
+		    
+		    System.out.println("net payable amount:"+entity.getNetPayableAmount());
+		    System.out.println("recieved amount:"+entity.getRecievedAmount());
+		    System.out.println("balance amount:"+balanceAmount);
+		    
 			Long net = dlSlips.stream().mapToLong(i -> i.getNetAmount()).sum() - vo.getTotalManualDisc();
 
 			entity.setNetPayableAmount(net);
-            entity.setBalanceAmount(balanceAmount);
+			entity.setBalanceAmount(balanceAmount);
 			entity.setBillNumber(
 					"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
 

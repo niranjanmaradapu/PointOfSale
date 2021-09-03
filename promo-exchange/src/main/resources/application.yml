@@ -5,9 +5,9 @@ spring:
     name: promo-exchange
  datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/promo-exchange
+    url: jdbc:postgresql://localhost:5432/promo-item
     username: postgres
-    password: root
+    password: Vasavi
 
   
  jpa:
