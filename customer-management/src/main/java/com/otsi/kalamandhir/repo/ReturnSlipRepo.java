@@ -57,4 +57,9 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 
 	List<ReturnSlip> findByCrNo(String creditNote);
 
+	List<ReturnSlip> findByCreatedDateBetweenAndTaggedItems_barCode(LocalDate dateFrom, LocalDate dateTo,
+			String barcode);
+
+	List<ReturnSlip> findByTaggedItems_barCode(String barcode);
+
 }

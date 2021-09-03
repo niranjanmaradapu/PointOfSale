@@ -113,15 +113,9 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() != null) {
-				Barcode bar = barCodeRepo.findByBarcode(vo.getBarcode());
-				if (bar != null) {
-					retunSlipdetails = returnSlipRepo.findByRsId(bar.getReturnSlips().getRsId());
-				} else {
-					// return new GateWayResponse<>(HttpStatus.OK, "no records found with the given
-					// information ") ;
-					throw new RuntimeException("no record found with the given barcode");
-
-				}
+				
+					retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCode(vo.getDateFrom(),vo.getDateTo(),vo.getBarcode());
+				
 			}
 			/**
 			 * getting the record using dates only
@@ -165,16 +159,9 @@ public class CustomerServiceImpl implements CustomerService {
 
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() != null) {
-				Barcode bar = barCodeRepo.findByBarcode(vo.getBarcode());
-				if (bar != null) {
-					retunSlipdetails = returnSlipRepo.findByRsId(bar.getReturnSlips().getRsId());
-				} else { // return
-
-					new GateWayResponse<>(HttpStatus.OK, "no records found with the given //information ");
-
-					throw new RuntimeException("no record found with the given barcode");
-
-				}
+				
+					retunSlipdetails = returnSlipRepo.findByTaggedItems_barCode(vo.getBarcode());
+				
 			}
 
 			/**
