@@ -65,3 +65,5 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME_R }}/customer-management:v1  # we can edit dockerimage name 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3          
