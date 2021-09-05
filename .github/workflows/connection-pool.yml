@@ -99,7 +99,7 @@ jobs:
  #         file: connection-pool/Dockerfile
  #         platforms: linux/amd64
  #         push: true
- #         tags: ${{ ECR_REGISTRY }}/${{ ECR_REPOSITORY }}:${{ IMAGE_TAG }}
+ #         tags: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           
 #      - name: deploy to cluster
 #        uses: kodermax/kubectl-aws-eks@master
