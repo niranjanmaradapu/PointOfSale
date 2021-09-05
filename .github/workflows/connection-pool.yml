@@ -85,7 +85,7 @@ jobs:
           ECR_REPOSITORY: connection-pool
           IMAGE_TAG: ${{ github.sha }}     # have to change dockerfile location 
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f connection-pool/Dockerfile  
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG connection-pool/
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG    
 
 #      - name: deploy to cluster
