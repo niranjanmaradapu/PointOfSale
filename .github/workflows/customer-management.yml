@@ -64,6 +64,6 @@ jobs:
           file: customer-management/Dockerfile   # we can edit Dockerfile location
           platforms: linux/amd64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME_R }}/customer-management:v1  # we can edit dockerimage name 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3          
+          tags: ${{ secrets.DOCKERHUB_USERNAME_R }}/customer-management:v1  # we can edit dockerimage nam#e #
+#      - name: Setup tmate session
+#        uses: mxschmitt/action-tmate@v3          
