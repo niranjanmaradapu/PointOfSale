@@ -1,0 +1,137 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: default
+data:
+  postgres_user: postgres
+  postgres_password: "1234"
+  postgres_host: jdbc:postgresql://postgres:5432/klm
+  
+---
+#apiVersion: v1
+#kind: PersistentVolumeClaim
+#metadata:
+#  name: postgres-pv-claim
+#spec:
+#  accessModes:
+#    - ReadWriteOnce
+#  resources:
+#    requests:
+#      storage: 1Gi
+#---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+#      volumes:
+#        - name: postgres-storage
+#          persistentVolumeClaim:
+#            claimName: postgres-pv-claim
+      containers:
+        - name: postgres
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: postgres_user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: postgres_password
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+            - name: POSTGRES_DB
+              value: klm
+          ports:
+            - containerPort: 5432
+              name: postgres
+#          volumeMounts:
+#            - name: postgres-storage
+#              mountPath: /var/lib/postgresql/data
+          image: postgres  
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+  selector:
+    app: postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: connection-pool-app
+  namespace: default
+spec:
+  selector:
+    matchLabels: 
+      app: connection-pool-app
+  replicas: 3
+  template:
+    metadata:
+      name: connection-pool-app
+      labels:
+        app: connection-pool-app
+    spec:
+      containers:
+      - name: connection-pool-app
+        env:
+          - name: SPRING_DATASOURCE_USERNAME
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-config
+                key: postgres_user
+          - name: SPRING_DATASOURCE_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-config
+                key: postgres_password
+          - name: SPRING_DATASOURCE_URL
+#            value: jdbc:postgresql://postgres:5432/klm
+            valueFrom:
+              configMapKeyRef:
+                name: postgres-config
+                key: postgres_host
+        image: ramakri4u/connection-pool:v1
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: "1"
+          requests:
+            memory: 256Mi
+            cpu: "0.2"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: connection-pool-app
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8083
+  selector:
+    app: connection-pool-app        
