@@ -115,7 +115,7 @@ spec:
               configMapKeyRef:
                 name: postgres-config
                 key: postgres_host
-        image: ramakri4u/connection-pool:v1
+        image: 881289302514.dkr.ecr.ap-south-1.amazonaws.com/connection-pool:latest
         resources:
           limits:
             memory: 512Mi
