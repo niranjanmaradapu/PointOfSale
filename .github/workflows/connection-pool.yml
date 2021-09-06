@@ -92,14 +92,15 @@ jobs:
 #          args: |
 #            kubectl apply -f  k8s/ 
 
-      - uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_R }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_R }}
-          aws-region: ap-south-1
-          
+
       - name: Deploy to EKS 
+        env: 
+          AWS_ACCESS_KEY_ID_R: ${{ secrets.AWS_ACCESS_KEY_ID_R }}
+          AWS_SECRET_ACCESS_KEY_R: ${{ secrets.AWS_SECRET_ACCESS_KEY_R }}
         run: |
+          aws configure set region ap-south-1
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID_R
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY_R
           sudo apt-get install curl -y         
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
