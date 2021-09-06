@@ -80,16 +80,16 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  connection-pool/
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest  connection-pool/
         env:  
-          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: connection-pool # enter repo
           IMAGE_TAG: ${{ github.sha }}
     
       - name: Push to ECR
-        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
         env:  
-          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: connection-pool # enter repo
           IMAGE_TAG: ${{ github.sha }}
    
