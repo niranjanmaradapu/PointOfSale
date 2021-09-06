@@ -29,7 +29,7 @@ public class CustomerServiceImpl implements CustomerService {
 	private CustomerMapper customerMapper;
 
 	@Override
-	public CustomerVo saveCustomerDetails(CustomerVo details) {
+	public ResponseEntity<?> saveCustomerDetails(CustomerVo details) {
 		log.debug("deugging saveCustomerDetails:" + details);
 		try {
 			Optional<CustomerDetailsEntity> list = customerRepo.findByMobileNumber(details.getMobileNumber());
@@ -41,15 +41,16 @@ public class CustomerServiceImpl implements CustomerService {
 				CustomerDetailsEntity savedDetails = customerRepo.save(entity);
 				log.warn("we are testing customer is saved succesfully..");
 				log.info("customer details saved succesfully..." + details);
-				
-			
+				return new ResponseEntity<>("Customer details saved successfully..", HttpStatus.OK);
+			} else {
+				log.error("Mobile number is already in my records");
+				return new ResponseEntity<>("Mobile number is already in my records", HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
 			log.error("error occurs while saving customer details");
-			e.printStackTrace();
+			return new ResponseEntity<>("error occurs while saving customer details", HttpStatus.BAD_REQUEST);
 		}
-		return details;
-		}
+	}
 
 	@Override
 	public CustomerVo getCustomerByMobileNumber(String mobileNumber) throws CustomerNotFoundExcecption {

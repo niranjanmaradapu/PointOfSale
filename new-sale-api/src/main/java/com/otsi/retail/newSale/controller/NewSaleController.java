@@ -60,7 +60,7 @@ public class NewSaleController {
 	public ResponseEntity<?> saveCustomerDetails(@Valid @RequestBody CustomerVo details) {
 		log.info("Received Request to saveCustomerDetails :" + details.toString());
 		try {
-			CustomerVo result = service.saveCustomerDetails(details);
+			ResponseEntity<?> result = service.saveCustomerDetails(details);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (Exception e) {
 			log.error("exception :" + e);
