@@ -136,13 +136,16 @@ public class NewSaleServiceImpl implements NewSaleService {
 			entity.setPaymentType(paymentAmountTypeMapper.VoToEntity(vo.getPaymentAmountType()));
 			long paymentAmount = paymentAmountTypeVos.stream().mapToLong(i -> i.getPaymentAmount()).sum();
 			entity.setRecievedAmount(paymentAmount);
-			entity.setGrossAmount(dlSlips.stream().mapToLong(i -> i.getMrp()).sum());
-			entity.setTotalPromoDisc(dlSlips.stream().mapToLong(i -> i.getPromoDisc()).sum());
+			long sumMrp = dlSlips.stream().mapToLong(i -> i.getMrp()).sum();
+			entity.setGrossAmount(sumMrp);
+			long sumPromoDisc = dlSlips.stream().mapToLong(i -> i.getPromoDisc()).sum();
+			entity.setTotalPromoDisc(sumPromoDisc);
 			entity.setTotalManualDisc(vo.getTotalManualDisc());
 			entity.setApprovedBy(vo.getApprovedBy());
 			entity.setDiscApprovedBy(vo.getDiscApprovedBy());
 			entity.setDiscType(vo.getDiscType());
 			entity.setCreatedDate(LocalDate.now());
+			entity.setInvoiceNumber(vo.getInvoiceNumber());
 
 			Long net = dlSlips.stream().mapToLong(i -> i.getNetAmount()).sum() - vo.getTotalManualDisc();
 
