@@ -10,7 +10,7 @@ import com.otsi.retail.newSale.vo.CustomerVo;
 @Component
 public interface CustomerService {
 
-	ResponseEntity<?> saveCustomerDetails(CustomerVo details) throws Exception;
+	CustomerVo saveCustomerDetails(CustomerVo details) throws Exception;
 
 	CustomerVo getCustomerByMobileNumber(String mobileNumber) throws CustomerNotFoundExcecption;
 

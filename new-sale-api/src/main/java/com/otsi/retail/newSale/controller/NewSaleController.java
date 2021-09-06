@@ -60,7 +60,7 @@ public class NewSaleController {
 	public ResponseEntity<?> saveCustomerDetails(@Valid @RequestBody CustomerVo details) {
 		log.info("Received Request to saveCustomerDetails :" + details.toString());
 		try {
-			ResponseEntity<?> result = service.saveCustomerDetails(details);
+			CustomerVo result = service.saveCustomerDetails(details);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (Exception e) {
 			log.error("exception :" + e);
@@ -114,10 +114,10 @@ public class NewSaleController {
 
 	// Method for creating Delivery slip using List of Barcodes
 	@PostMapping(CommonRequestMappigs.CREATE_DS)
-	public ResponseEntity<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo) {
+	public ResponseEntity<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo,String enumName) {
 		log.info("Received Request to saveDeliverySlip :" + vo.toString());
 		try {
-			ResponseEntity<?> saveDs = newSaleService.saveDeliverySlip(vo);
+			ResponseEntity<?> saveDs = newSaleService.saveDeliverySlip(vo, enumName);
 			return new ResponseEntity<>(saveDs, HttpStatus.OK);
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());

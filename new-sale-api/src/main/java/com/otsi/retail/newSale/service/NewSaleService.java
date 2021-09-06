@@ -30,7 +30,7 @@ public interface NewSaleService {
 
 	ResponseEntity<?> getBarcodeDetails(String barCode, String smId);
 
-	ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo);
+	ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo,String enumName);
 
 	ResponseEntity<?> getDeliverySlipDetails(String dsNumber);
 
@@ -52,6 +52,8 @@ public interface NewSaleService {
 	ResponseEntity<?> posClose(Boolean posclose);
 
 	void tagCustomerToExisitingNewSale(String mobileNo, Long invoiceNo) throws CustomerNotFoundExcecption;
+
+
 
 
 }

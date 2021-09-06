@@ -3,6 +3,7 @@ package com.otsi.retail.newSale.serviceimpl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -20,12 +21,15 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
+import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
+import com.otsi.retail.newSale.common.DSAttributes;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.PaymentType;
 import com.otsi.retail.newSale.mapper.CustomerMapper;
@@ -43,6 +47,7 @@ import com.otsi.retail.newSale.service.NewSaleService;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
+import com.otsi.retail.newSale.vo.EnumVo;
 import com.otsi.retail.newSale.vo.HsnDetailsVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
@@ -117,16 +122,20 @@ public class NewSaleServiceImpl implements NewSaleService {
 		if (vo.getCustomerDetails() != null) {
 
 			try {
-				customerService.saveCustomerDetails(vo.getCustomerDetails());
-			} catch (Exception e) {
 
+				CustomerDetailsEntity customerEntity = customerMapper.convertVoToEntity(vo.getCustomerDetails());
+				CustomerDetailsEntity savedDetails = customerRepo.save(customerEntity);
+				entity.setCustomerDetails(savedDetails);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 			List<DeliverySlipVo> dlSlips = vo.getDlSlip();
 			List<PaymentAmountTypeVo> paymentAmountTypeVos = vo.getPaymentAmountType();
 			entity.setNatureOfSale(vo.getNatureOfSale());
 			entity.setPaymentType(paymentAmountTypeMapper.VoToEntity(vo.getPaymentAmountType()));
-			entity.setRecievedAmount(paymentAmountTypeVos.stream().mapToLong(i -> i.getPaymentAmount()).sum());
+			long paymentAmount = paymentAmountTypeVos.stream().mapToLong(i -> i.getPaymentAmount()).sum();
+			entity.setRecievedAmount(paymentAmount);
 			entity.setGrossAmount(dlSlips.stream().mapToLong(i -> i.getMrp()).sum());
 			entity.setTotalPromoDisc(dlSlips.stream().mapToLong(i -> i.getPromoDisc()).sum());
 			entity.setTotalManualDisc(vo.getTotalManualDisc());
@@ -211,10 +220,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// Method for saving delivery slip
 	@Override
-	public ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo) {
+	public ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo, String enumName) {
 		log.debug("deugging saveDeliverySlip:" + vo);
 		try {
-
 			Random ran = new Random();
 			DeliverySlipEntity entity = dsMapper.convertDsVoToEntity(vo);
 
@@ -228,19 +236,31 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			List<BarcodeEntity> barcodeDetails = barcodeRepository.findByBarcodeIn(barcodeList);
 
-			barcodeDetails.stream().forEach(a -> {
+			if (enumName.equalsIgnoreCase(DSAttributes.PIECES.getName())) {
+				barcodeDetails.stream().forEach(a -> {
+					entity.setQty(a.getQty());
+					a.setDeliverySlip(savedEntity);
+					a.setLastModified(LocalDateTime.now());
 
-				a.setDeliverySlip(savedEntity);
-				a.setLastModified(LocalDateTime.now());
+					barcodeRepository.save(a);
+				});
 
-				barcodeRepository.save(a);
-			});
+			} else if (enumName.equalsIgnoreCase(DSAttributes.METERS.getName())) {
+				barcodeDetails.stream().forEach(a -> {
+					entity.setQty(a.getQty());// change chesanu
+					Long mrp = (entity.getQty() * entity.getMrp());// change chesanu
+					a.setMrp(mrp);// change chesanu
+					a.setDeliverySlip(savedEntity);
+					a.setLastModified(LocalDateTime.now());
+
+					barcodeRepository.save(a);
+				});
+			}
 			MessageVo message = new MessageVo();
 			message.setMessage("Successfully created deliverySlip with DS Number " + entity.getDsNumber());
 			message.setNumber(entity.getDsNumber());
-			log.warn("after saving deivery slip");
-			log.info("after saving deivery slip :" + message);
 			return new ResponseEntity<>(message, HttpStatus.OK);
+
 		} catch (Exception e) {
 			log.error("error occurs while saving Delivery slip");
 			return new ResponseEntity<>("error occurs while saving Delivery slip", HttpStatus.BAD_REQUEST);
@@ -615,7 +635,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		NewSaleList newSaleList1 = new NewSaleList();
 		List<NewSaleVo> newSaleList = new ArrayList<>();
 		if (vo.getInvoiceNo() != 0) {
-			
+
 			List<NewSaleEntity> newSaleEntity = newSaleRepository.findByInvoiceNumber(vo.getInvoiceNo());
 			newSaleList = newSaleEntity.stream().map(dto -> newSaleMapper.convertNewSaleDtoToVo(dto))
 					.collect(Collectors.toList());

@@ -16,7 +16,7 @@ public class CustomerMapper {
 		entity.setGender(details.getGender());
 		entity.setAddress(details.getAddress());
 		entity.setAltMobileNo(details.getAltMobileNo());
-		entity.setDob(details.getDob());
+		entity.setDob(details.getDob());                                                                                                     
 		entity.setGstNumber(details.getGstNumber());
 		entity.setEmail(details.getEmail());
 
@@ -28,6 +28,9 @@ public class CustomerMapper {
 	public CustomerVo convertEntityToVo(CustomerDetailsEntity customerDetailsEntity) {
 
 		CustomerVo vo = new CustomerVo();
+		if(customerDetailsEntity.getCustomerId()!=0) {
+		vo.setCustomerId(customerDetailsEntity.getCustomerId());
+		}
 		if (customerDetailsEntity.getMobileNumber() != null) {
 			vo.setMobileNumber(customerDetailsEntity.getMobileNumber());
 
