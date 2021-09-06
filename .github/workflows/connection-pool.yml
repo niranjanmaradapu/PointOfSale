@@ -67,26 +67,20 @@ jobs:
 #          tags: ${{ secrets.DOCKERHUB_USERNAME_R }}/connection-pool:v1
 #      - name: Setup tmate session
 #        uses: mxschmitt/action-tmate@v3
-
-      - uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build and Push Docker Image
-        env: 
-          CONNECTION_POOL_REPO: ${{ secrets.CONNECTION_POOL_REPO }}
-        run: |
-          docker build -t $CONNECTION_POOL_REPO:latest  connection-pool/
-          docker push  $CONNECTION_POOL_REPO:latest
         
-    
-   
+      - name: Login to ECR
+        id: ecr
+        uses: jwalton/gh-ecr-login@v1
+        with:
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: ap-south-1
+      - name: Push to ECR
+        run: |
+         docker build -t connection-pool  connection-pool/
+         docker tag connection-pool ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/connection-pool:latest
+         docker push ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/connection-pool:latest
+      
 #      - name: deploy to cluster
 #        uses: kodermax/kubectl-aws-eks@master
 #        env:
