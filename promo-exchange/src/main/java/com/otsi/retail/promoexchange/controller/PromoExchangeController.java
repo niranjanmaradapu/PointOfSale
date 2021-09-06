@@ -37,7 +37,6 @@ import com.otsi.retail.promoexchange.vo.PromoExchangeVo;
  */
 
 @RestController
-@CrossOrigin
 @RequestMapping(CommonRequestMappings.PROMO_ITEM_EXCHANGE)
 public class PromoExchangeController {
 
