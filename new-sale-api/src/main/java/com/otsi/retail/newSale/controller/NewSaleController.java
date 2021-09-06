@@ -1,6 +1,5 @@
 package com.otsi.retail.newSale.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -28,12 +27,14 @@ import com.otsi.retail.newSale.service.NewSaleService;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
+import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.UserDataVo;
 
 /**
  * Controller class for accepting all the requests which are related to
@@ -53,14 +54,14 @@ public class NewSaleController {
 	private NewSaleService newSaleService;
 
 	@Autowired
-	private CustomerService service;
+	private CustomerService customerService;
 
 	// Save customer details API
 	@PostMapping(path = CommonRequestMappigs.SAVE_CUSTOMERDETAILS, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> saveCustomerDetails(@Valid @RequestBody CustomerVo details) {
 		log.info("Received Request to saveCustomerDetails :" + details.toString());
 		try {
-			ResponseEntity<?> result = service.saveCustomerDetails(details);
+			ResponseEntity<?> result = customerService.saveCustomerDetails(details);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (Exception e) {
 			log.error("exception :" + e);
@@ -74,7 +75,7 @@ public class NewSaleController {
 		log.info("Received Request to getCustomerByMobileNumber :" + mobileNumber);
 		CustomerVo customer;
 		try {
-			customer = service.getCustomerByMobileNumber(mobileNumber);
+			customer = customerService.getCustomerByMobileNumber(mobileNumber);
 			return new ResponseEntity<>(customer, HttpStatus.OK);
 		} catch (CustomerNotFoundExcecption e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -114,7 +115,7 @@ public class NewSaleController {
 
 	// Method for creating Delivery slip using List of Barcodes
 	@PostMapping(CommonRequestMappigs.CREATE_DS)
-	public ResponseEntity<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo,String enumName) {
+	public ResponseEntity<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo, String enumName) {
 		log.info("Received Request to saveDeliverySlip :" + vo.toString());
 		try {
 			ResponseEntity<?> saveDs = newSaleService.saveDeliverySlip(vo, enumName);
@@ -227,7 +228,7 @@ public class NewSaleController {
 	@GetMapping("/getCustomerFromNewSale/{mobileNo}")
 	public ResponseEntity<?> getCustomerFromNewSale(@PathVariable String mobileNo) {
 		try {
-			CustomerVo customer = service.getCustomerByMobileNumber(mobileNo);
+			CustomerVo customer = customerService.getCustomerByMobileNumber(mobileNo);
 			return new ResponseEntity<>(customer, HttpStatus.OK);
 		} catch (CustomerNotFoundExcecption ce) {
 			return new ResponseEntity<>(ce.getMessage(), HttpStatus.NOT_FOUND);
@@ -263,18 +264,75 @@ public class NewSaleController {
 
 	}
 
-	@GetMapping("/discTypes")
-	public List<String> getDiscountsTypes() {
+//	@GetMapping("/discTypes")
+//	public List<String> getDiscountsTypes() {
+//
+//		List<String> discTypes = new ArrayList<>();
+//
+//		discTypes.add("Promotion not applied");
+//		discTypes.add("RT return discount");
+//		discTypes.add("Mgnt. SPL Discount");
+//		discTypes.add("Management discount");
+//		discTypes.add("DMG Discount");
+//		discTypes.add("Other");
+//
+//		return discTypes;
+//	}
+	// Method for saving GiftVoucher
+	@PostMapping("/saveGv")
+	public ResponseEntity<?> saveGiftVoucher(@RequestBody GiftVoucherVo vo) {
+		try {
+			String result = newSaleService.saveGiftVoucher(vo);
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>("Getting error while saving", HttpStatus.BAD_REQUEST);
+		}
+	}
 
-		List<String> discTypes = new ArrayList<>();
+	// Method for getting Gift voucher by GV Number
+	@GetMapping("/getGv")
+	public ResponseEntity<?> getGiftVoucher(@RequestParam String gvNumber) {
+		try {
+			ResponseEntity<?> result = newSaleService.getGiftVoucher(gvNumber);
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>("Exception occurs while fetching record..", HttpStatus.BAD_REQUEST);
+		}
+	}
 
-		discTypes.add("Promotion not applied");
-		discTypes.add("RT return discount");
-		discTypes.add("Mgnt. SPL Discount");
-		discTypes.add("Management discount");
-		discTypes.add("DMG Discount");
-		discTypes.add("Other");
+	// Method for saving Userdata
+	@PostMapping("/saveuser")
+	public ResponseEntity<?> saveUser(@RequestBody UserDataVo vo) {
+		try {
+			String message = customerService.saveUserData(vo);
+			return new ResponseEntity<>(message, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>("Exception occurs while saving data..", HttpStatus.BAD_REQUEST);
+		}
 
-		return discTypes;
+	}
+
+	// Method for fetching user data by using mobile number
+	@GetMapping("/getUserByMobileNo")
+	public ResponseEntity<?> getUserByMobileNo(@RequestParam Long mobileNum) {
+		try {
+			ResponseEntity<?> user = customerService.getUserByMobileNo(mobileNum);
+
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>("Exception occurs while saving data..", HttpStatus.BAD_REQUEST);
+		}
+
+	}
+
+	// Method for tagging Gift voucher to Customer
+	@PostMapping("/tagCustomerToGv/{userId}/{gvId}")
+	public ResponseEntity<?> tagCustomerToGv(@PathVariable Long userId, @PathVariable Long gvId) {
+		try {
+			String message = newSaleService.tagCustomerToGv(userId, gvId);
+			return new ResponseEntity<>(message, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>("Exception occurs while saving data..", HttpStatus.BAD_REQUEST);
+		}
 	}
 }

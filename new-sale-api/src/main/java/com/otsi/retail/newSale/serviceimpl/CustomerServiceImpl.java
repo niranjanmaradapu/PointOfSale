@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.serviceimpl;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -10,16 +11,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
+import com.otsi.retail.newSale.Entity.UserData;
+import com.otsi.retail.newSale.Entity.UserDataAv;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
+import com.otsi.retail.newSale.common.UserDataAVEnum;
 import com.otsi.retail.newSale.mapper.CustomerMapper;
 import com.otsi.retail.newSale.repository.CustomerDetailsRepo;
+import com.otsi.retail.newSale.repository.UserDataAvRepo;
+import com.otsi.retail.newSale.repository.UserDataRepo;
 import com.otsi.retail.newSale.service.CustomerService;
 import com.otsi.retail.newSale.vo.CustomerVo;
-
+import com.otsi.retail.newSale.vo.UserDataVo;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
-	
+
 	private Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
 
 	@Autowired
@@ -27,6 +33,12 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	private CustomerMapper customerMapper;
+
+	@Autowired
+	private UserDataRepo userDataRepo;
+
+	@Autowired
+	private UserDataAvRepo userDataAvRepo;
 
 	@Override
 	public ResponseEntity<?> saveCustomerDetails(CustomerVo details) {
@@ -59,17 +71,117 @@ public class CustomerServiceImpl implements CustomerService {
 		if (!customerDetails.isPresent()) {
 			log.error(
 					"Customer is with mobile number " + mobileNumber + " not exists. So please fill all the details..");
-			throw new CustomerNotFoundExcecption(
-					"Customer is with mobile number " + mobileNumber + " not exists. So please fill all the details.."+
-					HttpStatus.BAD_REQUEST);
+			throw new CustomerNotFoundExcecption("Customer is with mobile number " + mobileNumber
+					+ " not exists. So please fill all the details.." + HttpStatus.BAD_REQUEST);
 		} else {
 			CustomerVo details = customerMapper.convertEntityToVo(customerDetails.get());
 			log.warn("we are testing getting customer by mobile number");
 			log.info("after getting CustomerByMobileNumber :" + details);
 			return details;
 
-			
-		} 
+		}
+	}
+
+	// Method for saving user data
+	@Override
+	public String saveUserData(UserDataVo vo) {
+
+		if (vo.getPhoneNumber() != null) {
+			Optional<UserData> user = userDataRepo.findByPhoneNumber(vo.getPhoneNumber());
+
+			if (user.isPresent()) {
+				return "User already exits with Mobile Number : " + user.get().getPhoneNumber();
+			}
+		}
+
+		UserData entity = new UserData();
+
+		// Set common fields of Userdata
+		entity.setUserName(vo.getUserName());
+		entity.setGender(vo.getGender());
+		entity.setPhoneNumber(vo.getPhoneNumber());
+		entity.setCreationdate(LocalDate.now());
+		entity.setLastmodified(LocalDate.now());
+
+		UserData savedUser = userDataRepo.save(entity);
+		// Method for saving extra attributes in Attribute value table
+		saveAVValues(vo, savedUser);
+		return "User data saved successfully..";
+	}
+
+	// Method for saving extra attributes in Attribute value table
+	private void saveAVValues(UserDataVo vo, UserData savedUser) {
+
+		UserDataAv userAv = null;
+
+		if (vo.getGstNumber() != null) {
+			userAv = new UserDataAv();
+			userAv.setName(UserDataAVEnum.GSTNUMBER.geteName());
+			userAv.setType(UserDataAVEnum.GSTNUMBER.getId());
+			userAv.setStringValue(vo.getGstNumber());
+			userAv.setLastModified(LocalDate.now());
+			userAv.setUserData(savedUser);
+
+			userDataAvRepo.save(userAv);
+		}
+		if (vo.getPanNumber() != null) {
+
+			userAv = new UserDataAv();
+			userAv.setName(UserDataAVEnum.PANNUMBER.geteName());
+			userAv.setType(UserDataAVEnum.PANNUMBER.getId());
+			userAv.setStringValue(vo.getPanNumber());
+			userAv.setLastModified(LocalDate.now());
+			userAv.setUserData(savedUser);
+
+			userDataAvRepo.save(userAv);
+		}
+		if (vo.getDob() != null) {
+
+			userAv = new UserDataAv();
+			userAv.setName(UserDataAVEnum.DOB.geteName());
+			userAv.setType(UserDataAVEnum.DOB.getId());
+			userAv.setDateValue(vo.getDob());
+			userAv.setLastModified(LocalDate.now());
+			userAv.setUserData(savedUser);
+
+			userDataAvRepo.save(userAv);
+		}
+	}
+
+	// Method for fetching User data by using mobile Number
+	@Override
+	public ResponseEntity<?> getUserByMobileNo(Long mobileNum) {
+
+		Optional<UserData> userDetails = userDataRepo.findByPhoneNumber(mobileNum);
+		UserDataVo vo = new UserDataVo();
+		if (userDetails.isPresent()) {
+			UserData user = userDetails.get();
+
+			vo.setUserId(user.getUserId());
+			vo.setUserName(user.getUserName());
+			vo.setGender(user.getGender());
+			vo.setPhoneNumber(user.getPhoneNumber());
+			vo.setCreationdate(user.getCreationdate());
+
+			user.getUserAv().stream().forEach(x -> {
+				if (x.getName().equalsIgnoreCase(UserDataAVEnum.GSTNUMBER.geteName())) {
+					vo.setGstNumber(x.getStringValue());
+				}
+				if (x.getName().equalsIgnoreCase(UserDataAVEnum.PANNUMBER.geteName())) {
+
+					vo.setPanNumber(x.getStringValue());
+				}
+				if (x.getName().equalsIgnoreCase(UserDataAVEnum.DOB.geteName())) {
+					vo.setDob(x.getDateValue());
+				}
+
+			});
+
+		} else {
+			return new ResponseEntity<>("User not found with mobile number " + mobileNum, HttpStatus.BAD_REQUEST);
+		}
+
+		return new ResponseEntity<>(vo, HttpStatus.OK);
 	}
 
 }
