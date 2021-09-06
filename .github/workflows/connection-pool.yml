@@ -93,8 +93,8 @@ jobs:
       - name: Deploy
         uses: cancue/eks-action@v0.0.2
         env:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_R }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_R }}
           aws_region: ap-south-1 # we can edit 
           cluster_name: Microservice-K8S-Cluster # we can edit
         with:
