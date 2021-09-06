@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
@@ -27,9 +29,15 @@ public class PromoExchangeApplication {
 	public static void main(String[] args) throws RestClientException, IOException {
 		
 	 SpringApplication.run(PromoExchangeApplication.class, args);
-		
-		
+			
 	}
+	
+	@Bean
+	public Docket api() {
+		return new Docket(DocumentationType.SWAGGER_2).select()
+				.apis(RequestHandlerSelectors.basePackage("com.otsi.retail")).build();
+	}
+
 	
 	
 

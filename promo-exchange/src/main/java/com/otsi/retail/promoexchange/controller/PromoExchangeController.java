@@ -67,7 +67,7 @@ public class PromoExchangeController {
 	}
 
 	// @ Method for saving promo exchange items...
-	@PostMapping(CommonRequestMappings.PROMO_ITEM_EXCHANGE)
+	@PostMapping(CommonRequestMappings.ITEM_EXCHANGE)
 	public ResponseEntity<?> saveItemExchange(@RequestBody PromoExchangeVo vo) {
 
 		ResponseEntity<?> message = promoExchangeService.savePromoItemExchangeRequest(vo);

@@ -42,6 +42,7 @@ import com.otsi.retail.promoexchange.vo.ListOfSaleBillsVo;
 import com.otsi.retail.promoexchange.vo.MessageVo;
 import com.otsi.retail.promoexchange.vo.PromoExchangeVo;
 
+
 /**
  * Service class contains all bussiness logics related to new sale , create
  * barcode , getting barcode details and create delivery slip

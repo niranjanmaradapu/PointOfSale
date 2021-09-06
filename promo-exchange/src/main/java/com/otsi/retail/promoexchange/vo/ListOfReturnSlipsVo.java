@@ -1,6 +1,7 @@
 package com.otsi.retail.promoexchange.vo;
 
-import java.time.LocalDate;
+
+import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
@@ -8,9 +9,9 @@ import lombok.Data;
 @Data
 public class ListOfReturnSlipsVo {
 
-	private LocalDate dateFrom;
+	private Date dateFrom;
 
-	private LocalDate dateTo;
+	private Date dateTo;
 
 	private String barcode;
 
@@ -25,13 +26,13 @@ public class ListOfReturnSlipsVo {
 	// private List<Barcode> barcode;
 
 	private long amount;
-	
+
 	private Long recievedAmount;
 
-	private LocalDate createdInfo;
+	private Date createdInfo;
 
 	private String settelmentInfo;
 
 	private List<TaggedItems> barcodes;
-		
+
 }
