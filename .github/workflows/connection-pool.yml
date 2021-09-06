@@ -78,20 +78,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build Docker Image
+      - name: Build and Push Docker Image
+        env: 
+          CONNECTION_POOL_REPO: ${{ secrets.CONNECTION_POOL_REPO }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest  connection-pool/
-        env:  
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: connection-pool # enter repo
-          IMAGE_TAG: ${{ github.sha }}
+          docker build -t $CONNECTION_POOL_REPO:latest  connection-pool/
+          docker push  $CONNECTION_POOL_REPO:latest
+        
     
-      - name: Push to ECR
-        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        env:  
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: connection-pool # enter repo
-          IMAGE_TAG: ${{ github.sha }}
    
 #      - name: deploy to cluster
 #        uses: kodermax/kubectl-aws-eks@master
