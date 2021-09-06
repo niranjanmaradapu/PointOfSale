@@ -94,7 +94,6 @@ jobs:
           args: |
             kubectl apply -f  k8s/ 
 
-
  #     - name: Deploy to EKS 
  #       env: 
  #         AWS_ACCESS_KEY_ID_R: ${{ secrets.AWS_ACCESS_KEY_ID_R }}
