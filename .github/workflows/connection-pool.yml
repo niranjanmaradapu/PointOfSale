@@ -80,23 +80,30 @@ jobs:
          docker build -t connection-pool  connection-pool/
          docker tag connection-pool ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/connection-pool:latest
          docker push ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/connection-pool:latest
-      
-#      - name: deploy to cluster
-#        uses: kodermax/kubectl-aws-eks@master
+         
+#      - name: Deploy
+#        uses: cancue/eks-action@v0.0.2
 #        env:
-#          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-#          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#          ECR_REPOSITORY: my-app
-#          IMAGE_TAG: ${{ github.sha }}
+#          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_R }}
+#          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_R }}
+#          aws_region: ap-south-1 # we can edit 
+#          cluster_name: Microservice-K8S-Cluster # we can edit
 #        with:
-#          args: set image deployment/$ECR_REPOSITORY $ECR_REPOSITORY=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      - name: Deploy
-        uses: cancue/eks-action@v0.0.2
-        env:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_R }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_R }}
-          aws_region: ap-south-1 # we can edit 
-          cluster_name: Microservice-K8S-Cluster # we can edit
+#          args: |
+#            kubectl apply -f  k8s/ 
+
+      - uses: aws-actions/configure-aws-credentials@v1
         with:
-          args: |
-            kubectl apply -f  k8s/ 
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_R }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_R }}
+          aws-region: ap-south-1
+          
+      - name: Deploy to EKS 
+        run: |
+          sudo apt-get install curl -y         
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+          aws eks update-kubeconfig --name Microservice-K8S-Cluster  --region ap-south-1 --role-arn arn:aws:iam::881289302514:role/EKS-Role
+          kubectl apply -f k8s/connection-pool.yml
+          
+       
