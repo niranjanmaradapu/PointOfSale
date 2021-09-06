@@ -11,6 +11,7 @@ import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
+import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.HsnDetailsVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
@@ -52,6 +53,12 @@ public interface NewSaleService {
 	ResponseEntity<?> posClose(Boolean posclose);
 
 	void tagCustomerToExisitingNewSale(String mobileNo, Long invoiceNo) throws CustomerNotFoundExcecption;
+
+	String saveGiftVoucher(GiftVoucherVo vo);
+
+	ResponseEntity<?> getGiftVoucher(String gvNumber);
+
+	String tagCustomerToGv(Long userId, Long gvId);
 
 
 

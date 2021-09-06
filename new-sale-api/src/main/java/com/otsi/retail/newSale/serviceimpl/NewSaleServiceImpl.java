@@ -3,7 +3,6 @@ package com.otsi.retail.newSale.serviceimpl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -11,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -21,14 +21,13 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
+import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
-import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
 import com.otsi.retail.newSale.common.DSAttributes;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.PaymentType;
@@ -39,6 +38,7 @@ import com.otsi.retail.newSale.mapper.PaymentAmountTypeMapper;
 import com.otsi.retail.newSale.repository.BarcodeRepository;
 import com.otsi.retail.newSale.repository.CustomerDetailsRepo;
 import com.otsi.retail.newSale.repository.DeliverySlipRepository;
+import com.otsi.retail.newSale.repository.GiftVoucherRepo;
 import com.otsi.retail.newSale.repository.NewSaleRepository;
 import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.service.CustomerService;
@@ -47,7 +47,7 @@ import com.otsi.retail.newSale.service.NewSaleService;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
-import com.otsi.retail.newSale.vo.EnumVo;
+import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.HsnDetailsVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
@@ -111,6 +111,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private HSNVoService hsnService;
+
+	@Autowired
+	private GiftVoucherRepo gvRepo;
 
 	@Override
 	public ResponseEntity<?> saveNewSaleRequest(NewSaleVo vo) {
@@ -734,6 +737,63 @@ public class NewSaleServiceImpl implements NewSaleService {
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
+	}
+
+	// Method to save Gift vouchers and GiftVoucher Number should be unique
+	@Override
+	public String saveGiftVoucher(GiftVoucherVo vo) {
+
+		// Check condition for Duplicate GiftVoucher Numbers
+		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumber(vo.getGvNumber());
+
+		if (!gvEntity.isPresent()) {
+
+			GiftVoucherEntity entity = new GiftVoucherEntity();
+			BeanUtils.copyProperties(vo, entity);
+			entity.setCreatedDate(LocalDate.now());
+			entity.setIsTagged(Boolean.FALSE);
+			GiftVoucherEntity savedGf = gvRepo.save(entity);
+
+			return "Gift voucher saved succesfully..";
+		} else {
+			return "Given Giftvoucher number is already in records.." + gvEntity.get().getGvNumber();
+		}
+	}
+
+	// Method for getting Gift voucher details by Gv Number
+	@Override
+	public ResponseEntity<?> getGiftVoucher(String gvNumber) {
+
+		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumber(gvNumber);
+
+		if (gvEntity.isPresent()) {
+			GiftVoucherVo vo = new GiftVoucherVo();
+			BeanUtils.copyProperties(gvEntity.get(), vo);
+			return new ResponseEntity<>(vo, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>("please enter valid Gift Voucher number.", HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	// Method for tagging Gift voucher to Customer
+	@Override
+	public String tagCustomerToGv(Long userId, Long gvId) {
+
+		Optional<CustomerDetailsEntity> user = customerRepo.findById(userId);
+		if (user.isPresent()) {
+			Optional<GiftVoucherEntity> gv = gvRepo.findById(gvId);
+			// Gift voucher should not be tagged and expiry date should greater than today
+			if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
+				gv.get().setUserId(userId);
+				gv.get().setIsTagged(Boolean.TRUE);
+				gvRepo.save(gv.get());
+			} else {
+				return "Gift voucher is not valid";
+			}
+		} else {
+			return "User data is not Available..";
+		}
+		return "Gift vocher tagged successfully to " + user.get().getName();
 	}
 
 }
