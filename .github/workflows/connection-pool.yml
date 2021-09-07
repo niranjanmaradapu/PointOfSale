@@ -92,7 +92,7 @@ jobs:
           cluster_name: Microservice-K8S-Cluster # we can edit
         with:
           args: |
-            kubectl apply -f  k8s/ 
+            kubectl apply -f  k8s/connection-pool.yml
 
  #     - name: Deploy to EKS 
  #       env: 
