@@ -60,7 +60,7 @@ jobs:
       - name: Build and Push to ECR
         run: |
          docker build -t new-sale-api  new-sale-api/   # edit Directory 
-         docker tag connection-pool ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/new-sale-api:latest  # edit Image Name 
+         docker tag new-sale-api  ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/new-sale-api:latest  # edit Image Name 
          docker push ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/new-sale-api:latest  # create repository for new-sale-api        
       
       - name: Deploy
