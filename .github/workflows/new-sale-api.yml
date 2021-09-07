@@ -63,6 +63,7 @@ jobs:
          docker tag new-sale-api  ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/new-sale-api:latest  # edit Image Name 
          docker push ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/new-sale-api:latest  # create repository for new-sale-api        
       
+      
       - name: Deploy
         uses: cancue/eks-action@v0.0.2
         env:
