@@ -46,7 +46,7 @@ public interface NewSaleService {
 	List<NewSaleResponseVo> getNewsaleByCustomerId(Long customerId);
 
 	NewSaleVo updateNewSale(NewSaleResponseVo vo);
-	NewSaleList getInvoicDetails(InvoiceRequestVo vo);
+	NewSaleList getInvoicDetails(InvoiceRequestVo vo) throws Exception;
 
 	CustomerVo getCustomerFromNewSale(String mobileNo) throws Exception;
 

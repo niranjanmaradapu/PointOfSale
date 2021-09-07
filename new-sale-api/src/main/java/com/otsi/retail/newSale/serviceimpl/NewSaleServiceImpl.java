@@ -637,25 +637,25 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public NewSaleList getInvoicDetails(InvoiceRequestVo vo) {
+	public NewSaleList getInvoicDetails(InvoiceRequestVo vo) throws Exception {
 		NewSaleList newSaleList1 = new NewSaleList();
 		List<NewSaleVo> newSaleList = new ArrayList<>();
-		if (vo.getInvoiceNo() != 0) {
+		if (null !=  vo.getInvoiceNo() ) {
 
-			List<NewSaleEntity> newSaleEntity = newSaleRepository.findByInvoiceNumber(vo.getInvoiceNo());
+			List<NewSaleEntity> newSaleEntity = newSaleRepository.findByBillNumber(vo.getInvoiceNo());
 			newSaleList = newSaleEntity.stream().map(dto -> newSaleMapper.convertNewSaleDtoToVo(dto))
 					.collect(Collectors.toList());
 			newSaleList1.setNewSaleVo(newSaleList);
 			return newSaleList1;
 		}
-		if (vo.getBarCode() != null && !vo.getBarCode().isEmpty()) {
+		if (null != vo.getBarCode()  && !vo.getBarCode().isEmpty()) {
 			BarcodeEntity barcode = barcodeRepository.findByBarcode(vo.getBarCode());
 			DeliverySlipEntity dsSlip = dsRepo.findByDsNumber(barcode.getDeliverySlip().getDsNumber());
 			newSaleList.add(newSaleMapper.convertNewSaleDtoToVo(dsSlip.getNewsale()));
 			newSaleList1.setNewSaleVo(newSaleList);
 			return newSaleList1;
 		}
-		if (!vo.getMobileNo().isEmpty() && vo.getMobileNo() != null) {
+		if (null !=  vo.getMobileNo() &&!vo.getMobileNo().isEmpty()  ) {
 
 			List<NewSaleEntity> newSaleEntity = newSaleRepository
 					.findByCustomerDetailsMobileNumberAndCreatedDateBetween(vo.getMobileNo(), vo.getFromDate(),
@@ -665,7 +665,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			newSaleList1.setNewSaleVo(newSaleList);
 			return newSaleList1;
 		}
-		return null;
+		 throw new Exception("No records found with your inputs");
 	}
 
 	@Override
