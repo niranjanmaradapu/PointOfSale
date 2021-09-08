@@ -25,6 +25,9 @@ public class NewSaleVo {
 	private SaleNature natureOfSale;
 
 	private Long invoiceNumber;
+	
+	private String creditNumber;
+
 
 	private String biller;
 

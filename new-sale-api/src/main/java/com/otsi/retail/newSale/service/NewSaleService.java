@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
+import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
@@ -21,6 +22,7 @@ import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.pktAdvanceVo;
 
 @Component
 public interface NewSaleService {
@@ -37,7 +39,7 @@ public interface NewSaleService {
 
 	ResponseEntity<?> getListOfSaleBills(ListOfSaleBillsVo svo);
 
-	ResponseEntity<?> getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo);
+	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws RecordNotFoundException;
 
 	ResponseEntity<?> posDayClose();
 
@@ -59,6 +61,10 @@ public interface NewSaleService {
 	ResponseEntity<?> getGiftVoucher(String gvNumber);
 
 	String tagCustomerToGv(Long userId, Long gvId);
+	
+	List<pktAdvanceVo> getcreditNoteswithMobilenumber(String mobileNumber);
+	
+    pktAdvanceVo getcreditNoteBycreditNumber(String creditNumber);
 
 
 

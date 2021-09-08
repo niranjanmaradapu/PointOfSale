@@ -1,7 +1,7 @@
 package com.otsi.retail.newSale.vo;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;

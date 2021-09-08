@@ -35,6 +35,7 @@ import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
+import com.otsi.retail.newSale.vo.pktAdvanceVo;
 
 /**
  * Controller class for accepting all the requests which are related to
@@ -164,7 +165,7 @@ public class NewSaleController {
 		// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		try {
 
-			ResponseEntity<?> getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo);
+			ListOfDeliverySlipVo getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo);
 
 			return new ResponseEntity<>(getDs, HttpStatus.OK);
 		} catch (Exception e) {
@@ -334,5 +335,29 @@ public class NewSaleController {
 		} catch (Exception e) {
 			return new ResponseEntity<>("Exception occurs while saving data..", HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	@GetMapping(value = CommonRequestMappigs.GET_CREDITNOTES_BY_MOBILENUMBER)
+	public ResponseEntity<?> getcreditNoteswithMobilenumber(String mobileNumber) {
+		try {
+			List<pktAdvanceVo> creditNote = newSaleService.getcreditNoteswithMobilenumber(mobileNumber);
+			return new ResponseEntity<>(creditNote, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+		}
+
+	}
+	
+	@GetMapping(value = CommonRequestMappigs.GET_CREDITNOTE_BY_CREDITNUMBER)
+	public ResponseEntity<?> getcreditNoteByCreditNumber(String creditNumber) {
+		try {
+			pktAdvanceVo creditNote = newSaleService.getcreditNoteBycreditNumber(creditNumber);
+			return new ResponseEntity<>(creditNote, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+		}
+
 	}
 }

@@ -33,5 +33,8 @@ public class CommonRequestMappigs {
 	public static final String  DAY_CLOSER  =  "daycloser";
 	
 	public static final String  POS_CLOSEDAY  =  "poscloseday";
+	
+	public static final String GET_CREDITNOTES_BY_MOBILENUMBER="getcreditNotesByMobilenumber";
+	public static final String GET_CREDITNOTE_BY_CREDITNUMBER="getcreditNoteByCreditNumber";
 
 }

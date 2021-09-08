@@ -68,6 +68,8 @@ public class NewSaleEntity {
 	private String approvedBy;
 
 	private Long recievedAmount;
+	
+	private Long balencedAmount;
 
 	private String reason;
 

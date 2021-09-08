@@ -14,13 +14,19 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
@@ -28,6 +34,7 @@ import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
+import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
 import com.otsi.retail.newSale.common.DSAttributes;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.PaymentType;
@@ -57,6 +64,7 @@ import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
+import com.otsi.retail.newSale.vo.pktAdvanceVo;
 
 /**
  * Service class contains all bussiness logics related to new sale , create
@@ -114,6 +122,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private GiftVoucherRepo gvRepo;
+	
+	@Value("${getCreditNoteWithMobileNumber.url}")
+	private String creditNoteWithMobileNumber;
+
+	
+
+	@Value("${getCreditNoteWithCreditnumber.url}")
+	private String creditNoteWithCreditNumber;
+
+	@Value("${updateCreditNoteByCreditNumber.url}")
+	private String updateCreditNoteByCreditNumber;
+	
+	
 
 	@Override
 	public ResponseEntity<?> saveNewSaleRequest(NewSaleVo vo) {
@@ -132,6 +153,35 @@ public class NewSaleServiceImpl implements NewSaleService {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			pktAdvanceVo pktVo = getcreditNoteBycreditNumber(vo.getCreditNumber());
+
+			Long advanceAmount = pktVo.getAmount();
+			Long balencedAmount = null;
+			Long remainingAdvancedAmount = null;
+
+			if (pktVo != null) {
+
+				if (vo.getNetPayableAmount() >= advanceAmount) {
+
+					balencedAmount = vo.getNetPayableAmount() - advanceAmount;
+					entity.setBalencedAmount(balencedAmount);
+				}
+				if (vo.getNetPayableAmount() <= advanceAmount) {
+
+					remainingAdvancedAmount = advanceAmount - vo.getNetPayableAmount();
+					pktVo.setAmount(remainingAdvancedAmount);
+
+				}
+
+			}	
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			
+			HttpEntity<pktAdvanceVo> requestEntity = new HttpEntity<>(pktVo, headers);
+			ResponseEntity<pktAdvanceVo> newsaleResponse = template.postForEntity(
+					updateCreditNoteByCreditNumber + "?id=" + pktVo.getId(), requestEntity, pktAdvanceVo.class);
+
+			pktAdvanceVo pvo = newsaleResponse.getBody();
 
 			List<DeliverySlipVo> dlSlips = vo.getDlSlip();
 			List<PaymentAmountTypeVo> paymentAmountTypeVos = vo.getPaymentAmountType();
@@ -411,7 +461,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public ResponseEntity<?> getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) {
+	public ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws RecordNotFoundException {
 		log.debug("deugging getlistofDeliverySlips:" + listOfDeliverySlipVo);
 		List<DeliverySlipEntity> dsDetails = new ArrayList<DeliverySlipEntity>();
 		/*
@@ -429,7 +479,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.error("No record found with given barcode");
-				return new ResponseEntity<>("No record found with given barcode", HttpStatus.BAD_REQUEST);
+				throw new RecordNotFoundException("No record found with given barcode");
 			}
 		}
 		/*
@@ -448,8 +498,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.error("No record found with given barcode");
-				return new ResponseEntity<>("No record found with given barcode", HttpStatus.BAD_REQUEST);
-			}
+				throw new RecordNotFoundException("No record found with given barcode");			}
 		}
 		/*
 		 * getting the record using dsNumber and dates
@@ -463,8 +512,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (dsDetails == null) {
 				log.error("No record found with given information");
-				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
-			}
+				throw new RecordNotFoundException("No record found with given barcode");			
+				}
 
 		}
 		/*
@@ -479,7 +528,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (dsDetails == null) {
 				log.error("No record found with given information");
-				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+				throw new RecordNotFoundException("No record found with given information");			
 			}
 
 		}
@@ -505,7 +554,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				 * listOfDeliverySlipVo.getDsNumber());
 				 */
 				log.error("No record found with given DS Number");
-				return new ResponseEntity<>("No record found with giver DS Number", HttpStatus.BAD_REQUEST);
+				throw new RecordNotFoundException("No record found with given DS Number");			
 			}
 
 		}
@@ -522,7 +571,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (dsDetails == null) {
 				log.error("No record found with given DS Number");
-				return new ResponseEntity<>("No record found with giver DS Number", HttpStatus.BAD_REQUEST);
+				throw new RecordNotFoundException("No record found with given DS Number");			
 			}
 
 		}
@@ -538,15 +587,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (dsDetails == null) {
 				log.error("No record found with given information");
-				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+				throw new RecordNotFoundException("No record found with given information");			
 			}
 
 		}
 
-		ListOfDeliverySlipVo mapper = newSaleMapper.convertListDSToVo(dsDetails);
+		ListOfDeliverySlipVo vo = newSaleMapper.convertListDSToVo(dsDetails);
 		log.warn("we are testing is fetching list of deivery slips");
-		log.info("after getting list of delivery slips :" + mapper);
-		return new ResponseEntity<>(mapper, HttpStatus.OK);
+		log.info("after getting list of delivery slips :" + vo);
+		return vo;
 
 	}
 
@@ -795,5 +844,47 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 		return "Gift vocher tagged successfully to " + user.get().getName();
 	}
+	
+	@Override
+	public List<pktAdvanceVo> getcreditNoteswithMobilenumber(String mobileNumber) {
+		List<MediaType> acceptableMediaTypes = new ArrayList<MediaType>();
+		acceptableMediaTypes.add(MediaType.ALL);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(acceptableMediaTypes);
+		HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+		ResponseEntity<List<pktAdvanceVo>> newsaleResponse = template.exchange(
+				creditNoteWithMobileNumber + "?mobileNumber=" + mobileNumber, HttpMethod.GET, entity,
+				new ParameterizedTypeReference<List<pktAdvanceVo>>() {
+				}, mobileNumber);
+		 
+		ObjectMapper mapper = new ObjectMapper();
+		List<pktAdvanceVo> vo = newsaleResponse.getBody();
+		
+
+		return vo;
+	}
+	
+	@Override
+
+	public pktAdvanceVo getcreditNoteBycreditNumber(String creditNumber) {
+		List<MediaType> acceptableMediaTypes = new ArrayList<MediaType>();
+		acceptableMediaTypes.add(MediaType.ALL);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(acceptableMediaTypes);
+		HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+		ResponseEntity<pktAdvanceVo> newsaleResponse = template.exchange(
+				creditNoteWithCreditNumber + "?creditNumber=" + creditNumber, HttpMethod.GET, entity,
+				new ParameterizedTypeReference<pktAdvanceVo>() {
+				}, creditNumber);
+		pktAdvanceVo vo = newsaleResponse.getBody();
+
+		return vo;
+	}
+
+
 
 }
