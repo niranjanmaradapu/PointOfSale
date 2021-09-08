@@ -2,7 +2,7 @@ package com.otsi.retail.newSale.common;
 
 public enum UserDataAVEnum {
 
-	GSTNUMBER(1, "gstNumber"), PANNUMBER(1, "panNumber"), DOB(2, "dob");
+	GSTNUMBER(1, "gstNumber"), PANNUMBER(1, "panNumber"),ADDRESS(1,"address"),EMAIL(1,"email"), DOB(2, "dob");
 
 	private int id;
 	private String eName;

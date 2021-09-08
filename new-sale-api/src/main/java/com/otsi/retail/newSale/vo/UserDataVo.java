@@ -23,6 +23,10 @@ public class UserDataVo {
 	private char gender;
 
 	private LocalDate dob;
+	
+	private String email;
+	
+	private String address;
 
 	private String gstNumber;
 
