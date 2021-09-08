@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +78,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			if (vo.getRtNumber() != null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtNo(vo.getDateFrom(), vo.getDateTo(),
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtNoOrderByCreatedDateAsc(vo.getDateFrom(), vo.getDateTo(),
 						vo.getRtNumber());
 			}
 			/**
@@ -86,7 +87,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreditNote() != null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndCrNo(vo.getDateFrom(), vo.getDateTo(),
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndCrNoOrderByCreatedDateAsc(vo.getDateFrom(), vo.getDateTo(),
 						vo.getCreditNote());
 			}
 			/**
@@ -95,7 +96,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() != null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtStatus(vo.getDateFrom(), vo.getDateTo(),
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtStatusOrderByCreatedDateAsc(vo.getDateFrom(), vo.getDateTo(),
 						vo.getRtStatus());
 			}
 			/**
@@ -104,7 +105,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() != null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndIsReviewed(vo.getDateFrom(),
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndIsReviewedOrderByCreatedDateAsc(vo.getDateFrom(),
 						vo.getDateTo(), vo.getRtReviewStatus());
 			}
 			/**
@@ -114,7 +115,7 @@ public class CustomerServiceImpl implements CustomerService {
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() != null) {
 				
-					retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCode(vo.getDateFrom(),vo.getDateTo(),vo.getBarcode());
+			retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCodeOrderByCreatedDateAsc(vo.getDateFrom(),vo.getDateTo(),vo.getBarcode());
 				
 			}
 			/**
@@ -122,7 +123,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 *
 			 */
 			else
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetween(vo.getDateFrom(), vo.getDateTo());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenOrderByCreatedDateAsc(vo.getDateFrom(), vo.getDateTo());
 			/**
 			 * getting the records without dates
 			 *
@@ -134,7 +135,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			if (vo.getRtNumber() != null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByRtNo(vo.getRtNumber());
+				retunSlipdetails = returnSlipRepo.findByRtNoOrderByCreatedDateAsc(vo.getRtNumber());
 			}
 			/**
 			 * getting the record using creditnote
@@ -142,7 +143,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreditNote() != null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCrNo(vo.getCreditNote());
+				retunSlipdetails = returnSlipRepo.findByRtNoOrderByCreatedDateAsc(vo.getCreditNote());
 			}
 			/**
 			 * getting the record using RtStatus
@@ -150,7 +151,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() != null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByRtStatus(vo.getRtStatus());
+				retunSlipdetails = returnSlipRepo.findByRtNoOrderByCreatedDateAsc(vo.getRtStatus());
 			}
 			/**
 			 * getting the record using barcode
@@ -160,7 +161,7 @@ public class CustomerServiceImpl implements CustomerService {
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() != null) {
 				
-					retunSlipdetails = returnSlipRepo.findByTaggedItems_barCode(vo.getBarcode());
+					retunSlipdetails = returnSlipRepo.findByTaggedItems_barCodeOrderByCreatedDateAsc(vo.getBarcode());
 				
 			}
 
@@ -170,7 +171,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() != null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByIsReviewed(vo.getRtReviewStatus());
+				retunSlipdetails = returnSlipRepo.findByIsReviewedOrderByCreatedDateAsc(vo.getRtReviewStatus());
 			}
 
 		}

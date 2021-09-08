@@ -1,7 +1,7 @@
 package com.otsi.kalamandhir.repo;
 
 import java.time.LocalDate;
-
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -53,13 +53,38 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 //	List<ReturnSlip> findByCreatedDateBetweenAndCrNo(LocalDate dateFrom, LocalDate dateTo,
 //			String creditNote);
 
-	List<ReturnSlip> findByCreatedDateBetweenAndCrNo(LocalDate dateFrom, LocalDate dateTo, String creditNote);
+	List<ReturnSlip> findByCreatedDateBetweenAndCrNo(LocalDate localDate, LocalDate dateTo, String creditNote);
 
 	List<ReturnSlip> findByCrNo(String creditNote);
+
+	
+
+	List<ReturnSlip> findByTaggedItems_barCode(String barcode);
 
 	List<ReturnSlip> findByCreatedDateBetweenAndTaggedItems_barCode(LocalDate dateFrom, LocalDate dateTo,
 			String barcode);
 
-	List<ReturnSlip> findByTaggedItems_barCode(String barcode);
+	List<ReturnSlip> findByCreatedDateBetweenAndRtNoOrderByCreatedDateAsc(LocalDate dateFrom, LocalDate dateTo,
+			String rtNumber);
+
+	List<ReturnSlip> findByCreatedDateBetweenAndCrNoOrderByCreatedDateAsc(LocalDate dateFrom, LocalDate dateTo,
+			String creditNote);
+
+	List<ReturnSlip> findByCreatedDateBetweenAndRtStatusOrderByCreatedDateAsc(LocalDate dateFrom, LocalDate dateTo,
+			String rtStatus);
+
+	List<ReturnSlip> findByCreatedDateBetweenAndIsReviewedOrderByCreatedDateAsc(LocalDate dateFrom, LocalDate dateTo,
+			Boolean rtReviewStatus);
+
+	List<ReturnSlip> findByCreatedDateBetweenAndTaggedItems_barCodeOrderByCreatedDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, String barcode);
+
+	List<ReturnSlip> findByCreatedDateBetweenOrderByCreatedDateAsc(LocalDate dateFrom, LocalDate dateTo);
+
+	List<ReturnSlip> findByRtNoOrderByCreatedDateAsc(String rtNumber);
+
+	List<ReturnSlip> findByTaggedItems_barCodeOrderByCreatedDateAsc(String barcode);
+
+	List<ReturnSlip> findByIsReviewedOrderByCreatedDateAsc(Boolean rtReviewStatus);
 
 }
