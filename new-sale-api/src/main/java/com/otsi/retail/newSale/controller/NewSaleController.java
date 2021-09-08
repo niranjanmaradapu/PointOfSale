@@ -132,7 +132,7 @@ public class NewSaleController {
 	public ResponseEntity<?> getDeliverySlipDetails(@RequestParam String dsNumber) {
 		log.info("Received Request to getDeliverySlipDetails :" + dsNumber);
 		try {
-			ResponseEntity<?> dsDetails = newSaleService.getDeliverySlipDetails(dsNumber);
+     DeliverySlipVo dsDetails = newSaleService.getDeliverySlipDetails(dsNumber);
 			return new ResponseEntity<>(dsDetails, HttpStatus.OK);
 
 		} catch (Exception e) {

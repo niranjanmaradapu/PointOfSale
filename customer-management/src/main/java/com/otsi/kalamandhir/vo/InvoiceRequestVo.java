@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InvoiceRequestVo {
 
-	private long invoiceNo;
+	private String invoiceNo;
 	private String barCode;
 	private String mobileNo;
 	private LocalDate fromDate;

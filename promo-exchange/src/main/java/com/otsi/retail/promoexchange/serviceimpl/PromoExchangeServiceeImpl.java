@@ -1,20 +1,27 @@
 package com.otsi.retail.promoexchange.serviceimpl;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -41,7 +48,6 @@ import com.otsi.retail.promoexchange.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.promoexchange.vo.ListOfSaleBillsVo;
 import com.otsi.retail.promoexchange.vo.MessageVo;
 import com.otsi.retail.promoexchange.vo.PromoExchangeVo;
-
 
 /**
  * Service class contains all bussiness logics related to new sale , create
@@ -85,6 +91,10 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 	@Value("${savecustomer.url}")
 	private String url;
+	@Autowired
+	private RestTemplate restTemplate;
+
+	private final static String GET_DS_DETAILS_FROM_NEWSALE_URl = "http://localhost:8081/newsale/getdeliveryslip";
 
 	@Override
 	public ResponseEntity<?> savePromoItemExchangeRequest(PromoExchangeVo vo) {
@@ -103,20 +113,20 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 			}
 
 			List<DeliverySlipVo> dlSlips = vo.getDlSlip();
-            List<ListOfReturnSlipsVo> returnSlips=vo.getReturnSlips();
+			List<ListOfReturnSlipsVo> returnSlips = vo.getReturnSlips();
 			entity.setPayType(vo.getPayType());
 			entity.setGrossAmount(dlSlips.stream().mapToLong(i -> i.getMrp()).sum());
 			entity.setTotalPromoDisc(dlSlips.stream().mapToLong(i -> i.getPromoDisc()).sum());
 			entity.setTotalManualDisc(vo.getTotalManualDisc());
 			entity.setCreatedDate(LocalDate.now());
-            entity.setNetPayableAmount(dlSlips.stream().mapToLong(i->i.getNetAmount()).sum());
-            entity.setRecievedAmount(returnSlips.stream().mapToLong(r->r.getAmount()).sum());
-		    Long balanceAmount=entity.getNetPayableAmount()-entity.getRecievedAmount();  
-		    
-		    System.out.println("net payable amount:"+entity.getNetPayableAmount());
-		    System.out.println("recieved amount:"+entity.getRecievedAmount());
-		    System.out.println("balance amount:"+balanceAmount);
-		    
+			entity.setNetPayableAmount(dlSlips.stream().mapToLong(i -> i.getNetAmount()).sum());
+			entity.setRecievedAmount(returnSlips.stream().mapToLong(r -> r.getAmount()).sum());
+			Long balanceAmount = entity.getNetPayableAmount() - entity.getRecievedAmount();
+
+			System.out.println("net payable amount:" + entity.getNetPayableAmount());
+			System.out.println("recieved amount:" + entity.getRecievedAmount());
+			System.out.println("balance amount:" + balanceAmount);
+
 			Long net = dlSlips.stream().mapToLong(i -> i.getNetAmount()).sum() - vo.getTotalManualDisc();
 
 			entity.setNetPayableAmount(net);
@@ -151,20 +161,19 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 	@Override
 	public DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws Exception {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity entity = new HttpEntity(headers);
+		URI uri = null;
+		try {
+			
+			uri = UriComponentsBuilder.fromUri(new URI(GET_DS_DETAILS_FROM_NEWSALE_URl+"?dsNumber="+dsNumber)).build().encode()
+					.toUri();
+			ResponseEntity<DeliverySlipVo> vo = restTemplate.exchange(uri, HttpMethod.GET,entity,DeliverySlipVo.class);
+			return vo.getBody();	
 
-		DeliverySlipEntity dsEntity = dsRepo.findByDsNumber(dsNumber);
-
-		if (dsEntity != null) {
-			if (!dsEntity.getBarcodes().isEmpty()) {
-				DeliverySlipVo vo = dsMapper.convertDsEntityToVo(dsEntity);
-
-				return vo;
-			} else {
-				throw new Exception("Barcode details not exists with given DS Number");
-			}
-
-		} else {
-			throw new Exception("No record with DsNumber :" + dsNumber);
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
 		}
 
 	}

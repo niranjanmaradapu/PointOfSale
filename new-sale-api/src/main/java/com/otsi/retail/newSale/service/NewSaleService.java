@@ -35,11 +35,13 @@ public interface NewSaleService {
 
 	ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo,String enumName);
 
-	ResponseEntity<?> getDeliverySlipDetails(String dsNumber);
+	DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws Exception;
 
 	ResponseEntity<?> getListOfSaleBills(ListOfSaleBillsVo svo);
 
-	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws RecordNotFoundException;
+
+	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws Exception;
+
 
 	ResponseEntity<?> posDayClose();
 
@@ -48,7 +50,7 @@ public interface NewSaleService {
 	List<NewSaleResponseVo> getNewsaleByCustomerId(Long customerId);
 
 	NewSaleVo updateNewSale(NewSaleResponseVo vo);
-	NewSaleList getInvoicDetails(InvoiceRequestVo vo);
+	NewSaleList getInvoicDetails(InvoiceRequestVo vo) throws Exception;
 
 	CustomerVo getCustomerFromNewSale(String mobileNo) throws Exception;
 
