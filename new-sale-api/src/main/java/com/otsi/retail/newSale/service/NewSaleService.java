@@ -33,11 +33,11 @@ public interface NewSaleService {
 
 	ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo,String enumName);
 
-	ResponseEntity<?> getDeliverySlipDetails(String dsNumber);
+	DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws Exception;
 
 	ResponseEntity<?> getListOfSaleBills(ListOfSaleBillsVo svo);
 
-	ResponseEntity<?> getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo);
+	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws Exception;
 
 	ResponseEntity<?> posDayClose();
 
