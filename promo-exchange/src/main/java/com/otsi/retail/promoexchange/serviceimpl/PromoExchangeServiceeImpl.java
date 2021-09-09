@@ -138,21 +138,22 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 			List<DeliverySlipEntity> dsList = dsRepo.findByDsNumberIn(dlsList);
 
-			if (dsList.size() == vo.getDlSlip().size()) {
-
-				PromoExchangeEntity saveEntity = promoExchangeRepository.save(entity);
-
-				dsList.stream().forEach(a -> {
-
-					a.setPromoexchange(saveEntity);
-					a.setLastModified(LocalDateTime.now());
-
-					dsRepo.save(a);
-				});
-
-			} else {
-				return new ResponseEntity<>("Please enter Valid delivery slips..", HttpStatus.BAD_REQUEST);
-			}
+//			// if (dsList.size() == vo.getDlSlip().size()) {
+//
+//			PromoExchangeEntity saveEntity = promoExchangeRepository.save(entity);
+//
+//			dsList.stream().forEach(a -> {
+//
+//				a.setPromoexchange(saveEntity);
+//				a.setLastModified(LocalDateTime.now());
+//
+//				dsRepo.save(a);
+//			});
+//
+////			} else {
+////				return new ResponseEntity<>("Please enter Valid delivery slips..", HttpStatus.BAD_REQUEST);
+////			}
+			PromoExchangeEntity saveEntity = promoExchangeRepository.save(entity);
 		}
 
 		return new ResponseEntity<>("Bill generated with number :" + entity.getBillNumber(), HttpStatus.OK);
@@ -166,11 +167,12 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 		HttpEntity entity = new HttpEntity(headers);
 		URI uri = null;
 		try {
-			
-			uri = UriComponentsBuilder.fromUri(new URI(GET_DS_DETAILS_FROM_NEWSALE_URl+"?dsNumber="+dsNumber)).build().encode()
-					.toUri();
-			ResponseEntity<DeliverySlipVo> vo = restTemplate.exchange(uri, HttpMethod.GET,entity,DeliverySlipVo.class);
-			return vo.getBody();	
+
+			uri = UriComponentsBuilder.fromUri(new URI(GET_DS_DETAILS_FROM_NEWSALE_URl + "?dsNumber=" + dsNumber))
+					.build().encode().toUri();
+			ResponseEntity<DeliverySlipVo> vo = restTemplate.exchange(uri, HttpMethod.GET, entity,
+					DeliverySlipVo.class);
+			return vo.getBody();
 
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());

@@ -209,7 +209,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public String createReturnSlip(GenerateReturnSlipRequest request) throws Exception {
 		try {
 
-			if(request.isUserTagged()==Boolean.FALSE) {
+			if(!request.getIsUserTagged()) {
 				tagUserToInvoice(request.getMobileNumber(),request.getInvoiceNo());
 			}
 			
@@ -224,14 +224,14 @@ public class CustomerServiceImpl implements CustomerService {
 			returnSlipDto.setRtStatus(ReturnSlipStatus.PENDING.getId());
 			returnSlipDto.setAmount(request.getAmount());
 			returnSlipRepo.save(returnSlipDto);
-			return "Successfully saved";
+			return "Successfully saved "+returnSlipDto.getRtNo();
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
 
 	}
 
-	private void tagUserToInvoice(String mobileNumber, long invoiceNo) throws Exception {
+	private void tagUserToInvoice(String mobileNumber, String invoiceNo) throws Exception {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity entity = new HttpEntity(headers);

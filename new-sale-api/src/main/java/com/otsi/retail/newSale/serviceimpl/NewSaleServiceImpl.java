@@ -148,7 +148,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			entity.setDiscApprovedBy(vo.getDiscApprovedBy());
 			entity.setDiscType(vo.getDiscType());
 			entity.setCreatedDate(LocalDate.now());
-			entity.setInvoiceNumber(vo.getInvoiceNumber());
+			//entity.setInvoiceNumber(vo.getInvoiceNumber());
 
 			Long net = dlSlips.stream().mapToLong(i -> i.getNetAmount()).sum() - vo.getTotalManualDisc();
 
@@ -248,7 +248,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 					a.setDeliverySlip(savedEntity);
 					a.setLastModified(LocalDateTime.now());
 
-					barcodeRepository.save(a);
+					BarcodeEntity bar=		barcodeRepository.save(a);
+					
+					log.info("----------->"+bar);
+					
 				});
 
 			} else if (enumName.equalsIgnoreCase(DSAttributes.METERS.getName())) {
@@ -302,8 +305,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 				throw new Exception("No record with DsNumber :\" + dsNumber");
 			}
 		} catch (Exception e) {
-			log.error("error occurs while saving Delivery slip");
-			throw new Exception("error occurs while saving Delivery slip");
+			log.error(e.getMessage());
+			throw new Exception(e.getMessage());
 		}
 	}
 
@@ -645,7 +648,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	public NewSaleList getInvoicDetails(InvoiceRequestVo vo) throws Exception {
 		NewSaleList newSaleList1 = new NewSaleList();
 		List<NewSaleVo> newSaleList = new ArrayList<>();
-		if (null !=  vo.getInvoiceNo() ) {
+		if (null !=  vo.getInvoiceNo() && !vo.getInvoiceNo().isEmpty()) {
 
 			List<NewSaleEntity> newSaleEntity = newSaleRepository.findByBillNumber(vo.getInvoiceNo());
 			newSaleList = newSaleEntity.stream().map(dto -> newSaleMapper.convertNewSaleDtoToVo(dto))

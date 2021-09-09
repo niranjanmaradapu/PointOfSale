@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -132,7 +133,7 @@ public class NewSaleController {
 		log.info("Received Request to getDeliverySlipDetails :" + dsNumber);
 		try {
      DeliverySlipVo dsDetails = newSaleService.getDeliverySlipDetails(dsNumber);
-			return new ResponseEntity<>(dsDetails, HttpStatus.OK);
+			return new ResponseEntity(dsDetails, HttpStatus.OK);
 
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());
@@ -264,20 +265,20 @@ public class NewSaleController {
 
 	}
 
-//	@GetMapping("/discTypes")
-//	public List<String> getDiscountsTypes() {
-//
-//		List<String> discTypes = new ArrayList<>();
-//
-//		discTypes.add("Promotion not applied");
-//		discTypes.add("RT return discount");
-//		discTypes.add("Mgnt. SPL Discount");
-//		discTypes.add("Management discount");
-//		discTypes.add("DMG Discount");
-//		discTypes.add("Other");
-//
-//		return discTypes;
-//	}
+	@GetMapping("/discTypes")
+	public List<String> getDiscountsTypes() {
+
+		List<String> discTypes = new ArrayList<>();
+
+		discTypes.add("Promotion not applied");
+		discTypes.add("RT return discount");
+		discTypes.add("Mgnt. SPL Discount");	
+		discTypes.add("Management discount");
+		discTypes.add("DMG Discount");
+		discTypes.add("Other");
+
+		return discTypes;
+	}
 	// Method for saving GiftVoucher
 	@PostMapping("/saveGv")
 	public ResponseEntity<?> saveGiftVoucher(@RequestBody GiftVoucherVo vo) {
