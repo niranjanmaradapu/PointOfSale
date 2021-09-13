@@ -20,7 +20,6 @@ data:
 #    requests:
 #      storage: 1Gi
 #---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -135,5 +134,4 @@ spec:
   ports:
     - port: 8083
   selector:
-    app: connection-pool-app
-    
+    app: connection-pool-app    
