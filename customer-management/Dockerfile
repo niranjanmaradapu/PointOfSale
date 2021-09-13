@@ -1,3 +1,5 @@
-FROM tomcat:8.0
-USER root
-COPY customer-management/target/* /usr/local/tomcat/webapps/
+FROM openjdk:8
+COPY  target/  target/
+RUN  mv target/*.jar   target/customer-management.jar
+EXPOSE 8082
+ENTRYPOINT ["java", "-jar", "target/customer-management.jar"]
