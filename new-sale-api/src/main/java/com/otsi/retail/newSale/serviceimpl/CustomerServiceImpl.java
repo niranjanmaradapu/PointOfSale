@@ -72,7 +72,7 @@ public class CustomerServiceImpl implements CustomerService {
 			log.error(
 					"Customer is with mobile number " + mobileNumber + " not exists. So please fill all the details..");
 			throw new CustomerNotFoundExcecption("Customer is with mobile number " + mobileNumber
-					+ " not exists. So please fill all the details.." + HttpStatus.BAD_REQUEST);
+					+ " not exists. So please fill all the details" + HttpStatus.BAD_REQUEST);
 		} else {
 			CustomerVo details = customerMapper.convertEntityToVo(customerDetails.get());
 			log.warn("we are testing getting customer by mobile number");
