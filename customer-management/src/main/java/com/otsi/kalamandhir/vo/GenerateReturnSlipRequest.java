@@ -17,14 +17,14 @@ public class GenerateReturnSlipRequest {
 	private List<TaggedItems> barcodes;
 	private String rtNumber;
 	private String crNumber;
-	private long invoiceNo;
+	private String invoiceNo;
 	private String reason;
 	private String createdBy;
-	private boolean iSReviewed;
+	private Boolean iSReviewed;
 	private String reviewedBy;
 	private LocalDate createdDate;
 	private LocalDate modifiedDate;
 	private long amount;
-	private boolean isUserTagged;
+	private Boolean isUserTagged;
 	private String mobileNumber;
 }

@@ -71,7 +71,7 @@ public class NewSaleEntity {
 
 	private String reason;
 
-	@OneToMany(targetEntity = DeliverySlipEntity.class, mappedBy = "newsale", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(targetEntity = DeliverySlipEntity.class, mappedBy = "newsale", cascade = CascadeType.ALL)
 	private List<DeliverySlipEntity> dlSlip;
 
 	@ManyToOne
