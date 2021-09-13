@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      MODULE_NAME: connection-pool
     permissions:
       contents: read
       packages: write
@@ -35,7 +37,7 @@ jobs:
       
       
       - name: Build with Maven
-        run: mvn -B package --file connection-pool/pom.xml -DskipTests # change location of pom.xml file   
+        run: mvn -B package --file ${{ env.MODULE_NAME }}/pom.xml -DskipTests # change location of pom.xml file   
       
         
       - name: Persistent workflow data as artificats 
