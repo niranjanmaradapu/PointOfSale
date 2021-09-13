@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env: 
+      MODULE_NAME: new-sale-api
     permissions:
       contents: read
       packages: write
@@ -35,14 +37,14 @@ jobs:
       
       
       - name: Build with Maven
-        run: mvn -B package --file  new-sale-api/pom.xml -DskipTests # change location of pom.xml file   
+        run: mvn -B package --file  ${{ env.MODULE_NAME }}/pom.xml -DskipTests # change location of pom.xml file   
       
         
       - name: Persistent workflow data as artificats 
         uses: actions/upload-artifact@v2
         with: 
           name: github-actions-artifact
-          path: connection-pool/target
+          path: ${{ env.MODULE_NAME }}/target
  
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -59,9 +61,9 @@ jobs:
           region: ap-south-1
       - name: Build and Push to ECR
         run: |
-         docker build -t new-sale-api  new-sale-api/   # edit Directory 
-         docker tag new-sale-api  ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/new-sale-api:latest  # edit Image Name 
-         docker push ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/new-sale-api:latest  # create repository for new-sale-api        
+         docker build -t ${{ env.MODULE_NAME }}  ${{ env.MODULE_NAME }}/   # edit Directory 
+         docker tag ${{ env.MODULE_NAME }}  ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/${{ env.MODULE_NAME }}:latest  # edit Image Name 
+         docker push ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/${{ env.MODULE_NAME }}:latest  # create repository for new-sale-api        
       
       - name: Deploy
         uses: cancue/eks-action@v0.0.2
@@ -72,6 +74,6 @@ jobs:
           cluster_name: Microservice-K8S-Cluster # we can edit
         with:
           args: |
-            kubectl apply -f  k8s/new-sale-api.yml
+            kubectl apply -f  k8s/${{ env.MODULE_NAME }}.yml
       
        
