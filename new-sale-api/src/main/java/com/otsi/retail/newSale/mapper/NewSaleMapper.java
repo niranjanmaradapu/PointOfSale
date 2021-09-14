@@ -84,7 +84,7 @@ public class NewSaleMapper {
 
 			// BeanUtils.copyProperties(x, nsvo);
 
-			nsvo.setInvoiceNumber(x.getInvoiceNumber());
+			nsvo.setInvoiceNumber(x.getBillNumber());
 			nsvo.setBiller(x.getBiller());
 			nsvo.setCreatedDate(x.getCreatedDate());
 			nsvo.setTotalManualDisc(x.getTotalManualDisc());
@@ -128,7 +128,7 @@ public class NewSaleMapper {
 	public NewSaleVo entityToVo(NewSaleEntity dto) {
 		NewSaleVo vo = new NewSaleVo();
 		vo.setNewsaleId(dto.getNewsaleId());
-		vo.setInvoiceNumber(dto.getInvoiceNumber());
+		vo.setInvoiceNumber(dto.getBillNumber());
 		vo.setNetPayableAmount(dto.getNetPayableAmount());
 		vo.setRecievedAmount(dto.getRecievedAmount());
 		vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
@@ -178,7 +178,7 @@ public class NewSaleMapper {
 			vo.setDlSlip(deliverySlipMapper.convertDsEntityListToVoList(dto.getDlSlip()));
 		}
 		vo.setGrossAmount(dto.getGrossAmount());
-		vo.setInvoiceNumber(dto.getInvoiceNumber());
+		vo.setInvoiceNumber(dto.getBillNumber());
 		vo.setNatureOfSale(dto.getNatureOfSale());
 		vo.setNetPayableAmount(dto.getNetPayableAmount());
 		vo.setOfflineNumber(dto.getOfflineNumber());

@@ -148,7 +148,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			entity.setDiscApprovedBy(vo.getDiscApprovedBy());
 			entity.setDiscType(vo.getDiscType());
 			entity.setCreatedDate(LocalDate.now());
-			entity.setInvoiceNumber(vo.getInvoiceNumber());
+			//entity.setInvoiceNumber(vo.getInvoiceNumber());
 
 			Long net = dlSlips.stream().mapToLong(i -> i.getNetAmount()).sum() - vo.getTotalManualDisc();
 
@@ -248,7 +248,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 					a.setDeliverySlip(savedEntity);
 					a.setLastModified(LocalDateTime.now());
 
-					barcodeRepository.save(a);
+					BarcodeEntity bar=		barcodeRepository.save(a);
+					
+					log.info("----------->"+bar);
+					
 				});
 
 			} else if (enumName.equalsIgnoreCase(DSAttributes.METERS.getName())) {
@@ -274,9 +277,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public ResponseEntity<?> getDeliverySlipDetails(String dsNumber) {
+	public DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws Exception {
 		log.debug("deugging getDeliverySlipDetails:" + dsNumber);
 		try {
+			
+			
+			
+			
+			
+			
 			DeliverySlipEntity dsEntity = dsRepo.findByDsNumber(dsNumber);
 
 			if (dsEntity != null) {
@@ -284,22 +293,21 @@ public class NewSaleServiceImpl implements NewSaleService {
 					DeliverySlipVo vo = dsMapper.convertDsEntityToVo(dsEntity);
 					log.warn("we are testing fetching delivery slip details");
 					log.info("after getting delivery slip details :" + vo);
-					return new ResponseEntity<>(vo, HttpStatus.OK);
+					return vo;
 				} else {
 					log.error("Barcode details not exists with given DS Number");
-					return new ResponseEntity<>("Barcode details not exists with given DS Number",
-							HttpStatus.BAD_REQUEST);
+					throw new Exception("Barcode details not exists with given DS Number");
+							
 				}
 
 			} else {
 				log.error("No record with DsNumber :" + dsNumber);
-				return new ResponseEntity<>("No record with DsNumber :" + dsNumber, HttpStatus.BAD_REQUEST);
+				throw new Exception("No record with DsNumber :\" + dsNumber");
 			}
 		} catch (Exception e) {
-			log.error("error occurs while saving Delivery slip");
-			return new ResponseEntity<>("error occurs while saving Delivery slip", HttpStatus.BAD_REQUEST);
+			log.error(e.getMessage());
+			throw new Exception(e.getMessage());
 		}
-
 	}
 
 	@Override
@@ -411,7 +419,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public ResponseEntity<?> getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) {
+	public ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws Exception {
 		log.debug("deugging getlistofDeliverySlips:" + listOfDeliverySlipVo);
 		List<DeliverySlipEntity> dsDetails = new ArrayList<DeliverySlipEntity>();
 		/*
@@ -429,7 +437,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.error("No record found with given barcode");
-				return new ResponseEntity<>("No record found with given barcode", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given barcode");
 			}
 		}
 		/*
@@ -443,12 +451,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 			BarcodeEntity bar = barcodeRepository.findByBarcode(listOfDeliverySlipVo.getBarcode());
 
 			if (bar != null) {
-				dsDetails = dsRepo.findByCreatedDateBetweenAndDsId(listOfDeliverySlipVo.getDateFrom(),
+				dsDetails = dsRepo.findByCreatedDateBetweenAndDsIdOrderByCreatedDateAsc(listOfDeliverySlipVo.getDateFrom(),
 						listOfDeliverySlipVo.getDateTo(), bar.getDeliverySlip().getDsId());
 
 			} else {
 				log.error("No record found with given barcode");
-				return new ResponseEntity<>("No record found with given barcode", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given barcode");
 			}
 		}
 		/*
@@ -458,12 +466,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() == null
 				&& listOfDeliverySlipVo.getBarcode() == null) {
 
-			dsDetails = dsRepo.findByCreatedDateBetweenAndDsNumber(listOfDeliverySlipVo.getDateFrom(),
+			dsDetails = dsRepo.findByCreatedDateBetweenAndDsNumberOrderByCreatedDateAsc(listOfDeliverySlipVo.getDateFrom(),
 					listOfDeliverySlipVo.getDateTo(), listOfDeliverySlipVo.getDsNumber());
 
 			if (dsDetails == null) {
 				log.error("No record found with given information");
-				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given information");
 			}
 
 		}
@@ -474,12 +482,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
 				&& listOfDeliverySlipVo.getBarcode() == null) {
 
-			dsDetails = dsRepo.findByCreatedDateBetweenAndStatus(listOfDeliverySlipVo.getDateFrom(),
+			dsDetails = dsRepo.findByCreatedDateBetweenAndStatusOrderByCreatedDateAsc(listOfDeliverySlipVo.getDateFrom(),
 					listOfDeliverySlipVo.getDateTo(), listOfDeliverySlipVo.getStatus());
 
 			if (dsDetails == null) {
 				log.error("No record found with given information");
-				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given information");
 			}
 
 		}
@@ -496,7 +504,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			// x.getDsNumber()).collect(Collectors.toList());
 			List<String> dsList = new ArrayList<>();
 			dsList.add(listOfDeliverySlipVo.getDsNumber());
-			dsDetails = dsRepo.findByDsNumberIn(dsList);
+			dsDetails = dsRepo.findByDsNumberInOrderByCreatedDateAsc(dsList);
 
 			if (dsDetails.isEmpty()) {
 
@@ -505,7 +513,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				 * listOfDeliverySlipVo.getDsNumber());
 				 */
 				log.error("No record found with given DS Number");
-				return new ResponseEntity<>("No record found with giver DS Number", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given DS Numbe");
 			}
 
 		}
@@ -518,11 +526,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
 				&& listOfDeliverySlipVo.getBarcode() == null) {
 
-			dsDetails = dsRepo.findByStatus(listOfDeliverySlipVo.getStatus());
+			dsDetails = dsRepo.findByStatusOrderByCreatedDateAsc(listOfDeliverySlipVo.getStatus());
 
 			if (dsDetails == null) {
 				log.error("No record found with given DS Number");
-				return new ResponseEntity<>("No record found with giver DS Number", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given DS Numbe");
 			}
 
 		}
@@ -533,12 +541,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
 				&& listOfDeliverySlipVo.getBarcode() == null) {
 
-			dsDetails = dsRepo.findByCreatedDateBetween(listOfDeliverySlipVo.getDateFrom(),
+			dsDetails = dsRepo.findByCreatedDateBetweenOrderByCreatedDateAsc(listOfDeliverySlipVo.getDateFrom(),
 					listOfDeliverySlipVo.getDateTo());
 
 			if (dsDetails == null) {
 				log.error("No record found with given information");
-				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given information");
 			}
 
 		}
@@ -546,7 +554,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		ListOfDeliverySlipVo mapper = newSaleMapper.convertListDSToVo(dsDetails);
 		log.warn("we are testing is fetching list of deivery slips");
 		log.info("after getting list of delivery slips :" + mapper);
-		return new ResponseEntity<>(mapper, HttpStatus.OK);
+		return mapper;
 
 	}
 
@@ -640,7 +648,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	public NewSaleList getInvoicDetails(InvoiceRequestVo vo) throws Exception {
 		NewSaleList newSaleList1 = new NewSaleList();
 		List<NewSaleVo> newSaleList = new ArrayList<>();
-		if (null !=  vo.getInvoiceNo() ) {
+		if (null !=  vo.getInvoiceNo() && !vo.getInvoiceNo().isEmpty()) {
 
 			List<NewSaleEntity> newSaleEntity = newSaleRepository.findByBillNumber(vo.getInvoiceNo());
 			newSaleList = newSaleEntity.stream().map(dto -> newSaleMapper.convertNewSaleDtoToVo(dto))
