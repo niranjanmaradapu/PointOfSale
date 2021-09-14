@@ -1,5 +1,5 @@
 server:
- port: 8083
+ port: 8085
  
 #eureka:
 #  client:
@@ -15,9 +15,9 @@ spring:
     name: connection-pool
  datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/klm
+    url: jdbc:postgresql://localhost:5432/connectionpool
     username: postgres
-    password: 1234 
+    password: root
  jpa:
    hibernate:
     ddl-auto: update

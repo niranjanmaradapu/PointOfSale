@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.retail.connectionpool.entity.PoolEntity;
 import com.otsi.retail.connectionpool.entity.PromotionsEntity;
+import com.otsi.retail.connectionpool.entity.StoresEntity;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
 
@@ -20,7 +21,7 @@ import com.otsi.retail.connectionpool.vo.PromotionsVo;
 @Component
 public class PromotionMapper {
 
-	public PromotionsEntity convertPromoVoToEntity(PromotionsVo vo, List<PoolEntity> poolList) {
+	public PromotionsEntity convertPromoVoToEntity(PromotionsVo vo, List<PoolEntity> poolList,List<StoresEntity> stores) {
 
 		PromotionsEntity promo = new PromotionsEntity();
 
@@ -38,6 +39,8 @@ public class PromotionMapper {
 		promo.setCreatedDate(LocalDate.now());
 		promo.setLastModified(LocalDate.now());
 		promo.setPoolEntity(poolList);// Mapping all poolIds to Promotions
+		
+		promo.setStoreEntity(stores);//Mapping all storeIds to Promotions
 
 		return promo;
 	}

@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import com.otsi.retail.connectionpool.common.Applicability;
 import com.otsi.retail.connectionpool.common.PromoApplyType;
+import com.otsi.retail.connectionpool.common.PromotionType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,6 +47,14 @@ public class PromotionsEntity {
 	private int buyItemsFromPool;
 
 	private Boolean isActive;
+	
+	//For store mapping
+	
+    private PromotionType promoType;
+	
+	private LocalDate startDate;
+	
+	private LocalDate endDate;
 
 	private LocalDate createdDate;
 
@@ -54,5 +63,14 @@ public class PromotionsEntity {
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "pool_promo", joinColumns = @JoinColumn(name = "promoId"), inverseJoinColumns = @JoinColumn(name = "poolId"))
 	private List<PoolEntity> poolEntity;
+	
+	
+	/**
+	 * @Many_To_Many mapping
+	 */
+	
+	@ManyToMany(/*targetEntity = StoresEntity.class,*/ cascade = { CascadeType.ALL})
+	@JoinTable(name = "promo_store", joinColumns = @JoinColumn(name = "promoId"), inverseJoinColumns = @JoinColumn(name = "storeId")) 
+    private List<StoresEntity> storeEntity;
 
 }
