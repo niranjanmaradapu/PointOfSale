@@ -53,7 +53,7 @@ public class CustomerServiceImpl implements CustomerService {
 				CustomerDetailsEntity savedDetails = customerRepo.save(entity);
 				log.warn("we are testing customer is saved succesfully..");
 				log.info("customer details saved succesfully..." + details);
-				return new ResponseEntity<>("Customer details saved successfully..", HttpStatus.OK);
+				return new ResponseEntity<>("Customer details saved successfully", HttpStatus.OK);
 			} else {
 				log.error("Mobile number is already in my records");
 				return new ResponseEntity<>("Mobile number is already in my records", HttpStatus.BAD_REQUEST);
