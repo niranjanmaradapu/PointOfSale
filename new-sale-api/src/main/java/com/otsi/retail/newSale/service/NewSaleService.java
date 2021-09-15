@@ -25,21 +25,21 @@ import com.otsi.retail.newSale.vo.NewSaleVo;
 @Component
 public interface NewSaleService {
 
-	ResponseEntity<?> saveNewSaleRequest(NewSaleVo vo);
+	String saveNewSaleRequest(NewSaleVo vo);
 
-	ResponseEntity<?> saveBarcode(BarcodeVo vo);
+	String saveBarcode(BarcodeVo vo);
 
-	ResponseEntity<?> getBarcodeDetails(String barCode, String smId);
+	BarcodeVo getBarcodeDetails(String barCode, String smId) throws Exception;
 
-	ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo,String enumName);
+	String saveDeliverySlip(DeliverySlipVo vo,String enumName);
 
 	DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws Exception;
 
-	ResponseEntity<?> getListOfSaleBills(ListOfSaleBillsVo svo);
+	ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo) throws Exception;
 
 	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws Exception;
 
-	ResponseEntity<?> posDayClose();
+	String posDayClose();
 
 	double getNewSaleWithHsn(double netAmt) throws JsonMappingException, JsonProcessingException;
 
@@ -50,13 +50,13 @@ public interface NewSaleService {
 
 	CustomerVo getCustomerFromNewSale(String mobileNo) throws Exception;
 
-	ResponseEntity<?> posClose(Boolean posclose);
+	String posClose(Boolean posclose);
 
 	void tagCustomerToExisitingNewSale(String mobileNo, Long invoiceNo) throws CustomerNotFoundExcecption;
 
 	String saveGiftVoucher(GiftVoucherVo vo);
 
-	ResponseEntity<?> getGiftVoucher(String gvNumber);
+	GiftVoucherVo getGiftVoucher(String gvNumber) throws Exception;
 
 	String tagCustomerToGv(Long userId, Long gvId);
 

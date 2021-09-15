@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.common.CommonRequestMappigs;
+import com.otsi.retail.newSale.gatewayresponse.GateWayResponse;
 import com.otsi.retail.newSale.service.CustomerService;
 import com.otsi.retail.newSale.service.NewSaleService;
 import com.otsi.retail.newSale.vo.BarcodeVo;
@@ -59,118 +61,130 @@ public class NewSaleController {
 
 	// Save customer details API
 	@PostMapping(path = CommonRequestMappigs.SAVE_CUSTOMERDETAILS, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> saveCustomerDetails(@Valid @RequestBody CustomerVo details) {
+	public GateWayResponse<?> saveCustomerDetails(@Valid @RequestBody CustomerVo details) {
 		log.info("Received Request to saveCustomerDetails :" + details.toString());
 		try {
-			ResponseEntity<?> result = customerService.saveCustomerDetails(details);
-			return new ResponseEntity<>(result, HttpStatus.OK);
+			String result = customerService.saveCustomerDetails(details);
+			return new GateWayResponse<>(HttpStatus.OK,result);
 		} catch (Exception e) {
 			log.error("exception :" + e);
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
 		}
 	}
 
 	// Get customer details from Mobile number
 	@GetMapping(path = CommonRequestMappigs.GET_CUSTOMERDETAILS_BY_MOBILENUMBER)
-	public ResponseEntity<?> getCustomerByMobileNumber(@RequestParam String mobileNumber) {
+	public GateWayResponse<?> getCustomerByMobileNumber(@RequestParam String mobileNumber) {
 		log.info("Received Request to getCustomerByMobileNumber :" + mobileNumber);
 		CustomerVo customer;
 		try {
 			customer = customerService.getCustomerByMobileNumber(mobileNumber);
-			return new ResponseEntity<>(customer, HttpStatus.OK);
+			return new GateWayResponse<>(HttpStatus.OK,customer,"");
 		} catch (CustomerNotFoundExcecption e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
 		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
 		}
 
 	}
 
 	// Method for saving new sale items...
 	@PostMapping(CommonRequestMappigs.SALE)
-	public ResponseEntity<?> saveNewSale(@RequestBody NewSaleVo vo) {
+	public GateWayResponse<?> saveNewSale(@RequestBody NewSaleVo vo) {
 		log.info("Received Request to saveNewSale :" + vo.toString());
-		ResponseEntity<?> message = newSaleService.saveNewSaleRequest(vo);
+		try {
+		String message = newSaleService.saveNewSaleRequest(vo);
 
-		return new ResponseEntity<>(message, HttpStatus.OK);
+		return new GateWayResponse<>( HttpStatus.OK,message);
+		}catch (Exception e) {
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
+		}
 	}
 
 	// Method for create new Barcode..
 	@PostMapping(CommonRequestMappigs.CREATE_BARCODE)
-	public ResponseEntity<?> saveBarcode(@RequestBody BarcodeVo vo) {
+	public GateWayResponse<?> saveBarcode(@RequestBody BarcodeVo vo) {
 		log.info("Received Request to saveBarcode :" + vo.toString());
-		ResponseEntity<?> result = newSaleService.saveBarcode(vo);
+		try {
+		String result = newSaleService.saveBarcode(vo);
 
-		return new ResponseEntity<>(result, HttpStatus.OK);
+		return new GateWayResponse<>( HttpStatus.OK,result,"");
+		}catch (Exception e) {
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
+		}
 	}
 
 	// Method for getting Barcode details from Barcode table using Barcode number
 	@GetMapping(CommonRequestMappigs.GET_BARCODE_DETAILS)
-	public ResponseEntity<?> getBarcodeDetails(@RequestParam String barCode, @RequestParam String smId) {
+	public GateWayResponse<?> getBarcodeDetails(@RequestParam String barCode, @RequestParam String smId) {
 		log.info("Received Request to getBarcodeDetails:" + barCode);
-		ResponseEntity<?> barCodeDetails = newSaleService.getBarcodeDetails(barCode, smId);
+		try {
+			BarcodeVo barCodeDetails = newSaleService.getBarcodeDetails(barCode, smId);
 
-		return new ResponseEntity<>(barCodeDetails, HttpStatus.OK);
+		return new GateWayResponse<>( HttpStatus.OK,barCodeDetails,"");
+		}catch (Exception e) {
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
+		}
 
 	}
 
 	// Method for creating Delivery slip using List of Barcodes
 	@PostMapping(CommonRequestMappigs.CREATE_DS)
-	public ResponseEntity<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo, String enumName) {
+	public GateWayResponse<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo, String enumName) {
 		log.info("Received Request to saveDeliverySlip :" + vo.toString());
 		try {
-			ResponseEntity<?> saveDs = newSaleService.saveDeliverySlip(vo, enumName);
-			return new ResponseEntity<>(saveDs, HttpStatus.OK);
+			String saveDs = newSaleService.saveDeliverySlip(vo, enumName);
+			return new GateWayResponse<>( HttpStatus.OK,saveDs,"");
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
 		}
 	}
 
 	// Method for getting Delivery slip Data using DsNumber
 	@GetMapping(CommonRequestMappigs.GET_DS)
-	public ResponseEntity<?> getDeliverySlipDetails(@RequestParam String dsNumber) {
+	public GateWayResponse<?> getDeliverySlipDetails(@RequestParam String dsNumber) {
 		log.info("Received Request to getDeliverySlipDetails :" + dsNumber);
 		try {
      DeliverySlipVo dsDetails = newSaleService.getDeliverySlipDetails(dsNumber);
-			return new ResponseEntity(dsDetails, HttpStatus.OK);
+			return new GateWayResponse<>( HttpStatus.OK,dsDetails,"");
 
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
 		}
 
 	}
 
 	// Method for getting list of sale bills
-	@GetMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
-	public ResponseEntity<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo) {
+	@PostMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
+	public GateWayResponse<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo) {
 		log.info("Received Request to getListOfSaleBills :" + svo.toString());
 		try {
 
-			ResponseEntity<?> listOfSaleBills = newSaleService.getListOfSaleBills(svo);
-			return new ResponseEntity<>(listOfSaleBills, HttpStatus.OK);
+			ListOfSaleBillsVo listOfSaleBills = newSaleService.getListOfSaleBills(svo);
+			return new GateWayResponse<>( HttpStatus.OK,listOfSaleBills,"");
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
 
 		}
 	}
 
 	// Method for getting list of delivery slips
 
-	@GetMapping(CommonRequestMappigs.GET_LISTOF_DS)
-	public ResponseEntity<?> getlistofDeliverySlips(@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo) {
+	@PostMapping(CommonRequestMappigs.GET_LISTOF_DS)
+	public GateWayResponse<?> getlistofDeliverySlips(@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo) {
 		log.info("Received Request to getlistofDeliverySlips :" + listOfDeliverySlipVo.toString());
 		// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		try {
 
 			ListOfDeliverySlipVo getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo);
 
-			return new ResponseEntity<>(getDs, HttpStatus.OK);
+			return new GateWayResponse<>( HttpStatus.OK,getDs,"");
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
 
 		}
 
@@ -178,71 +192,79 @@ public class NewSaleController {
 	// Method for day closer
 
 	@GetMapping(CommonRequestMappigs.DAY_CLOSER)
-	public ResponseEntity<?> dayclose() {
+	public GateWayResponse<?> dayclose() {
 		log.info("Recieved request to dayclose()");
 		try {
-			ResponseEntity<?> dayclose = newSaleService.posDayClose();
-			return new ResponseEntity<>(dayclose, HttpStatus.OK);
+			String dayclose = newSaleService.posDayClose();
+			return new GateWayResponse<>(HttpStatus.OK,dayclose,"");
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
 
 		}
 
 	}
 
 	@GetMapping(CommonRequestMappigs.POS_CLOSEDAY)
-	public ResponseEntity<?> posclose(@RequestParam Boolean posclose) {
+	public GateWayResponse<?> posclose(@RequestParam Boolean posclose) {
 		try {
-			ResponseEntity<?> dayclose = newSaleService.posClose(posclose);
-			return new ResponseEntity<>(dayclose, HttpStatus.OK);
+			String dayclose = newSaleService.posClose(posclose);
+			return new GateWayResponse<>(HttpStatus.OK,dayclose, "");
 		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
 		}
 	}
 
 	@GetMapping(CommonRequestMappigs.GET_NEWSALEBYCUSTOMERID)
-	public ResponseEntity<?> getNewsaleByCustomerId(@RequestParam Long customerId) {
+	public GateWayResponse<?> getNewsaleByCustomerId(@RequestParam Long customerId) {
 		log.info("Recieved request to getNewsaleByCustomerId():" + customerId);
+		try {
 		List<NewSaleResponseVo> message = newSaleService.getNewsaleByCustomerId(customerId);
-		return new ResponseEntity<>(message, HttpStatus.OK);
+		return new GateWayResponse<>( HttpStatus.OK,message,"");
+		}catch (Exception e) {
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
+		}
 	}
 
 	@PostMapping(CommonRequestMappigs.UPDATE_NEWSALE)
-	public ResponseEntity<?> updateNewSale(@RequestBody NewSaleResponseVo vo) {
+	public GateWayResponse<?> updateNewSale(@RequestBody NewSaleResponseVo vo) {
 		log.info("Recieved request to updateNewSale():" + vo.toString());
+		try {
 		NewSaleVo message = newSaleService.updateNewSale(vo);
-		return new ResponseEntity<>(message, HttpStatus.OK);
+		return new GateWayResponse<>(HttpStatus.OK,message,"");
+		}catch (Exception e) {
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
+		}
 	}
 
 	@PostMapping(value = "getInvoiceDetails", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getInvoiceDetails(@RequestBody InvoiceRequestVo vo) {
+	public GateWayResponse<?> getInvoiceDetails(@RequestBody InvoiceRequestVo vo) {
 		try {
 			NewSaleList newSaleList = newSaleService.getInvoicDetails(vo);
-			return new ResponseEntity<>(newSaleList, HttpStatus.OK);
+			return new GateWayResponse<>( HttpStatus.OK,newSaleList,"");
 		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
 		}
 	}
 
 	@GetMapping("/getCustomerFromNewSale/{mobileNo}")
-	public ResponseEntity<?> getCustomerFromNewSale(@PathVariable String mobileNo) {
+	public GateWayResponse<?> getCustomerFromNewSale(@PathVariable String mobileNo) {
 		try {
 			CustomerVo customer = customerService.getCustomerByMobileNumber(mobileNo);
-			return new ResponseEntity<>(customer, HttpStatus.OK);
+			return new GateWayResponse<>(HttpStatus.OK,customer, "");
 		} catch (CustomerNotFoundExcecption ce) {
-			return new ResponseEntity<>(ce.getMessage(), HttpStatus.NOT_FOUND);
+			return new GateWayResponse<>( HttpStatus.NOT_FOUND,ce.getMessage());
 		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
 		}
 	}
 
 	@GetMapping("/getHsnDetails/{netAmt}")
-	public ResponseEntity<?> getHsnDetails(@PathVariable double netAmt) {
+	public GateWayResponse<?> getHsnDetails(@PathVariable double netAmt) {
 		try {
 			log.info("Recieved request to getNewSaleWithHsn()");
-			return new ResponseEntity<>(newSaleService.getNewSaleWithHsn(netAmt), HttpStatus.OK);
+			double netamt=	newSaleService.getNewSaleWithHsn(netAmt);
+			return new GateWayResponse<>( HttpStatus.OK,netamt,"");
 		} catch (JsonMappingException e) {
 
 			e.printStackTrace();
@@ -255,7 +277,7 @@ public class NewSaleController {
 	}
 
 	@GetMapping("/tagCustomerToInvoice/{mobileNo}/{invoiceNo}")
-	public ResponseEntity<?> tagCustomerToInvoice(@PathVariable String mobileNo, @PathVariable String invoiceNo) {
+	public GateWayResponse<?> tagCustomerToInvoice(@PathVariable String mobileNo, @PathVariable String invoiceNo) {
 		try {
 			newSaleService.tagCustomerToExisitingNewSale(mobileNo, Long.parseLong(invoiceNo));
 		} catch (CustomerNotFoundExcecption e) {
@@ -281,59 +303,59 @@ public class NewSaleController {
 	}
 	// Method for saving GiftVoucher
 	@PostMapping("/saveGv")
-	public ResponseEntity<?> saveGiftVoucher(@RequestBody GiftVoucherVo vo) {
+	public GateWayResponse<?> saveGiftVoucher(@RequestBody GiftVoucherVo vo) {
 		try {
 			String result = newSaleService.saveGiftVoucher(vo);
-			return new ResponseEntity<>(result, HttpStatus.OK);
+			return new GateWayResponse<>(HttpStatus.OK,result);
 		} catch (Exception e) {
-			return new ResponseEntity<>("Getting error while saving", HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,"Getting error while saving");
 		}
 	}
 
 	// Method for getting Gift voucher by GV Number
 	@GetMapping("/getGv")
-	public ResponseEntity<?> getGiftVoucher(@RequestParam String gvNumber) {
+	public GateWayResponse<?> getGiftVoucher(@RequestParam String gvNumber) {
 		try {
-			ResponseEntity<?> result = newSaleService.getGiftVoucher(gvNumber);
-			return new ResponseEntity<>(result, HttpStatus.OK);
+			GiftVoucherVo result = newSaleService.getGiftVoucher(gvNumber);
+			return new GateWayResponse<>( HttpStatus.OK,result,"");
 		} catch (Exception e) {
-			return new ResponseEntity<>("Exception occurs while fetching record..", HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,"Exception occurs while fetching record..");
 		}
 	}
 
 	// Method for saving Userdata
 	@PostMapping("/saveuser")
-	public ResponseEntity<?> saveUser(@RequestBody UserDataVo vo) {
+	public GateWayResponse<?> saveUser(@RequestBody UserDataVo vo) {
 		try {
 			String message = customerService.saveUserData(vo);
-			return new ResponseEntity<>(message, HttpStatus.OK);
+			return new GateWayResponse<>( HttpStatus.OK,message,"");
 		} catch (Exception e) {
-			return new ResponseEntity<>("Exception occurs while saving data..", HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,"Exception occurs while saving data..");
 		}
 
 	}
 
 	// Method for fetching user data by using mobile number
 	@GetMapping("/getUserByMobileNo")
-	public ResponseEntity<?> getUserByMobileNo(@RequestParam Long mobileNum) {
+	public GateWayResponse<?> getUserByMobileNo(@RequestParam Long mobileNum) {
 		try {
-			ResponseEntity<?> user = customerService.getUserByMobileNo(mobileNum);
+			UserDataVo user = customerService.getUserByMobileNo(mobileNum);
 
-			return new ResponseEntity<>(user, HttpStatus.OK);
+			return new  GateWayResponse<>( HttpStatus.OK,user,"");
 		} catch (Exception e) {
-			return new ResponseEntity<>("Exception occurs while saving data..", HttpStatus.BAD_REQUEST);
+			return new  GateWayResponse<>(HttpStatus.BAD_REQUEST,"Exception occurs while saving data.." );
 		}
 
 	}
 
 	// Method for tagging Gift voucher to Customer
 	@PostMapping("/tagCustomerToGv/{userId}/{gvId}")
-	public ResponseEntity<?> tagCustomerToGv(@PathVariable Long userId, @PathVariable Long gvId) {
+	public GateWayResponse<?> tagCustomerToGv(@PathVariable Long userId, @PathVariable Long gvId) {
 		try {
 			String message = newSaleService.tagCustomerToGv(userId, gvId);
-			return new ResponseEntity<>(message, HttpStatus.OK);
+			return new GateWayResponse<>( HttpStatus.OK,message,"");
 		} catch (Exception e) {
-			return new ResponseEntity<>("Exception occurs while saving data..", HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,"Exception occurs while saving data..");
 		}
 	}
 }
