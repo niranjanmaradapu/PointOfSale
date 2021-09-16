@@ -11,11 +11,11 @@ import com.otsi.retail.userStore.vo.StoreVO;
 @Service
 public interface StoreService {
 
-	ResponseEntity<?> save(StoreModel storeModel);
+	String save(StoreModel storeModel);
 
-	ResponseEntity<?> findByName(String storeName);
+	StoreVO findByName(String storeName);
 
-	ResponseEntity<Object> deleteById(Long id);
+	String deleteById(Long id);
 
 	List<StoreVO> getAllStores();
 

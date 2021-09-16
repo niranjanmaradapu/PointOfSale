@@ -11,13 +11,13 @@ import com.otsi.retail.newSale.vo.UserDataVo;
 @Component
 public interface CustomerService {
 
-	ResponseEntity<?> saveCustomerDetails(CustomerVo details) throws Exception;
+	String saveCustomerDetails(CustomerVo details) throws Exception;
 
 	CustomerVo getCustomerByMobileNumber(String mobileNumber) throws CustomerNotFoundExcecption;
 
 	String saveUserData(UserDataVo vo);
 
-	ResponseEntity<?> getUserByMobileNo(Long mobileNum);
+	UserDataVo getUserByMobileNo(Long mobileNum) throws Exception;
 
 }
 
