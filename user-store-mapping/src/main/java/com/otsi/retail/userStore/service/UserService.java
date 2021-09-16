@@ -11,9 +11,9 @@ import com.otsi.retail.userStore.vo.UserVo;
 @Service
 public interface UserService {
 
-	ResponseEntity<?> addUser(UserVo userVo) throws DuplicateRecordException ;
+	String addUser(UserVo userVo) throws DuplicateRecordException ;
 
-	ResponseEntity<?> updateuser(Long id, UserVo userVo);
+	String updateuser(Long id, UserVo userVo);
 
 	String deleteUser(Long id);
 
