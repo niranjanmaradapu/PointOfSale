@@ -17,5 +17,11 @@ public class CommonRequestMappigs {
 	public static final String GET_PROMO_LIST = "getpromolist";
 
 	public static final String EDIT_PROMO = "editpromo";
+	
+	public static final String STORE = "store";
+	
+	public static final String ADD_STORE = "addstore";
+	
+	public static final String GET_ALL_STORES = "getAllStores";
 
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.retail.connectionpool.common.Applicability;
 import com.otsi.retail.connectionpool.common.PromoApplyType;
+import com.otsi.retail.connectionpool.common.PromotionType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,6 +44,12 @@ public class PromotionsVo {
 
 	private Boolean isActive;
 
+	private PromotionType promoType;
+
+	private LocalDate startDate;
+
+	private LocalDate endDate;
+
 	private LocalDate createdDate;
 
 	private LocalDate lastModified;
@@ -50,5 +57,7 @@ public class PromotionsVo {
 	private Boolean isForEdit;
 
 	private List<ConnectionPoolVo> poolVo;
+	
+	private List<StoreVo> storeVo;
 
 }
