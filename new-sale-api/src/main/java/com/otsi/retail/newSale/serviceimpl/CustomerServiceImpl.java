@@ -53,7 +53,7 @@ public class CustomerServiceImpl implements CustomerService {
 				CustomerDetailsEntity savedDetails = customerRepo.save(entity);
 				log.warn("we are testing customer is saved succesfully..");
 				log.info("customer details saved succesfully..." + details);
-				return new ResponseEntity<>("Customer details saved successfully..", HttpStatus.OK);
+				return new ResponseEntity<>("Customer details saved successfully", HttpStatus.OK);
 			} else {
 				log.error("Mobile number is already in my records");
 				return new ResponseEntity<>("Mobile number is already in my records", HttpStatus.BAD_REQUEST);
@@ -96,7 +96,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 		UserData entity = new UserData();
 
-		// Set common fields of Userdata
+		// Set common fields of User data
 		entity.setUserName(vo.getUserName());
 		entity.setGender(vo.getGender());
 		entity.setPhoneNumber(vo.getPhoneNumber());
@@ -104,7 +104,7 @@ public class CustomerServiceImpl implements CustomerService {
 		entity.setLastmodified(LocalDate.now());
 
 		UserData savedUser = userDataRepo.save(entity);
-		// Method for saving extra attributes in Attribute value table
+		// Method for saving extra attributes in User data Av table
 		saveAVValues(vo, savedUser);
 		return "User data saved successfully..";
 	}
@@ -113,39 +113,62 @@ public class CustomerServiceImpl implements CustomerService {
 	private void saveAVValues(UserDataVo vo, UserData savedUser) {
 
 		UserDataAv userAv = null;
-
+		// Set GST Number
 		if (vo.getGstNumber() != null) {
 			userAv = new UserDataAv();
 			userAv.setName(UserDataAVEnum.GSTNUMBER.geteName());
 			userAv.setType(UserDataAVEnum.GSTNUMBER.getId());
 			userAv.setStringValue(vo.getGstNumber());
-			userAv.setLastModified(LocalDate.now());
-			userAv.setUserData(savedUser);
+			saveToRepo(userAv, savedUser);
 
-			userDataAvRepo.save(userAv);
 		}
+		// Set PAN Number
 		if (vo.getPanNumber() != null) {
 
 			userAv = new UserDataAv();
 			userAv.setName(UserDataAVEnum.PANNUMBER.geteName());
 			userAv.setType(UserDataAVEnum.PANNUMBER.getId());
 			userAv.setStringValue(vo.getPanNumber());
-			userAv.setLastModified(LocalDate.now());
-			userAv.setUserData(savedUser);
-
-			userDataAvRepo.save(userAv);
+			saveToRepo(userAv, savedUser);
 		}
+		// Set Date of birth(DOB)
 		if (vo.getDob() != null) {
 
 			userAv = new UserDataAv();
 			userAv.setName(UserDataAVEnum.DOB.geteName());
 			userAv.setType(UserDataAVEnum.DOB.getId());
 			userAv.setDateValue(vo.getDob());
-			userAv.setLastModified(LocalDate.now());
-			userAv.setUserData(savedUser);
+			saveToRepo(userAv, savedUser);
 
-			userDataAvRepo.save(userAv);
 		}
+		// Set email
+		if (vo.getEmail() != null) {
+
+			userAv = new UserDataAv();
+			userAv.setName(UserDataAVEnum.EMAIL.geteName());
+			userAv.setType(UserDataAVEnum.EMAIL.getId());
+			userAv.setStringValue(vo.getEmail());
+			saveToRepo(userAv, savedUser);
+
+		}
+		// Set Address
+		if (vo.getAddress() != null) {
+
+			userAv = new UserDataAv();
+			userAv.setName(UserDataAVEnum.ADDRESS.geteName());
+			userAv.setType(UserDataAVEnum.ADDRESS.getId());
+			userAv.setStringValue(vo.getAddress());
+			saveToRepo(userAv, savedUser);
+
+		}
+	}
+
+	// Method for calling User data Av repository
+	private void saveToRepo(UserDataAv userAv, UserData savedUser) {
+
+		userAv.setLastModified(LocalDate.now());
+		userAv.setUserData(savedUser);
+		userDataAvRepo.save(userAv);
 	}
 
 	// Method for fetching User data by using mobile Number
@@ -168,11 +191,13 @@ public class CustomerServiceImpl implements CustomerService {
 					vo.setGstNumber(x.getStringValue());
 				}
 				if (x.getName().equalsIgnoreCase(UserDataAVEnum.PANNUMBER.geteName())) {
-
 					vo.setPanNumber(x.getStringValue());
 				}
 				if (x.getName().equalsIgnoreCase(UserDataAVEnum.DOB.geteName())) {
 					vo.setDob(x.getDateValue());
+				}
+				if (x.getName().equalsIgnoreCase(UserDataAVEnum.EMAIL.geteName())) {
+					vo.setEmail(x.getStringValue());
 				}
 
 			});

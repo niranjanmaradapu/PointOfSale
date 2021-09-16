@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GiftVoucherVo {
+public class GiftVoucherVo {// Don't change these field names because these are mapped with entity object
 
 	private Long gvId;
 
