@@ -25,7 +25,4 @@ public interface StoreRepo extends JpaRepository<StoresEntity, Long> {
 
 	Optional<StoresEntity> findByStoreName(String storeName);
 
-	//StoresEntity findByStoreId(Long storeId);
-
-	
 }

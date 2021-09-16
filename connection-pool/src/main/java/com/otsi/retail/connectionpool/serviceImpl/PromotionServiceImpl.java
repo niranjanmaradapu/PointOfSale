@@ -41,7 +41,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 	@Autowired
 	private PoolRepo poolRepo;
-	
+
 	@Autowired
 	private StoreRepo storeRepo;
 
@@ -69,7 +69,7 @@ public class PromotionServiceImpl implements PromotionService {
 		// b.getStoreName()).collect(Collectors.toList());
 		// List<StoresEntity> storeList = storeRepo.findByStoreNameIn(storeName);
 
-		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList,storeList);
+		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList, storeList);
 
 		if (poolVo.size() == poolList.size() && storeVo.size() == storeList.size()) {
 
@@ -121,10 +121,10 @@ public class PromotionServiceImpl implements PromotionService {
 				List<Long> poolIds = poolVo.stream().map(x -> x.getPoolId()).collect(Collectors.toList());
 
 				List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
-				
+
 				// Code added by sudheer
 				List<StoreVo> storeVo = vo.getStoreVo();
-				
+
 				/** Promotion mapped to store by storeId **/
 
 				List<Long> storeId = storeVo.stream().map(a -> a.getStoreId()).collect(Collectors.toList());
@@ -136,10 +136,9 @@ public class PromotionServiceImpl implements PromotionService {
 				// b.getStoreName()).collect(Collectors.toList());
 				// List<StoresEntity> storeList = storeRepo.findByStoreNameIn(storeName);
 
-
 				if (poolVo.size() == poolList.size()) {
 
-					PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList,storeList);
+					PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList, storeList);
 					PromotionsEntity savedPromo = promoRepo.save(entity);
 
 				} else {

@@ -66,7 +66,7 @@ public class PromotionsEntity {
 	
 	
 	/**
-	 * @Many_To_Many mapping
+	 * @Many_To_Many mapping from Promotions to Stores
 	 */
 	
 	@ManyToMany(/*targetEntity = StoresEntity.class,*/ cascade = { CascadeType.ALL})

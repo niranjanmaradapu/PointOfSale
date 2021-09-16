@@ -20,7 +20,7 @@ public class StoreVo {
 	
 	private LocalDate lastModifiedDate;
 	
-	//private List<PromotionsVo> promoVo;
+	
 
 
 }

@@ -20,14 +20,11 @@ import com.otsi.retail.connectionpool.vo.StoreVo;
  */
 @Component
 public interface StoresService {
-	
-	
-	 ResponseEntity<?> addStore(StoreVo vo) throws Exception;
 
-	 //List<StoresEntity> getAllStores();
+	ResponseEntity<?> addStore(StoreVo vo) throws Exception;
 
-	 Optional<StoresEntity> findStoreByName(String storeName);
+	Optional<StoresEntity> findStoreByName(String storeName);
 
-	 Optional<StoresEntity> getByStoreId(Long storeId);
+	Optional<StoresEntity> getByStoreId(Long storeId);
 
 }

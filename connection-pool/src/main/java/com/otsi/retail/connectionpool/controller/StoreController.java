@@ -28,20 +28,19 @@ import com.otsi.retail.connectionpool.vo.StoreVo;
  *
  */
 
-
 @RestController
 @CrossOrigin
 @RequestMapping(CommonRequestMappigs.STORE)
 public class StoreController {
-	
+
 	@Autowired
 	private StoresService storeService;
-	
+
 	@PostMapping(CommonRequestMappigs.ADD_STORE)
 	public ResponseEntity<?> addStore(@RequestBody StoreVo vo) {
 
 		try {
-             
+
 			ResponseEntity<?> saveStore = storeService.addStore(vo);
 			return new ResponseEntity<>(saveStore, HttpStatus.OK);
 
@@ -49,12 +48,12 @@ public class StoreController {
 			return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@GetMapping(CommonRequestMappigs.GET_STORE_BY_ID)
 	public ResponseEntity<?> getByStoreId(@RequestParam Long storeId) {
 
 		try {
-             
+
 			Optional<StoresEntity> getAllStore = storeService.getByStoreId(storeId);
 			return new ResponseEntity<>(getAllStore, HttpStatus.OK);
 
@@ -62,21 +61,18 @@ public class StoreController {
 			return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@GetMapping(CommonRequestMappigs.GET_STORE_BY_NAME)
 	public ResponseEntity<?> getStoreDetailsByStoreName(@RequestParam String storeName) {
-		//log.info("Received Request to getDeliverySlipDetails :" + dsNumber);
+
 		try {
-            Optional<StoresEntity> stores = storeService.findStoreByName(storeName);
-			return new ResponseEntity(stores, HttpStatus.OK);
+			Optional<StoresEntity> stores = storeService.findStoreByName(storeName);
+			return new ResponseEntity<>(stores, HttpStatus.OK);
 
 		} catch (Exception e) {
-			//log.error("exception :" + e.getMessage());
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 
 	}
-	
-	
 
 }

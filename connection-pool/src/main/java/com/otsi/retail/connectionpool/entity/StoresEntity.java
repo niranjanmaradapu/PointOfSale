@@ -17,33 +17,24 @@ import lombok.Data;
 @Data
 @Table(name = "stores")
 public class StoresEntity {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long storeId;
-	
+
 	private String storeName;
-	
+
 	private String storeDescription;
-	
+
 	private LocalDate createdDate;
-	
+
 	private LocalDate lastModifiedDate;
-	
-	
+
 	/**
-	 * @Many_To_Many mapping
+	 * @Many_To_Many mapping from Stores to Promotions
 	 */
 
-	@ManyToMany(mappedBy = "storeEntity",cascade = CascadeType.ALL)
+	@ManyToMany(mappedBy = "storeEntity", cascade = CascadeType.ALL)
 	private List<PromotionsEntity> promoEntity;
-	
-	
-//	@ManyToMany(targetEntity = PromotionsEntity.class, cascade = {CascadeType.ALL},mappedBy = "storeEntity")
-//	List<PromotionsEntity> promoEntity;
-	
-//	@OneToMany(mappedBy = "storeEntity",cascade = CascadeType.ALL)
-//	@JsonIgnore
-//	private List<PromoStoreEntity> promoStore = new ArrayList<>();
-	
+
 }

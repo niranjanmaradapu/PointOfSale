@@ -17,38 +17,33 @@ import com.otsi.retail.connectionpool.vo.StoreVo;
  */
 @Component
 public class StoreMapper {
-	
-	
-	public StoresEntity converStoreVoToEntity(StoreVo vo)
-	{
-		
+
+	public StoresEntity converStoreVoToEntity(StoreVo vo) {
+
 		StoresEntity dto = new StoresEntity();
 		dto.setStoreId(vo.getStoreId());
 		dto.setStoreName(vo.getStoreName());
 		dto.setStoreDescription(vo.getStoreDescription());
-		
+
 		return dto;
 	}
-	
+
 	public List<StoresEntity> VoToEntity(List<StoreVo> vos) {
 		return vos.stream().map(vo -> converStoreVoToEntity(vo)).collect(Collectors.toList());
 
 	}
 
-	
-	
-	public StoreVo entityToVo(StoresEntity dto)
-	{
-		
+	public StoreVo entityToVo(StoresEntity dto) {
+
 		StoreVo vo = new StoreVo();
 		vo.setStoreId(dto.getStoreId());
 		vo.setStoreName(dto.getStoreName());
 		vo.setStoreDescription(vo.getStoreDescription());
-		
+
 		return vo;
 	}
-	
-	public List<StoreVo > EntityToVo(List<StoresEntity> dtos) {
+
+	public List<StoreVo> EntityToVo(List<StoresEntity> dtos) {
 		return dtos.stream().map(dto -> entityToVo(dto)).collect(Collectors.toList());
 
 	}

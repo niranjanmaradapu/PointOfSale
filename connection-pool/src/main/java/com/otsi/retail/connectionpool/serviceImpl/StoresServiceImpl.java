@@ -55,19 +55,12 @@ public class StoresServiceImpl implements StoresService {
 
 	@Override
 	public Optional<StoresEntity> getByStoreId(Long storeId) {
-		
+
 		Optional<StoresEntity> storeList = storeRepo.findById(storeId);
-		
+
 		return storeList;
 	}
 
-//	public Optional<StoresEntity> findStoreById(Long storeId) {
-//
-//		return storeRepo.findById(storeId);
-//
-//	}
-	
-	
 	@Override
 	public Optional<StoresEntity> findStoreByName(String storeName) {
 
