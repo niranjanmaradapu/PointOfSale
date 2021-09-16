@@ -32,6 +32,8 @@ public class ListOfReturnSlipsVo {
 	private String creditNote;
 	private String createdBy;
 	private Boolean rtReviewStatus;
+	
+	
 
 	// private List<Barcode> barcode;
 

@@ -178,14 +178,9 @@ public class CustomerServiceImpl implements CustomerService {
 		}
 
 		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapEntityToVo(retunSlipdetails);
-		Long total=rvo.stream().mapToLong(a->a.getAmount()).sum();
 		
 		if (!rvo.isEmpty()) {
-			rvo.stream().forEach(a->{
-				ListOfReturnSlipsVo lvo= new ListOfReturnSlipsVo();
-				lvo.setTotalAmount(total);
-			rvo.add(lvo);
-			});
+			
 			return rvo;
 		} else
 			throw new RuntimeException("no record found with the giveninformation");
