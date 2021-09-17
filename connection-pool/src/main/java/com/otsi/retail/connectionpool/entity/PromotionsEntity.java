@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -69,7 +68,7 @@ public class PromotionsEntity {
 	 * @Many_To_Many mapping
 	 */
 	
-	@ManyToMany(/*targetEntity = StoresEntity.class,*/ cascade = { CascadeType.ALL})
+	@ManyToMany(cascade = { CascadeType.ALL})
 	@JoinTable(name = "promo_store", joinColumns = @JoinColumn(name = "promoId"), inverseJoinColumns = @JoinColumn(name = "storeId")) 
     private List<StoresEntity> storeEntity;
 
