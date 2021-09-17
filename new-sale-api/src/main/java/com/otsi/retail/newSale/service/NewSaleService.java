@@ -60,6 +60,8 @@ public interface NewSaleService {
 
 	String tagCustomerToGv(Long userId, Long gvId);
 
+	List<BarcodeVo> getAllBarcodes() throws Exception;
+
 
 
 
