@@ -1,5 +1,7 @@
 package com.otsi.retail.connectionpool.service;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -8,10 +10,10 @@ import com.otsi.retail.connectionpool.vo.PromotionsVo;
 @Component
 public interface PromotionService {
 
-	ResponseEntity<?> addPromotion(PromotionsVo vo);
+	String addPromotion(PromotionsVo vo) throws Exception;
 
-	ResponseEntity<?> getListOfPromotions(String flag);
+	List<PromotionsVo> getListOfPromotions(String flag) throws Exception;
 
-	ResponseEntity<?> editPromotion(PromotionsVo vo);
+	String editPromotion(PromotionsVo vo) throws Exception;
 
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.otsi.retail.connectionpool.common.CommonRequestMappigs;
 import com.otsi.retail.connectionpool.entity.StoresEntity;
+import com.otsi.retail.connectionpool.gatewayresponse.GateWayResponse;
 import com.otsi.retail.connectionpool.service.StoresService;
 import com.otsi.retail.connectionpool.vo.StoreVo;
 
@@ -35,40 +36,40 @@ public class StoreController {
 	private StoresService storeService;
 
 	@PostMapping(CommonRequestMappigs.ADD_STORE)
-	public ResponseEntity<?> addStore(@RequestBody StoreVo vo) {
+	public GateWayResponse<?> addStore(@RequestBody StoreVo vo) {
 
 		try {
 
-			ResponseEntity<?> saveStore = storeService.addStore(vo);
-			return new ResponseEntity<>(saveStore, HttpStatus.OK);
+			String saveStore = storeService.addStore(vo);
+			return new GateWayResponse<>(HttpStatus.OK, saveStore, "");
 
 		} catch (Exception e) {
-			return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e, "");
 		}
 	}
 
 	@GetMapping(CommonRequestMappigs.GET_STORE_BY_ID)
-	public ResponseEntity<?> getByStoreId(@RequestParam Long storeId) {
+	public GateWayResponse<?> getByStoreId(@RequestParam Long storeId) {
 
 		try {
 
 			Optional<StoresEntity> getAllStore = storeService.getByStoreId(storeId);
-			return new ResponseEntity<>(getAllStore, HttpStatus.OK);
+			return new GateWayResponse<>(HttpStatus.OK, getAllStore, "");
 
 		} catch (Exception e) {
-			return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e, "");
 		}
 	}
 
 	@GetMapping(CommonRequestMappigs.GET_STORE_BY_NAME)
-	public ResponseEntity<?> getStoreDetailsByStoreName(@RequestParam String storeName) {
+	public GateWayResponse<?> getStoreDetailsByStoreName(@RequestParam String storeName) {
 
 		try {
 			Optional<StoresEntity> stores = storeService.findStoreByName(storeName);
-			return new ResponseEntity<>(stores, HttpStatus.OK);
+			return new GateWayResponse<>(HttpStatus.OK, stores, "");
 
 		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 
 	}

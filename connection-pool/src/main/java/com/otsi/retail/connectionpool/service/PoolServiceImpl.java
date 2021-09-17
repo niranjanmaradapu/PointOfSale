@@ -1,4 +1,4 @@
-package com.otsi.retail.connectionpool.serviceImpl;
+package com.otsi.retail.connectionpool.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,7 +14,6 @@ import com.otsi.retail.connectionpool.entity.PoolEntity;
 import com.otsi.retail.connectionpool.mapper.PoolMapper;
 import com.otsi.retail.connectionpool.repository.PoolRepo;
 import com.otsi.retail.connectionpool.repository.RuleRepo;
-import com.otsi.retail.connectionpool.service.PoolService;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 
 /**
@@ -37,7 +36,7 @@ public class PoolServiceImpl implements PoolService {
 
 	// Method for saving pools from Connection VO
 	@Override
-	public ResponseEntity<?> savePool(ConnectionPoolVo vo) {
+	public String savePool(ConnectionPoolVo vo) throws Exception {
 
 		try {
 			PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
@@ -50,16 +49,16 @@ public class PoolServiceImpl implements PoolService {
 				ruleRepo.save(x);
 			});
 
-			return new ResponseEntity<>("Pool saved Successfully", HttpStatus.OK);
+			return "Pool saved Successfully";
 
 		} catch (Exception e) {
-			return new ResponseEntity<>("Exception occurs while saving the Pool", HttpStatus.BAD_REQUEST);
+			throw new Exception("Exception occurs while saving the Pool");
 		}
 	}
 
 	// Method for getting list of pools based on the status flag
 	@Override
-	public ResponseEntity<?> getListOfPools(String isActive) {
+	public List<ConnectionPoolVo>  getListOfPools(String isActive) throws Exception {
 		try {
 			List<PoolEntity> poolEntity = new ArrayList<>();
 			Boolean flag = null;
@@ -79,19 +78,19 @@ public class PoolServiceImpl implements PoolService {
 			if (!poolEntity.isEmpty()) {
 
 				List<ConnectionPoolVo> poolVo = poolMapper.convertPoolEntityToVo(poolEntity);
-				return new ResponseEntity<>(poolVo, HttpStatus.OK);
+				return poolVo;
 
 			} else {
-				return new ResponseEntity<>("No data found", HttpStatus.BAD_REQUEST);
+				throw new Exception("No data found");
 			}
 		} catch (Exception e) {
-			return new ResponseEntity<>("Getting error while fetching data", HttpStatus.BAD_GATEWAY);
+			throw new Exception("Getting error while fetching data");
 		}
 	}
 
 	// Method for Modifying/Edit the existing pool details
 	@Override
-	public ResponseEntity<?> modifyPool(ConnectionPoolVo vo) {
+	public String modifyPool(ConnectionPoolVo vo) throws Exception {
 
 		try {
 
@@ -107,11 +106,11 @@ public class PoolServiceImpl implements PoolService {
 				PoolEntity savedPool = poolRepo.save(poolEntity);
 
 			} else {
-				return new ResponseEntity<>("Invalid Pool Id", HttpStatus.BAD_REQUEST);
+				return "Invalid Pool Id";
 			}
-			return new ResponseEntity<>("Pool Modified Successfully...", HttpStatus.OK);
+			throw new Exception("Pool Modified Successfully...");
 		} catch (Exception e) {
-			return new ResponseEntity<>("Exception occurs while modifying the record.", HttpStatus.BAD_REQUEST);
+			throw new Exception("Exception occurs while modifying the record.");
 		}
 	}
 }

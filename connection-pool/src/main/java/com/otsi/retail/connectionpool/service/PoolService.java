@@ -1,5 +1,7 @@
 package com.otsi.retail.connectionpool.service;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +16,10 @@ import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 @Component
 public interface PoolService {
 
-	ResponseEntity<?> savePool(ConnectionPoolVo vo);
+	String savePool(ConnectionPoolVo vo) throws Exception;
 
-	ResponseEntity<?> getListOfPools(String isActive);
+	List<ConnectionPoolVo> getListOfPools(String isActive) throws Exception;
 
-	ResponseEntity<?> modifyPool(ConnectionPoolVo vo);
+	String modifyPool(ConnectionPoolVo vo) throws Exception;
 
 }

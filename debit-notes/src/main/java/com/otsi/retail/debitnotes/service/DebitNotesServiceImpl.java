@@ -1,4 +1,4 @@
-package com.otsi.retail.debitnotes.serviceimpl;
+package com.otsi.retail.debitnotes.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.debitnotes.mapper.DebitNotesMapper;
 import com.otsi.retail.debitnotes.model.DebitNotes;
 import com.otsi.retail.debitnotes.repo.DebitNotesRepo;
-import com.otsi.retail.debitnotes.service.DebitNotesService;
 import com.otsi.retail.debitnotes.vo.CustomerVo;
 import com.otsi.retail.debitnotes.vo.DebitNotesVo;
 import com.otsi.retail.debitnotes.vo.NewSaleResponseVo;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.otsi.retail.connectionpool.serviceImpl;
+package com.otsi.retail.connectionpool.service;
 
 import java.util.Optional;
 
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import com.otsi.retail.connectionpool.entity.StoresEntity;
 import com.otsi.retail.connectionpool.mapper.StoreMapper;
 import com.otsi.retail.connectionpool.repository.StoreRepo;
-import com.otsi.retail.connectionpool.service.StoresService;
 import com.otsi.retail.connectionpool.vo.StoreVo;
 
 /**
@@ -30,7 +29,7 @@ public class StoresServiceImpl implements StoresService {
 	private StoreMapper storeMapper;
 
 	@Override
-	public ResponseEntity<?> addStore(StoreVo vo) throws Exception {
+	public String addStore(StoreVo vo) throws Exception {
 
 		StoresEntity entity = storeMapper.converStoreVoToEntity(vo);
 		Optional<StoresEntity> storeName = storeRepo.findByStoreName(vo.getStoreName());
@@ -41,12 +40,12 @@ public class StoresServiceImpl implements StoresService {
 				vo = storeMapper.entityToVo(storeRepo.save(entity));
 
 			} else {
-				return new ResponseEntity<>("Store already exists!!", HttpStatus.BAD_REQUEST);
+				throw new Exception("Store already exists!!");
 			}
-			return new ResponseEntity<>("Store Created Successfully...", HttpStatus.OK);
+			return "Store Created Successfully...";
 		} catch (Exception e) {
 
-			return new ResponseEntity<>("Exception occurs while creating the store..", HttpStatus.BAD_REQUEST);
+			throw new Exception("Exception occurs while creating the store..");
 
 		}
 

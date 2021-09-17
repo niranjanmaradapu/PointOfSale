@@ -1,4 +1,4 @@
-package com.otsi.retail.promoexchange.serviceimpl;
+package com.otsi.retail.promoexchange.service;
 
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.otsi.retail.promoexchange.Entity.CustomerDetailsEntity;
 import com.otsi.retail.promoexchange.mapper.CustomerMapper;
 import com.otsi.retail.promoexchange.repository.CustomerDetailsRepo;
-import com.otsi.retail.promoexchange.service.CustomerService;
 import com.otsi.retail.promoexchange.vo.CustomerVo;
 
 
@@ -23,7 +22,7 @@ public class CustomerServiceImpl implements CustomerService {
 	private CustomerMapper customerMapper;
 
 	@Override
-	public ResponseEntity<?> saveCustomerDetails(CustomerVo details) {
+	public String saveCustomerDetails(CustomerVo details) throws Exception {
 		try {
 			Optional<CustomerDetailsEntity> list = customerRepo.findByMobileNumber(details.getMobileNumber());
 
@@ -31,26 +30,25 @@ public class CustomerServiceImpl implements CustomerService {
 
 				CustomerDetailsEntity entity = customerMapper.convertVoToEntity(details);// mapper for VO to DTO
 				customerRepo.save(entity);
-				return new ResponseEntity<>("Customer details saved successfully..", HttpStatus.OK);
+				return "Customer details saved successfully..";
 			} else {
-				return new ResponseEntity<>("Mobile number is already in my records", HttpStatus.BAD_REQUEST);
+				throw new Exception("Mobile number is already in my records");
 			}
 		} catch (Exception e) {
-			return new ResponseEntity<>("error occurs while saving customer details", HttpStatus.BAD_REQUEST);
+			throw new Exception("error occurs while saving customer details");
 		}
 	}
 
 	@Override
-	public ResponseEntity<?> getCustomerByMobileNumber(String mobileNumber) {
+	public CustomerVo getCustomerByMobileNumber(String mobileNumber) throws Exception {
 
 		Optional<CustomerDetailsEntity> customerDetails = customerRepo.findByMobileNumber(mobileNumber);
 		if (!customerDetails.isPresent()) {
-			return new ResponseEntity<>(
-					"Customer is with mobile number " + mobileNumber + " not exists. So please fill all the details..",
-					HttpStatus.BAD_REQUEST);
+			throw  new Exception(
+					"Customer is with mobile number " + mobileNumber + " not exists. So please fill all the details..");
 		} else {
 			CustomerVo details = customerMapper.convertEntityToVo(customerDetails.get());
-			return new ResponseEntity<>(details, HttpStatus.OK);
+			return details;
 
 		}
 	}
