@@ -33,7 +33,7 @@ public class HSNVoService {
 
 		if (config.getVo() == null) {
 
-			System.out.println("hits");
+			//System.out.println("hits");
 			
 			ResponseEntity<?> hsnResponse = template.exchange(HsnUrl, HttpMethod.GET, null, GateWayResponse.class);
 			ObjectMapper mapper = new ObjectMapper();
@@ -46,7 +46,6 @@ public class HSNVoService {
 			config.setVo(vo1);
 		}
 		return config.getVo();
-
 	}
 
 }

@@ -795,5 +795,18 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 		return "Gift vocher tagged successfully to " + user.get().getName();
 	}
+	
+	// Method for Return all Bar code items
+	@Override
+	public List<BarcodeVo> getAllBarcodes() throws Exception {
+		try {
+			List<BarcodeEntity> listOfBarcodes = barcodeRepository.findAll();
+			List<BarcodeVo> mappedList = newSaleMapper.convertBarcodeListFromEntityToVo(listOfBarcodes);
+			return mappedList;
+			
+		} catch (Exception e) {
+			throw new Exception("Exception occurs while fetching barcodes list");
+		}
+	}
 
 }

@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -300,6 +299,7 @@ public class NewSaleController {
 
 		return discTypes;
 	}
+	
 	// Method for saving GiftVoucher
 	@PostMapping("/saveGv")
 	public GateWayResponse<?> saveGiftVoucher(@RequestBody GiftVoucherVo vo) {
@@ -353,6 +353,18 @@ public class NewSaleController {
 			return new GateWayResponse<>( HttpStatus.OK,message,"");
 		} catch (Exception e) {
 			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,"Exception occurs while saving data..");
+		}
+	}
+	
+	// Method for getting all Bar codes list
+	@GetMapping("/getAllBarcodes")
+	public GateWayResponse<?> getAllBarcodes() {
+		try {
+			List<BarcodeVo> listOfBarcodes = newSaleService.getAllBarcodes();
+			return new GateWayResponse<>(HttpStatus.OK, listOfBarcodes, "Successfully fetched list of Barcodes");
+		} catch (Exception e) {
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(),
+					"Exception occurs while fetching data");
 		}
 	}
 }

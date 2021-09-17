@@ -200,4 +200,18 @@ public class NewSaleMapper {
 
 	}
 
+	// Method for convert List of Bar code entities to List of bar code Vo's
+	public List<BarcodeVo> convertBarcodeListFromEntityToVo(List<BarcodeEntity> listOfBarcodes) {
+
+		List<BarcodeVo> barcodeList = new ArrayList<>();
+
+		listOfBarcodes.parallelStream().forEach(x -> {
+
+			BarcodeVo barcodeVo = convertBarcodeEntityToVo(x);
+			barcodeList.add(barcodeVo);
+
+		});
+		return barcodeList;
+	}
+
 }
