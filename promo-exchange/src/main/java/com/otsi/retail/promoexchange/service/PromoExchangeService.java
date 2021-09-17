@@ -22,23 +22,23 @@ import com.otsi.retail.promoexchange.vo.PromoExchangeVo;
 public interface PromoExchangeService {
 
 	
-	ResponseEntity<?> savePromoItemExchangeRequest(PromoExchangeVo vo);
+	String savePromoItemExchangeRequest(PromoExchangeVo vo);
 
-	ResponseEntity<?> getBarcodeDetails(String barCode);
+	BarcodeVo getBarcodeDetails(String barCode) throws Exception;
 
-	ResponseEntity<?> getListOfSaleBills(ListOfSaleBillsVo svo);
+	ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo) throws Exception;
 	
 	DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws Exception;
 
-	ResponseEntity<?> getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo);
+	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws Exception;
 
-	ResponseEntity<?> posDayClose();
+	/* ResponseEntity<?> posDayClose(); */
 
 	//List<ReturnSlipsVo> getListOfReturnSlips(ReturnSlipsVo vo);
 
-	ResponseEntity<?> saveBarcode(BarcodeVo vo);
+	String saveBarcode(BarcodeVo vo) throws Exception;
 
-	ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo);
+	String saveDeliverySlip(DeliverySlipVo vo) throws Exception;
 
 	List<ListOfReturnSlipsVo> getListOfRetunSlips()
 			throws JsonMappingException, JsonProcessingException;

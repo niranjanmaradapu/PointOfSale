@@ -1,16 +1,13 @@
-package com.otsi.retail.promoexchange.serviceimpl;
+package com.otsi.retail.promoexchange.service;
 
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -22,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -39,8 +35,6 @@ import com.otsi.retail.promoexchange.repository.BarcodeRepository;
 import com.otsi.retail.promoexchange.repository.CustomerDetailsRepo;
 import com.otsi.retail.promoexchange.repository.DeliverySlipRepository;
 import com.otsi.retail.promoexchange.repository.PromoExchangeRepository;
-import com.otsi.retail.promoexchange.service.CustomerService;
-import com.otsi.retail.promoexchange.service.PromoExchangeService;
 import com.otsi.retail.promoexchange.vo.BarcodeVo;
 import com.otsi.retail.promoexchange.vo.DeliverySlipVo;
 import com.otsi.retail.promoexchange.vo.ListOfDeliverySlipVo;
@@ -97,7 +91,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 	private final static String GET_DS_DETAILS_FROM_NEWSALE_URl = "http://localhost:8081/newsale/getdeliveryslip";
 
 	@Override
-	public ResponseEntity<?> savePromoItemExchangeRequest(PromoExchangeVo vo) {
+	public String savePromoItemExchangeRequest(PromoExchangeVo vo) {
 
 		Random ran = new Random();
 
@@ -156,7 +150,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 			PromoExchangeEntity saveEntity = promoExchangeRepository.save(entity);
 		}
 
-		return new ResponseEntity<>("Bill generated with number :" + entity.getBillNumber(), HttpStatus.OK);
+		return "Bill generated with number :" + entity.getBillNumber();
 
 	}
 
@@ -181,7 +175,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 	}
 
 	@Override
-	public ResponseEntity<?> saveBarcode(BarcodeVo vo) {
+	public String saveBarcode(BarcodeVo vo) throws Exception {
 
 		BarcodeEntity barcodeDetails = barcodeRepository.findByBarcode(vo.getBarcode());
 		if (barcodeDetails == null) {
@@ -189,29 +183,28 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 			BarcodeEntity barcode = promoExchangeMapper.convertBarcodeVoToEntity(vo);
 			barcodeRepository.save(barcode);
 
-			return new ResponseEntity<>("Barcode details saved successfully..", HttpStatus.OK);
+			return "Barcode details saved successfully..";
 		} else {
-			return new ResponseEntity<>("Barcode with " + vo.getBarcode() + " is already exists",
-					HttpStatus.BAD_GATEWAY);
+			throw new Exception("Barcode with " + vo.getBarcode() + " is already exists");
 		}
 	}
 
 	@Override
-	public ResponseEntity<?> getBarcodeDetails(String barCode) {
+	public BarcodeVo getBarcodeDetails(String barCode) throws Exception {
 
 		BarcodeEntity barcodeDetails = barcodeRepository.findByBarcode(barCode);
 
 		if (barcodeDetails == null) {
-			return new ResponseEntity<>("Barcode with number " + barCode + " is not exists", HttpStatus.BAD_GATEWAY);
+			throw new Exception("Barcode with number " + barCode + " is not exists");
 		} else {
 			BarcodeVo vo = promoExchangeMapper.convertBarcodeEntityToVo(barcodeDetails);
-			return new ResponseEntity<>(vo, HttpStatus.OK);
+			return vo;
 		}
 	}
 
 	// Method for saving delivery slip
 	@Override
-	public ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo) {
+	public String saveDeliverySlip(DeliverySlipVo vo) throws Exception {
 		try {
 
 			Random ran = new Random();
@@ -234,13 +227,16 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 				barcodeRepository.save(a);
 			});
-			MessageVo message = new MessageVo();
-			message.setMessage("Successfully created deliverySlip with DS Number " + entity.getDsNumber());
-			message.setNumber(entity.getDsNumber());
-
-			return new ResponseEntity<>(message, HttpStatus.OK);
+			/*
+			 * MessageVo message = new MessageVo();
+			 * message.setMessage("Successfully created deliverySlip with DS Number " +
+			 * entity.getDsNumber()); message.setNumber(entity.getDsNumber());
+			 * 
+			 * return new ResponseEntity<>(message, HttpStatus.OK);
+			 */
+			return "Successfully created deliverySlip with DS Number " + entity.getDsNumber();
 		} catch (Exception e) {
-			return new ResponseEntity<>("error occurs while saving Delivery slip", HttpStatus.BAD_REQUEST);
+			throw new Exception("error occurs while saving Delivery slip");
 		}
 	}
 
@@ -334,7 +330,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 	}
 
 	@Override
-	public ResponseEntity<?> getListOfSaleBills(ListOfSaleBillsVo svo) {
+	public ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo) throws Exception {
 
 		List<PromoExchangeEntity> saleDetails = new ArrayList<>();
 
@@ -361,7 +357,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 							.findByPromoExchangeId(customer.get().getPromoexchange().get(0).getPromoExchangeId());
 
 				} else {
-					return new ResponseEntity<>("No record found with given mobilenumber", HttpStatus.BAD_REQUEST);
+					throw new Exception("No record found with given mobilenumber");
 				}
 
 			}
@@ -378,7 +374,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 							.findByPromoExchangeId(bar.getDeliverySlip().getPromoexchange().getPromoExchangeId());
 
 				} else {
-					return new ResponseEntity<>("No record found with given barcode", HttpStatus.BAD_REQUEST);
+					throw new Exception("No record found with given barcode");
 				}
 
 			}
@@ -410,25 +406,20 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 			} else
 				saleDetails = promoExchangeRepository.findByCreatedDateBetween(svo.getDateFrom(), svo.getDateTo());
 
-			if (saleDetails != null) {
+			if (saleDetails == null) {
 
-				ListOfSaleBillsVo lsvo = promoExchangeMapper.convertlistSalesEntityToVo(saleDetails);
-				return new ResponseEntity<>(lsvo, HttpStatus.OK);
+				throw new Exception("No record found with given information");
 
-			}
-
-			else {
-
-				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
 			}
 
 		}
-		return new ResponseEntity<>("sucessfully getting the records", HttpStatus.OK);
+		ListOfSaleBillsVo lsvo = promoExchangeMapper.convertlistSalesEntityToVo(saleDetails);
+		return lsvo;
 
 	}
 
 	@Override
-	public ResponseEntity<?> getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) {
+	public ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws Exception {
 
 		List<DeliverySlipEntity> dsDetails = new ArrayList<DeliverySlipEntity>();
 		/*
@@ -445,7 +436,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 				dsDetails = dsRepo.findByDsId(bar.getDeliverySlip().getDsId());
 
 			} else {
-				return new ResponseEntity<>("No record found with given barcode", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given barcode");
 			}
 		}
 		/*
@@ -463,7 +454,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 						listOfDeliverySlipVo.getDateTo(), bar.getDeliverySlip().getDsId());
 
 			} else {
-				return new ResponseEntity<>("No record found with given barcode", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given barcode");
 			}
 		}
 		/*
@@ -478,7 +469,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 			if (dsDetails == null) {
 
-				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given information");
 			}
 
 		}
@@ -494,7 +485,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 			if (dsDetails == null) {
 
-				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given information");
 			}
 
 		}
@@ -519,7 +510,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 				 * throw new RuntimeException( "No record found with giver DS Number :" +
 				 * listOfDeliverySlipVo.getDsNumber());
 				 */
-				return new ResponseEntity<>("No record found with giver DS Number", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with giver DS Number");
 			}
 
 		}
@@ -536,7 +527,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 			if (dsDetails == null) {
 
-				return new ResponseEntity<>("No record found with giver DS Number", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with giver DS Number");
 			}
 
 		}
@@ -552,30 +543,31 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 			if (dsDetails == null) {
 
-				return new ResponseEntity<>("No record found with given information", HttpStatus.BAD_REQUEST);
+				throw new Exception("No record found with given information");
 			}
 
 		}
 
 		ListOfDeliverySlipVo mapper = promoExchangeMapper.convertListDSToVo(dsDetails);
-		return new ResponseEntity<>(mapper, HttpStatus.OK);
+		return mapper;
 
 	}
 
-	@Override
-	public ResponseEntity<?> posDayClose() {
-
-		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDate(DSStatus.Pending, LocalDate.now());
-
-		if (DsList.isEmpty()) {
-			return new ResponseEntity<>(
-					"successfully we can close the day of pos " + " uncleared delivery Slips count :  " + DsList.size(),
-					HttpStatus.OK);
-
-		} else
-			return new ResponseEntity<>("to  close the day of pos please clear pending  delivery Slips"
-					+ " uncleared delivery Slips count   " + DsList.size(), HttpStatus.BAD_REQUEST);
-	}
+	/*
+	 * @Override public ResponseEntity<?> posDayClose() {
+	 * 
+	 * List<DeliverySlipEntity> DsList =
+	 * dsRepo.findByStatusAndCreatedDate(DSStatus.Pending, LocalDate.now());
+	 * 
+	 * if (DsList.isEmpty()) { return new ResponseEntity<>(
+	 * "successfully we can close the day of pos " +
+	 * " uncleared delivery Slips count :  " + DsList.size(), HttpStatus.OK);
+	 * 
+	 * } else return new ResponseEntity<>
+	 * ("to  close the day of pos please clear pending  delivery Slips" +
+	 * " uncleared delivery Slips count   " + DsList.size(),
+	 * HttpStatus.BAD_REQUEST); }
+	 */
 
 	/*
 	 * @Override public DeliverySlipVo getNewsaleWithDeliveryslip(String dsNumber) {

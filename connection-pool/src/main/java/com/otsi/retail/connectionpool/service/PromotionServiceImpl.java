@@ -1,4 +1,4 @@
-package com.otsi.retail.connectionpool.serviceImpl;
+package com.otsi.retail.connectionpool.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,6 @@ import com.otsi.retail.connectionpool.mapper.PromotionMapper;
 import com.otsi.retail.connectionpool.repository.PoolRepo;
 import com.otsi.retail.connectionpool.repository.PromotionRepo;
 import com.otsi.retail.connectionpool.repository.StoreRepo;
-import com.otsi.retail.connectionpool.service.PromotionService;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
 import com.otsi.retail.connectionpool.vo.StoreVo;
@@ -47,7 +46,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 	// Method for adding promotion to pools
 	@Override
-	public ResponseEntity<?> addPromotion(PromotionsVo vo) {
+	public String addPromotion(PromotionsVo vo) throws Exception {
 
 		List<ConnectionPoolVo> poolVo = vo.getPoolVo();
 
@@ -76,14 +75,14 @@ public class PromotionServiceImpl implements PromotionService {
 			PromotionsEntity savedPromo = promoRepo.save(entity);
 
 		} else {
-			return new ResponseEntity<>("Please give valid/active pools/stores", HttpStatus.BAD_REQUEST);
+			throw new Exception("Please give valid/active pools/stores");
 		}
-		return new ResponseEntity<>("Promotion mapped succesfully...", HttpStatus.OK);
+		return "Promotion mapped succesfully...";
 	}
 
 	// Method for getting list of Promotions by using flag(Status)
 	@Override
-	public ResponseEntity<?> getListOfPromotions(String flag) {
+	public List<PromotionsVo> getListOfPromotions(String flag) throws Exception {
 
 		List<PromotionsEntity> promoList = new ArrayList<>();
 		try {
@@ -101,16 +100,16 @@ public class PromotionServiceImpl implements PromotionService {
 			}
 
 			List<PromotionsVo> listOfPromo = promoMapper.convertPromoEntityToVo(promoList);
-			return new ResponseEntity<>(listOfPromo, HttpStatus.OK);
+			return listOfPromo;
 
 		} catch (Exception e) {
-			return new ResponseEntity<>("Exception occurs while modifying Promotion", HttpStatus.BAD_REQUEST);
+			throw new Exception("Exception occurs while modifying Promotion");
 		}
 	}
 
 	// Method for modifying/editing Promotion
 	@Override
-	public ResponseEntity<?> editPromotion(PromotionsVo vo) {
+	public String editPromotion(PromotionsVo vo) throws Exception {
 
 		try {
 			Optional<PromotionsEntity> promotion = promoRepo.findById(vo.getPromoId());
@@ -143,15 +142,15 @@ public class PromotionServiceImpl implements PromotionService {
 					PromotionsEntity savedPromo = promoRepo.save(entity);
 
 				} else {
-					return new ResponseEntity<>("Please give valid/active pools", HttpStatus.BAD_REQUEST);
+					throw new Exception("Please give valid/active pools");
 				}
-				return new ResponseEntity<>("Promotion Modified succesfully", HttpStatus.OK);
+				return "Promotion Modified succesfully";
 
 			} else {
-				return new ResponseEntity<>("please give valid Promotion Id", HttpStatus.BAD_REQUEST);
+				throw new Exception("please give valid Promotion Id");
 			}
 		} catch (Exception e) {
-			return new ResponseEntity<>("Exception occurs while modifying Promotion", HttpStatus.BAD_REQUEST);
+			throw new Exception("Exception occurs while modifying Promotion");
 		}
 	}
 }
