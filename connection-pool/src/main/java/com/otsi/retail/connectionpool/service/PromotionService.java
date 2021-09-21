@@ -10,10 +10,10 @@ import com.otsi.retail.connectionpool.vo.PromotionsVo;
 @Component
 public interface PromotionService {
 
-	String addPromotion(PromotionsVo vo) throws Exception;
+	String addPromotion(PromotionsVo vo);
 
-	List<PromotionsVo> getListOfPromotions(String flag) throws Exception;
+	List<PromotionsVo> getListOfPromotions(String flag);
 
-	String editPromotion(PromotionsVo vo) throws Exception;
+	String editPromotion(PromotionsVo vo);
 
 }

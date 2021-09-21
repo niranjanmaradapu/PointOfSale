@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.otsi.retail.debitnotes.exceptions.DataNotFoundException;
 import com.otsi.retail.debitnotes.model.DebitNotes;
 import com.otsi.retail.debitnotes.vo.CustomerVo;
 import com.otsi.retail.debitnotes.vo.DebitNotesVo;
@@ -17,7 +18,7 @@ import com.otsi.retail.debitnotes.vo.NewSaleVo;
 @Service
 public interface DebitNotesService {
 
-	DebitNotesVo saveDebitNotes(@Valid DebitNotesVo debitNotesVo);
+	DebitNotesVo saveDebitNotes(@Valid DebitNotesVo debitNotesVo) throws DataNotFoundException;
 
 	Optional<DebitNotes> getDebitNotesByDrNo(String drNo);
 

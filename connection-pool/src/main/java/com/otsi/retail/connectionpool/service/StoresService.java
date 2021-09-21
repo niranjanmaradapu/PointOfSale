@@ -21,7 +21,7 @@ import com.otsi.retail.connectionpool.vo.StoreVo;
 @Component
 public interface StoresService {
 
-	String addStore(StoreVo vo) throws Exception;
+	String addStore(StoreVo vo);
 
 	Optional<StoresEntity> findStoreByName(String storeName);
 

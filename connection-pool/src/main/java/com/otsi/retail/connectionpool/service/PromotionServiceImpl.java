@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Service;
 import com.otsi.retail.connectionpool.entity.PoolEntity;
 import com.otsi.retail.connectionpool.entity.PromotionsEntity;
 import com.otsi.retail.connectionpool.entity.StoresEntity;
+import com.otsi.retail.connectionpool.exceptions.EmptyInputException;
+import com.otsi.retail.connectionpool.exceptions.InvalidDataException;
+import com.otsi.retail.connectionpool.exceptions.RecordNotFoundException;
 import com.otsi.retail.connectionpool.mapper.PromotionMapper;
 import com.otsi.retail.connectionpool.repository.PoolRepo;
 import com.otsi.retail.connectionpool.repository.PromotionRepo;
@@ -32,6 +37,8 @@ import com.otsi.retail.connectionpool.vo.StoreVo;
 @Service
 public class PromotionServiceImpl implements PromotionService {
 
+	private Logger log = LoggerFactory.getLogger(PromotionServiceImpl.class);
+
 	@Autowired
 	private PromotionMapper promoMapper;
 
@@ -40,14 +47,17 @@ public class PromotionServiceImpl implements PromotionService {
 
 	@Autowired
 	private PoolRepo poolRepo;
-	
+
 	@Autowired
 	private StoreRepo storeRepo;
 
 	// Method for adding promotion to pools
 	@Override
-	public String addPromotion(PromotionsVo vo) throws Exception {
-
+	public String addPromotion(PromotionsVo vo) {
+		log.debug("debugging addPromotion:" + vo);
+		if (vo.getStoreVo() == null || vo.getPoolVo() == null) {
+			throw new EmptyInputException("please give valid data");
+		}
 		List<ConnectionPoolVo> poolVo = vo.getPoolVo();
 
 		List<Long> poolIds = poolVo.stream().map(x -> x.getPoolId()).collect(Collectors.toList());
@@ -68,89 +78,103 @@ public class PromotionServiceImpl implements PromotionService {
 		// b.getStoreName()).collect(Collectors.toList());
 		// List<StoresEntity> storeList = storeRepo.findByStoreNameIn(storeName);
 
-		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList,storeList);
+		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList, storeList);
 
 		if (poolVo.size() == poolList.size() && storeVo.size() == storeList.size()) {
 
 			PromotionsEntity savedPromo = promoRepo.save(entity);
 
 		} else {
-			throw new Exception("Please give valid/active pools/stores");
+			log.error("Please give valid/active pools/stores");
+			throw new InvalidDataException("Please give valid/active pools/stores");
 		}
+		log.warn("we are checking if pool is added...");
+		log.info("Promotion mapped succesfully...");
 		return "Promotion mapped succesfully...";
 	}
 
 	// Method for getting list of Promotions by using flag(Status)
 	@Override
-	public List<PromotionsVo> getListOfPromotions(String flag) throws Exception {
-
+	public List<PromotionsVo> getListOfPromotions(String flag) {
+		log.debug("debugging getListOfPromotions:" + flag);
 		List<PromotionsEntity> promoList = new ArrayList<>();
-		try {
-			Boolean status = null;
-			if (flag.equalsIgnoreCase("true")) {
-				status = Boolean.TRUE;
-			}
-			if (flag.equalsIgnoreCase("false")) {
-				status = Boolean.FALSE;
-			}
-			if (flag.equalsIgnoreCase("all")) {
-				promoList = promoRepo.findAll();
-			} else {
-				promoList = promoRepo.findByIsActive(status);
-			}
-
-			List<PromotionsVo> listOfPromo = promoMapper.convertPromoEntityToVo(promoList);
-			return listOfPromo;
-
-		} catch (Exception e) {
-			throw new Exception("Exception occurs while modifying Promotion");
+		/* try { */
+		Boolean status = null;
+		if (flag.equalsIgnoreCase("true")) {
+			status = Boolean.TRUE;
 		}
+		if (flag.equalsIgnoreCase("false")) {
+			status = Boolean.FALSE;
+		}
+		if (flag.equalsIgnoreCase("all")) {
+			promoList = promoRepo.findAll();
+		} else {
+			promoList = promoRepo.findByIsActive(status);
+		}
+
+		List<PromotionsVo> listOfPromo = promoMapper.convertPromoEntityToVo(promoList);
+		log.warn("we are checking if list of promotions is fetching...");
+		log.info("list of promotions is fetching...");
+		return listOfPromo;
+
+		/*
+		 * } catch (Exception e) { throw new
+		 * Exception("Exception occurs while modifying Promotion"); }
+		 */
 	}
 
 	// Method for modifying/editing Promotion
 	@Override
-	public String editPromotion(PromotionsVo vo) throws Exception {
+	public String editPromotion(PromotionsVo vo) {
+		log.debug("debugging editPromotion:" + vo);
+		if (vo.getPoolVo() == null) {
+			throw new EmptyInputException("please enter valid data");
+		}
+		/* try { */
+		Optional<PromotionsEntity> promotion = promoRepo.findById(vo.getPromoId());
 
-		try {
-			Optional<PromotionsEntity> promotion = promoRepo.findById(vo.getPromoId());
+		if (promotion.isPresent()) {
+			List<ConnectionPoolVo> poolVo = vo.getPoolVo();
 
-			if (promotion.isPresent()) {
-				List<ConnectionPoolVo> poolVo = vo.getPoolVo();
+			List<Long> poolIds = poolVo.stream().map(x -> x.getPoolId()).collect(Collectors.toList());
 
-				List<Long> poolIds = poolVo.stream().map(x -> x.getPoolId()).collect(Collectors.toList());
+			List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
 
-				List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
-				
-				// Code added by sudheer
-				List<StoreVo> storeVo = vo.getStoreVo();
-				
-				/** Promotion mapped to store by storeId **/
+			// Code added by sudheer
+			List<StoreVo> storeVo = vo.getStoreVo();
 
-				List<Long> storeId = storeVo.stream().map(a -> a.getStoreId()).collect(Collectors.toList());
-				List<StoresEntity> storeList = storeRepo.findByStoreIdIn(storeId);
+			/** Promotion mapped to store by storeId **/
 
-				/** Promotion mapped to store by storeName **/
+			List<Long> storeId = storeVo.stream().map(a -> a.getStoreId()).collect(Collectors.toList());
+			List<StoresEntity> storeList = storeRepo.findByStoreIdIn(storeId);
 
-				// List<String> storeName = storeVo.stream().map(b ->
-				// b.getStoreName()).collect(Collectors.toList());
-				// List<StoresEntity> storeList = storeRepo.findByStoreNameIn(storeName);
+			/** Promotion mapped to store by storeName **/
 
+			// List<String> storeName = storeVo.stream().map(b ->
+			// b.getStoreName()).collect(Collectors.toList());
+			// List<StoresEntity> storeList = storeRepo.findByStoreNameIn(storeName);
 
-				if (poolVo.size() == poolList.size()) {
+			if (poolVo.size() == poolList.size()) {
 
-					PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList,storeList);
-					PromotionsEntity savedPromo = promoRepo.save(entity);
-
-				} else {
-					throw new Exception("Please give valid/active pools");
-				}
-				return "Promotion Modified succesfully";
+				PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList, storeList);
+				PromotionsEntity savedPromo = promoRepo.save(entity);
 
 			} else {
-				throw new Exception("please give valid Promotion Id");
+				log.error("Please give valid/active pools");
+				throw new InvalidDataException("Please give valid/active pools");
 			}
-		} catch (Exception e) {
-			throw new Exception("Exception occurs while modifying Promotion");
+
+			log.warn("we wre checking if pool is modified...");
+			log.info("Promotion Modified succesfully");
+			return "Promotion Modified succesfully";
+
+		} else {
+			log.error("please give valid Promotion Id");
+			throw new RecordNotFoundException("please give valid Promotion Id");
 		}
+		/*
+		 * } catch (Exception e) { throw new
+		 * Exception("Exception occurs while modifying Promotion"); }
+		 */
 	}
 }

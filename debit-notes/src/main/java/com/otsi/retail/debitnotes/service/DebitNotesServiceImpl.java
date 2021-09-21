@@ -18,6 +18,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.otsi.retail.debitnotes.exceptions.DataNotFoundException;
+import com.otsi.retail.debitnotes.exceptions.RecordNotFoundException;
 import com.otsi.retail.debitnotes.mapper.DebitNotesMapper;
 import com.otsi.retail.debitnotes.model.DebitNotes;
 import com.otsi.retail.debitnotes.repo.DebitNotesRepo;
@@ -46,7 +48,7 @@ public class DebitNotesServiceImpl implements DebitNotesService {
 	private DebitNotesMapper debitNotesMapper;
 
 	@Override
-	public DebitNotesVo saveDebitNotes(@Valid DebitNotesVo debitNotesVo) {
+	public DebitNotesVo saveDebitNotes(@Valid DebitNotesVo debitNotesVo) throws DataNotFoundException {
 		log.debug("debugging saveDebitNotes:" + debitNotesVo);
 		DebitNotes debitNotes = debitNotesMapper.mapVoToEntity(debitNotesVo);
 		NewSaleResponseVo resVo = new NewSaleResponseVo();
@@ -59,7 +61,7 @@ public class DebitNotesServiceImpl implements DebitNotesService {
 		if (!result.hasBody()) {
 
 			log.error("invoice number doesn't exists");
-			throw new RuntimeException("invoice number doesn't exists");
+			throw new DataNotFoundException("invoice number doesn't exists");
 
 		}
 
@@ -74,6 +76,9 @@ public class DebitNotesServiceImpl implements DebitNotesService {
 	public Optional<DebitNotes> getDebitNotesByDrNo(String drNo) {
 		log.debug("debugging getDebitNotesByDrNo:" + drNo);
 		Optional<DebitNotes> vo = debitNotesRepo.findByDrNo(drNo);
+		if(!(vo.isPresent())) {
+			throw new RecordNotFoundException("record not found");
+		}
 		log.warn("we are testing is fetching getDebitNotesByDrNo ");
 		log.info("after fetching getDebitNotesByDrNo :" + vo.toString());
 		return vo;

@@ -5,12 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.otsi.retail.connectionpool.controller.StoreController;
 import com.otsi.retail.connectionpool.entity.PoolEntity;
+import com.otsi.retail.connectionpool.exceptions.EmptyInputException;
+import com.otsi.retail.connectionpool.exceptions.InvalidDataException;
+import com.otsi.retail.connectionpool.exceptions.RecordNotFoundException;
 import com.otsi.retail.connectionpool.mapper.PoolMapper;
 import com.otsi.retail.connectionpool.repository.PoolRepo;
 import com.otsi.retail.connectionpool.repository.RuleRepo;
@@ -25,6 +31,8 @@ import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 @Service
 public class PoolServiceImpl implements PoolService {
 
+	private Logger log = LoggerFactory.getLogger(PoolServiceImpl.class);
+
 	@Autowired
 	private PoolMapper poolMapper;
 
@@ -36,8 +44,8 @@ public class PoolServiceImpl implements PoolService {
 
 	// Method for saving pools from Connection VO
 	@Override
-	public String savePool(ConnectionPoolVo vo) throws Exception {
-
+	public String savePool(ConnectionPoolVo vo) {
+		log.debug("debugging savePool():" + vo);
 		try {
 			PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
 
@@ -48,69 +56,78 @@ public class PoolServiceImpl implements PoolService {
 				x.setPoolEntity(savedPool);
 				ruleRepo.save(x);
 			});
-
+			log.warn("we are checking if pool is saved...");
+			log.info("pool saved Successfully");
 			return "Pool saved Successfully";
 
 		} catch (Exception e) {
-			throw new Exception("Exception occurs while saving the Pool");
+			log.error("please give valid data");
+			throw new InvalidDataException("please give valid data");
 		}
 	}
 
 	// Method for getting list of pools based on the status flag
 	@Override
-	public List<ConnectionPoolVo>  getListOfPools(String isActive) throws Exception {
-		try {
-			List<PoolEntity> poolEntity = new ArrayList<>();
-			Boolean flag = null;
+	public List<ConnectionPoolVo> getListOfPools(String isActive) {
+		log.debug("debugging savePool():" + isActive);
+		List<PoolEntity> poolEntity = new ArrayList<>();
+		Boolean flag = null;
 
-			if (isActive.equalsIgnoreCase("true")) {
-				flag = Boolean.TRUE;
-			}
-			if (isActive.equalsIgnoreCase("false")) {
-				flag = Boolean.FALSE;
-			}
-
-			if (isActive.equalsIgnoreCase("ALL")) {
-				poolEntity = poolRepo.findAll();
-			} else {
-				poolEntity = poolRepo.findByIsActive(flag);
-			}
-			if (!poolEntity.isEmpty()) {
-
-				List<ConnectionPoolVo> poolVo = poolMapper.convertPoolEntityToVo(poolEntity);
-				return poolVo;
-
-			} else {
-				throw new Exception("No data found");
-			}
-		} catch (Exception e) {
-			throw new Exception("Getting error while fetching data");
+		if (isActive.equalsIgnoreCase("true")) {
+			flag = Boolean.TRUE;
 		}
-	}
+		if (isActive.equalsIgnoreCase("false")) {
+			flag = Boolean.FALSE;
+		}
+
+		if (isActive.equalsIgnoreCase("ALL")) {
+			poolEntity = poolRepo.findAll();
+		} else {
+			poolEntity = poolRepo.findByIsActive(flag);
+		}
+		if (!poolEntity.isEmpty()) {
+
+			List<ConnectionPoolVo> poolVo = poolMapper.convertPoolEntityToVo(poolEntity);
+			log.warn("we are checking if pool is fetching...");
+			log.info("fetching list of pools");
+			return poolVo;
+
+		} else {
+			log.error("record not found");
+			throw new RecordNotFoundException("record not found");
+		}
+	} /*
+		 * catch (Exception e) {
+		 * System.out.println("Getting error while fetching data"); throw new
+		 * RecordNotFoundException("record not found"); }
+		 */
 
 	// Method for Modifying/Edit the existing pool details
 	@Override
-	public String modifyPool(ConnectionPoolVo vo) throws Exception {
-
-		try {
-
-			Optional<PoolEntity> pool = poolRepo.findById(vo.getPoolId());
-
-			if (pool.isPresent()) {
-
-				PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
-
-				poolEntity.setPoolId(vo.getPoolId());
-				poolEntity.setLastModified(LocalDate.now());
-
-				PoolEntity savedPool = poolRepo.save(poolEntity);
-
-			} else {
-				return "Invalid Pool Id";
-			}
-			throw new Exception("Pool Modified Successfully...");
-		} catch (Exception e) {
-			throw new Exception("Exception occurs while modifying the record.");
+	public String modifyPool(ConnectionPoolVo vo) {
+		log.debug("debugging modifyPool():" + vo);
+		if (vo.getRuleVo() == null) {
+			throw new EmptyInputException("please enter valid data");
 		}
+
+		Optional<PoolEntity> pool = poolRepo.findById(vo.getPoolId());
+
+		if (pool.isPresent()) {
+
+			PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
+
+			poolEntity.setPoolId(vo.getPoolId());
+			poolEntity.setLastModified(LocalDate.now());
+
+			PoolEntity savedPool = poolRepo.save(poolEntity);
+
+		} else {
+			log.error("record not found");
+			throw new RecordNotFoundException("record not found");
+		}
+		log.warn("we are checking if pool is modify...");
+		log.info("Pool Modified Successfully...");
+		return "Pool Modified Successfully...";
+
 	}
 }

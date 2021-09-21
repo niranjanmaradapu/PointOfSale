@@ -1,14 +1,14 @@
 server:
  port: 8085
  
-#eureka:
-#  client:
-#    register-with-eureka: true
-#    fetch-registry: true
-#    service-url:
-#      defaultZone: http://localhost:8761/eureka/
-#  instance:
-#    hostname: localhost
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost
   
 spring:
  application:
@@ -23,3 +23,8 @@ spring:
     ddl-auto: update
    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
    show-sql: true
+logging:
+    file:
+      name: C:/Users/ADMIN/Desktop/logs/connection-pool.log
+    level:
+      com.otsi.retail.connectionpool.service: DEBUG  
