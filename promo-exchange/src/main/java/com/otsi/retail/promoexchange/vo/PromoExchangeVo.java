@@ -14,10 +14,12 @@ import lombok.Data;
 public class PromoExchangeVo {
 
 	private CustomerVo customerDetails;
-    
+
 	private Long invoiceNumber;
-	
+
 	private String biller;
+
+	private String billNumber;
 
 	private PaymentType payType;
 
@@ -32,23 +34,23 @@ public class PromoExchangeVo {
 	private float roundOff;
 
 	private Long netPayableAmount;
-	
+
 	private LocalDate createdDate;
 
 	private Long taxAmount;
-    
+
 	private Long offlineNumber;
-	
+
 	private String approvedBy;
-	
+
 	private String reason;
-	
+
 	private List<ListOfReturnSlipsVo> returnSlips;
 
 	private List<DeliverySlipVo> dlSlip;
 
 	private Long recievedAmount;
-	
+
 	private Long balanceAmount;
 
 }

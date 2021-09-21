@@ -68,10 +68,7 @@ public class PromoExchangeEntity {
 	private Long balanceAmount;
 	
 	private Long recievedAmount;
-
-	@OneToMany(targetEntity = DeliverySlipEntity.class, mappedBy = "promoexchange", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<DeliverySlipEntity> dlSlip;
-
+	
 	@ManyToOne
 	@JoinColumn(name = "customer_id")
 	private CustomerDetailsEntity customerDetails;
