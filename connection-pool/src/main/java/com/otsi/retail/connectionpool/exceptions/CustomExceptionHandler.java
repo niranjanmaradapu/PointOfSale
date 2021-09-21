@@ -32,6 +32,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		ErrorResponse error = new ErrorResponse(500, " please enter some data", new Date());
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(value = InvalidDataException.class)
+	public ResponseEntity<ErrorResponse> handleInvalidDataException(InvalidDataException invalidDataException) {
+		ErrorResponse error = new ErrorResponse(501, " please give valid data", new Date());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
+	}
+
 
 }
 
