@@ -16,10 +16,10 @@ import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 @Component
 public interface PoolService {
 
-	String savePool(ConnectionPoolVo vo) throws Exception;
+	String savePool(ConnectionPoolVo vo);
 
-	List<ConnectionPoolVo> getListOfPools(String isActive) throws Exception;
+	List<ConnectionPoolVo> getListOfPools(String isActive);
 
-	String modifyPool(ConnectionPoolVo vo) throws Exception;
+	String modifyPool(ConnectionPoolVo vo);
 
 }

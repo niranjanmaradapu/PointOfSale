@@ -1,6 +1,9 @@
 package com.otsi.retail.connectionpool.controller;
 
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,45 +31,35 @@ import com.sun.istack.NotNull;
 @RequestMapping(CommonRequestMappigs.PROMO)
 public class PromotionController {
 
+	private Logger log = LoggerFactory.getLogger(PromotionController.class);
+
 	@Autowired
 	private PromotionService promoService;
 
 	// Method for adding promotion to pools
 	@PostMapping(CommonRequestMappigs.ADD_PROMO)
 	public GateWayResponse<?> addPromotion(@RequestBody PromotionsVo vo) {
+		log.info("Recieved request to addpromotion():" + vo);
+		String savePromo = promoService.addPromotion(vo);
+		return new GateWayResponse<>(HttpStatus.OK, savePromo, "");
 
-		try {
-			String savePromo = promoService.addPromotion(vo);
-			return new GateWayResponse<>(HttpStatus.OK, savePromo, "");
-
-		} catch (Exception e) {
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e, "");
-		}
 	}
 
 	// Method for getting list of all promotions based on their status
 	@GetMapping(CommonRequestMappigs.GET_PROMO_LIST)
 	public GateWayResponse<?> listOfPromotions(@NotNull @RequestParam String flag) {
+		log.info("Recieved request to listOfPromotions():" + flag);
+		List<PromotionsVo> promoList = promoService.getListOfPromotions(flag);
+		return new GateWayResponse<>(HttpStatus.OK, promoList, "");
 
-		try {
-			List<PromotionsVo> promoList = promoService.getListOfPromotions(flag);
-			return new GateWayResponse<>(HttpStatus.OK, promoList, "");
-
-		} catch (Exception e) {
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e, "");
-		}
 	}
 
 	// Method for modifying/editing Promotion
 	@PostMapping(CommonRequestMappigs.EDIT_PROMO)
 	public GateWayResponse<?> editPromotion(@RequestBody PromotionsVo vo) {
+		log.info("Recieved request to editPromotion():" + vo);
+		String result = promoService.editPromotion(vo);
+		return new GateWayResponse<>(HttpStatus.OK, result, "");
 
-		try {
-			String result = promoService.editPromotion(vo);
-			return new GateWayResponse<>(HttpStatus.OK, result, "");
-
-		} catch (Exception e) {
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e, "");
-		}
 	}
 }
