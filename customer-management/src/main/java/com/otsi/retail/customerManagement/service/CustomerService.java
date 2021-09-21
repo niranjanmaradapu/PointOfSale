@@ -7,11 +7,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.otsi.retail.customerManagement.vo.CustomerDetailsVo;
 import com.otsi.retail.customerManagement.vo.GenerateReturnSlipRequest;
+import com.otsi.retail.customerManagement.vo.HsnDetailsVo;
 import com.otsi.retail.customerManagement.vo.InvoiceRequestVo;
 import com.otsi.retail.customerManagement.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.customerManagement.vo.NewSaleList;
+import com.otsi.retail.customerManagement.vo.RetrnSlipDetailsVo;
 
 /**
  * @author vasavi
@@ -29,4 +33,11 @@ public interface CustomerService {
 	CustomerDetailsVo getCustomerFDetailsFromInvoice(String mobileNo) throws Exception;
 
 	List<ListOfReturnSlipsVo> getAllListOfReturnSlips();
+HsnDetailsVo getHsnDetails(double netAmt) throws JsonMappingException, JsonProcessingException;
+
+	
+
+	RetrnSlipDetailsVo ReturnSlipsDeatils(String RtNumber) throws JsonMappingException, JsonProcessingException;
+
+	String updateReturnSlip(String rtNumber, GenerateReturnSlipRequest request);;
 }

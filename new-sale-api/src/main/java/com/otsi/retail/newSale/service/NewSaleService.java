@@ -62,6 +62,8 @@ public interface NewSaleService {
 
 	List<BarcodeVo> getAllBarcodes() throws Exception;
 
+	List<BarcodeVo> getBarcodes(List<String> barCode) throws Exception;
+
 
 
 

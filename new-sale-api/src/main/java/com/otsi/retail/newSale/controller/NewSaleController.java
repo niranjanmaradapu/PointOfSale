@@ -367,4 +367,20 @@ public class NewSaleController {
 					"Exception occurs while fetching data");
 		}
 	}
+	
+	@PostMapping(CommonRequestMappigs.GET_BARCODES)
+	//@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	
+	public GateWayResponse<?> getBarcodes(@RequestBody List<String> barCode) {
+		log.info("Received Request to getBarcodeDetails:" + barCode);
+		System.out.println("Received Request to getBarcodeDetails:" + barCode);
+		try {
+			List<BarcodeVo> barCodeDetails = newSaleService.getBarcodes(barCode);
+
+		return new GateWayResponse<>( HttpStatus.OK,barCodeDetails,"");
+		}catch (Exception e) {
+			return new GateWayResponse<>( HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+
+	}
 }

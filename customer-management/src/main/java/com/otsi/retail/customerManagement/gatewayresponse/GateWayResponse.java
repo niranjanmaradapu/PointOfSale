@@ -25,6 +25,10 @@ public class GateWayResponse<T> {
 	private List<String> errors;
 	private List<FieldError> fieldErrors;
 	
+	public GateWayResponse() {
+		super();
+	}
+	
 
 	/**
 	 * @param errors

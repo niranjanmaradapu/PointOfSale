@@ -213,5 +213,20 @@ public class NewSaleMapper {
 		});
 		return barcodeList;
 	}
+	
+	public List<BarcodeVo> convertBarcodesEntityToVo(List<BarcodeEntity> barcodeDetails) {
+		return barcodeDetails.stream().map(dto -> barentityToVo(dto)).collect(Collectors.toList());
+	
+		
+	}
+
+	private BarcodeVo barentityToVo(BarcodeEntity dto) {
+		
+		BarcodeVo vo = new BarcodeVo();
+		BeanUtils.copyProperties(dto, vo);
+		
+		return vo;
+	}
+
 
 }

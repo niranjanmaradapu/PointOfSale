@@ -15,15 +15,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.otsi.retail.customerManagement.gatewayresponse.GateWayResponse;
 import com.otsi.retail.customerManagement.service.CustomerService;
 import com.otsi.retail.customerManagement.vo.CustomerDetailsVo;
 import com.otsi.retail.customerManagement.vo.GenerateReturnSlipRequest;
+import com.otsi.retail.customerManagement.vo.HsnDetailsVo;
 import com.otsi.retail.customerManagement.vo.InvoiceRequestVo;
 import com.otsi.retail.customerManagement.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.customerManagement.vo.NewSaleList;
+import com.otsi.retail.customerManagement.vo.RetrnSlipDetailsVo;
 
 @RestController
 
@@ -85,6 +90,16 @@ public class CustomerController {
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
+	
+	@PostMapping("/updateReturnSlip")
+	public GateWayResponse<?> updateReturnSlip(@RequestParam  String rtNumber,@RequestBody GenerateReturnSlipRequest request) {
+		try {
+			String message = customerService.updateReturnSlip(rtNumber,request);
+			return new GateWayResponse<>(HttpStatus.CREATED, message);
+		} catch (Exception e) {
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
 
 	@GetMapping("/getCustomerDetails/{mobileNo}")
 	public GateWayResponse<?> getCustomerDetails(@PathVariable String mobileNo) {
@@ -117,6 +132,42 @@ public class CustomerController {
 		// return new
 		// GateWayResponse<List<ListOfReturnSlipsVo>>(customerService.getListOfReturnSlips(vo));
 
+	}
+	@GetMapping("/getReturnSlipsDetails")
+	public GateWayResponse<?>ReturnSlipsDeatils(String rtNumber) {
+
+		RetrnSlipDetailsVo listVo = null;
+
+		try {
+			listVo = customerService.ReturnSlipsDeatils(rtNumber);
+			// if vo is null,it will print failure message.Otherwise,it will give the
+			// details;
+			if (listVo == null) {
+				return new GateWayResponse<>(false, HttpStatus.OK, "no record found with the given information",
+						"Failure");
+			}
+			return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
+		} catch (Exception ex) {
+			return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+		}
+		
+
+	}
+	@GetMapping("/getHsnDetails/{netAmt}")
+	public GateWayResponse<?> getHsnDetails(@PathVariable double netAmt) {
+		try {
+			log.info("Recieved request to getNewSaleWithHsn()");
+			HsnDetailsVo netamt=	customerService.getHsnDetails(netAmt);
+			return new GateWayResponse<>( HttpStatus.OK,netamt,"");
+		} catch (JsonMappingException e) {
+
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+
+			e.printStackTrace();
+		}
+		log.error("hsn details not found");
+		throw new RuntimeException("hsn details not found");
 	}
 
 }

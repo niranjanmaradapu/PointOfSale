@@ -9,6 +9,9 @@ public class CommonRequestMappigs {
 	public static final String CREATE_BARCODE = "createbarcode";
 
 	public static final String GET_BARCODE_DETAILS = "getbarcodedetails";
+	
+	public static final String GET_BARCODES = "getbarcodes";
+
 
 	public static final String CREATE_DS = "createdeliveryslip";
 
