@@ -808,5 +808,24 @@ public class NewSaleServiceImpl implements NewSaleService {
 			throw new Exception("Exception occurs while fetching barcodes list");
 		}
 	}
+	@Override
+	public List<BarcodeVo> getBarcodes(List<String>  barCode) throws Exception {
+		log.debug("deugging getBarcodeDetails" + barCode);
+		
+		List<BarcodeEntity> barcodeDetails = barcodeRepository.findByBarcodeIn(barCode);
+
+		
+		
+		if (barcodeDetails.isEmpty()) {
+			log.error("Barcode with number " + barCode + " is not exists");
+			throw new Exception("Barcode with number " + barCode + " is not exists");
+		} else {
+			List<BarcodeVo> vo = newSaleMapper.convertBarcodesEntityToVo(barcodeDetails);
+			log.warn("we are fetching barcode details...");
+			log.info("after getting barcode details :" + vo);
+			return vo;
+		}
+	}
+
 
 }

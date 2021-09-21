@@ -10,8 +10,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -22,19 +24,28 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.customerManagement.gatewayresponse.GateWayResponse;
 import com.otsi.retail.customerManagement.mapper.ReturnSlipMapper;
 import com.otsi.retail.customerManagement.model.Barcode;
 import com.otsi.retail.customerManagement.model.ReturnSlip;
+import com.otsi.retail.customerManagement.model.TaggedItems;
 import com.otsi.retail.customerManagement.repo.BarcodeRepo;
 import com.otsi.retail.customerManagement.repo.ReturnSlipRepo;
 import com.otsi.retail.customerManagement.service.CustomerService;
 import com.otsi.retail.customerManagement.utils.ReturnSlipStatus;
+import com.otsi.retail.customerManagement.vo.BarcodeVo;
 import com.otsi.retail.customerManagement.vo.CustomerDetailsVo;
 import com.otsi.retail.customerManagement.vo.GenerateReturnSlipRequest;
+import com.otsi.retail.customerManagement.vo.HsnDetailsVo;
 import com.otsi.retail.customerManagement.vo.InvoiceRequestVo;
 import com.otsi.retail.customerManagement.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.customerManagement.vo.NewSaleList;
+import com.otsi.retail.customerManagement.vo.RetrnSlipDetailsVo;
+import com.otsi.retail.customerManagement.vo.TaxVo;
 
 /**
  * @author vasavi
@@ -51,6 +62,13 @@ public class CustomerServiceImpl implements CustomerService {
 	@Autowired
 	private BarcodeRepo barCodeRepo;
 
+	@Value("${getbarcodes.url}")
+	private String getbarcodesUrl;
+	
+	@Autowired
+	private HSNVoService hsnService;
+
+	
 	@Autowired
 	private ReturnSlipRepo returnSlipRepo;
 
@@ -289,6 +307,87 @@ public class CustomerServiceImpl implements CustomerService {
 		
 		return rvo;
 	} 
+	
+	@Override
+
+	public RetrnSlipDetailsVo ReturnSlipsDeatils(String rtNumber) throws JsonMappingException, JsonProcessingException {
+
+		ReturnSlip rts = returnSlipRepo.findByRtNo(rtNumber);
+
+		List<RetrnSlipDetailsVo> lvo = new ArrayList<>();
+
+		List<TaggedItems> tgItems = rts.getTaggedItems();
+
+		List<String> barcodes = tgItems.stream().map(x -> x.getBarCode()).collect(Collectors.toList());
+
+		System.out.println("Received Request to getBarcodeDetails:" + barcodes);
+
+		HttpHeaders headers = new HttpHeaders();
+
+		HttpEntity<List<String>> request = new HttpEntity<List<String>>(barcodes, headers);
+
+		ResponseEntity<?> newsaleResponse = restTemplate.exchange(getbarcodesUrl, HttpMethod.POST, request,
+				GateWayResponse.class);
+
+		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
+		ObjectMapper mapper = new ObjectMapper();
+
+		GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
+
+		List<BarcodeVo> bvo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<List<BarcodeVo>>() {
+		});
+
+		RetrnSlipDetailsVo rrvo = new RetrnSlipDetailsVo();
+
+		HsnDetailsVo HsnDetails = getHsnDetails(rts.getAmount());
+
+		rrvo.setBarcode(bvo);
+		rrvo.setHsnCode(HsnDetails);
+		rrvo.setCreatedDate(rts.getCreatedDate());
+		rrvo.setRtNumber(rts.getRtNo());
+
+		return rrvo;
+	}
+
+	@Override
+	public HsnDetailsVo getHsnDetails(double netAmt) throws JsonMappingException, JsonProcessingException {
+		List<HsnDetailsVo> vo = hsnService.getHsn();
+		TaxVo tvo = new TaxVo();
+		HsnDetailsVo hvo = new HsnDetailsVo();
+
+		vo.stream().forEach(x -> {
+
+			x.getSlabVos().stream().forEach(a -> {
+
+				if (a.getPriceFrom() <= netAmt && netAmt <= a.getPriceTo()) {
+
+					tvo.setSgst((float) ((a.getTaxVo().getSgst() * netAmt) / 100));
+					tvo.setIgst((float) ((a.getTaxVo().getIgst() * netAmt) / 100));
+					tvo.setCgst((float) ((a.getTaxVo().getCgst() * netAmt) / 100));
+					hvo.setHsnCode(x.getHsnCode());
+					hvo.setTaxVo(tvo);
+
+					
+				}
+			});
+		});
+
+		return hvo;
+
+	}
+
+	@Override
+	public String updateReturnSlip(String rtNumber, GenerateReturnSlipRequest request) {
+		
+		ReturnSlip rts = returnSlipRepo.findByRtNo(rtNumber);
+		//ReturnSlip returnSlipDto = new ReturnSlip();
+		rts.setIsReviewed(true);
+
+		returnSlipRepo.save(rts);
+		
+		return "Successfully updated " + rts.getRtNo();
+	}
+
 
 
 	

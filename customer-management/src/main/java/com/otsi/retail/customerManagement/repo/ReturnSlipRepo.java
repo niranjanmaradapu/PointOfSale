@@ -29,7 +29,7 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 
 	List<ReturnSlip> findByCreatedDateBetween(LocalDate dateFrom, LocalDate dateTo);
 
-	List<ReturnSlip> findByRtNo(String rtNumber);
+	//ReturnSlip findByRtNo(String rtNumber);
 
 	List<ReturnSlip> findByRtStatus(String rtStatus);
 
@@ -86,5 +86,7 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 	List<ReturnSlip> findByTaggedItems_barCodeOrderByCreatedDateAsc(String barcode);
 
 	List<ReturnSlip> findByIsReviewedOrderByCreatedDateAsc(Boolean rtReviewStatus);
+
+	ReturnSlip findByRtNo(String rtNumber);
 
 }
