@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +39,7 @@ public class StoreController {
 	public GateWayResponse<?> addStore(@RequestBody StoreVo vo) {
 		log.info("Recieved request to addStore():" + vo);
 		String saveStore = storeService.addStore(vo);
-		return new GateWayResponse<>(HttpStatus.OK, saveStore, "");
+		return new GateWayResponse<>("added store successfully", saveStore);
 
 	}
 
@@ -48,20 +47,15 @@ public class StoreController {
 	public GateWayResponse<?> getByStoreId(@RequestParam Long storeId) {
 		log.info("Recieved request to getByStoreId():" + storeId);
 		Optional<StoresEntity> getAllStore = storeService.getByStoreId(storeId);
-		return new GateWayResponse<>(HttpStatus.OK, getAllStore, "");
+		return new GateWayResponse<>("fetching store through store id successfully", getAllStore);
 
 	}
 
 	@GetMapping(CommonRequestMappigs.GET_STORE_BY_NAME)
 	public GateWayResponse<?> getStoreDetailsByStoreName(@RequestParam String storeName) {
 		log.info("Recieved request to getStoreDetailsByStoreName():" + storeName);
-		try {
-			Optional<StoresEntity> stores = storeService.findStoreByName(storeName);
-			return new GateWayResponse<>(HttpStatus.OK, stores, "");
-
-		} catch (Exception e) {
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
+		Optional<StoresEntity> stores = storeService.findStoreByName(storeName);
+		return new GateWayResponse<>("fetching store through store name successfully", stores);
 
 	}
 

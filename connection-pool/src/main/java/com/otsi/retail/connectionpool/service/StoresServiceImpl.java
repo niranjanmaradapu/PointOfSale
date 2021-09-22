@@ -61,7 +61,7 @@ public class StoresServiceImpl implements StoresService {
 		Optional<StoresEntity> storeList = storeRepo.findById(storeId);
 		if (storeList.isPresent()) {
 			log.warn("we are checking if store is fetching by Id...");
-			log.info("fetchinf store with Id:" + storeList);
+			log.info("fetching store with Id:" + storeList);
 			return storeList;
 		} else
 			log.error("record not found");
