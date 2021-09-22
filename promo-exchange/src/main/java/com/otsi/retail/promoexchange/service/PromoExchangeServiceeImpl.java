@@ -139,6 +139,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 		DeliverySlipVo vo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<DeliverySlipVo>() {
 		});
+
 		return vo;
 	}
 
@@ -147,7 +148,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 		ResponseEntity<?> returnSlipListResponse = template.exchange(getListOfReturnSlipsUrl, HttpMethod.GET, null,
 				GateWayResponse.class);
-		
+
 		ObjectMapper mapper = new ObjectMapper();
 
 		GateWayResponse<?> gatewayResponse = mapper.convertValue(returnSlipListResponse.getBody(),
@@ -156,7 +157,6 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 		List<ListOfReturnSlipsVo> vo = mapper.convertValue(gatewayResponse.getResult(),
 				new TypeReference<List<ListOfReturnSlipsVo>>() {
 				});
-		
 
 		return vo;
 	}
@@ -165,7 +165,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 	public List<PromoExchangeVo> getListOfSaleBills() {
 
 		List<PromoExchangeEntity> pmodel = promoExchangeRepository.findAll();
-		
+
 		if (pmodel.isEmpty()) {
 
 			throw new RecordNotFoundException("Record not found");

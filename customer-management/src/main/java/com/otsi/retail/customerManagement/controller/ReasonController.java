@@ -15,7 +15,6 @@ import com.otsi.retail.customerManagement.gatewayresponse.GateWayResponse;
 import com.otsi.retail.customerManagement.model.Reason;
 import com.otsi.retail.customerManagement.service.ReasonService;
 
-
 @RestController
 @RequestMapping("/reason")
 public class ReasonController {
@@ -24,36 +23,25 @@ public class ReasonController {
 
 	@GetMapping()
 	public GateWayResponse<?> getAllReason() {
-		try {
-		List<Reason> reasons=reasonService.getAllReasons();
-			return new GateWayResponse<>(HttpStatus.OK, reasons, "");
-		} catch (Exception e) {
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
-		
+
+		List<Reason> reasons = reasonService.getAllReasons();
+		return new GateWayResponse<>(HttpStatus.OK, reasons, "Success");
+
 	}
 
 	@PostMapping()
 	public GateWayResponse<?> saveReason(@RequestBody Reason reason) {
 
-		try {
-			String result = reasonService.saveReason(reason);
-			return new GateWayResponse<>(HttpStatus.OK, result);
-		} catch (Exception e) {
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
+		String result = reasonService.saveReason(reason);
+		return new GateWayResponse<>("Reason Saved Successfully", result);
 
 	}
 
 	@DeleteMapping()
 	public GateWayResponse<?> deleteReason(Long id) {
-		try {
-			String result=	reasonService.deleteReason(id);
-			return new GateWayResponse<>(HttpStatus.OK, result);
 
-		} catch (Exception e) {
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
+		String result = reasonService.deleteReason(id);
+		return new GateWayResponse<>("Reason Deleted successfully", result);
 
 	}
 

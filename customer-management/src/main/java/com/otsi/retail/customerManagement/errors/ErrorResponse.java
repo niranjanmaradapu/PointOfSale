@@ -1,4 +1,4 @@
-package com.otsi.retail.promoexchange.errors;
+package com.otsi.retail.customerManagement.errors;
 
 
 
@@ -71,3 +71,4 @@ public class ErrorResponse<T> {
 
 	
 }
+

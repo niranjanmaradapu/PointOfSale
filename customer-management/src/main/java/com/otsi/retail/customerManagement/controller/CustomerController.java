@@ -52,63 +52,38 @@ public class CustomerController {
 		log.info("Received request to getListOfReturnSlips:" + vo);
 		List<ListOfReturnSlipsVo> listVo = null;
 
-		try {
-			listVo = customerService.getListOfReturnSlips(vo);
-			// if vo is null,it will print failure message.Otherwise,it will give the
-			// details;
-			if (listVo == null) {
-				return new GateWayResponse<>(false, HttpStatus.OK, "no record found with the given information",
-						"Failure");
-			}
-			return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
-		} catch (Exception ex) {
-			return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-		}
-		// return new
-		// GateWayResponse<List<ListOfReturnSlipsVo>>(customerService.getListOfReturnSlips(vo));
-
+		listVo = customerService.getListOfReturnSlips(vo);
+		return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
 	}
 
 	@PostMapping("/getInvoiceDetails")
-	public GateWayResponse<?> getInvoiceDetails(@RequestBody InvoiceRequestVo searchVo) {
+	public GateWayResponse<?> getInvoiceDetails(@RequestBody InvoiceRequestVo searchVo) throws Exception {
 
-		try {
-			NewSaleList newSale = customerService.getInvoiceDetailsFromNewSale(searchVo);
-			return new GateWayResponse<>(HttpStatus.OK, newSale, "");
-		} catch (Exception e) {
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
+		NewSaleList newSale = customerService.getInvoiceDetailsFromNewSale(searchVo);
+		return new GateWayResponse<>(HttpStatus.OK, newSale, "");
 
 	}
 
 	@PostMapping("/createReturnSlip")
-	public GateWayResponse<?> createReturnSlip(@RequestBody GenerateReturnSlipRequest request) {
-		try {
-			String message = customerService.createReturnSlip(request);
-			return new GateWayResponse<>(HttpStatus.CREATED, message);
-		} catch (Exception e) {
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
+	public GateWayResponse<?> createReturnSlip(@RequestBody GenerateReturnSlipRequest request) throws Exception {
+
+		String message = customerService.createReturnSlip(request);
+		return new GateWayResponse<>("ReturnSlip Created Successfully", message);
 	}
-	
+
 	@PostMapping("/updateReturnSlip")
-	public GateWayResponse<?> updateReturnSlip(@RequestParam  String rtNumber,@RequestBody GenerateReturnSlipRequest request) {
-		try {
-			String message = customerService.updateReturnSlip(rtNumber,request);
-			return new GateWayResponse<>(HttpStatus.CREATED, message);
-		} catch (Exception e) {
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
+	public GateWayResponse<?> updateReturnSlip(@RequestParam String rtNumber,
+			@RequestBody GenerateReturnSlipRequest request) {
+		String message = customerService.updateReturnSlip(rtNumber, request);
+		return new GateWayResponse<>("Return Slip Details Updated Successfully", message);
+
 	}
 
 	@GetMapping("/getCustomerDetails/{mobileNo}")
-	public GateWayResponse<?> getCustomerDetails(@PathVariable String mobileNo) {
-		try {
-			CustomerDetailsVo customerVo = customerService.getCustomerFDetailsFromInvoice(mobileNo);
-			return new GateWayResponse<>(HttpStatus.OK, customerVo, "");
-		} catch (Exception e) {
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
+	public GateWayResponse<?> getCustomerDetails(@PathVariable String mobileNo) throws Exception {
+
+		CustomerDetailsVo customerVo = customerService.getCustomerFDetailsFromInvoice(mobileNo);
+		return new GateWayResponse<>(HttpStatus.OK, customerVo, "");
 
 	}
 
@@ -117,57 +92,31 @@ public class CustomerController {
 
 		List<ListOfReturnSlipsVo> listVo = null;
 
-		try {
-			listVo = customerService.getAllListOfReturnSlips();
-			// if vo is null,it will print failure message.Otherwise,it will give the
-			// details;
-			if (listVo == null) {
-				return new GateWayResponse<>(false, HttpStatus.OK, "no record found with the given information",
-						"Failure");
-			}
-			return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
-		} catch (Exception ex) {
-			return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-		}
-		// return new
-		// GateWayResponse<List<ListOfReturnSlipsVo>>(customerService.getListOfReturnSlips(vo));
+		listVo = customerService.getAllListOfReturnSlips();
+
+		return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
 
 	}
+
 	@GetMapping("/getReturnSlipsDetails")
-	public GateWayResponse<?>ReturnSlipsDeatils(String rtNumber) {
+	public GateWayResponse<?> ReturnSlipsDeatils(String rtNumber) throws JsonMappingException, JsonProcessingException {
 
 		RetrnSlipDetailsVo listVo = null;
 
-		try {
-			listVo = customerService.ReturnSlipsDeatils(rtNumber);
-			// if vo is null,it will print failure message.Otherwise,it will give the
-			// details;
-			if (listVo == null) {
-				return new GateWayResponse<>(false, HttpStatus.OK, "no record found with the given information",
-						"Failure");
-			}
-			return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
-		} catch (Exception ex) {
-			return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-		}
-		
+		listVo = customerService.ReturnSlipsDeatils(rtNumber);
+
+		return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
 
 	}
+
 	@GetMapping("/getHsnDetails/{netAmt}")
-	public GateWayResponse<?> getHsnDetails(@PathVariable double netAmt) {
-		try {
-			log.info("Recieved request to getNewSaleWithHsn()");
-			HsnDetailsVo netamt=	customerService.getHsnDetails(netAmt);
-			return new GateWayResponse<>( HttpStatus.OK,netamt,"");
-		} catch (JsonMappingException e) {
+	public GateWayResponse<?> getHsnDetails(@PathVariable double netAmt)
+			throws JsonMappingException, JsonProcessingException {
 
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
+		log.info("Recieved request to getNewSaleWithHsn()");
+		HsnDetailsVo netamt = customerService.getHsnDetails(netAmt);
+		return new GateWayResponse<>(HttpStatus.OK, netamt, "");
 
-			e.printStackTrace();
-		}
-		log.error("hsn details not found");
-		throw new RuntimeException("hsn details not found");
 	}
 
 }
