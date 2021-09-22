@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.otsi.retail.promoexchange.Entity.CustomerDetailsEntity;
+import com.otsi.retail.promoexchange.exceptions.DuplicateRecordFoundException;
+import com.otsi.retail.promoexchange.exceptions.RecordNotFoundException;
 import com.otsi.retail.promoexchange.mapper.CustomerMapper;
 import com.otsi.retail.promoexchange.repository.CustomerDetailsRepo;
 import com.otsi.retail.promoexchange.vo.CustomerVo;
@@ -23,7 +25,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public String saveCustomerDetails(CustomerVo details) throws Exception {
-		try {
+		
 			Optional<CustomerDetailsEntity> list = customerRepo.findByMobileNumber(details.getMobileNumber());
 
 			if (!list.isPresent()) {
@@ -32,11 +34,9 @@ public class CustomerServiceImpl implements CustomerService {
 				customerRepo.save(entity);
 				return "Customer details saved successfully..";
 			} else {
-				throw new Exception("Mobile number is already in my records");
+				throw new DuplicateRecordFoundException("Record already exists");
 			}
-		} catch (Exception e) {
-			throw new Exception("error occurs while saving customer details");
-		}
+		
 	}
 
 	@Override
@@ -44,8 +44,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 		Optional<CustomerDetailsEntity> customerDetails = customerRepo.findByMobileNumber(mobileNumber);
 		if (!customerDetails.isPresent()) {
-			throw  new Exception(
-					"Customer is with mobile number " + mobileNumber + " not exists. So please fill all the details..");
+			throw new RecordNotFoundException("Record Not Found");
 		} else {
 			CustomerVo details = customerMapper.convertEntityToVo(customerDetails.get());
 			return details;

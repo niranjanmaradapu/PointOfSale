@@ -23,36 +23,15 @@ public interface PromoExchangeService {
 
 	
 	String savePromoItemExchangeRequest(PromoExchangeVo vo);
-
-	BarcodeVo getBarcodeDetails(String barCode) throws Exception;
-
-	ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo) throws Exception;
 	
 	DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws Exception;
-
-	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws Exception;
-
-	/* ResponseEntity<?> posDayClose(); */
-
-	//List<ReturnSlipsVo> getListOfReturnSlips(ReturnSlipsVo vo);
-
-	String saveBarcode(BarcodeVo vo) throws Exception;
-
-	String saveDeliverySlip(DeliverySlipVo vo) throws Exception;
-
+	
 	List<ListOfReturnSlipsVo> getListOfRetunSlips()
 			throws JsonMappingException, JsonProcessingException;
 
+	List<PromoExchangeVo> getListOfSaleBills();
+
+	List<PromoExchangeVo> getSaleBillByBillNumber(String billNumber);
+    
 	
-
-	/* DeliverySlipVo getNewsaleWithDeliveryslip(String dsNumber); */
-
-	
-
-	
-
-	/* Optional<PromoExchangeEntity> getPromoItems(Long promoExchangeId); */
-
-	
-
 }
