@@ -28,6 +28,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.otsi.retail.customerManagement.exceptions.DataNotFoundException;
+import com.otsi.retail.customerManagement.exceptions.InvalidDataException;
+import com.otsi.retail.customerManagement.exceptions.RecordNotFoundException;
 import com.otsi.retail.customerManagement.gatewayresponse.GateWayResponse;
 import com.otsi.retail.customerManagement.mapper.ReturnSlipMapper;
 import com.otsi.retail.customerManagement.model.Barcode;
@@ -53,28 +56,20 @@ import com.otsi.retail.customerManagement.vo.TaxVo;
 @Component
 public class CustomerServiceImpl implements CustomerService {
 
-
-
-
-
-	
-
 	@Autowired
 	private BarcodeRepo barCodeRepo;
 
 	@Value("${getbarcodes.url}")
 	private String getbarcodesUrl;
-	
+
 	@Autowired
 	private HSNVoService hsnService;
 
-	
 	@Autowired
 	private ReturnSlipRepo returnSlipRepo;
 
 	@Autowired
 	private ReturnSlipMapper returnSlipMapper;
-
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -96,8 +91,8 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			if (vo.getRtNumber() != null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtNoOrderByCreatedDateAsc(vo.getDateFrom(), vo.getDateTo(),
-						vo.getRtNumber());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtNoOrderByCreatedDateAsc(vo.getDateFrom(),
+						vo.getDateTo(), vo.getRtNumber());
 			}
 			/**
 			 * getting the record using dates and creditNote
@@ -105,8 +100,8 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreditNote() != null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndCrNoOrderByCreatedDateAsc(vo.getDateFrom(), vo.getDateTo(),
-						vo.getCreditNote());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndCrNoOrderByCreatedDateAsc(vo.getDateFrom(),
+						vo.getDateTo(), vo.getCreditNote());
 			}
 			/**
 			 * getting the record using dates and RtStatus
@@ -114,8 +109,8 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() != null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtStatusOrderByCreatedDateAsc(vo.getDateFrom(), vo.getDateTo(),
-						vo.getRtStatus());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtStatusOrderByCreatedDateAsc(
+						vo.getDateFrom(), vo.getDateTo(), vo.getRtStatus());
 			}
 			/**
 			 * getting the record using dates and RtReviewStatus
@@ -123,8 +118,8 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() != null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndIsReviewedOrderByCreatedDateAsc(vo.getDateFrom(),
-						vo.getDateTo(), vo.getRtReviewStatus());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndIsReviewedOrderByCreatedDateAsc(
+						vo.getDateFrom(), vo.getDateTo(), vo.getRtReviewStatus());
 			}
 			/**
 			 * getting the record using dates and barcode
@@ -132,16 +127,18 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() != null) {
-				
-			retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCodeOrderByCreatedDateAsc(vo.getDateFrom(),vo.getDateTo(),vo.getBarcode());
-				
+
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCodeOrderByCreatedDateAsc(
+						vo.getDateFrom(), vo.getDateTo(), vo.getBarcode());
+
 			}
 			/**
 			 * getting the record using dates only
 			 *
 			 */
 			else
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenOrderByCreatedDateAsc(vo.getDateFrom(), vo.getDateTo());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenOrderByCreatedDateAsc(vo.getDateFrom(),
+						vo.getDateTo());
 			/**
 			 * getting the records without dates
 			 *
@@ -178,9 +175,9 @@ public class CustomerServiceImpl implements CustomerService {
 
 			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
 					&& vo.getRtReviewStatus() == null && vo.getBarcode() != null) {
-				
-					retunSlipdetails = returnSlipRepo.findByTaggedItems_barCodeOrderByCreatedDateAsc(vo.getBarcode());
-				
+
+				retunSlipdetails = returnSlipRepo.findByTaggedItems_barCodeOrderByCreatedDateAsc(vo.getBarcode());
+
 			}
 
 			/**
@@ -198,7 +195,8 @@ public class CustomerServiceImpl implements CustomerService {
 		if (!rvo.isEmpty()) {
 			return rvo;
 		} else
-			throw new RuntimeException("no record found with the giveninformation");
+			// throw new RuntimeException("no record found with the giveninformation");
+			throw new DataNotFoundException("No return slips are found");
 	}
 
 	@Override
@@ -215,7 +213,7 @@ public class CustomerServiceImpl implements CustomerService {
 			if (responce.getStatusCode() == HttpStatus.OK && responce.getStatusCode().equals(HttpStatus.OK)) {
 				return responce.getBody();
 			} else {
-				throw new Exception("" + responce.getBody());
+				throw new RecordNotFoundException("Invoice details are not exists" + responce.getBody());
 			}
 
 		} catch (Exception e) {
@@ -225,27 +223,28 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public String createReturnSlip(GenerateReturnSlipRequest request) throws Exception {
-		try {
 
-			if(!request.getIsUserTagged()) {
-				tagUserToInvoice(request.getMobileNumber(),request.getInvoiceNo());
-			}
-			
-			ReturnSlip returnSlipDto = new ReturnSlip();
-			returnSlipDto.setCrNo(generateCrNumber());
-			returnSlipDto.setRtNo(generateRtNumber());
-			returnSlipDto.setCreatedDate(LocalDate.now());
-			returnSlipDto.setModifiedDate(LocalDate.now());
-			returnSlipDto.setIsReviewed(Boolean.FALSE);
-			returnSlipDto.setCreatedBy(request.getCreatedBy());
-			returnSlipDto.setTaggedItems(request.getBarcodes());
-			returnSlipDto.setRtStatus(ReturnSlipStatus.PENDING.getId());
-			returnSlipDto.setAmount(request.getAmount());
-			returnSlipRepo.save(returnSlipDto);
-			return "Successfully saved "+returnSlipDto.getRtNo();
-		} catch (Exception e) {
-			throw new Exception(e.getMessage());
+		if (!request.getIsUserTagged()) {
+			tagUserToInvoice(request.getMobileNumber(), request.getInvoiceNo());
 		}
+
+		ReturnSlip returnSlipDto = new ReturnSlip();
+		returnSlipDto.setCrNo(generateCrNumber());
+		returnSlipDto.setRtNo(generateRtNumber());
+		returnSlipDto.setCreatedDate(LocalDate.now());
+		returnSlipDto.setModifiedDate(LocalDate.now());
+		returnSlipDto.setIsReviewed(Boolean.FALSE);
+		returnSlipDto.setCreatedBy(request.getCreatedBy());
+		returnSlipDto.setTaggedItems(request.getBarcodes());
+		returnSlipDto.setRtStatus(ReturnSlipStatus.PENDING.getId());
+		returnSlipDto.setAmount(request.getAmount());
+		returnSlipRepo.save(returnSlipDto);
+
+		if (returnSlipDto.getTaggedItems() == null || request.getIsUserTagged() == null) {
+			throw new InvalidDataException("Please enter some data");
+		}
+
+		return "Successfully saved " + returnSlipDto.getRtNo();
 
 	}
 
@@ -255,11 +254,10 @@ public class CustomerServiceImpl implements CustomerService {
 		HttpEntity entity = new HttpEntity(headers);
 		URI uri = null;
 		try {
-			uri = UriComponentsBuilder.fromUri(new URI(TAG_CUSTOMER_TO_INVOICE  + "/" + mobileNumber +"/"+invoiceNo)).build().encode()
-					.toUri();
-			
-			ResponseEntity<String> res = restTemplate.exchange(uri, HttpMethod.GET, entity,
-					String.class);
+			uri = UriComponentsBuilder.fromUri(new URI(TAG_CUSTOMER_TO_INVOICE + "/" + mobileNumber + "/" + invoiceNo))
+					.build().encode().toUri();
+
+			ResponseEntity<String> res = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
 		} catch (URISyntaxException e) {
 			throw new Exception(e.getMessage());
 		}
@@ -281,7 +279,7 @@ public class CustomerServiceImpl implements CustomerService {
 				System.out.println(res.getBody());
 				return res.getBody();
 			} else {
-				throw new Exception("" + res.getBody());
+				throw new RecordNotFoundException("Mobile number not exists" + res.getBody());
 			}
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
@@ -303,16 +301,23 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public List<ListOfReturnSlipsVo> getAllListOfReturnSlips() {
 		List<ReturnSlip> rmodel = returnSlipRepo.findAll();
+		if (rmodel.isEmpty()) {
+
+			throw new DataNotFoundException("No return slips are found");
+		}
 		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapEntityToVo(rmodel);
-		
+
 		return rvo;
-	} 
-	
+	}
+
 	@Override
 
 	public RetrnSlipDetailsVo ReturnSlipsDeatils(String rtNumber) throws JsonMappingException, JsonProcessingException {
 
 		ReturnSlip rts = returnSlipRepo.findByRtNo(rtNumber);
+		if (rts == null) {
+			throw new RecordNotFoundException("given RT number is not exists");
+		}
 
 		List<RetrnSlipDetailsVo> lvo = new ArrayList<>();
 
@@ -352,6 +357,9 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public HsnDetailsVo getHsnDetails(double netAmt) throws JsonMappingException, JsonProcessingException {
 		List<HsnDetailsVo> vo = hsnService.getHsn();
+		if (vo == null) {
+			new RecordNotFoundException("Record not found");
+		}
 		TaxVo tvo = new TaxVo();
 		HsnDetailsVo hvo = new HsnDetailsVo();
 
@@ -367,7 +375,6 @@ public class CustomerServiceImpl implements CustomerService {
 					hvo.setHsnCode(x.getHsnCode());
 					hvo.setTaxVo(tvo);
 
-					
 				}
 			});
 		});
@@ -378,18 +385,17 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public String updateReturnSlip(String rtNumber, GenerateReturnSlipRequest request) {
-		
+
 		ReturnSlip rts = returnSlipRepo.findByRtNo(rtNumber);
-		//ReturnSlip returnSlipDto = new ReturnSlip();
+		if (rts == null) {
+			throw new RecordNotFoundException("RT Number not found");
+		}
+		// ReturnSlip returnSlipDto = new ReturnSlip();
 		rts.setIsReviewed(true);
 
 		returnSlipRepo.save(rts);
-		
+
 		return "Successfully updated " + rts.getRtNo();
 	}
-
-
-
-	
 
 }
