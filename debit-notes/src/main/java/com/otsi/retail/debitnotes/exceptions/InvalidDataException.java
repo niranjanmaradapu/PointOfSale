@@ -1,14 +1,13 @@
-package com.otsi.retail.connectionpool.exceptions;
+package com.otsi.retail.debitnotes.exceptions;
 
-public class EmptyInputException extends RuntimeException {
-
+public class InvalidDataException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	private String msg;
 
 	/**
 	 * @param msg
 	 */
-	public EmptyInputException(String msg) {
+	public InvalidDataException(String msg) {
 		super();
 		this.msg = msg;
 	}
@@ -28,6 +27,3 @@ public class EmptyInputException extends RuntimeException {
 	}
 
 }
-
-
-

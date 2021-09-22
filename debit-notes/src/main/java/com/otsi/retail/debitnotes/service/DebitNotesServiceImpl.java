@@ -2,9 +2,7 @@ package com.otsi.retail.debitnotes.service;
 
 import java.util.List;
 import java.util.Optional;
-
 import javax.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +11,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.debitnotes.exceptions.DataNotFoundException;
+import com.otsi.retail.debitnotes.exceptions.InvalidDataException;
 import com.otsi.retail.debitnotes.exceptions.RecordNotFoundException;
+import com.otsi.retail.debitnotes.gatewayresponse.GateWayResponse;
 import com.otsi.retail.debitnotes.mapper.DebitNotesMapper;
 import com.otsi.retail.debitnotes.model.DebitNotes;
 import com.otsi.retail.debitnotes.repo.DebitNotesRepo;
@@ -49,6 +48,10 @@ public class DebitNotesServiceImpl implements DebitNotesService {
 
 	@Override
 	public DebitNotesVo saveDebitNotes(@Valid DebitNotesVo debitNotesVo) throws DataNotFoundException {
+		if(debitNotesVo.getPaymentAmountTypeId()==null) {
+			log.error("please give payment details");
+			throw new InvalidDataException("please give payment details");
+		}
 		log.debug("debugging saveDebitNotes:" + debitNotesVo);
 		DebitNotes debitNotes = debitNotesMapper.mapVoToEntity(debitNotesVo);
 		NewSaleResponseVo resVo = new NewSaleResponseVo();
@@ -56,7 +59,7 @@ public class DebitNotesServiceImpl implements DebitNotesService {
 		resVo.setNewsaleId(debitNotesVo.getNewsaleId());
 		resVo.setPaymentAmountTypeId(debitNotesVo.getPaymentAmountTypeId());
 		resVo.setInvoiceNumber(debitNotesVo.getInvoiceNumber());
-		ResponseEntity<String> result = restTemplate.postForEntity("http://localhost:8082/newsale/updateNewsale", resVo,
+		ResponseEntity<String> result = restTemplate.postForEntity("http://localhost:8081/newsale/updateNewsale", resVo,
 				String.class);
 		if (!result.hasBody()) {
 
@@ -76,7 +79,7 @@ public class DebitNotesServiceImpl implements DebitNotesService {
 	public Optional<DebitNotes> getDebitNotesByDrNo(String drNo) {
 		log.debug("debugging getDebitNotesByDrNo:" + drNo);
 		Optional<DebitNotes> vo = debitNotesRepo.findByDrNo(drNo);
-		if(!(vo.isPresent())) {
+		if (!(vo.isPresent())) {
 			throw new RecordNotFoundException("record not found");
 		}
 		log.warn("we are testing is fetching getDebitNotesByDrNo ");
@@ -106,17 +109,19 @@ public class DebitNotesServiceImpl implements DebitNotesService {
 	@Override
 	public CustomerVo getDebitWithCustomerMobileno(String mobileNumber) {
 		log.debug("debugging getDebitWithCustomerMobileno:" + mobileNumber);
-		ResponseEntity<?> customerResponse = restTemplate
-				.exchange(customerByMobileNoUrl + "?mobileNumber=" + mobileNumber, HttpMethod.GET, null, String.class);
+		ResponseEntity<?> customerResponse = restTemplate.exchange(
+				customerByMobileNoUrl + "?mobileNumber=" + mobileNumber, HttpMethod.GET, null, GateWayResponse.class);
 		ObjectMapper mapper = new ObjectMapper();
-		// GateWayResponse<?> gatewayResponse =
-		// mapper.convertValue(customerResponse.getBody(), GateWayResponse.class);
-		CustomerVo vo = null;
-		try {
-			vo = mapper.readValue(customerResponse.getBody().toString(), CustomerVo.class);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
+		GateWayResponse<?> gatewayResponse = mapper.convertValue(customerResponse.getBody(), GateWayResponse.class);
+		CustomerVo vo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<CustomerVo>() {
+		});
+		// CustomerVo vo = null;
+		/*
+		 * try { vo = mapper.readValue(customerResponse.getBody().toString(),
+		 * CustomerVo.class); } catch (JsonProcessingException e) { e.printStackTrace();
+		 * }
+		 */
+
 		log.warn("we are testing is getDebitWithCustomerMobileno");
 		log.info("after fetching getDebitWithCustomerMobileno:" + vo.toString());
 		return vo;
@@ -126,21 +131,20 @@ public class DebitNotesServiceImpl implements DebitNotesService {
 	public List<NewSaleResponseVo> getNewsaleByCustomerId(Long customerId) {
 		log.debug("debugging getNewsaleByCustomerId:" + customerId);
 		ResponseEntity<?> newsaleResponse = restTemplate.exchange(newsaleByCustomerId + "?customerId=" + customerId,
-				HttpMethod.GET, null, String.class);
+				HttpMethod.GET, null, GateWayResponse.class);
 		ObjectMapper mapper = new ObjectMapper();
-		// GateWayResponse<?> gatewayResponse =
-		// mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
-		List<NewSaleResponseVo> vo = null;
-		try {
-			vo = mapper.readValue(newsaleResponse.getBody().toString(), new TypeReference<List<NewSaleResponseVo>>() {
-			});
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
+		List<NewSaleResponseVo> vo = mapper.convertValue(gatewayResponse.getResult(),
+				new TypeReference<List<NewSaleResponseVo>>() {
+				});
+		/*
+		 * List<NewSaleResponseVo> vo = null; try { vo =
+		 * mapper.readValue(newsaleResponse.getBody().toString(), new
+		 * TypeReference<List<NewSaleResponseVo>>() { }); } catch (JsonMappingException
+		 * e) { // TODO Auto-generated catch block e.printStackTrace(); } catch
+		 * (JsonProcessingException e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); }
+		 */
 		log.warn("we are testing is getNewsaleByCustomerId");
 		log.info("after fetching getNewsaleByCustomerId:" + vo.toString());
 		return vo;

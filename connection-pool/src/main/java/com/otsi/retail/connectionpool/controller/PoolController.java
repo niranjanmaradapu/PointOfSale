@@ -27,7 +27,7 @@ import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 @CrossOrigin
 @RequestMapping(CommonRequestMappigs.POOL)
 public class PoolController {
-	
+
 	private Logger log = LoggerFactory.getLogger(PoolController.class);
 
 	@Autowired
@@ -36,27 +36,27 @@ public class PoolController {
 	// Method for creating pool
 	@PostMapping(CommonRequestMappigs.CREATE_POOL)
 	public GateWayResponse<?> saveNewPool(@RequestBody ConnectionPoolVo vo) {
-		log.info("Recieved request to saveNewPool():"+vo);
+		log.info("Recieved request to saveNewPool():" + vo);
 		String savePool = poolService.savePool(vo);
-		return new GateWayResponse<>(HttpStatus.OK, savePool, "");
+		return new GateWayResponse<>("saved pool successfully", savePool);
 
 	}
 
 	// Method for getting List of Pools from status flag
 	@GetMapping(CommonRequestMappigs.GET_POOL_LIST)
 	public GateWayResponse<?> getListOfPools(@RequestParam String isActive) {
-		log.info("Recieved request to getListOfPools():"+isActive);
+		log.info("Recieved request to getListOfPools():" + isActive);
 		List<ConnectionPoolVo> vo = poolService.getListOfPools(isActive);
-		return new GateWayResponse<>(HttpStatus.OK, vo, "");
+		return new GateWayResponse<>("fetching list of pools successfully", vo);
 
 	}
 
 	// Method for modify/editing the Existing Pool and Rules
 	@PostMapping(CommonRequestMappigs.MODIFY_POOL)
 	public GateWayResponse<?> modifyPool(@RequestBody ConnectionPoolVo vo) {
-		log.info("Recieved request to modifyPool():"+vo);
+		log.info("Recieved request to modifyPool():" + vo);
 		String message = poolService.modifyPool(vo);
-		return new GateWayResponse<>(HttpStatus.OK, message, "");
+		return new GateWayResponse<>("updated pool successfully", message);
 
 	}
 }

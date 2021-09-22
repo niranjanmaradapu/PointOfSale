@@ -4,17 +4,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import com.otsi.retail.connectionpool.controller.StoreController;
 import com.otsi.retail.connectionpool.entity.PoolEntity;
-import com.otsi.retail.connectionpool.exceptions.EmptyInputException;
 import com.otsi.retail.connectionpool.exceptions.InvalidDataException;
 import com.otsi.retail.connectionpool.exceptions.RecordNotFoundException;
 import com.otsi.retail.connectionpool.mapper.PoolMapper;
@@ -46,7 +40,10 @@ public class PoolServiceImpl implements PoolService {
 	@Override
 	public String savePool(ConnectionPoolVo vo) {
 		log.debug("debugging savePool():" + vo);
-		try {
+		if (vo.getRuleVo() == null) {
+			throw new InvalidDataException("please enter valid data");
+		}
+		/* try { */
 			PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
 
 			PoolEntity savedPool = poolRepo.save(poolEntity);
@@ -60,10 +57,10 @@ public class PoolServiceImpl implements PoolService {
 			log.info("pool saved Successfully");
 			return "Pool saved Successfully";
 
-		} catch (Exception e) {
+		 /*catch (Exception e) {
 			log.error("please give valid data");
 			throw new InvalidDataException("please give valid data");
-		}
+		}*/
 	}
 
 	// Method for getting list of pools based on the status flag
@@ -107,7 +104,7 @@ public class PoolServiceImpl implements PoolService {
 	public String modifyPool(ConnectionPoolVo vo) {
 		log.debug("debugging modifyPool():" + vo);
 		if (vo.getRuleVo() == null) {
-			throw new EmptyInputException("please enter valid data");
+			throw new InvalidDataException("please enter valid data");
 		}
 
 		Optional<PoolEntity> pool = poolRepo.findById(vo.getPoolId());

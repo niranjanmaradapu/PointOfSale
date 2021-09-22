@@ -4,18 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import com.otsi.retail.connectionpool.entity.PoolEntity;
 import com.otsi.retail.connectionpool.entity.PromotionsEntity;
 import com.otsi.retail.connectionpool.entity.StoresEntity;
-import com.otsi.retail.connectionpool.exceptions.EmptyInputException;
 import com.otsi.retail.connectionpool.exceptions.InvalidDataException;
 import com.otsi.retail.connectionpool.exceptions.RecordNotFoundException;
 import com.otsi.retail.connectionpool.mapper.PromotionMapper;
@@ -56,7 +51,7 @@ public class PromotionServiceImpl implements PromotionService {
 	public String addPromotion(PromotionsVo vo) {
 		log.debug("debugging addPromotion:" + vo);
 		if (vo.getStoreVo() == null || vo.getPoolVo() == null) {
-			throw new EmptyInputException("please give valid data");
+			throw new InvalidDataException("please give valid data");
 		}
 		List<ConnectionPoolVo> poolVo = vo.getPoolVo();
 
@@ -98,7 +93,7 @@ public class PromotionServiceImpl implements PromotionService {
 	public List<PromotionsVo> getListOfPromotions(String flag) {
 		log.debug("debugging getListOfPromotions:" + flag);
 		List<PromotionsEntity> promoList = new ArrayList<>();
-		/* try { */
+
 		Boolean status = null;
 		if (flag.equalsIgnoreCase("true")) {
 			status = Boolean.TRUE;
@@ -111,16 +106,16 @@ public class PromotionServiceImpl implements PromotionService {
 		} else {
 			promoList = promoRepo.findByIsActive(status);
 		}
+		if (!promoList.isEmpty()) {
+			List<PromotionsVo> listOfPromo = promoMapper.convertPromoEntityToVo(promoList);
+			log.warn("we are checking if list of promotions is fetching...");
+			log.info("list of promotions is fetching...");
+			return listOfPromo;
+		} else {
+			log.error("record not found");
+			throw new RecordNotFoundException("record not found");
+		}
 
-		List<PromotionsVo> listOfPromo = promoMapper.convertPromoEntityToVo(promoList);
-		log.warn("we are checking if list of promotions is fetching...");
-		log.info("list of promotions is fetching...");
-		return listOfPromo;
-
-		/*
-		 * } catch (Exception e) { throw new
-		 * Exception("Exception occurs while modifying Promotion"); }
-		 */
 	}
 
 	// Method for modifying/editing Promotion
@@ -128,7 +123,7 @@ public class PromotionServiceImpl implements PromotionService {
 	public String editPromotion(PromotionsVo vo) {
 		log.debug("debugging editPromotion:" + vo);
 		if (vo.getPoolVo() == null) {
-			throw new EmptyInputException("please enter valid data");
+			throw new InvalidDataException("please enter valid data");
 		}
 		/* try { */
 		Optional<PromotionsEntity> promotion = promoRepo.findById(vo.getPromoId());

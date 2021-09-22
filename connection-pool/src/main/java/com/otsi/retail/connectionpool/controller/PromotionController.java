@@ -41,7 +41,7 @@ public class PromotionController {
 	public GateWayResponse<?> addPromotion(@RequestBody PromotionsVo vo) {
 		log.info("Recieved request to addpromotion():" + vo);
 		String savePromo = promoService.addPromotion(vo);
-		return new GateWayResponse<>(HttpStatus.OK, savePromo, "");
+		return new GateWayResponse<>("added promotion successfully", savePromo);
 
 	}
 
@@ -50,7 +50,7 @@ public class PromotionController {
 	public GateWayResponse<?> listOfPromotions(@NotNull @RequestParam String flag) {
 		log.info("Recieved request to listOfPromotions():" + flag);
 		List<PromotionsVo> promoList = promoService.getListOfPromotions(flag);
-		return new GateWayResponse<>(HttpStatus.OK, promoList, "");
+		return new GateWayResponse<>("fetching list of promotions successfully", promoList);
 
 	}
 
@@ -59,7 +59,7 @@ public class PromotionController {
 	public GateWayResponse<?> editPromotion(@RequestBody PromotionsVo vo) {
 		log.info("Recieved request to editPromotion():" + vo);
 		String result = promoService.editPromotion(vo);
-		return new GateWayResponse<>(HttpStatus.OK, result, "");
+		return new GateWayResponse<>("updated promotion successfully", result);
 
 	}
 }

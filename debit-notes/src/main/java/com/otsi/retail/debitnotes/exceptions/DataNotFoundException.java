@@ -1,6 +1,6 @@
 package com.otsi.retail.debitnotes.exceptions;
 
-public class DataNotFoundException extends Exception {
+public class DataNotFoundException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	private String msg;
 
