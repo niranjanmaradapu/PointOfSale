@@ -392,18 +392,21 @@ public class NewSaleServiceImpl implements NewSaleService {
 			} else
 				saleDetails = newSaleRepository.findByCreatedDateBetween(svo.getDateFrom(), svo.getDateTo());
 
-			if (saleDetails.isEmpty()) {
-
-				log.error("No record found with given information");
-				throw new RecordNotFoundException("No record found with given information");
-
-			}
+			
 
 		}
+		if (saleDetails.isEmpty()) {
+
+			log.error("No record found with given information");
+			throw new RecordNotFoundException("No record found with given information");
+
+		}
+		else {
 		ListOfSaleBillsVo lsvo = newSaleMapper.convertlistSalesEntityToVo(saleDetails);
 		log.warn("we are fetching sale bills details");
 		log.info("after getting  sale bills details :" + lsvo);
 		return lsvo;
+		}
 
 	}
 
@@ -537,17 +540,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 			dsDetails = dsRepo.findByCreatedDateBetweenOrderByCreatedDateAsc(listOfDeliverySlipVo.getDateFrom(),
 					listOfDeliverySlipVo.getDateTo());
 
-			if (dsDetails.isEmpty()) {
-				log.error("No record found with given information");
-				throw new RecordNotFoundException("No record found with given information");
-			}
-
+			
+		}
+		if (dsDetails.isEmpty()) {
+			log.error("No record found with given information");
+			throw new RecordNotFoundException("No record found with given information");
 		}
 
+		else {
 		ListOfDeliverySlipVo mapper = newSaleMapper.convertListDSToVo(dsDetails);
 		log.warn("we are testing is fetching list of deivery slips");
 		log.info("after getting list of delivery slips :" + mapper);
 		return mapper;
+		}
 
 	}
 

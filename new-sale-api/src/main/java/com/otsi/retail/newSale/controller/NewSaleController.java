@@ -151,7 +151,7 @@ public class NewSaleController {
 
 	// Method for getting list of delivery slips
 
-	@GetMapping(CommonRequestMappigs.GET_LISTOF_DS)
+	@PostMapping(CommonRequestMappigs.GET_LISTOF_DS)
 	public GateWayResponse<?> getlistofDeliverySlips(@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo)
 			throws RecordNotFoundException {
 		log.info("Received Request to getlistofDeliverySlips :" + listOfDeliverySlipVo.toString());
