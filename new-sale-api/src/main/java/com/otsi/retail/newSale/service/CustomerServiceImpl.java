@@ -14,6 +14,8 @@ import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
 import com.otsi.retail.newSale.Entity.UserData;
 import com.otsi.retail.newSale.Entity.UserDataAv;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
+import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
+import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
 import com.otsi.retail.newSale.common.UserDataAVEnum;
 import com.otsi.retail.newSale.mapper.CustomerMapper;
 import com.otsi.retail.newSale.repository.CustomerDetailsRepo;
@@ -41,9 +43,9 @@ public class CustomerServiceImpl implements CustomerService {
 	private UserDataAvRepo userDataAvRepo;
 
 	@Override
-	public String  saveCustomerDetails(CustomerVo details) {
+	public String  saveCustomerDetails(CustomerVo details) throws DuplicateRecordException {
 		log.debug("deugging saveCustomerDetails:" + details);
-		try {
+		
 			Optional<CustomerDetailsEntity> list = customerRepo.findByMobileNumber(details.getMobileNumber());
 
 			if (!list.isPresent()) {
@@ -56,12 +58,9 @@ public class CustomerServiceImpl implements CustomerService {
 				return "Customer details saved successfully..";
 			} else {
 				log.error("Mobile number is already in my records");
-				return "Mobile number is already in my records";
+				throw new DuplicateRecordException("Mobile number is already in my records") ;
 			}
-		} catch (Exception e) {
-			log.error("error occurs while saving customer details");
-			return "error occurs while saving customer details";
-		}
+		
 	}
 
 	@Override
@@ -84,13 +83,13 @@ public class CustomerServiceImpl implements CustomerService {
 
 	// Method for saving user data
 	@Override
-	public String saveUserData(UserDataVo vo) {
+	public String saveUserData(UserDataVo vo) throws DuplicateRecordException {
 
 		if (vo.getPhoneNumber() != null) {
 			Optional<UserData> user = userDataRepo.findByPhoneNumber(vo.getPhoneNumber());
 
 			if (user.isPresent()) {
-				return "User already exits with Mobile Number : " + user.get().getPhoneNumber();
+				throw new DuplicateRecordException("User already exits with Mobile Number : " + user.get().getPhoneNumber());
 			}
 		}
 
@@ -173,7 +172,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	// Method for fetching User data by using mobile Number
 	@Override
-	public UserDataVo  getUserByMobileNo(Long mobileNum) throws Exception {
+	public UserDataVo  getUserByMobileNo(Long mobileNum) throws RecordNotFoundException {
 
 		Optional<UserData> userDetails = userDataRepo.findByPhoneNumber(mobileNum);
 		UserDataVo vo = new UserDataVo();
@@ -203,7 +202,7 @@ public class CustomerServiceImpl implements CustomerService {
 			});
 
 		} else {
-			throw new Exception("User not found with mobile number " + mobileNum);
+			throw new RecordNotFoundException("User not found with mobile number " + mobileNum);
 		}
 
 		return vo;

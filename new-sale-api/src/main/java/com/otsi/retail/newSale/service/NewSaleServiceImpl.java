@@ -28,6 +28,10 @@ import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
+import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
+import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
+import com.otsi.retail.newSale.Exceptions.InvalidInputException;
+import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
 import com.otsi.retail.newSale.common.DSAttributes;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.PaymentType;
@@ -124,14 +128,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		if (vo.getCustomerDetails() != null) {
 
-			try {
+			
 
 				CustomerDetailsEntity customerEntity = customerMapper.convertVoToEntity(vo.getCustomerDetails());
 				CustomerDetailsEntity savedDetails = customerRepo.save(customerEntity);
 				entity.setCustomerDetails(savedDetails);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		}else {
+			throw new DataNotFoundException("data not found");
+		}	
 
 			List<DeliverySlipVo> dlSlips = vo.getDlSlip();
 			List<PaymentAmountTypeVo> paymentAmountTypeVos = vo.getPaymentAmountType();
@@ -180,9 +184,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.error("Please enter Valid delivery slips..");
-				return "Please enter Valid delivery slips..";
+				throw new InvalidInputException("Please enter Valid delivery slips..");
 			}
-		}
+		
 		log.warn("we are testing bill generated with number");
 		log.info("after generated bill with number:" + entity.getBillNumber());
 		return "Bill generated with number :" + entity.getBillNumber();
@@ -190,7 +194,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public String saveBarcode(BarcodeVo vo) {
+	public String saveBarcode(BarcodeVo vo) throws DuplicateRecordException {
 		log.debug("deugging saveBarcode" + vo);
 		BarcodeEntity barcodeDetails = barcodeRepository.findByBarcode(vo.getBarcode());
 		if (barcodeDetails == null) {
@@ -203,18 +207,18 @@ public class NewSaleServiceImpl implements NewSaleService {
 			return "Barcode details saved successfully..";
 		} else {
 			log.error("Barcode with " + vo.getBarcode() + " is already exists");
-			return "Barcode with " + vo.getBarcode() + " is already exists";
+			throw new DuplicateRecordException("Barcode with " + vo.getBarcode() + " is already exists");
 		}
 	}
 
 	@Override
-	public BarcodeVo getBarcodeDetails(String barCode, String smId) throws Exception {
+	public BarcodeVo getBarcodeDetails(String barCode, String smId) throws RecordNotFoundException {
 		log.debug("deugging getBarcodeDetails" + barCode);
 		BarcodeEntity barcodeDetails = barcodeRepository.findByBarcode(barCode);
 
 		if (barcodeDetails == null) {
 			log.error("Barcode with number " + barCode + " is not exists");
-			throw new Exception("Barcode with number " + barCode + " is not exists");
+			throw new RecordNotFoundException("Barcode with number " + barCode + " is not exists");
 		} else {
 			BarcodeVo vo = newSaleMapper.convertBarcodeEntityToVo(barcodeDetails);
 			log.warn("we are fetching barcode details...");
@@ -225,9 +229,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// Method for saving delivery slip
 	@Override
-	public String saveDeliverySlip(DeliverySlipVo vo, String enumName) {
+	public String saveDeliverySlip(DeliverySlipVo vo, String enumName) throws RecordNotFoundException {
 		log.debug("deugging saveDeliverySlip:" + vo);
-		try {
+		
 			Random ran = new Random();
 			DeliverySlipEntity entity = dsMapper.convertDsVoToEntity(vo);
 
@@ -240,6 +244,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 			List<String> barcodeList = barVo.stream().map(x -> x.getBarcode()).collect(Collectors.toList());
 
 			List<BarcodeEntity> barcodeDetails = barcodeRepository.findByBarcodeIn(barcodeList);
+			
+			if (barcodeDetails == null) {
+				log.error("Barcode with number " + barcodeList + " is not exists");
+				throw new RecordNotFoundException("Barcode with number " + barcodeList + " is not exists");
+			}
 
 			if (enumName.equalsIgnoreCase(DSAttributes.PIECES.getName())) {
 				barcodeDetails.stream().forEach(a -> {
@@ -271,16 +280,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 			return "Successfully created deliverySlip with DS Number " + entity.getDsNumber();
 
-		} catch (Exception e) {
-			log.error("error occurs while saving Delivery slip");
-			return "error occurs while saving Delivery slip";
-		}
+		
 	}
 
 	@Override
-	public DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws Exception {
+	public DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws RecordNotFoundException {
 		log.debug("deugging getDeliverySlipDetails:" + dsNumber);
-		try {
+		
 
 			DeliverySlipEntity dsEntity = dsRepo.findByDsNumber(dsNumber);
 
@@ -292,22 +298,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 					return vo;
 				} else {
 					log.error("Barcode details not exists with given DS Number");
-					throw new Exception("Barcode details not exists with given DS Number");
+					throw new  RecordNotFoundException("Barcode details not exists with given DS Number");
 
 				}
 
 			} else {
 				log.error("No record with DsNumber :" + dsNumber);
-				throw new Exception("No record with DsNumber :\" + dsNumber");
+				throw new RecordNotFoundException("No record with DsNumber :\" + dsNumber");
 			}
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			throw new Exception(e.getMessage());
-		}
+		
 	}
 
 	@Override
-	public ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo) throws Exception {
+	public ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo) throws RecordNotFoundException {
 		log.debug("deugging getListOfSaleBills:" + svo);
 		List<NewSaleEntity> saleDetails = new ArrayList<>();
 
@@ -338,7 +341,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				} else {
 					log.error("No record found with given mobilenumber");
-					throw new Exception("No record found with given mobilenumber");
+					throw new RecordNotFoundException("No record found with given mobilenumber");
 				}
 
 			}
@@ -359,7 +362,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				} else {
 					log.error("No record found with given barcode");
-					throw new Exception("No record found with given barcode");
+					throw new RecordNotFoundException("No record found with given barcode");
 				}
 
 			}
@@ -394,10 +397,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 			} else
 				saleDetails = newSaleRepository.findByCreatedDateBetween(svo.getDateFrom(), svo.getDateTo());
 
-			if (saleDetails == null) {
+			if (saleDetails.isEmpty()) {
 
 				log.error("No record found with given information");
-				throw new Exception("No record found with given information");
+				throw new RecordNotFoundException("No record found with given information");
 
 			}
 
@@ -410,7 +413,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws Exception {
+	public ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws RecordNotFoundException {
 		log.debug("deugging getlistofDeliverySlips:" + listOfDeliverySlipVo);
 		List<DeliverySlipEntity> dsDetails = new ArrayList<DeliverySlipEntity>();
 		/*
@@ -428,7 +431,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.error("No record found with given barcode");
-				throw new Exception("No record found with given barcode");
+				throw new RecordNotFoundException("No record found with given barcode");
 			}
 		}
 		/*
@@ -448,7 +451,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.error("No record found with given barcode");
-				throw new Exception("No record found with given barcode");
+				throw new RecordNotFoundException("No record found with given barcode");
 			}
 		}
 		/*
@@ -464,7 +467,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (dsDetails == null) {
 				log.error("No record found with given information");
-				throw new Exception("No record found with given information");
+				throw new RecordNotFoundException("No record found with given information");
 			}
 
 		}
@@ -481,7 +484,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (dsDetails == null) {
 				log.error("No record found with given information");
-				throw new Exception("No record found with given information");
+				throw new RecordNotFoundException("No record found with given information");
 			}
 
 		}
@@ -507,7 +510,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				 * listOfDeliverySlipVo.getDsNumber());
 				 */
 				log.error("No record found with given DS Number");
-				throw new Exception("No record found with given DS Numbe");
+				throw new RecordNotFoundException("No record found with given DS Numbe");
 			}
 
 		}
@@ -524,7 +527,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (dsDetails == null) {
 				log.error("No record found with given DS Number");
-				throw new Exception("No record found with given DS Numbe");
+				throw new RecordNotFoundException("No record found with given DS Numbe");
 			}
 
 		}
@@ -538,9 +541,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 			dsDetails = dsRepo.findByCreatedDateBetweenOrderByCreatedDateAsc(listOfDeliverySlipVo.getDateFrom(),
 					listOfDeliverySlipVo.getDateTo());
 
-			if (dsDetails == null) {
+			if (dsDetails.isEmpty()) {
 				log.error("No record found with given information");
-				throw new Exception("No record found with given information");
+				throw new RecordNotFoundException("No record found with given information");
 			}
 
 		}
@@ -583,17 +586,23 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public List<NewSaleResponseVo> getNewsaleByCustomerId(Long customerId) {
+	public List<NewSaleResponseVo> getNewsaleByCustomerId(Long customerId) throws DataNotFoundException {
 		log.debug(" debugging getNewsaleByCustomerId:" + customerId);
 		List<NewSaleEntity> entity = newSaleRepository.findByCustomerDetailsCustomerId(customerId);
+		if(entity== null) {
+			throw new DataNotFoundException("Data not found");
+			
+		}
+		
 		List<NewSaleResponseVo> vo = newSaleMapper.entityToResVo(entity);
 		log.warn("we are testing is fetching getNewsaleByCustomerId");
 		log.info("after fetching newsaleByCustomerId:" + vo);
 		return vo;
+		
 	}
 
 	@Override
-	public NewSaleVo updateNewSale(NewSaleResponseVo vo) {
+	public NewSaleVo updateNewSale(NewSaleResponseVo vo) throws RecordNotFoundException {
 		log.debug(" debugging updateNewSale");
 		Optional<NewSaleEntity> newSaleOpt = newSaleRepository.findByNewsaleId(vo.getNewsaleId());
 		NewSaleVo newsaleVo = new NewSaleVo();
@@ -601,7 +610,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			NewSaleEntity newSale = newSaleOpt.get();
 			if (!newSale.getInvoiceNumber().equals(vo.getInvoiceNumber())) {
 				log.error("invoice is not present");
-				throw new RuntimeException("invoice is not present");
+				throw new RecordNotFoundException("invoice is not present");
 			}
 			vo.getPaymentAmountTypeId().forEach(p -> {
 				PaymentAmountType paymentAmountType = new PaymentAmountType();
@@ -637,7 +646,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public NewSaleList getInvoicDetails(InvoiceRequestVo vo) throws Exception {
+	public NewSaleList getInvoicDetails(InvoiceRequestVo vo) throws RecordNotFoundException {
 		NewSaleList newSaleList1 = new NewSaleList();
 		List<NewSaleVo> newSaleList = new ArrayList<>();
 		if (null != vo.getInvoiceNo() && !vo.getInvoiceNo().isEmpty()) {
@@ -665,21 +674,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 			newSaleList1.setNewSaleVo(newSaleList);
 			return newSaleList1;
 		}
-		throw new Exception("No records found with your inputs");
+		throw new RecordNotFoundException("No records found with your inputs");
 	}
 
 	@Override
-	public CustomerVo getCustomerFromNewSale(String mobileNo) throws Exception {
-		try {
+	public CustomerVo getCustomerFromNewSale(String mobileNo) throws DataNotFoundException {
+		
 			Optional<CustomerDetailsEntity> responce = newSaleRepository.findByCustomerDetailsMobileNumber(mobileNo);
 			if (responce.isPresent() == Boolean.TRUE) {
 				return customerMapper.convertEntityToVo(responce.get());
 			} else {
-				throw new Exception("No Customer Found");
+				throw new DataNotFoundException("No Customer Found");
 			}
-		} catch (Exception e) {
-			throw new Exception(e.getMessage());
-		}
+		
 	}
 
 	/*
@@ -688,9 +695,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 	double result = 0.0;
 
 	@Override
-	public double getNewSaleWithHsn(double netAmt) throws JsonMappingException, JsonProcessingException {
+	public double getNewSaleWithHsn(double netAmt) throws JsonMappingException, JsonProcessingException,DataNotFoundException {
 
 		List<HsnDetailsVo> vo = hsnService.getHsn();
+		
+		if(vo == null) {
+			throw new DataNotFoundException("Data not found");
+		}
 
 		vo.stream().forEach(x -> {
 
@@ -731,17 +742,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	private String setCustomerToNewSale(NewSaleEntity newSale, CustomerDetailsEntity customer) throws Exception {
 		newSale.setCustomerDetails(customer);
-		try {
+		
 			NewSaleEntity responce = newSaleRepository.save(newSale);
 			return "Succesfully Tagged Customer";
-		} catch (Exception e) {
-			throw new Exception(e.getMessage());
-		}
+		
 	}
 
 	// Method to save Gift vouchers and GiftVoucher Number should be unique
 	@Override
-	public String saveGiftVoucher(GiftVoucherVo vo) {
+	public String saveGiftVoucher(GiftVoucherVo vo) throws DuplicateRecordException {
 
 		// Check condition for Duplicate GiftVoucher Numbers
 		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumber(vo.getGvNumber());
@@ -756,13 +765,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			return "Gift voucher saved succesfully..";
 		} else {
-			return "Given Giftvoucher number is already in records.." + gvEntity.get().getGvNumber();
+			throw new DuplicateRecordException("Given Giftvoucher number is already in records.." + gvEntity.get().getGvNumber());
 		}
 	}
 
 	// Method for getting Gift voucher details by Gv Number
 	@Override
-	public GiftVoucherVo getGiftVoucher(String gvNumber) throws Exception {
+	public GiftVoucherVo getGiftVoucher(String gvNumber) throws InvalidInputException {
 
 		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumber(gvNumber);
 
@@ -771,13 +780,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 			BeanUtils.copyProperties(gvEntity.get(), vo);
 			return vo;
 		} else {
-			throw new Exception("please enter valid Gift Voucher number.");
+			throw new InvalidInputException("please enter valid Gift Voucher number.");
 		}
 	}
 
 	// Method for tagging Gift voucher to Customer
 	@Override
-	public String tagCustomerToGv(Long userId, Long gvId) {
+	public String tagCustomerToGv(Long userId, Long gvId)throws InvalidInputException,DataNotFoundException {
 
 		Optional<CustomerDetailsEntity> user = customerRepo.findById(userId);
 		if (user.isPresent()) {
@@ -788,28 +797,30 @@ public class NewSaleServiceImpl implements NewSaleService {
 				gv.get().setIsTagged(Boolean.TRUE);
 				gvRepo.save(gv.get());
 			} else {
-				return "Gift voucher is not valid";
+				throw new InvalidInputException ("Gift voucher is not valid");
 			}
 		} else {
-			return "User data is not Available..";
+			throw new DataNotFoundException("User data is not Available..");
 		}
 		return "Gift vocher tagged successfully to " + user.get().getName();
 	}
 	
 	// Method for Return all Bar code items
 	@Override
-	public List<BarcodeVo> getAllBarcodes() throws Exception {
-		try {
+	public List<BarcodeVo> getAllBarcodes() throws DataNotFoundException {
+		
 			List<BarcodeEntity> listOfBarcodes = barcodeRepository.findAll();
+			if(listOfBarcodes.isEmpty())
+			{
+				throw new DataNotFoundException("data not found");
+			}
 			List<BarcodeVo> mappedList = newSaleMapper.convertBarcodeListFromEntityToVo(listOfBarcodes);
 			return mappedList;
 			
-		} catch (Exception e) {
-			throw new Exception("Exception occurs while fetching barcodes list");
-		}
+		
 	}
 	@Override
-	public List<BarcodeVo> getBarcodes(List<String>  barCode) throws Exception {
+	public List<BarcodeVo> getBarcodes(List<String>  barCode) throws RecordNotFoundException {
 		log.debug("deugging getBarcodeDetails" + barCode);
 		
 		List<BarcodeEntity> barcodeDetails = barcodeRepository.findByBarcodeIn(barCode);
@@ -818,7 +829,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		
 		if (barcodeDetails.isEmpty()) {
 			log.error("Barcode with number " + barCode + " is not exists");
-			throw new Exception("Barcode with number " + barCode + " is not exists");
+			throw new RecordNotFoundException("Barcode with number " + barCode + " is not exists");
 		} else {
 			List<BarcodeVo> vo = newSaleMapper.convertBarcodesEntityToVo(barcodeDetails);
 			log.warn("we are fetching barcode details...");
