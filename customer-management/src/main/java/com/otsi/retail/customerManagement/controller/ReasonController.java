@@ -2,6 +2,8 @@ package com.otsi.retail.customerManagement.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,12 +20,14 @@ import com.otsi.retail.customerManagement.service.ReasonService;
 @RestController
 @RequestMapping("/reason")
 public class ReasonController {
+
+	private Logger log = LoggerFactory.getLogger(ReasonController.class);
 	@Autowired
 	private ReasonService reasonService;
 
 	@GetMapping()
 	public GateWayResponse<?> getAllReason() {
-
+		log.info("Received request to getAllReason()");
 		List<Reason> reasons = reasonService.getAllReasons();
 		return new GateWayResponse<>(HttpStatus.OK, reasons, "Success");
 
@@ -31,7 +35,7 @@ public class ReasonController {
 
 	@PostMapping()
 	public GateWayResponse<?> saveReason(@RequestBody Reason reason) {
-
+		log.info("Received request to saveReason():" + reason);
 		String result = reasonService.saveReason(reason);
 		return new GateWayResponse<>("Reason Saved Successfully", result);
 
@@ -39,7 +43,7 @@ public class ReasonController {
 
 	@DeleteMapping()
 	public GateWayResponse<?> deleteReason(Long id) {
-
+		log.info("Received request to deleteReason():" + id);
 		String result = reasonService.deleteReason(id);
 		return new GateWayResponse<>("Reason Deleted successfully", result);
 

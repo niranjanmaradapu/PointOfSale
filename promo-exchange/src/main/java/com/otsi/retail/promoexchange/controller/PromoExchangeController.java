@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,6 +31,8 @@ import com.otsi.retail.promoexchange.vo.PromoExchangeVo;
 @RequestMapping(CommonRequestMappings.PROMO_ITEM_EXCHANGE)
 public class PromoExchangeController {
 
+	private Logger log = LoggerFactory.getLogger(PromoExchangeController.class);
+
 	@Autowired
 	private PromoExchangeService promoExchangeService;
 
@@ -38,7 +42,7 @@ public class PromoExchangeController {
 	// Save customer details API
 	@PostMapping(path = CommonRequestMappings.SAVE_CUSTOMERDETAILS, produces = MediaType.APPLICATION_JSON_VALUE)
 	public GateWayResponse<?> saveCustomerDetails(@Valid @RequestBody CustomerVo details) throws Exception {
-
+		log.info("Recieved request to saveCustomerDetails():" + details);
 		String result = service.saveCustomerDetails(details);
 		return new GateWayResponse<>(result);
 
@@ -47,26 +51,23 @@ public class PromoExchangeController {
 	// Get customer details from Mobile number
 	@GetMapping(path = CommonRequestMappings.GET_CUSTOMERDETAILS_BY_MOBILENUMBER)
 	public GateWayResponse<?> getCustomerByMobileNumber(@RequestParam String mobileNumber) throws Exception {
-
-		CustomerVo customer;
-
-		customer = service.getCustomerByMobileNumber(mobileNumber);
+		log.info("Recieved request to getCustomerByMobileNumber():" + mobileNumber);
+		CustomerVo customer = service.getCustomerByMobileNumber(mobileNumber);
 		return new GateWayResponse<>(customer);
 	}
 
 	// @ Method for saving promo exchange items...
 	@PostMapping(CommonRequestMappings.ITEM_EXCHANGE)
 	public GateWayResponse<?> saveItemExchange(@RequestBody PromoExchangeVo vo) {
-
+		log.info("Recieved request to saveItemExchange():" + vo);
 		String message = promoExchangeService.savePromoItemExchangeRequest(vo);
-
 		return new GateWayResponse<>("Item Exchanged Successfully", message);
 	}
 
 	// Method for getting Delivery slip Data using DsNumber
 	@GetMapping(CommonRequestMappings.GET_DS)
 	public GateWayResponse<?> getDeliverySlipDetails(@RequestParam String dsNumber) throws Exception {
-
+		log.info("Recieved request to getDeliverySlipDetails():" + dsNumber);
 		DeliverySlipVo dsDetails = promoExchangeService.getDeliverySlipDetails(dsNumber);
 		return new GateWayResponse<>(HttpStatus.OK, dsDetails, "");
 
@@ -74,9 +75,8 @@ public class PromoExchangeController {
 
 	@GetMapping(CommonRequestMappings.GET_LIST_OF_RETURN_SLIPS)
 	public GateWayResponse<?> getlistofReturnSlips() throws JsonMappingException, JsonProcessingException {
-
+		log.info("Recieved request to getlistofReturnSlips()");
 		List<ListOfReturnSlipsVo> returnSlips = promoExchangeService.getListOfRetunSlips();
-
 		return new GateWayResponse<>(HttpStatus.OK, returnSlips, "Success");
 
 	}
@@ -84,7 +84,7 @@ public class PromoExchangeController {
 	// Method for getting Delivery slip Data using DsNumber
 	@GetMapping(CommonRequestMappings.GET_PROMO_EXCHANGE_BILLS_BY_BILL_NUMBER)
 	public GateWayResponse<?> getSaleBillsBillNumber(@RequestParam String billNumber) {
-
+		log.info("Recieved request to getSaleBillsBillNumber():" + billNumber);
 		List<PromoExchangeVo> billDetails = promoExchangeService.getSaleBillByBillNumber(billNumber);
 		return new GateWayResponse<>(HttpStatus.OK, billDetails, "Success");
 
@@ -92,7 +92,7 @@ public class PromoExchangeController {
 
 	@GetMapping(CommonRequestMappings.GET_LIST_OF_PROMO_EXCHANGE_BILLS)
 	public GateWayResponse<?> getlistofPromoExchageBills() {
-
+		log.info("Recieved request to getlistofPromoExchageBills()");
 		List<PromoExchangeVo> vo = promoExchangeService.getListOfSaleBills();
 
 		return new GateWayResponse<>(HttpStatus.OK, vo, "Success");

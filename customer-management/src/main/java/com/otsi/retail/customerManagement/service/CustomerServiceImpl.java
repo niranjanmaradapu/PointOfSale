@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -28,6 +30,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.otsi.retail.customerManagement.controller.ReasonController;
 import com.otsi.retail.customerManagement.exceptions.DataNotFoundException;
 import com.otsi.retail.customerManagement.exceptions.InvalidDataException;
 import com.otsi.retail.customerManagement.exceptions.RecordNotFoundException;
@@ -56,6 +59,8 @@ import com.otsi.retail.customerManagement.vo.TaxVo;
 @Component
 public class CustomerServiceImpl implements CustomerService {
 
+	private Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
+
 	@Autowired
 	private BarcodeRepo barCodeRepo;
 
@@ -79,6 +84,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public List<ListOfReturnSlipsVo> getListOfReturnSlips(ListOfReturnSlipsVo vo) {
+		log.debug("debugging getListOfReturnSlips():" + vo);
 		List<ReturnSlip> retunSlipdetails = new ArrayList<>();
 		/**
 		 * getting the record using dates combination
@@ -193,14 +199,18 @@ public class CustomerServiceImpl implements CustomerService {
 
 		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapEntityToVo(retunSlipdetails);
 		if (!rvo.isEmpty()) {
+			log.warn("we are checking if list of return slips is fetching...");
+			log.info("fetching list of return slips successfully:" + rvo);
 			return rvo;
 		} else
-			// throw new RuntimeException("no record found with the giveninformation");
-			throw new DataNotFoundException("No return slips are found");
+			log.error("No return slips are found");
+		// throw new RuntimeException("no record found with the giveninformation");
+		throw new DataNotFoundException("No return slips are found");
 	}
 
 	@Override
 	public NewSaleList getInvoiceDetailsFromNewSale(InvoiceRequestVo vo) throws Exception {
+		log.debug("debugging getInvoiceDetailsFromNewSale():" + vo);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<InvoiceRequestVo> entity = new HttpEntity<>(vo, headers);
@@ -211,8 +221,11 @@ public class CustomerServiceImpl implements CustomerService {
 			ResponseEntity<NewSaleList> responce = restTemplate.exchange(uri, HttpMethod.POST, entity,
 					NewSaleList.class);
 			if (responce.getStatusCode() == HttpStatus.OK && responce.getStatusCode().equals(HttpStatus.OK)) {
+				log.warn("we are checking if invoice details is fetching from newsale...");
+				log.info("fetching invoice details from newsale:" + responce.getBody());
 				return responce.getBody();
 			} else {
+				log.error("Invoice details are not exists" + responce.getBody());
 				throw new RecordNotFoundException("Invoice details are not exists" + responce.getBody());
 			}
 
@@ -223,7 +236,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public String createReturnSlip(GenerateReturnSlipRequest request) throws Exception {
-
+		log.debug("debugging createReturnSlip:" + request);
 		if (!request.getIsUserTagged()) {
 			tagUserToInvoice(request.getMobileNumber(), request.getInvoiceNo());
 		}
@@ -241,14 +254,17 @@ public class CustomerServiceImpl implements CustomerService {
 		returnSlipRepo.save(returnSlipDto);
 
 		if (returnSlipDto.getTaggedItems() == null || request.getIsUserTagged() == null) {
+			log.error("Please enter some data");
 			throw new InvalidDataException("Please enter some data");
 		}
-
+		log.warn("we are checking if return slip is saved...");
+		log.info("Successfully saved " + returnSlipDto.getRtNo());
 		return "Successfully saved " + returnSlipDto.getRtNo();
 
 	}
 
 	private void tagUserToInvoice(String mobileNumber, String invoiceNo) throws Exception {
+		log.debug("debugging tagUserToInvoice():" + mobileNumber + "and the invoice is:" + invoiceNo);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity entity = new HttpEntity(headers);
@@ -258,6 +274,7 @@ public class CustomerServiceImpl implements CustomerService {
 					.build().encode().toUri();
 
 			ResponseEntity<String> res = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+			log.info("tagging user to invoice:" + res);
 		} catch (URISyntaxException e) {
 			throw new Exception(e.getMessage());
 		}
@@ -265,6 +282,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public CustomerDetailsVo getCustomerFDetailsFromInvoice(String mobileNo) throws Exception {
+		log.debug("debugging getCustomerFDetailsFromInvoice:" + mobileNo);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity entity = new HttpEntity(headers);
@@ -277,8 +295,10 @@ public class CustomerServiceImpl implements CustomerService {
 					CustomerDetailsVo.class);
 			if (res.getStatusCode() == HttpStatus.OK) {
 				System.out.println(res.getBody());
+				log.info("fetching customer details from invoice:" + res.getBody());
 				return res.getBody();
 			} else {
+				log.error("Mobile number not exists" + res.getBody());
 				throw new RecordNotFoundException("Mobile number not exists" + res.getBody());
 			}
 		} catch (Exception e) {
@@ -300,22 +320,24 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public List<ListOfReturnSlipsVo> getAllListOfReturnSlips() {
+		log.debug("debugging getAllListOfReturnSlips()");
 		List<ReturnSlip> rmodel = returnSlipRepo.findAll();
 		if (rmodel.isEmpty()) {
-
+			log.error("No return slips are found");
 			throw new DataNotFoundException("No return slips are found");
 		}
 		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapEntityToVo(rmodel);
-
+		log.info("fetching list of return slips successfully:" + rvo);
 		return rvo;
 	}
 
 	@Override
 
 	public RetrnSlipDetailsVo ReturnSlipsDeatils(String rtNumber) throws JsonMappingException, JsonProcessingException {
-
+		log.debug("debugging ReturnSlipsDeatils():" + rtNumber);
 		ReturnSlip rts = returnSlipRepo.findByRtNo(rtNumber);
 		if (rts == null) {
+			log.error("given RT number is not exists");
 			throw new RecordNotFoundException("given RT number is not exists");
 		}
 
@@ -350,14 +372,16 @@ public class CustomerServiceImpl implements CustomerService {
 		rrvo.setHsnCode(HsnDetails);
 		rrvo.setCreatedDate(rts.getCreatedDate());
 		rrvo.setRtNumber(rts.getRtNo());
-
+		log.info("return slip details:" + rrvo);
 		return rrvo;
 	}
 
 	@Override
 	public HsnDetailsVo getHsnDetails(double netAmt) throws JsonMappingException, JsonProcessingException {
+		log.debug("debugging getHsnDetails:" + netAmt);
 		List<HsnDetailsVo> vo = hsnService.getHsn();
 		if (vo == null) {
+			log.error("Record not found");
 			new RecordNotFoundException("Record not found");
 		}
 		TaxVo tvo = new TaxVo();
@@ -378,23 +402,26 @@ public class CustomerServiceImpl implements CustomerService {
 				}
 			});
 		});
-
+		log.warn("we are checking if hsn details is fetching...");
+		log.info("fetching hsn details successfuuly:" + hvo);
 		return hvo;
 
 	}
 
 	@Override
 	public String updateReturnSlip(String rtNumber, GenerateReturnSlipRequest request) {
-
+		log.debug("debugging getHsnDetails:" + rtNumber + " and the request is:" + request);
 		ReturnSlip rts = returnSlipRepo.findByRtNo(rtNumber);
 		if (rts == null) {
+			log.error("RT Number not found");
 			throw new RecordNotFoundException("RT Number not found");
 		}
 		// ReturnSlip returnSlipDto = new ReturnSlip();
 		rts.setIsReviewed(true);
 
 		returnSlipRepo.save(rts);
-
+		log.warn("we wre checking if return slip is updated..");
+		log.info("Successfully updated " + rts.getRtNo());
 		return "Successfully updated " + rts.getRtNo();
 	}
 

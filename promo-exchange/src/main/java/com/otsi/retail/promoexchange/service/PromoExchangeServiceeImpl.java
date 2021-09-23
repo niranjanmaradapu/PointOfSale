@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -41,6 +43,8 @@ import com.otsi.retail.promoexchange.vo.PromoExchangeVo;
 @Component
 public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
+	private Logger log = LoggerFactory.getLogger(PromoExchangeServiceeImpl.class);
+
 	@Autowired
 	private RestTemplate template;
 
@@ -71,8 +75,9 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 	@Override
 	public String savePromoItemExchangeRequest(PromoExchangeVo vo) {
-
+		log.debug("debugging savePromoItemExchangeRequest:" + vo);
 		if (vo.getDlSlip() == null || vo.getReturnSlips() == null || vo.getCustomerDetails() == null) {
+			log.error("please enter valid data");
 			throw new InvalidDataException("please enter valid data");
 		}
 
@@ -114,13 +119,15 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 			List<String> dlsList = dlSlips.stream().map(x -> x.getDsNumber()).collect(Collectors.toList());
 			PromoExchangeEntity saveEntity = promoExchangeRepository.save(entity);
 		}
-
+		log.warn("we wre checking if promotion is saved...");
+		log.info("Bill generated with number :" + entity.getBillNumber());
 		return "Bill generated with number :" + entity.getBillNumber();
 
 	}
 
 	@Override
 	public DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws Exception {
+		log.debug("debugging getDeliverySlipDetails:" + dsNumber);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<?> entity = new HttpEntity<Object>(headers);
@@ -139,13 +146,14 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 		DeliverySlipVo vo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<DeliverySlipVo>() {
 		});
-
+		log.warn("we re checking if delivery slip details is fetching...");
+		log.info("after fetching delivery slip details:" + vo);
 		return vo;
 	}
 
 	@Override
 	public List<ListOfReturnSlipsVo> getListOfRetunSlips() throws JsonMappingException, JsonProcessingException {
-
+		log.debug("debugging getListOfRetunSlips()");
 		ResponseEntity<?> returnSlipListResponse = template.exchange(getListOfReturnSlipsUrl, HttpMethod.GET, null,
 				GateWayResponse.class);
 
@@ -157,35 +165,39 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 		List<ListOfReturnSlipsVo> vo = mapper.convertValue(gatewayResponse.getResult(),
 				new TypeReference<List<ListOfReturnSlipsVo>>() {
 				});
-
+		log.warn("we re checking if return slip details is fetching...");
+		log.info("after fetching return slip details:" + vo);
 		return vo;
 	}
 
 	@Override
 	public List<PromoExchangeVo> getListOfSaleBills() {
-
+		log.debug("debugging getListOfSaleBills()");
 		List<PromoExchangeEntity> pmodel = promoExchangeRepository.findAll();
 
 		if (pmodel.isEmpty()) {
-
+			log.error("Record not found");
 			throw new RecordNotFoundException("Record not found");
 		}
 		List<PromoExchangeVo> pvo = promoExchangeMapper.mapEntityToVo(pmodel);
-
+		log.warn("we re checking if list of sale bills details is fetching...");
+		log.info("after fetching list of sale billsdetails:" + pvo);
 		return pvo;
 	}
 
 	@Override
 	public List<PromoExchangeVo> getSaleBillByBillNumber(String billNumber) {
+		log.debug("debugging getSaleBillByBillNumber():" + billNumber);
 		List<PromoExchangeEntity> pmodel = promoExchangeRepository.findByBillNumber(billNumber);
 
 		if (pmodel.isEmpty()) {
-
+			log.error("Record not found");
 			throw new RecordNotFoundException("Record not found");
 		}
 
 		List<PromoExchangeVo> pvo = promoExchangeMapper.mapEntityToVo(pmodel);
-
+		log.warn("we re checking if sale bills details is fetching with bill number...");
+		log.info("after fetching sale bills with bill number:" + pvo);
 		return pvo;
 
 	}

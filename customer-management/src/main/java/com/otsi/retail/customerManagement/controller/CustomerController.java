@@ -58,7 +58,7 @@ public class CustomerController {
 
 	@PostMapping("/getInvoiceDetails")
 	public GateWayResponse<?> getInvoiceDetails(@RequestBody InvoiceRequestVo searchVo) throws Exception {
-
+		log.info("Received request to getInvoiceDetails:" + searchVo);
 		NewSaleList newSale = customerService.getInvoiceDetailsFromNewSale(searchVo);
 		return new GateWayResponse<>(HttpStatus.OK, newSale, "");
 
@@ -66,7 +66,7 @@ public class CustomerController {
 
 	@PostMapping("/createReturnSlip")
 	public GateWayResponse<?> createReturnSlip(@RequestBody GenerateReturnSlipRequest request) throws Exception {
-
+		log.info("Received request to createReturnSlip:" + request);
 		String message = customerService.createReturnSlip(request);
 		return new GateWayResponse<>("ReturnSlip Created Successfully", message);
 	}
@@ -74,6 +74,7 @@ public class CustomerController {
 	@PostMapping("/updateReturnSlip")
 	public GateWayResponse<?> updateReturnSlip(@RequestParam String rtNumber,
 			@RequestBody GenerateReturnSlipRequest request) {
+		log.info("Received request to updateReturnSlip:" + rtNumber + "and the request is:" + request);
 		String message = customerService.updateReturnSlip(rtNumber, request);
 		return new GateWayResponse<>("Return Slip Details Updated Successfully", message);
 
@@ -81,7 +82,7 @@ public class CustomerController {
 
 	@GetMapping("/getCustomerDetails/{mobileNo}")
 	public GateWayResponse<?> getCustomerDetails(@PathVariable String mobileNo) throws Exception {
-
+		log.info("Received request to getCustomerDetails:" + mobileNo);
 		CustomerDetailsVo customerVo = customerService.getCustomerFDetailsFromInvoice(mobileNo);
 		return new GateWayResponse<>(HttpStatus.OK, customerVo, "");
 
@@ -89,7 +90,7 @@ public class CustomerController {
 
 	@GetMapping("/getAllListOfReturnSlips")
 	public GateWayResponse<?> getAllListOfReturnSlips() {
-
+		log.info("Received request to getAllListOfReturnSlips()");
 		List<ListOfReturnSlipsVo> listVo = null;
 
 		listVo = customerService.getAllListOfReturnSlips();
@@ -100,7 +101,7 @@ public class CustomerController {
 
 	@GetMapping("/getReturnSlipsDetails")
 	public GateWayResponse<?> ReturnSlipsDeatils(String rtNumber) throws JsonMappingException, JsonProcessingException {
-
+		log.info("Received request to ReturnSlipsDeatils():" + rtNumber);
 		RetrnSlipDetailsVo listVo = null;
 
 		listVo = customerService.ReturnSlipsDeatils(rtNumber);
