@@ -29,12 +29,10 @@ public class UserController {
 
 	@PostMapping("/createuser")
 	public GateWayResponse<?> createUser(@RequestBody UserVo userVo) throws DuplicateRecordException {
-		try {
+		
 			String message = userService.addUser(userVo);
-			return new GateWayResponse<>( HttpStatus.CREATED,message,"Success");
-			}catch (Exception ex) {
-				return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-			}
+			return new GateWayResponse<>( HttpStatus.CREATED,message);
+			
 	}
 
 	// update the existing user with the help of id
@@ -42,39 +40,31 @@ public class UserController {
 	@PutMapping("/updateuser/{id}")
 	public GateWayResponse<?> updateExistingUser(@PathVariable(name = "id") Long id, @RequestBody UserVo userVo) {
 
-		try {
+		
 			String message = userService.updateuser(id, userVo);
 
-			return new GateWayResponse<>( HttpStatus.CREATED,message,"Success");
-	       }catch (Exception ex) {
-				return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-			}
+			return new GateWayResponse<>( HttpStatus.CREATED,message);
+	       
 	}
 	// delete the user from database by using id
 
 	@DeleteMapping("/disableuser/{id}")
 	public GateWayResponse<?> disableUser(@PathVariable(name = "id") Long id) {
-		try
-		{
+		
 		String message = userService.deleteUser(id);
-		return new GateWayResponse<>( HttpStatus.CREATED,message,"Success");
-		}catch (Exception ex) {
-			return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-		}
+		return new GateWayResponse<>( HttpStatus.CREATED,message);
+		
 	}
 
 	// get all the users
 
-	@GetMapping("/getusers")
+	@GetMapping("/o")
 	public GateWayResponse<?> getAllUsers() {
-		try
-		{
+	
+	
 			List<UserVo>  vO = userService.getAllUsers();
 			return new GateWayResponse<>( HttpStatus.OK,vO,"Success");
-			}catch (Exception ex) {
-				return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-			}
-
+			
 	}
 
 	}

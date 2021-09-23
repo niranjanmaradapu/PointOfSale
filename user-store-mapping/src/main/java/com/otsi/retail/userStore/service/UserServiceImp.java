@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.otsi.retail.userStore.exceptions.DuplicateRecordException;
+import com.otsi.retail.userStore.exceptions.RecordNotFoundException;
 import com.otsi.retail.userStore.mapper.UserMapper;
 import com.otsi.retail.userStore.model.UserModel;
 import com.otsi.retail.userStore.repository.UserRepository;
@@ -27,6 +28,9 @@ public class UserServiceImp implements UserService {
 	public List<UserVo> getAllUsers() {
 		List<UserVo> userVos = new ArrayList<>();
 		List<UserModel> users = userrepo.findAll();
+		if(users.isEmpty()) {
+			throw new RecordNotFoundException("Recod Not Found");
+		}
 		users.stream().forEach(user -> {
 			UserVo uservo = userMapper.mapEntityToVo(user);
 			userVos.add(uservo);
@@ -52,6 +56,9 @@ public class UserServiceImp implements UserService {
 	@Override
 	public  String updateuser(Long id, UserVo userVo) {
 		UserModel userv = userrepo.getById(id);
+		if(userv==null) {
+			throw new RecordNotFoundException("Recod Not Found");
+		}
 
 		userv.getStores().clear();
 		userMapper.mapVoToEntity(userVo, userv);
@@ -72,6 +79,6 @@ public class UserServiceImp implements UserService {
 			userrepo.deleteById(user.get().getId());
 			return "user with id: " + id + " deleted successfully!";
 		}
-		return "record not found";
+		throw new RecordNotFoundException("record not found");
 	}
 }

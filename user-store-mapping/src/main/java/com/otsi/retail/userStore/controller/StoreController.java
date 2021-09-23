@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.otsi.retail.userStore.exceptions.DuplicateRecordException;
+import com.otsi.retail.userStore.exceptions.RecordNotFoundException;
 import com.otsi.retail.userStore.gatewayresponse.GateWayResponse;
 import com.otsi.retail.userStore.model.StoreModel;
 import com.otsi.retail.userStore.service.StoreService;
@@ -29,47 +31,39 @@ public class StoreController {
     //create new store and save the details into DB
 	@PostMapping("/store")
 	public GateWayResponse<?> addStore(@RequestBody StoreModel storeModel) {
-		try {
+		
 			String message= storeService.save(storeModel);
-			return new GateWayResponse<>(HttpStatus.OK, message, "Success");
-		}catch (Exception ex) {
-			return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-		}
+			return new GateWayResponse<>(HttpStatus.OK, message);
+		
 
 
 	}
    //get the store details  by using storename
 	@GetMapping("/store/storename")
 	public GateWayResponse<?> getStoreByName(@RequestParam String storeName) {
-		try {
+		
 			StoreVO vo=storeService.findByName(storeName);
 			return new GateWayResponse<>(HttpStatus.OK, vo, "Success");
-			}catch (Exception ex) {
-				return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-			}
+			
 
 	}
     //delete the store information  by using id
 	@DeleteMapping("/deletestore")
-	public GateWayResponse<Object> deleteStoreById(@RequestParam Long id) {
-		try {
+	public GateWayResponse<Object> deleteStoreById(@RequestParam Long id) throws DuplicateRecordException, RecordNotFoundException {
+		
 			String message=storeService.deleteById(id);
-			return new GateWayResponse<>(HttpStatus.OK, message, "Success");
-			}catch (Exception ex) {
-				return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-			}
+			return new GateWayResponse<>(HttpStatus.OK, message);
+			
 
 
 	}
 	//get all the stores
-	@RequestMapping("/getstores")
+	@GetMapping("/getstores")
 	public GateWayResponse<?> getAllStores() {
-		try {
+		
 			List<StoreVO> vo=storeService.getAllStores();
-			return new GateWayResponse<>(HttpStatus.OK, vo, "Success");
-			}catch (Exception ex) {
-				return new GateWayResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-			}
+			return new GateWayResponse<>(HttpStatus.OK, vo,"success fully getting the Records");
+			
 
 
 	}
