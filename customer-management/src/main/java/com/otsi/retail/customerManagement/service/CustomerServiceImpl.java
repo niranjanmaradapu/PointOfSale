@@ -197,8 +197,10 @@ public class CustomerServiceImpl implements CustomerService {
 
 		}
 
-		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapEntityToVo(retunSlipdetails);
-		if (!rvo.isEmpty()) {
+		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapReturnEntityToVo(retunSlipdetails);
+		
+		
+		if (rvo!=null) {
 			log.warn("we are checking if list of return slips is fetching...");
 			log.info("fetching list of return slips successfully:" + rvo);
 			return rvo;
@@ -240,6 +242,26 @@ public class CustomerServiceImpl implements CustomerService {
 		if (!request.getIsUserTagged()) {
 			tagUserToInvoice(request.getMobileNumber(), request.getInvoiceNo());
 		}
+		List<TaggedItems> tgItems = request.getBarcodes();
+
+		List<String> barcodes = tgItems.stream().map(x -> x.getBarCode()).collect(Collectors.toList());
+
+		
+		HttpHeaders headers = new HttpHeaders();
+
+		HttpEntity<List<String>> request1 = new HttpEntity<List<String>>(barcodes, headers);
+
+		ResponseEntity<?> newsaleResponse = restTemplate.exchange(getbarcodesUrl, HttpMethod.POST, request1,
+				GateWayResponse.class);
+
+		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
+		ObjectMapper mapper = new ObjectMapper();
+
+		GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
+
+		List<BarcodeVo> bvo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<List<BarcodeVo>>() {
+		});
+Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 
 		ReturnSlip returnSlipDto = new ReturnSlip();
 		returnSlipDto.setCrNo(generateCrNumber());
@@ -250,7 +272,8 @@ public class CustomerServiceImpl implements CustomerService {
 		returnSlipDto.setCreatedBy(request.getCreatedBy());
 		returnSlipDto.setTaggedItems(request.getBarcodes());
 		returnSlipDto.setRtStatus(ReturnSlipStatus.PENDING.getId());
-		returnSlipDto.setAmount(request.getAmount());
+		returnSlipDto.setAmount(totalAmount);
+		returnSlipDto.setMobileNumber(request.getMobileNumber());
 		returnSlipRepo.save(returnSlipDto);
 
 		if (returnSlipDto.getTaggedItems() == null || request.getIsUserTagged() == null) {
@@ -326,7 +349,7 @@ public class CustomerServiceImpl implements CustomerService {
 			log.error("No return slips are found");
 			throw new DataNotFoundException("No return slips are found");
 		}
-		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapEntityToVo(rmodel);
+		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapReturnEntityToVo(rmodel);
 		log.info("fetching list of return slips successfully:" + rvo);
 		return rvo;
 	}
@@ -364,14 +387,32 @@ public class CustomerServiceImpl implements CustomerService {
 		List<BarcodeVo> bvo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<List<BarcodeVo>>() {
 		});
 
+		List<HsnDetailsVo> list = new ArrayList<>();
+
+		bvo.stream().forEach(x -> {
+
+			try {
+				HsnDetailsVo hsnDetails = getHsnDetails(x.getNetAmount());
+				list.add(hsnDetails);
+
+			} catch (JsonMappingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+
 		RetrnSlipDetailsVo rrvo = new RetrnSlipDetailsVo();
 
-		HsnDetailsVo HsnDetails = getHsnDetails(rts.getAmount());
+		//HsnDetailsVo HsnDetails = getHsnDetails(rts.getAmount());
 
 		rrvo.setBarcode(bvo);
-		rrvo.setHsnCode(HsnDetails);
+		rrvo.setHsnCode(list);
 		rrvo.setCreatedDate(rts.getCreatedDate());
 		rrvo.setRtNumber(rts.getRtNo());
+		rrvo.setMobileNumber(rts.getMobileNumber());
 		log.info("return slip details:" + rrvo);
 		return rrvo;
 	}

@@ -24,22 +24,42 @@ public class ReturnSlipMapper {
 
 	
 	
-	public List<ListOfReturnSlipsVo> mapEntityToVo(List<ReturnSlip> dtos) {
-		return dtos.stream().map(dto -> mapEntityToVo(dto)).collect(Collectors.toList());
+	/*
+	 * public List<ListOfReturnSlipsVo> mapEntityToVo(List<ReturnSlip> dtos) {
+	 * return dtos.stream().map(dto ->
+	 * mapEntityToVo(dto)).collect(Collectors.toList());
+	 * 
+	 * }
+	 * 
+	 * private ListOfReturnSlipsVo mapEntityToVo(ReturnSlip dto) {
+	 * 
+	 * ListOfReturnSlipsVo vo=new ListOfReturnSlipsVo();
+	 * vo.setCreditNote(dto.getCrNo()); vo.setRtNumber(dto.getRtNo());
+	 * vo.setAmount(dto.getAmount()); vo.setBarcodes(dto.getTaggedItems());
+	 * vo.setRtReviewStatus(dto.getIsReviewed());
+	 * vo.setCreatedInfo(dto.getCreatedDate()); vo.setCreatedBy(dto.getCreatedBy());
+	 * return vo; }
+	 */
+	public List<ListOfReturnSlipsVo> mapReturnEntityToVo(List<ReturnSlip> dtos) {
+		List<ListOfReturnSlipsVo> lvo = new ArrayList<>();
 
-	}
+		dtos.stream().forEach(dto -> {
+			ListOfReturnSlipsVo vo = new ListOfReturnSlipsVo();
+			// ListOfReturnSlipsVo vo= new ListOfReturnSlipsVo();
+			vo.setCreditNote(dto.getCrNo());
+			vo.setRtNumber(dto.getRtNo());
+			vo.setAmount(dto.getAmount());
+			vo.setBarcodes(dto.getTaggedItems());
+			vo.setRtReviewStatus(dto.getIsReviewed());
+			vo.setCreatedInfo(dto.getCreatedDate());
+			vo.setCreatedBy(dto.getCreatedBy());
+			lvo.add(vo);
+		});
+		Long totalAmount = dtos.stream().mapToLong(a -> a.getAmount()).sum();
+		lvo.stream().forEach(x -> x.setTotalAmount(totalAmount));
 
-	private ListOfReturnSlipsVo mapEntityToVo(ReturnSlip dto) {
-		
-		ListOfReturnSlipsVo vo=new ListOfReturnSlipsVo();
-        vo.setCreditNote(dto.getCrNo());
-        vo.setRtNumber(dto.getRtNo());
-        vo.setAmount(dto.getAmount());
-        vo.setBarcodes(dto.getTaggedItems());
-        vo.setRtReviewStatus(dto.getIsReviewed());
-        vo.setCreatedInfo(dto.getCreatedDate());
-        vo.setCreatedBy(dto.getCreatedBy());
-		return vo;
+		return lvo;
 	}
+	
 
 }
