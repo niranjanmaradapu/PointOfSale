@@ -30,6 +30,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.otsi.retail.customerManagement.config.Config;
 import com.otsi.retail.customerManagement.controller.ReasonController;
 import com.otsi.retail.customerManagement.exceptions.DataNotFoundException;
 import com.otsi.retail.customerManagement.exceptions.InvalidDataException;
@@ -53,6 +54,7 @@ import com.otsi.retail.customerManagement.vo.NewSaleList;
 import com.otsi.retail.customerManagement.vo.RetrnSlipDetailsVo;
 import com.otsi.retail.customerManagement.vo.TaxVo;
 
+
 /**
  * @author vasavi
  */
@@ -64,8 +66,7 @@ public class CustomerServiceImpl implements CustomerService {
 	@Autowired
 	private BarcodeRepo barCodeRepo;
 
-	@Value("${getbarcodes.url}")
-	private String getbarcodesUrl;
+	
 
 	@Autowired
 	private HSNVoService hsnService;
@@ -75,13 +76,14 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	private ReturnSlipMapper returnSlipMapper;
+	
+	@Autowired
+	Config config;
+
 
 	@Autowired
 	private RestTemplate restTemplate;
-	private final static String NEW_SALE_GET_INVOICEDETAILS_URL = "http://localhost:8081/newsale/getInvoiceDetails";
-	private final static String GET_CUSTOMER_FROM_NEWSALE_URL = "http://localhost:8081/newsale/getCustomerFromNewSale";
-	private final static String TAG_CUSTOMER_TO_INVOICE = "http://localhost:8081/newsale/tagCustomerToInvoice";
-
+	
 	@Override
 	public List<ListOfReturnSlipsVo> getListOfReturnSlips(ListOfReturnSlipsVo vo) {
 		log.debug("debugging getListOfReturnSlips():" + vo);
@@ -218,7 +220,7 @@ public class CustomerServiceImpl implements CustomerService {
 		HttpEntity<InvoiceRequestVo> entity = new HttpEntity<>(vo, headers);
 		URI uri = null;
 		try {
-			uri = UriComponentsBuilder.fromUri(new URI(NEW_SALE_GET_INVOICEDETAILS_URL)).build().encode().toUri();
+			uri = UriComponentsBuilder.fromUri(new URI(config.getInvoiceDetails())).build().encode().toUri();
 
 			ResponseEntity<NewSaleList> responce = restTemplate.exchange(uri, HttpMethod.POST, entity,
 					NewSaleList.class);
@@ -251,7 +253,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 		HttpEntity<List<String>> request1 = new HttpEntity<List<String>>(barcodes, headers);
 
-		ResponseEntity<?> newsaleResponse = restTemplate.exchange(getbarcodesUrl, HttpMethod.POST, request1,
+		ResponseEntity<?> newsaleResponse = restTemplate.exchange(config.getGetbarcodesUrl(), HttpMethod.POST, request1,
 				GateWayResponse.class);
 
 		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
@@ -293,7 +295,7 @@ Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 		HttpEntity entity = new HttpEntity(headers);
 		URI uri = null;
 		try {
-			uri = UriComponentsBuilder.fromUri(new URI(TAG_CUSTOMER_TO_INVOICE + "/" + mobileNumber + "/" + invoiceNo))
+			uri = UriComponentsBuilder.fromUri(new URI(config.getTagCustomerToInvoice() + "/" + mobileNumber + "/" + invoiceNo))
 					.build().encode().toUri();
 
 			ResponseEntity<String> res = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
@@ -311,7 +313,7 @@ Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 		HttpEntity entity = new HttpEntity(headers);
 		URI uri = null;
 		try {
-			uri = UriComponentsBuilder.fromUri(new URI(GET_CUSTOMER_FROM_NEWSALE_URL + "/" + mobileNo)).build().encode()
+			uri = UriComponentsBuilder.fromUri(new URI(config.getCustomerDetails() + "/" + mobileNo)).build().encode()
 					.toUri();
 
 			ResponseEntity<CustomerDetailsVo> res = restTemplate.exchange(uri, HttpMethod.GET, entity,
@@ -376,7 +378,7 @@ Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 
 		HttpEntity<List<String>> request = new HttpEntity<List<String>>(barcodes, headers);
 
-		ResponseEntity<?> newsaleResponse = restTemplate.exchange(getbarcodesUrl, HttpMethod.POST, request,
+		ResponseEntity<?> newsaleResponse = restTemplate.exchange(config.getGetbarcodesUrl(), HttpMethod.POST, request,
 				GateWayResponse.class);
 
 		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
