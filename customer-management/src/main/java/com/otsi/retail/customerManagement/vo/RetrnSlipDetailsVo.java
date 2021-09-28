@@ -14,7 +14,7 @@ public class RetrnSlipDetailsVo {
 	
 	 private List<BarcodeVo>  barcode;
 	 
-	 private HsnDetailsVo  hsnCode;
+	 private List<HsnDetailsVo>  hsnCode;
 
 	 
 		/*
@@ -36,6 +36,8 @@ public class RetrnSlipDetailsVo {
 	 private String rtNumber;
 	 
 	 private LocalDate createdDate;
+	 
+	 private String mobileNumber;
 		
 	
 	

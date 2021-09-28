@@ -35,11 +35,13 @@ public class ListOfReturnSlipsVo {
 
 	// private List<Barcode> barcode;
 
-	private long amount;
+	private Long amount;
 
 	private LocalDate createdInfo;
 
 	private String settelmentInfo;
+	
+	private Long totalAmount;
 
 	private List<TaggedItems> barcodes;
 
