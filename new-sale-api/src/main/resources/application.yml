@@ -9,7 +9,7 @@ spring:
     platform: postgres
     url: jdbc:postgresql://localhost:5432/newSale
     username: postgres
-    password: Otsi@123
+    password: 12345678
  jpa:
    hibernate:
     ddl-auto: update
@@ -33,8 +33,3 @@ logging:
 springdoc:
   packagesToScan: com.otsi.retail.newSale
   
-savecustomer:
-  url: http://localhost:8081/customer/savecustomerdetails
-  
-getNewSaleWithHsn: 
-  url: http://localhost:8083/hsnDetails/getHsnDetails

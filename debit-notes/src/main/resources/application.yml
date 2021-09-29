@@ -25,10 +25,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     hostname: localhost
-getcustomerdetailsbymobilenumber.url:
-               http://localhost:8081/newsale/getcustomerdetailsbymobilenuber
-getNewsaleByCustomerId.url:
-               http://localhost:8081/newsale/getNewsaleByCustomerId
+
 logging:
     file:
       name: C:/Users/ADMIN/Desktop/logs/debit-notes.log    

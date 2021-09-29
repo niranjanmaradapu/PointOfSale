@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.otsi.retail.debitnotes.config.Config;
 import com.otsi.retail.debitnotes.exceptions.DataNotFoundException;
 import com.otsi.retail.debitnotes.exceptions.InvalidDataException;
 import com.otsi.retail.debitnotes.exceptions.RecordNotFoundException;
@@ -31,14 +32,13 @@ public class DebitNotesServiceImpl implements DebitNotesService {
 
 	private Logger log = LoggerFactory.getLogger(DebitNotesServiceImpl.class);
 
-	@Value("${getcustomerdetailsbymobilenumber.url}")
-	private String customerByMobileNoUrl;
-
-	@Value("${getNewsaleByCustomerId.url}")
-	private String newsaleByCustomerId;
+	
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	Config config;
 
 	@Autowired
 	private DebitNotesRepo debitNotesRepo;
@@ -110,7 +110,7 @@ public class DebitNotesServiceImpl implements DebitNotesService {
 	public CustomerVo getDebitWithCustomerMobileno(String mobileNumber) {
 		log.debug("debugging getDebitWithCustomerMobileno:" + mobileNumber);
 		ResponseEntity<?> customerResponse = restTemplate.exchange(
-				customerByMobileNoUrl + "?mobileNumber=" + mobileNumber, HttpMethod.GET, null, GateWayResponse.class);
+				config.getCustomerByMobileNoUrl() + "?mobileNumber=" + mobileNumber, HttpMethod.GET, null, GateWayResponse.class);
 		ObjectMapper mapper = new ObjectMapper();
 		GateWayResponse<?> gatewayResponse = mapper.convertValue(customerResponse.getBody(), GateWayResponse.class);
 		CustomerVo vo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<CustomerVo>() {
@@ -130,7 +130,7 @@ public class DebitNotesServiceImpl implements DebitNotesService {
 	@Override
 	public List<NewSaleResponseVo> getNewsaleByCustomerId(Long customerId) {
 		log.debug("debugging getNewsaleByCustomerId:" + customerId);
-		ResponseEntity<?> newsaleResponse = restTemplate.exchange(newsaleByCustomerId + "?customerId=" + customerId,
+		ResponseEntity<?> newsaleResponse = restTemplate.exchange(config.getNewsaleByCustomerId() + "?customerId=" + customerId,
 				HttpMethod.GET, null, GateWayResponse.class);
 		ObjectMapper mapper = new ObjectMapper();
 		GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);

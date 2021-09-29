@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.promoexchange.Entity.CustomerDetailsEntity;
 import com.otsi.retail.promoexchange.Entity.PromoExchangeEntity;
+import com.otsi.retail.promoexchange.config.Config;
 import com.otsi.retail.promoexchange.exceptions.DataNotFoundException;
 import com.otsi.retail.promoexchange.exceptions.InvalidDataException;
 import com.otsi.retail.promoexchange.exceptions.RecordNotFoundException;
@@ -49,11 +50,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 	private RestTemplate template;
 
 	// Rest call
-	@Value("${getdeliveryslip.url}")
-	private String getDeliveryslipWithDsnumber;
-
-	@Value("${getreturnslip.url}")
-	private String getListOfReturnSlipsUrl;
+	
 
 	@Autowired
 	private CustomerService customerService;
@@ -66,12 +63,11 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 	@Autowired
 	private PromoExchangeRepository promoExchangeRepository;
 
-	@Value("${savecustomer.url}")
-	private String url;
+	@Autowired
+	Config config;
 	@Autowired
 	private RestTemplate restTemplate;
 
-	private final static String GET_DS_DETAILS_FROM_NEWSALE_URl = "http://localhost:8081/newsale/getdeliveryslip";
 
 	@Override
 	public String savePromoItemExchangeRequest(PromoExchangeVo vo) {
@@ -134,7 +130,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 		URI uri = null;
 		// try {
 
-		uri = UriComponentsBuilder.fromUri(new URI(GET_DS_DETAILS_FROM_NEWSALE_URl + "?dsNumber=" + dsNumber)).build()
+		uri = UriComponentsBuilder.fromUri(new URI(config.getGetDsDetails() + "?dsNumber=" + dsNumber)).build()
 				.encode().toUri();
 		ResponseEntity<?> deliverySlipResponse = restTemplate.exchange(uri, HttpMethod.GET, entity,
 				GateWayResponse.class);
@@ -154,7 +150,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 	@Override
 	public List<ListOfReturnSlipsVo> getListOfRetunSlips() throws JsonMappingException, JsonProcessingException {
 		log.debug("debugging getListOfRetunSlips()");
-		ResponseEntity<?> returnSlipListResponse = template.exchange(getListOfReturnSlipsUrl, HttpMethod.GET, null,
+		ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetListOfReturnSlipsUrl(), HttpMethod.GET, null,
 				GateWayResponse.class);
 
 		ObjectMapper mapper = new ObjectMapper();

@@ -29,8 +29,7 @@ public class HSNVoService {
 	@Autowired
 	private Config config;
 
-	@Value("${getNewSaleWithHsn.url}")
-	private String HsnUrl;
+	
 
 	public List<HsnDetailsVo> getHsn() {
 		
@@ -39,7 +38,7 @@ public class HSNVoService {
 
 			//System.out.println("hits");
 			
-			ResponseEntity<?> hsnResponse = template.exchange(HsnUrl, HttpMethod.GET, null, GateWayResponse.class);
+			ResponseEntity<?> hsnResponse = template.exchange(config.getHsnUrl(), HttpMethod.GET, null, GateWayResponse.class);
 			ObjectMapper mapper = new ObjectMapper();
 
 			GateWayResponse<?> gatewayResponse = mapper.convertValue(hsnResponse.getBody(), GateWayResponse.class);
