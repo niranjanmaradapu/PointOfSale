@@ -1,6 +1,5 @@
 FROM openjdk:8
-#ARG JAR_FILE=connection-pool/target/*.jar 
 COPY  debit-notes/target/*  target/
 RUN  mv target/*.jar   target/debit-notes.jar
-EXPOSE 8083
+EXPOSE 8084
 ENTRYPOINT ["java", "-jar", "target/debit-notes.jar"]

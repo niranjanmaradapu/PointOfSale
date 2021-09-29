@@ -5,8 +5,8 @@ metadata:
   namespace: default
 data:
   postgres_user: postgres
-  postgres_password: "1234"
-  postgres_host: jdbc:postgresql://postgres:5432/klm
+  postgres_password: Vasavi
+  postgres_host: jdbc:postgresql://postgres:5432/debit-notes
   
 ---
 #apiVersion: v1
@@ -23,7 +23,7 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-cp
+  name: postgres-dn
 spec:
   selector:
     matchLabels:
@@ -72,7 +72,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-cp
+  name: postgres-dn
 spec:
   type: ClusterIP
   ports:
@@ -83,21 +83,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: connection-pool-app
+  name: debit-notes
   namespace: default
 spec:
   selector:
     matchLabels: 
-      app: connection-pool-app
+      app: debit-notes
   replicas: 1
   template:
     metadata:
-      name: connection-pool-app
+      name: debit-notes
       labels:
-        app: connection-pool-app
+        app: debit-notes
     spec:
       containers:
-      - name: connection-pool-app
+      - name: debit-notes
         env:
           - name: SPRING_DATASOURCE_USERNAME
             valueFrom:
@@ -114,7 +114,7 @@ spec:
               configMapKeyRef:
                 name: postgres-config
                 key: postgres_host
-        image: 881289302514.dkr.ecr.ap-south-1.amazonaws.com/connection-pool:latest
+        image: 881289302514.dkr.ecr.ap-south-1.amazonaws.com/debit-notes:latest
         resources:
           limits:
             memory: 512Mi
@@ -127,10 +127,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: connection-pool-app
+  name: debit-notes
 spec:
   type: LoadBalancer
   ports:
-    - port: 8083
+    - port: 8084
   selector:
-    app: connection-pool-app        
+    app: debit-notes        

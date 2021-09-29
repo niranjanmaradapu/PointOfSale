@@ -6,7 +6,7 @@ metadata:
 data:
   postgres_user: postgres
   postgres_password: Vasavi
-  postgres_host: jdbc:postgresql://postgres:5432/postgres  # change the database name 
+  postgres_host: jdbc:postgresql://postgres:5432/postgres 
   
 ---
 #apiVersion: v1
@@ -23,22 +23,22 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-new
+  name: postgres-nsp
 spec:
   selector:
     matchLabels:
-      app: postgres-new
+      app: postgres
   template:
     metadata:
       labels:
-        app: postgres-new
+        app: postgres
     spec:
 #      volumes:
 #        - name: postgres-storage
 #          persistentVolumeClaim:
 #            claimName: postgres-pv-claim
       containers:
-        - name: postgres-new
+        - name: postgres
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -56,7 +56,7 @@ spec:
               value: postgres
           ports:
             - containerPort: 5432
-              name: postgres-new
+              name: postgres
 #          volumeMounts:
 #            - name: postgres-storage
 #              mountPath: /var/lib/postgresql/data
@@ -72,13 +72,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-new
+  name: postgres-nsp
 spec:
   type: ClusterIP
   ports:
     - port: 5432
   selector:
-    app: postgres-new
+    app: postgres
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -110,7 +110,6 @@ spec:
                 name: postgres-config
                 key: postgres_password
           - name: SPRING_DATASOURCE_URL
-#            value: jdbc:postgresql://postgres:5432/klm
             valueFrom:
               configMapKeyRef:
                 name: postgres-config

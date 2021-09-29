@@ -5,8 +5,8 @@ metadata:
   namespace: default
 data:
   postgres_user: postgres
-  postgres_password: "1234"
-  postgres_host: jdbc:postgresql://postgres:5432/klm
+  postgres_password: Vasavi
+  postgres_host: jdbc:postgresql://postgres:5432/postgres
   
 ---
 #apiVersion: v1
@@ -23,7 +23,7 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-cp
+  name: postgres-cm
 spec:
   selector:
     matchLabels:
@@ -53,7 +53,7 @@ spec:
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
             - name: POSTGRES_DB
-              value: klm
+              value: postgres
           ports:
             - containerPort: 5432
               name: postgres
@@ -72,7 +72,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-cp
+  name: postgres-cm
 spec:
   type: ClusterIP
   ports:
@@ -83,21 +83,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: connection-pool-app
+  name: customer-management
   namespace: default
 spec:
   selector:
     matchLabels: 
-      app: connection-pool-app
+      app: customer-management
   replicas: 1
   template:
     metadata:
-      name: connection-pool-app
+      name: customer-management
       labels:
-        app: connection-pool-app
+        app: customer-management
     spec:
       containers:
-      - name: connection-pool-app
+      - name: customer-management
         env:
           - name: SPRING_DATASOURCE_USERNAME
             valueFrom:
@@ -114,7 +114,7 @@ spec:
               configMapKeyRef:
                 name: postgres-config
                 key: postgres_host
-        image: 881289302514.dkr.ecr.ap-south-1.amazonaws.com/connection-pool:latest
+        image: 881289302514.dkr.ecr.ap-south-1.amazonaws.com/customer-management:latest
         resources:
           limits:
             memory: 512Mi
@@ -127,10 +127,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: connection-pool-app
+  name: customer-management
 spec:
   type: LoadBalancer
   ports:
-    - port: 8083
+    - port: 0
   selector:
-    app: connection-pool-app        
+    app: customer-management        
