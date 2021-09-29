@@ -107,11 +107,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Autowired
 	private PaymentAmountTypeMapper paymentAmountTypeMapper;
 
-	@Value("${savecustomer.url}")
-	private String url;
-
-	@Value("${getNewSaleWithHsn.url}")
-	private String HsnUrl;
+	
 
 	@Autowired
 	private HSNVoService hsnService;

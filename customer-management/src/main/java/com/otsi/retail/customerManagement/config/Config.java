@@ -28,8 +28,11 @@ public class Config {
 	@Value("${TAG_CUSTOMER_TO_INVOICE}")
 	private String tagCustomerToInvoice;
 	
-	@Value("${getbarcodes.url}")
+	@Value("${getbarcodes_url}")
 	private String getbarcodesUrl;
+	
+	@Value("${getNewSaleWithHsn_url}")
+	private String HsnUrl;
 	
 
 }

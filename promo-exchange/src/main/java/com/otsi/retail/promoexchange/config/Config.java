@@ -1,11 +1,7 @@
-package com.otsi.retail.newSale.config;
-
-import java.util.List;
+package com.otsi.retail.promoexchange.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-
-import com.otsi.retail.newSale.vo.HsnDetailsVo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,16 +9,20 @@ import lombok.NoArgsConstructor;
 
 @Configuration
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Config {
+	
+	@Value("${getdeliveryslip_url}")
+	private String getDeliveryslipWithDsnumber;
 
-	public List<HsnDetailsVo> vo ;
+	@Value("${getreturnslip_url}")
+	private String getListOfReturnSlipsUrl;
 	
 	@Value("${savecustomer_url}")
 	private String url;
-
-	@Value("${getNewSaleWithHsn_url}")
-	private String HsnUrl;
+	
+	@Value("${GET_DS_DETAILS_FROM_NEWSALE_URl}")
+	private String getDsDetails;
 
 }
