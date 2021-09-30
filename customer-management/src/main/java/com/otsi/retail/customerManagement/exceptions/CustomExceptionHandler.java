@@ -36,6 +36,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
 	}
 
+	@ExceptionHandler(value = ServiceDownException.class)
+	public ResponseEntity<Object> invalidDataException(ServiceDownException serviceDownException) {
+		ErrorResponse<?> error = new ErrorResponse<>(406, "Internal calling service is down");
+		log.error("error response is:"+error);
+		return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
+	}
+
 	
 	
 
