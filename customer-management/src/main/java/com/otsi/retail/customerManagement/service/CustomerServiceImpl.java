@@ -242,7 +242,7 @@ public class CustomerServiceImpl implements CustomerService {
 		}
 	}
 
-	public  NewSaleList  getInvoiceFallback(InvoiceRequestVo vo) throws Exception{
+	public  NewSaleList  getInvoiceFallback(InvoiceRequestVo vo){
 		log.error("Invocie details service down" );
 		throw new ServiceDownException("Invoice details are down");
 	}
