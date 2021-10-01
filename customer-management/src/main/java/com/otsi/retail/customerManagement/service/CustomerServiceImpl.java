@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.otsi.retail.customerManagement.exceptions.ServiceDownException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -213,6 +216,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
+	@CircuitBreaker(name="newSale", fallbackMethod = "getInvoiceFallback")
 	public NewSaleList getInvoiceDetailsFromNewSale(InvoiceRequestVo vo) throws Exception {
 		log.debug("debugging getInvoiceDetailsFromNewSale():" + vo);
 		HttpHeaders headers = new HttpHeaders();
@@ -236,6 +240,11 @@ public class CustomerServiceImpl implements CustomerService {
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
+	}
+
+	public  NewSaleList  getInvoiceFallback(InvoiceRequestVo vo){
+		log.error("Invocie details service down" );
+		throw new ServiceDownException("Invoice details are down");
 	}
 
 	@Override
