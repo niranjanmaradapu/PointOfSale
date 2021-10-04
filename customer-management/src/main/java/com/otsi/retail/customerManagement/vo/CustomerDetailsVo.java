@@ -10,6 +10,8 @@ import lombok.ToString;
 @Data
 @ToString
 public class CustomerDetailsVo {
+	private Long customerId;
+
 	private String name;
 	private String mobileNumber;
 	private String gstNumber;
@@ -18,5 +20,7 @@ public class CustomerDetailsVo {
 	private LocalDate dob;
 	private String gender;
 	private String altMobileNo;
+	private String email;
+
 	
 }

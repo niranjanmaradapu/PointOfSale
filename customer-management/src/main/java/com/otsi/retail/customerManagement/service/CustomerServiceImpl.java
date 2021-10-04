@@ -33,6 +33,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.otsi.retail.customerManagement.config.Config;
 import com.otsi.retail.customerManagement.controller.ReasonController;
 import com.otsi.retail.customerManagement.exceptions.DataNotFoundException;
@@ -262,15 +264,16 @@ public class CustomerServiceImpl implements CustomerService {
 
 		HttpEntity<List<String>> request1 = new HttpEntity<List<String>>(barcodes, headers);
 
-		ResponseEntity<?> newsaleResponse = restTemplate.exchange(config.getGetbarcodesUrl(), HttpMethod.POST, request1,
+		ResponseEntity<GateWayResponse> newsaleResponse = restTemplate.exchange(config.getGetbarcodesUrl(), HttpMethod.POST, request1,
 				GateWayResponse.class);
 
 		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
-		ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper mapper=new ObjectMapper().registerModule(new JavaTimeModule())
+	            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-		GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
+		//GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
 
-		List<BarcodeVo> bvo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<List<BarcodeVo>>() {
+		List<BarcodeVo> bvo = mapper.convertValue(newsaleResponse.getBody().getResult(), new TypeReference<List<BarcodeVo>>() {
 		});
 Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 
@@ -307,7 +310,7 @@ Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 			uri = UriComponentsBuilder.fromUri(new URI(config.getTagCustomerToInvoice() + "/" + mobileNumber + "/" + invoiceNo))
 					.build().encode().toUri();
 
-			ResponseEntity<String> res = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+			ResponseEntity<GateWayResponse> res = restTemplate.exchange(uri, HttpMethod.GET, entity, GateWayResponse.class);
 			log.info("tagging user to invoice:" + res);
 		} catch (URISyntaxException e) {
 			throw new Exception(e.getMessage());
@@ -321,16 +324,19 @@ Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity entity = new HttpEntity(headers);
 		URI uri = null;
+		ObjectMapper mapper=new ObjectMapper().registerModule(new JavaTimeModule())
+	            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		try {
 			uri = UriComponentsBuilder.fromUri(new URI(config.getCustomerDetails() + "/" + mobileNo)).build().encode()
 					.toUri();
 
-			ResponseEntity<CustomerDetailsVo> res = restTemplate.exchange(uri, HttpMethod.GET, entity,
-					CustomerDetailsVo.class);
+			ResponseEntity<GateWayResponse> res = restTemplate.exchange(uri, HttpMethod.GET, entity,
+					GateWayResponse.class);
 			if (res.getStatusCode() == HttpStatus.OK) {
-				System.out.println(res.getBody());
 				log.info("fetching customer details from invoice:" + res.getBody());
-				return res.getBody();
+				
+				CustomerDetailsVo vo=mapper.convertValue(res.getBody().getResult(), CustomerDetailsVo.class);
+				return vo;
 			} else {
 				log.error("Mobile number not exists" + res.getBody());
 				throw new RecordNotFoundException("Mobile number not exists" + res.getBody());
