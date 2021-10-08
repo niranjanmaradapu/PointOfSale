@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import com.otsi.retail.newSale.Entity.*;
+import com.otsi.retail.newSale.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -21,12 +23,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.otsi.retail.newSale.Entity.BarcodeEntity;
-import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
-import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
-import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
-import com.otsi.retail.newSale.Entity.NewSaleEntity;
-import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
@@ -34,17 +30,12 @@ import com.otsi.retail.newSale.Exceptions.InvalidInputException;
 import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
 import com.otsi.retail.newSale.common.DSAttributes;
 import com.otsi.retail.newSale.common.DSStatus;
+import com.otsi.retail.newSale.common.DomainData;
 import com.otsi.retail.newSale.common.PaymentType;
 import com.otsi.retail.newSale.mapper.CustomerMapper;
 import com.otsi.retail.newSale.mapper.DeliverySlipMapper;
 import com.otsi.retail.newSale.mapper.NewSaleMapper;
 import com.otsi.retail.newSale.mapper.PaymentAmountTypeMapper;
-import com.otsi.retail.newSale.repository.BarcodeRepository;
-import com.otsi.retail.newSale.repository.CustomerDetailsRepo;
-import com.otsi.retail.newSale.repository.DeliverySlipRepository;
-import com.otsi.retail.newSale.repository.GiftVoucherRepo;
-import com.otsi.retail.newSale.repository.NewSaleRepository;
-import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.service.CustomerService;
 import com.otsi.retail.newSale.service.HSNVoService;
 import com.otsi.retail.newSale.service.NewSaleService;
@@ -107,83 +98,130 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Autowired
 	private PaymentAmountTypeMapper paymentAmountTypeMapper;
 
-	
-
 	@Autowired
 	private HSNVoService hsnService;
 
 	@Autowired
 	private GiftVoucherRepo gvRepo;
 
+	// Method for saving order
 	@Override
 	public String saveNewSaleRequest(NewSaleVo vo) {
 		log.debug("deugging saveNewSaleRequest" + vo);
-		Random ran = new Random();
-
-		NewSaleEntity entity = new NewSaleEntity();
 
 		if (vo.getCustomerDetails() != null) {
+//			CustomerDetailsEntity customerEntity = customerMapper.convertVoToEntity(vo.getCustomerDetails());
+//			CustomerDetailsEntity savedDetails = customerRepo.save(customerEntity);
+//			entity.setCustomerDetails(savedDetails);
 
-			CustomerDetailsEntity customerEntity = customerMapper.convertVoToEntity(vo.getCustomerDetails());
-			CustomerDetailsEntity savedDetails = customerRepo.save(customerEntity);
-			entity.setCustomerDetails(savedDetails);
+			// Need to get userId from Userdata table once user is saved.
+
 		} else {
 			throw new DataNotFoundException("data not found");
 		}
 
-		List<DeliverySlipVo> dlSlips = vo.getDlSlip();
-		List<PaymentAmountTypeVo> paymentAmountTypeVos = vo.getPaymentAmountType();
+		Random ran = new Random();
+		NewSaleEntity entity = new NewSaleEntity();
+
 		entity.setNatureOfSale(vo.getNatureOfSale());
-		entity.setPaymentType(paymentAmountTypeMapper.VoToEntity(vo.getPaymentAmountType()));
-		long paymentAmount = paymentAmountTypeVos.stream().mapToLong(i -> i.getPaymentAmount()).sum();
-		entity.setRecievedAmount(paymentAmount);
-		long sumMrp = dlSlips.stream().mapToLong(i -> i.getMrp()).sum();
-		entity.setGrossAmount(sumMrp);
-		long sumPromoDisc = dlSlips.stream().mapToLong(i -> i.getPromoDisc()).sum();
-		entity.setTotalPromoDisc(sumPromoDisc);
-		entity.setTotalManualDisc(vo.getTotalManualDisc());
-		entity.setApprovedBy(vo.getApprovedBy());
+		entity.setDomainId(vo.getDomainId());
+		entity.setGrossValue(vo.getGrossAmount());
+		entity.setPromoDisc(vo.getTotalPromoDisc());
+		entity.setManualDisc(vo.getTotalManualDisc());
+		entity.setCreatedBy(vo.getApprovedBy());
 		entity.setDiscApprovedBy(vo.getDiscApprovedBy());
 		entity.setDiscType(vo.getDiscType());
-		entity.setCreatedDate(LocalDate.now());
+		entity.setCreationDate(LocalDate.now());
+		entity.setOrderNumber(
+				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
+		entity.setNetValue(vo.getNetPayableAmount());
+		entity.setStoreId(vo.getStoreId());
+
+		// List<PaymentAmountTypeVo> paymentAmountTypeVos = vo.getPaymentAmountType();
+
+		// entity.setPaymentType(paymentAmountTypeMapper.VoToEntity(vo.getPaymentAmountType()));
+		// long paymentAmount = paymentAmountTypeVos.stream().mapToLong(i ->
+		// i.getPaymentAmount()).sum();
+		// entity.setRecievedAmount(paymentAmount);
+		// long sumMrp = dlSlips.stream().mapToLong(i -> i.getMrp()).sum();
+
+		// long sumPromoDisc = dlSlips.stream().mapToLong(i -> i.getPromoDisc()).sum();
+
 		// entity.setInvoiceNumber(vo.getInvoiceNumber());
 
-		Long net = dlSlips.stream().mapToLong(i -> i.getNetAmount()).sum() - vo.getTotalManualDisc();
+		// Long net = dlSlips.stream().mapToLong(i -> i.getNetAmount()).sum() -
+		// vo.getTotalManualDisc();
 
-		entity.setNetPayableAmount(net);
+		if (vo.getDomainId() == DomainData.TE.getId()) {
 
-		entity.setBillNumber(
-				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
+			List<DeliverySlipVo> dlSlips = vo.getDlSlip();
 
-		List<String> dlsList = dlSlips.stream().map(x -> x.getDsNumber()).collect(Collectors.toList());
+			List<String> dlsList = dlSlips.stream().map(x -> x.getDsNumber()).collect(Collectors.toList());
 
-		List<DeliverySlipEntity> dsList = dsRepo.findByDsNumberIn(dlsList);
+			List<DeliverySlipEntity> dsList = dsRepo.findByDsNumberIn(dlsList);
 
-		if (dsList.size() == vo.getDlSlip().size()) {
+			if (dsList.size() == vo.getDlSlip().size()) {
 
-			NewSaleEntity saveEntity = newSaleRepository.save(entity);
+				NewSaleEntity saveEntity = newSaleRepository.save(entity);
 
-			dsList.stream().forEach(a -> {
+				dsList.stream().forEach(a -> {
 
-				a.setNewsale(saveEntity);
-				a.setLastModified(LocalDateTime.now());
+					a.setOrder(saveEntity);
+					a.setLastModified(LocalDateTime.now());
 
-				dsRepo.save(a);
-			});
-			entity.getPaymentType().forEach(p -> {
-				p.setNewsaleId(saveEntity);
-				paymentAmountTypeRepository.save(p);
+					dsRepo.save(a);
+				});
 
-			});
+				// }
 
-		} else {
-			log.error("Please enter Valid delivery slips..");
-			throw new InvalidInputException("Please enter Valid delivery slips..");
+				// As per discussion introduce new table
+//			dsList.stream().forEach(x -> {
+//				OrderDsSlipEntity orderDsSlip = new OrderDsSlipEntity();
+//				orderDsSlip.setOrderId(saveEntity.getOrderId());
+//				orderDsSlip.setDsSlipId(x.getDsId());
+//				orderDsSlipRepo.save(orderDsSlip);
+//			});
+
+//			entity.getPaymentType().forEach(p -> {
+//				p.setOrderId(saveEntity.getNewsaleId());
+//				p.setPaymentAmount(p.getPaymentAmount());
+//				//p.setPaymentType(p.get);
+//				paymentAmountTypeRepository.save(p);
+//			});
+
+			} else {
+				log.error("Please provide Valid delivery slips..");
+				throw new InvalidInputException("Please provide Valid delivery slips..");
+			}
+		}
+		if (vo.getDomainId() == DomainData.RE.getId() || vo.getDomainId() == DomainData.DS.getId()) {
+
+			List<BarcodeVo> lineItems = vo.getLineItems();
+
+			List<String> lineItemsList = lineItems.stream().map(x -> x.getBarcode()).collect(Collectors.toList());
+
+			List<BarcodeEntity> lineItemsRecords = barcodeRepository.findByBarcodeIn(lineItemsList);
+
+			if (lineItemsList.size() == lineItemsRecords.size()) {
+
+				NewSaleEntity saveEntity = newSaleRepository.save(entity);
+
+				lineItemsRecords.stream().forEach(x -> {
+					x.setOrder(saveEntity);
+					x.setCreatedDate(LocalDateTime.now());
+					barcodeRepository.save(x);
+				});
+
+			} else {
+				log.error("Please provide valid LineItems..");
+				throw new InvalidInputException("Please provide Valid delivery slips..");
+
+			}
 		}
 
 		log.warn("we are testing bill generated with number");
-		log.info("after generated bill with number:" + entity.getBillNumber());
-		return "Bill generated with number :" + entity.getBillNumber();
+		log.info("after generated bill with number:" + entity.getOrderNumber());
+		return "Bill generated with number :" + entity.getOrderNumber();
 
 	}
 
@@ -313,8 +351,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			if (svo.getBillStatus() != null && svo.getCustMobileNumber() == null && svo.getBillNumber() == null
 					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
 
-				saleDetails = newSaleRepository.findByCreatedDateBetweenAndBillStatus(svo.getDateFrom(),
-						svo.getDateTo(), svo.getBillStatus());
+				saleDetails = newSaleRepository.findByCreationDateBetweenAndStatus(svo.getDateFrom(), svo.getDateTo(),
+						svo.getBillStatus());
 			}
 			/*
 			 * getting the record using custmobilenumber
@@ -323,17 +361,17 @@ public class NewSaleServiceImpl implements NewSaleService {
 					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
 
 				Optional<CustomerDetailsEntity> customer = customerRepo.findByMobileNumber(svo.getCustMobileNumber());
-				if (customer.isPresent()) {
-					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
-							.findByNewsaleId(customer.get().getNewsale().get(0).getNewsaleId());
-					if (newSaleOpt.isPresent()) {
-						saleDetails.add(newSaleOpt.get());
-					}
-
-				} else {
-					log.error("No record found with given mobilenumber");
-					throw new RecordNotFoundException("No record found with given mobilenumber");
-				}
+//				if (customer.isPresent()) {
+//					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
+//							.findByNewsaleId(customer.get().getNewsale().get(0).getOrderId());
+//					if (newSaleOpt.isPresent()) {
+//						saleDetails.add(newSaleOpt.get());
+//					}
+//
+//				} else {
+//					log.error("No record found with given mobilenumber");
+//					throw new RecordNotFoundException("No record found with given mobilenumber");
+//				}
 
 			}
 			/*
@@ -345,11 +383,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 				BarcodeEntity bar = barcodeRepository.findByBarcode(svo.getBarcode());
 				if (bar != null) {
 
-					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
-							.findByNewsaleId(bar.getDeliverySlip().getNewsale().getNewsaleId());
-					if (newSaleOpt.isPresent()) {
-						saleDetails.add(newSaleOpt.get());
-					}
+//					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
+//							.findByNewsaleId(bar.getDeliverySlip().getNewsale().getOrderId());
+//					if (newSaleOpt.isPresent()) {
+//						saleDetails.add(newSaleOpt.get());
+//					}
 
 				} else {
 					log.error("No record found with given barcode");
@@ -362,14 +400,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getBillNumber() != null
 					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
-				saleDetails = newSaleRepository.findByBillNumber(svo.getBillNumber());
+				saleDetails = newSaleRepository.findByOrderNumber(svo.getBillNumber());
 			}
 			/*
 			 * getting the record using invoice number
 			 */
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getBillNumber() == null
 					&& svo.getBarcode() == null && svo.getInvoiceNumber() != null && svo.getDsNumber() == null) {
-				saleDetails = newSaleRepository.findByInvoiceNumber(svo.getInvoiceNumber());
+				saleDetails = newSaleRepository.findByOrderNumber(svo.getInvoiceNumber());
 			}
 			/*
 			 * getting the record using dsNumber
@@ -378,17 +416,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() != null) {
 				DeliverySlipEntity ds = dsRepo.findByDsNumber(svo.getDsNumber());
 
-				if (ds != null) {
-					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
-							.findByNewsaleId(ds.getNewsale().getNewsaleId());
-					if (newSaleOpt.isPresent()) {
-						saleDetails.add(newSaleOpt.get());
-					}
-				}
+//				if (ds != null) {
+//					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
+//							.findByNewsaleId(ds.getNewsale().getOrderId());
+//					if (newSaleOpt.isPresent()) {
+//						saleDetails.add(newSaleOpt.get());
+//					}
+//				}
 			} else
-				saleDetails = newSaleRepository.findByCreatedDateBetween(svo.getDateFrom(), svo.getDateTo());
-
-			
+				saleDetails = newSaleRepository.findByCreationDateBetween(svo.getDateFrom(), svo.getDateTo());
 
 		}
 		if (saleDetails.isEmpty()) {
@@ -396,12 +432,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 			log.error("No record found with given information");
 			throw new RecordNotFoundException("No record found with given information");
 
-		}
-		else {
-		ListOfSaleBillsVo lsvo = newSaleMapper.convertlistSalesEntityToVo(saleDetails);
-		log.warn("we are fetching sale bills details");
-		log.info("after getting  sale bills details :" + lsvo);
-		return lsvo;
+		} else {
+			ListOfSaleBillsVo lsvo = newSaleMapper.convertlistSalesEntityToVo(saleDetails);
+			log.warn("we are fetching sale bills details");
+			log.info("after getting  sale bills details :" + lsvo);
+			return lsvo;
 		}
 
 	}
@@ -536,7 +571,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 			dsDetails = dsRepo.findByCreatedDateBetweenOrderByCreatedDateAsc(listOfDeliverySlipVo.getDateFrom(),
 					listOfDeliverySlipVo.getDateTo());
 
-			
 		}
 		if (dsDetails.isEmpty()) {
 			log.error("No record found with given information");
@@ -544,10 +578,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 
 		else {
-		ListOfDeliverySlipVo mapper = newSaleMapper.convertListDSToVo(dsDetails);
-		log.warn("we are testing is fetching list of deivery slips");
-		log.info("after getting list of delivery slips :" + mapper);
-		return mapper;
+			ListOfDeliverySlipVo mapper = newSaleMapper.convertListDSToVo(dsDetails);
+			log.warn("we are testing is fetching list of deivery slips");
+			log.info("after getting list of delivery slips :" + mapper);
+			return mapper;
 		}
 
 	}
@@ -585,7 +619,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public List<NewSaleResponseVo> getNewsaleByCustomerId(Long customerId) throws DataNotFoundException {
 		log.debug(" debugging getNewsaleByCustomerId:" + customerId);
-		List<NewSaleEntity> entity = newSaleRepository.findByCustomerDetailsCustomerId(customerId);
+		List<NewSaleEntity> entity = newSaleRepository.findByUserId(customerId);
 		if (entity == null) {
 			throw new DataNotFoundException("Data not found");
 
@@ -601,11 +635,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public NewSaleVo updateNewSale(NewSaleResponseVo vo) throws RecordNotFoundException {
 		log.debug(" debugging updateNewSale");
-		Optional<NewSaleEntity> newSaleOpt = newSaleRepository.findByNewsaleId(vo.getNewsaleId());
+		Optional<NewSaleEntity> newSaleOpt = newSaleRepository.findByOrderId(vo.getNewsaleId());
 		NewSaleVo newsaleVo = new NewSaleVo();
 		if (newSaleOpt.isPresent()) {
 			NewSaleEntity newSale = newSaleOpt.get();
-			if (!newSale.getInvoiceNumber().equals(vo.getInvoiceNumber())) {
+			if (!newSale.getOrderNumber().equals(vo.getInvoiceNumber())) {
 				log.error("invoice is not present");
 				throw new RecordNotFoundException("invoice is not present");
 			}
@@ -618,23 +652,22 @@ public class NewSaleServiceImpl implements NewSaleService {
 						|| p.getPaymentType() == PaymentType.GETQRCODE || p.getPaymentType() == PaymentType.UPI
 						|| p.getPaymentType() == PaymentType.OtherPayments) {
 					/* Only paid amounts are deducted from received amount column of newSale */
-					newSale.setRecievedAmount(newSale.getRecievedAmount() - p.getPaymentAmount());
+					newSale.setGrossValue(newSale.getGrossValue() - p.getPaymentAmount());
 				}
 
 				paymentAmountType.setPaymentAmount(p.getPaymentAmount());
-				paymentAmountType.setPaymentType(p.getPaymentType());
+				// paymentAmountType.setPaymentType(p.getPaymentType());
 
 				paymentAmountTypeList.add(paymentAmountType);
 
-				newSale.setPaymentType(paymentAmountTypeList);
+				// newSale.setPaymentType(paymentAmountTypeList);
 			});
 
 			NewSaleEntity saveEntity = newSaleRepository.save(newSale);
-			newSale.getPaymentType().forEach(p -> {
-				p.setNewsaleId(saveEntity);
-				paymentAmountTypeRepository.save(p);
-
-			});
+//			newSale.getPaymentType().forEach(p -> {
+//				p.setOrderId(saveEntity.getNewsaleId());
+//				paymentAmountTypeRepository.save(p);
+//			});
 			newsaleVo = newSaleMapper.entityToVo(saveEntity);
 		}
 		log.warn("we are checking if newsale is updated");
@@ -649,7 +682,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		List<NewSaleVo> newSaleList = new ArrayList<>();
 		if (null != vo.getInvoiceNo() && !vo.getInvoiceNo().isEmpty()) {
 
-			List<NewSaleEntity> newSaleEntity = newSaleRepository.findByBillNumber(vo.getInvoiceNo());
+			List<NewSaleEntity> newSaleEntity = newSaleRepository.findByOrderNumber(vo.getInvoiceNo());
 			newSaleList = newSaleEntity.stream().map(dto -> newSaleMapper.convertNewSaleDtoToVo(dto))
 					.collect(Collectors.toList());
 			newSaleList1.setNewSaleVo(newSaleList);
@@ -658,14 +691,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 		if (null != vo.getBarCode() && !vo.getBarCode().isEmpty()) {
 			BarcodeEntity barcode = barcodeRepository.findByBarcode(vo.getBarCode());
 			DeliverySlipEntity dsSlip = dsRepo.findByDsNumber(barcode.getDeliverySlip().getDsNumber());
-			newSaleList.add(newSaleMapper.convertNewSaleDtoToVo(dsSlip.getNewsale()));
+			// newSaleList.add(newSaleMapper.convertNewSaleDtoToVo(dsSlip.getNewsale()));
 			newSaleList1.setNewSaleVo(newSaleList);
 			return newSaleList1;
 		}
 		if (null != vo.getMobileNo() && !vo.getMobileNo().isEmpty()) {
 
 			List<NewSaleEntity> newSaleEntity = newSaleRepository
-					.findByCustomerDetailsMobileNumberAndCreatedDateBetween(vo.getMobileNo(), vo.getFromDate(),
+					.findByCustomerDetailsMobileNumberAndCreationDateBetween(vo.getMobileNo(), vo.getFromDate(),
 							vo.getToDate());
 			newSaleList = newSaleEntity.stream().map(dto -> newSaleMapper.convertNewSaleDtoToVo(dto))
 					.collect(Collectors.toList());
@@ -728,7 +761,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		if (custmoreOptional.isPresent()) {
 			CustomerDetailsEntity customer = custmoreOptional.get();
-			List<NewSaleEntity> newSaleList = newSaleRepository.findByInvoiceNumber(invoiceNo);
+			List<NewSaleEntity> newSaleList = newSaleRepository.findByOrderNumber(invoiceNo);
 			newSaleList.stream().forEach(newSale -> {
 				try {
 					String message = setCustomerToNewSale(newSale, customer);
@@ -746,7 +779,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	private String setCustomerToNewSale(NewSaleEntity newSale, CustomerDetailsEntity customer) throws Exception {
-		newSale.setCustomerDetails(customer);
+		// newSale.setCustomerDetails(customer);
 		log.debug(" debugging setCustomerToNewSale:" + newSale + "and the customer is:" + customer);
 		NewSaleEntity responce = newSaleRepository.save(newSale);
 		log.warn("we are testing if customer is set to newsale...");

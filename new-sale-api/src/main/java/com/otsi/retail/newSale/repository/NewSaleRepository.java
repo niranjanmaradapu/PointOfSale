@@ -13,22 +13,21 @@ import com.otsi.retail.newSale.Entity.NewSaleEntity;
 @Repository
 public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 
-	List<NewSaleEntity> findByCreatedDateBetweenAndBillStatus(LocalDate dateFrom, LocalDate dateTo, String billStatus);
+	List<NewSaleEntity> findByCreationDateBetweenAndStatus(LocalDate dateFrom, LocalDate dateTo, String billStatus);
 
-	Optional<NewSaleEntity> findByNewsaleId(Long newsaleId);
+	Optional<NewSaleEntity> findByOrderId(Long newsaleId);
 
-	List<NewSaleEntity> findByBillNumber(String billNumber);
+	List<NewSaleEntity> findByOrderNumber(String billNumber);
 
-	List<NewSaleEntity> findByInvoiceNumber(Long invoiceNumber);
+	List<NewSaleEntity> findByOrderNumber(Long invoiceNumber);
 
-	List<NewSaleEntity> findByCreatedDateBetween(LocalDate dateFrom, LocalDate dateTo);
+	List<NewSaleEntity> findByCreationDateBetween(LocalDate dateFrom, LocalDate dateTo);
 	
-	List<NewSaleEntity> findByCustomerDetailsCustomerId(Long customerId);
+	List<NewSaleEntity> findByUserId(Long customerId);
 
-	List<NewSaleEntity> findByCustomerDetailsMobileNumberAndCreatedDateBetween(String mobileNo, LocalDate fromDate, LocalDate toDate);
+	List<NewSaleEntity> findByCustomerDetailsMobileNumberAndCreationDateBetween(String mobileNo, LocalDate fromDate, LocalDate toDate);
 
 	Optional<CustomerDetailsEntity> findByCustomerDetailsMobileNumber(String mobileNo);
 
-	
 
 }

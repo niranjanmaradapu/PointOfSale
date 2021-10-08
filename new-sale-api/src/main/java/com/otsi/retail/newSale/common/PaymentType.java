@@ -2,20 +2,25 @@ package com.otsi.retail.newSale.common;
 
 public enum PaymentType {
 
-	None(0,"None"),Cash(1, "Cash"), Card(2, "Card"), RTSlip(3, "RTSlip"), PKTPENDING(4, "PKTPENDING"), PKTADVANCE(5, "PKTADVANCE"),
-	PHRGVS(6, "PHRGVS"), LoyaltyPoint(7, "LoyaltyPoint"), OtherPayments(8, "OtherPayments"), GETQRCODE(9, "GETQRCODE"),
-	UPI(10, "UPI");
+	None(0, "None"), Cash(1, "Cash"), Card(2, "Card"), RTSlip(3, "RTSlip"), PKTPENDING(4, "PKTPENDING"),
+	PKTADVANCE(5, "PKTADVANCE"), PHRGVS(6, "PHRGVS"), LoyaltyPoint(7, "LoyaltyPoint"),
+	OtherPayments(8, "OtherPayments"), GETQRCODE(9, "GETQRCODE"), UPI(10, "UPI");
 
-	private int num;
-
+	private int id;
 	private String type;
 
-	public int getNum() {
-		return num;
+	private PaymentType(int id, String type) {
+
+		this.id = id;
+		this.type = type;
 	}
 
-	public void setNum(int num) {
-		this.num = num;
+	public int getNum() {
+		return id;
+	}
+
+	public void setNum(int id) {
+		this.id = id;
 	}
 
 	public String getType() {
@@ -24,13 +29,6 @@ public enum PaymentType {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	private PaymentType(int num, String type) {
-
-		this.num = num;
-		this.type = type;
-
 	}
 
 }

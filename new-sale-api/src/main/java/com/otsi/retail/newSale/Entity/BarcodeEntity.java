@@ -45,10 +45,10 @@ public class BarcodeEntity {
 	@ManyToOne
 	@JoinColumn(name = "ds_id")
 	private DeliverySlipEntity deliverySlip;
-
-	/*
-	 * @ManyToOne // @JoinColumn(name = "ds_id") private DeliverySlipEntity
-	 * delivery_slip;
-	 */
+	
+	@ManyToOne
+	@JoinColumn(name = "order_id")
+	private NewSaleEntity order;
+	
 
 }

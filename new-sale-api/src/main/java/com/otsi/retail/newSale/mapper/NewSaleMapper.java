@@ -34,6 +34,7 @@ public class NewSaleMapper {
 
 	@Autowired
 	private DeliverySlipMapper deliverySlipMapper;
+	private NewSaleVo nsvo;
 
 	public BarcodeEntity convertBarcodeVoToEntity(BarcodeVo vo) {
 
@@ -84,18 +85,18 @@ public class NewSaleMapper {
 
 			// BeanUtils.copyProperties(x, nsvo);
 
-			nsvo.setInvoiceNumber(x.getBillNumber());
-			nsvo.setBiller(x.getBiller());
-			nsvo.setCreatedDate(x.getCreatedDate());
-			nsvo.setTotalManualDisc(x.getTotalManualDisc());
-			nsvo.setApprovedBy(x.getApprovedBy());
-			nsvo.setReason(x.getReason());
+			nsvo.setInvoiceNumber(x.getOrderNumber());
+			//nsvo.setBiller(x.getBiller());
+			nsvo.setCreatedDate(x.getCreationDate());
+			nsvo.setTotalManualDisc(x.getManualDisc());
+			nsvo.setApprovedBy(x.getCreatedBy());
+			//nsvo.setReason(x.getReason());
 			nsvo.setOfflineNumber(x.getOfflineNumber());
 
 			sVoList.add(nsvo);
 
 		});
-		lsvo.setAmount(saleDetails.stream().mapToLong(i -> i.getNetPayableAmount()).sum());
+		lsvo.setAmount(saleDetails.stream().mapToLong(i -> i.getNetValue()).sum());
 
 		lsvo.setNewSaleVo(sVoList);
 		return lsvo;
@@ -127,11 +128,11 @@ public class NewSaleMapper {
 
 	public NewSaleVo entityToVo(NewSaleEntity dto) {
 		NewSaleVo vo = new NewSaleVo();
-		vo.setNewsaleId(dto.getNewsaleId());
-		vo.setInvoiceNumber(dto.getBillNumber());
-		vo.setNetPayableAmount(dto.getNetPayableAmount());
-		vo.setRecievedAmount(dto.getRecievedAmount());
-		vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
+		vo.setNewsaleId(dto.getOrderId());
+		vo.setInvoiceNumber(dto.getOrderNumber());
+		vo.setNetPayableAmount(dto.getGrossValue());
+		vo.setRecievedAmount(dto.getNetValue());
+		//vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
 		return vo;
 	}
 
@@ -152,48 +153,47 @@ public class NewSaleMapper {
 	public NewSaleResponseVo entityToResVo(NewSaleEntity dto) {
 		NewSaleResponseVo vo = new NewSaleResponseVo();
 		List<PaymentAmountTypeVo> payVos = new ArrayList<>();
-		vo.setCustomerId(dto.getCustomerDetails().getCustomerId());
-		vo.setCustomerName(dto.getCustomerDetails().getName());
-		vo.setMobileNumber(dto.getCustomerDetails().getMobileNumber());
-		vo.setNewsaleId(dto.getNewsaleId());
-		dto.getPaymentType().forEach(p -> {
-			PaymentAmountTypeVo payVo = new PaymentAmountTypeVo();
-			payVo.setId(p.getId());
-			payVo.setPaymentAmount(p.getPaymentAmount());
-			payVo.setPaymentType(p.getPaymentType());
-			payVos.add(payVo);
-		});
+		vo.setCustomerId(dto.getUserId());
+		//vo.setCustomerName(dto.getCustomerDetails().getName());
+		//vo.setMobileNumber(dto.getCustomerDetails().getMobileNumber());
+		vo.setNewsaleId(dto.getOrderId());
+//		dto.getPaymentType().forEach(p -> {
+//			PaymentAmountTypeVo payVo = new PaymentAmountTypeVo();
+//			payVo.setId(p.getId());
+//			payVo.setPaymentAmount(p.getPaymentAmount());
+//			payVo.setPaymentType(p.getPaymentType());
+//			payVos.add(payVo);
+//		});
 		vo.setPaymentAmountTypeId(payVos);
-		vo.setAmount(dto.getNetPayableAmount() - dto.getRecievedAmount());
-		vo.setInvoiceNumber(dto.getInvoiceNumber());
+		vo.setAmount(dto.getNetValue() - dto.getNetValue());
+		vo.setInvoiceNumber(dto.getOrderNumber());
 		return vo;
 	}
 
 	public NewSaleVo convertNewSaleDtoToVo(NewSaleEntity dto) {
 		NewSaleVo vo = new NewSaleVo();
-		vo.setApprovedBy(dto.getApprovedBy());
-		vo.setBiller(dto.getBiller());
-		vo.setCreatedDate(dto.getCreatedDate());
-		if (dto.getDlSlip() != null) {
-			vo.setDlSlip(deliverySlipMapper.convertDsEntityListToVoList(dto.getDlSlip()));
-		}
-		vo.setGrossAmount(dto.getGrossAmount());
-		vo.setInvoiceNumber(dto.getBillNumber());
+		vo.setApprovedBy(dto.getCreatedBy());
+		//vo.setBiller(dto.getBiller());
+		vo.setCreatedDate(dto.getCreationDate());
+//		if (dto.getDlSlip() != null) {
+//			vo.setDlSlip(deliverySlipMapper.convertDsEntityListToVoList(dto.getDlSlip()));
+//		}
+		vo.setGrossAmount(dto.getGrossValue());
+		vo.setInvoiceNumber(dto.getOrderNumber());
 		vo.setNatureOfSale(dto.getNatureOfSale());
-		vo.setNetPayableAmount(dto.getNetPayableAmount());
+		vo.setNetPayableAmount(dto.getNetValue());
 		vo.setOfflineNumber(dto.getOfflineNumber());
-		if (dto.getPaymentType() != null) {
-			vo.setPaymentAmountType(paymentAmountTypeMapper.EntityToVo(dto.getPaymentType()));
-
-		}
-		vo.setRoundOff(dto.getRoundOff());
-		vo.setTaxAmount(dto.getTaxAmount());
-		vo.setTotalManualDisc(dto.getTotalManualDisc());
-		vo.setTotalPromoDisc(dto.getTotalPromoDisc());
-		if (dto.getCustomerDetails() != null) {
-			vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
-
-		}
+//		if (dto.getPaymentType() != null) {
+//			vo.setPaymentAmountType(paymentAmountTypeMapper.EntityToVo(dto.getPaymentType()));
+//
+//		}
+		//vo.setRoundOff(dto.getRoundOff());
+		vo.setTaxAmount(dto.getTaxValue());
+		vo.setTotalManualDisc(dto.getManualDisc());
+		vo.setTotalPromoDisc(dto.getPromoDisc());
+//		if (dto.getCustomerDetails() != null) {
+//			vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
+//		}
 
 		return vo;
 		// TODO Auto-generated method stub

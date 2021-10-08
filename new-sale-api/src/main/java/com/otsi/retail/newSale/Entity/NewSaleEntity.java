@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.otsi.retail.newSale.common.PaymentType;
+import com.otsi.retail.newSale.common.OrderStatus;
 import com.otsi.retail.newSale.common.SaleNature;
 
 import lombok.AllArgsConstructor;
@@ -23,7 +23,7 @@ import lombok.ToString;
 
 @Data
 @Entity
-@Table(name = "newsale")
+@Table(name = "order_table")
 @AllArgsConstructor
 @ToString
 @NoArgsConstructor
@@ -31,54 +31,70 @@ public class NewSaleEntity {
 
 	@Id
 	@GeneratedValue
-	private Long newsaleId;
+	// @Column(name = "orderId")
+	private Long orderId;
 
 	private SaleNature natureOfSale;
 
-	private PaymentType payType;
+	private Long userId;// Customer Id from user data table
 
-	private Long grossAmount;
+	private Long storeId;
 
-	private Long totalPromoDisc;
+	private Long domainId;// Which type of store (Textail,Retail etc., )
 
-	private Long totalManualDisc;
+	private Long orderTransactionId;// Payment related Id (orderTransaction table)
+
+	// private PaymentType payType;
+
+	private Long grossValue;
+
+	private Long promoDisc;
+
+	private Long manualDisc;
 
 	private String discType;
 
 	private String discApprovedBy;
 
-	private float roundOff;
+	// private float roundOff;
 
-	private Long netPayableAmount;
+	private Long netValue;
 
-	private Long taxAmount;
+	private Long taxValue;
 
-	private String billNumber;
+	// private String billNumber;
 
-	private String biller;
+	private String createdBy;// Application User(Cashier)
 
-	private String billStatus;
+	private OrderStatus status;
 
-	private Long invoiceNumber;
-
-	private LocalDate createdDate;
+	private String orderNumber;
 
 	private Long offlineNumber;
 
-	private String approvedBy;
+	private LocalDate creationDate;
 
-	private Long recievedAmount;
+	private LocalDate lastModified;
 
-	private String reason;
+	// private String approvedBy;
 
-	@OneToMany(targetEntity = DeliverySlipEntity.class, mappedBy = "newsale", cascade = CascadeType.ALL)
+	// private Long recievedAmount;
+
+	// private String reason;//Needed to move to AV table
+
+	@OneToMany(targetEntity = DeliverySlipEntity.class, mappedBy = "order", cascade = CascadeType.ALL)
 	private List<DeliverySlipEntity> dlSlip;
+	
+	@OneToMany( mappedBy  = "order", cascade = CascadeType.ALL)
+	private List<BarcodeEntity> lineItems;
+	
 
 	@ManyToOne
 	@JoinColumn(name = "customerId")
 	private CustomerDetailsEntity customerDetails;
 
-	@OneToMany(targetEntity = PaymentAmountType.class, mappedBy = "newsaleId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<PaymentAmountType> paymentType;
+//	 @OneToMany(targetEntity = PaymentAmountType.class, mappedBy = "newsaleId",
+//	 cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//	 private List<PaymentAmountType> paymentType;
 
 }
