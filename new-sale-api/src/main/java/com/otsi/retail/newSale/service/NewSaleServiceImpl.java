@@ -371,6 +371,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					&& svo.getBarcode() == null && svo.getInvoiceNumber() != null && svo.getDsNumber() == null) {
 				saleDetails = newSaleRepository.findByInvoiceNumber(svo.getInvoiceNumber());
 			}
+			
 			/*
 			 * getting the record using dsNumber
 			 */
@@ -411,6 +412,26 @@ public class NewSaleServiceImpl implements NewSaleService {
 			throws RecordNotFoundException {
 		log.debug("deugging getlistofDeliverySlips:" + listOfDeliverySlipVo);
 		List<DeliverySlipEntity> dsDetails = new ArrayList<DeliverySlipEntity>();
+		///////
+		
+		if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
+				&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() != null
+				&& listOfDeliverySlipVo.getBarcode() != null) {
+
+			BarcodeEntity bar = barcodeRepository.findByBarcode(listOfDeliverySlipVo.getBarcode());
+
+			if (bar != null) {
+				dsDetails = dsRepo.findByCreatedDateBetweenAndDsIdAndDsNumberAndStatusOrderByCreatedDateAsc(
+						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
+						bar.getDeliverySlip().getDsId(),listOfDeliverySlipVo.getDsNumber(),listOfDeliverySlipVo.getStatus());
+
+			} else {
+				log.error("No record found with given barcode");
+				throw new RecordNotFoundException("No record found with given barcode");
+			}
+		}
+		
+		//////////////////
 		/*
 		 * getting the record using barcode
 		 */

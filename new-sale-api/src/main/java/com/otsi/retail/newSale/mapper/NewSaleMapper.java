@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
@@ -106,22 +107,63 @@ public class NewSaleMapper {
 		ListOfDeliverySlipVo vo = new ListOfDeliverySlipVo();
 
 		List<DeliverySlipVo> dsVoList = new ArrayList<>();
+		//////
+		List<BarcodeEntity> barEnt = new ArrayList<>();
+		
+		dsDetails.stream().forEach(x->{
+			
+			
+			
+			x.getBarcodes().stream().forEach(y->{
+				
+				
+				barEnt.add(y);
+				
+				
+			});
+			
+			
+			
+		});
+		
 
+		List<BarcodeVo> listBarVo = new ArrayList<>();
+/////////////
 		dsDetails.stream().forEach(x -> {
 
 			DeliverySlipVo dsvo = new DeliverySlipVo();
+			
 
 			BeanUtils.copyProperties(x, dsvo);
 
 			dsVoList.add(dsvo);
 
 		});
+		//////////
+		barEnt.stream().forEach(x -> {
+
+			BarcodeVo barvo = new BarcodeVo();
+			//barvo.setBarcode(x.getBarcode())
+			
+
+			BeanUtils.copyProperties(x, barvo);
+
+			listBarVo.add(barvo);
+
+		});
+		
+		
+		///////
 
 		vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i -> i.getPromoDisc()).sum());
 		vo.setTotalNetAmount(dsDetails.stream().mapToLong(i -> i.getNetAmount()).sum());
 		vo.setTotalGrossAmount(dsDetails.stream().mapToLong(i -> i.getMrp()).sum());
 		vo.setDeliverySlipVo(dsVoList);
-
+		vo.setBarcodevo(listBarVo);
+		vo.setBartoatalPromoDisc(listBarVo.stream().mapToLong(i->i.getPromoDisc()).sum());
+		vo.setBartotalNetAmount(listBarVo.stream().mapToLong(i->i.getNetAmount()).sum());
+		vo.setBartotalGrossAmount(listBarVo.stream().mapToLong(i->i.getMrp()).sum());
+		vo.setBarTotalQty(listBarVo.stream().mapToInt(q->q.getQty()).sum());
 		return vo;
 	}
 
@@ -213,20 +255,18 @@ public class NewSaleMapper {
 		});
 		return barcodeList;
 	}
-	
+
 	public List<BarcodeVo> convertBarcodesEntityToVo(List<BarcodeEntity> barcodeDetails) {
 		return barcodeDetails.stream().map(dto -> barentityToVo(dto)).collect(Collectors.toList());
-	
-		
+
 	}
 
 	private BarcodeVo barentityToVo(BarcodeEntity dto) {
-		
+
 		BarcodeVo vo = new BarcodeVo();
 		BeanUtils.copyProperties(dto, vo);
-		
+
 		return vo;
 	}
-
 
 }
