@@ -1,14 +1,14 @@
-/**
- * 
- */
-package com.otsi.retail.connectionpool.common;
-
-/**
- * @author Sudheer
- *pr
- */
-public enum PromotionType {
-	
-	By_Promotion,By_Store
-
-}
+///**
+// * 
+// */
+//package com.otsi.retail.connectionpool.common;
+//
+///**
+// * @author Sudheer
+// *
+// */
+//public enum PromotionType {
+//	
+//	By_Promotion,By_Store
+//
+//}

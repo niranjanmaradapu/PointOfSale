@@ -10,16 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.otsi.retail.connectionpool.entity.PoolEntity;
 import com.otsi.retail.connectionpool.entity.PromotionsEntity;
-import com.otsi.retail.connectionpool.entity.StoresEntity;
 import com.otsi.retail.connectionpool.exceptions.InvalidDataException;
 import com.otsi.retail.connectionpool.exceptions.RecordNotFoundException;
 import com.otsi.retail.connectionpool.mapper.PromotionMapper;
 import com.otsi.retail.connectionpool.repository.PoolRepo;
 import com.otsi.retail.connectionpool.repository.PromotionRepo;
-import com.otsi.retail.connectionpool.repository.StoreRepo;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
-import com.otsi.retail.connectionpool.vo.StoreVo;
 
 /**
  * This class contains all Bussiness logics regarding promotions and their
@@ -43,14 +40,14 @@ public class PromotionServiceImpl implements PromotionService {
 	@Autowired
 	private PoolRepo poolRepo;
 
-	@Autowired
-	private StoreRepo storeRepo;
+//	@Autowired
+//	private StoreRepo storeRepo;
 
 	// Method for adding promotion to pools
 	@Override
 	public String addPromotion(PromotionsVo vo) {
 		log.debug("debugging addPromotion:" + vo);
-		if (vo.getStoreVo() == null || vo.getPoolVo() == null) {
+		if (/*vo.getStoreVo() == null || */ vo.getPoolVo() == null) {
 			throw new InvalidDataException("please give valid data");
 		}
 		List<ConnectionPoolVo> poolVo = vo.getPoolVo();
@@ -59,13 +56,13 @@ public class PromotionServiceImpl implements PromotionService {
 
 		List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
 
-		// Code added by sudheer
-		List<StoreVo> storeVo = vo.getStoreVo();
+		// Code added by sudheer for store mappping
+		//List<StoreVo> storeVo = vo.getStoreVo();
 
 		/** Promotion mapped to store by storeId **/
 
-		List<Long> storeId = storeVo.stream().map(a -> a.getStoreId()).collect(Collectors.toList());
-		List<StoresEntity> storeList = storeRepo.findByStoreIdIn(storeId);
+		//List<Long> storeId = storeVo.stream().map(a -> a.getStoreId()).collect(Collectors.toList());
+		//List<StoresEntity> storeList = storeRepo.findByStoreIdIn(storeId);
 
 		/** Promotion mapped to store by storeName **/
 
@@ -73,15 +70,15 @@ public class PromotionServiceImpl implements PromotionService {
 		// b.getStoreName()).collect(Collectors.toList());
 		// List<StoresEntity> storeList = storeRepo.findByStoreNameIn(storeName);
 
-		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList, storeList);
+		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList/*, storeList */);
 
-		if (poolVo.size() == poolList.size() && storeVo.size() == storeList.size()) {
+		if (poolVo.size() == poolList.size() /*&& storeVo.size() == storeList.size() */) {
 
 			PromotionsEntity savedPromo = promoRepo.save(entity);
 
 		} else {
-			log.error("Please give valid/active pools/stores");
-			throw new InvalidDataException("Please give valid/active pools/stores");
+			log.error("Please give valid/active pools");
+			throw new InvalidDataException("Please give valid/active pools");
 		}
 		log.warn("we are checking if pool is added...");
 		log.info("Promotion mapped succesfully...");
@@ -136,12 +133,12 @@ public class PromotionServiceImpl implements PromotionService {
 			List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
 
 			// Code added by sudheer
-			List<StoreVo> storeVo = vo.getStoreVo();
+			//List<StoreVo> storeVo = vo.getStoreVo();
 
 			/** Promotion mapped to store by storeId **/
 
-			List<Long> storeId = storeVo.stream().map(a -> a.getStoreId()).collect(Collectors.toList());
-			List<StoresEntity> storeList = storeRepo.findByStoreIdIn(storeId);
+			//List<Long> storeId = storeVo.stream().map(a -> a.getStoreId()).collect(Collectors.toList());
+			//List<StoresEntity> storeList = storeRepo.findByStoreIdIn(storeId);
 
 			/** Promotion mapped to store by storeName **/
 
@@ -151,7 +148,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 			if (poolVo.size() == poolList.size()) {
 
-				PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList, storeList);
+				PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList/*, storeList */);
 				PromotionsEntity savedPromo = promoRepo.save(entity);
 
 			} else {

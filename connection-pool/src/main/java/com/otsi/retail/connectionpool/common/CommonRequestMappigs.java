@@ -18,12 +18,12 @@ public class CommonRequestMappigs {
 
 	public static final String EDIT_PROMO = "editpromo";
 	
-	public static final String STORE = "store";
+	//public static final String STORE = "store";
 	
-	public static final String ADD_STORE = "addstore";
+	//public static final String ADD_STORE = "addstore";
 	
-	public static final String GET_STORE_BY_ID = "getStoreById";
+	//public static final String GET_STORE_BY_ID = "getStoreById";
 	
-	public static final String GET_STORE_BY_NAME = "getStoreByName";
+	//public static final String GET_STORE_BY_NAME = "getStoreByName";
 
 }
