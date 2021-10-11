@@ -21,12 +21,16 @@ public class NewSaleVo {
 	private Long newsaleId;
 
 	private CustomerVo customerDetails;
+	
+	private Long domainId;
+	
+	private Long storeId;
 
 	private SaleNature natureOfSale;
 
 	private String invoiceNumber;
 
-	private String biller;
+	//private String biller;
 
 	private List<PaymentAmountTypeVo> paymentAmountType;
 
@@ -57,5 +61,6 @@ public class NewSaleVo {
 	private String reason;
 
 	private List<DeliverySlipVo> dlSlip;
-
+	
+	private List<BarcodeVo> lineItems;
 }

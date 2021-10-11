@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.otsi.retail.newSale.Entity;
 
@@ -15,7 +15,9 @@ import javax.persistence.Table;
 
 import com.otsi.retail.newSale.common.PaymentType;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author vasavi
@@ -23,22 +25,24 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "payment_amount_type")
+@Table(name = "order_transaction")
+@AllArgsConstructor
+@NoArgsConstructor
 public class PaymentAmountType {
-	
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+    private Long id;
 
-    @Enumerated(EnumType.ORDINAL)
-	private PaymentType paymentType;
+    //@Enumerated(EnumType.ORDINAL)
+    private String paymentType;
 
-	private Long paymentAmount;
+    private Long paymentAmount;
 
-	@ManyToOne
-	@JoinColumn(name = "newsale_id")
-	private NewSaleEntity newsaleId;
-	
-
+	private Long orderId;
+//    @ManyToOne
+//    @JoinColumn(name = "order_id")
+//    private Long newSale;
+    private String razorPayId;
 }
 

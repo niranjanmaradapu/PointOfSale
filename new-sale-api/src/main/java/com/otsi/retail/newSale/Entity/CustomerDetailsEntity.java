@@ -49,9 +49,9 @@ public class CustomerDetailsEntity {
 
 	private String altMobileNo;
 	
-	@JsonIgnore
-	@OneToMany(targetEntity = NewSaleEntity.class, mappedBy = "customerDetails", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<NewSaleEntity> newsale;
+//	@JsonIgnore
+//	@OneToMany(targetEntity = NewSaleEntity.class, mappedBy = "customerDetails", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//	private List<NewSaleEntity> newsale;
 	
 	
 

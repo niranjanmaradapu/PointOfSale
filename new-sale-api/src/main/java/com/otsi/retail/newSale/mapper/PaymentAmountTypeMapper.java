@@ -26,7 +26,7 @@ public class PaymentAmountTypeMapper {
 	public PaymentAmountTypeVo EntityToVo(PaymentAmountType dto) {
 		PaymentAmountTypeVo vo = new PaymentAmountTypeVo();
 		vo.setPaymentAmount(dto.getPaymentAmount());
-		vo.setPaymentType(dto.getPaymentType());
+		//vo.setPaymentType(dto.getPaymentType());
 		// vo.setNewsale();
 		return vo;
 
@@ -48,7 +48,7 @@ public class PaymentAmountTypeMapper {
 	public PaymentAmountType VoToEntity(PaymentAmountTypeVo vo) {
 		PaymentAmountType dto = new PaymentAmountType();
 		dto.setPaymentAmount(vo.getPaymentAmount());
-		dto.setPaymentType(vo.getPaymentType());
+		//dto.setPaymentType(vo.getPaymentType());
 		// vo.setNewsale();
 		return dto;
 

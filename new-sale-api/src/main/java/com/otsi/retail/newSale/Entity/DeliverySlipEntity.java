@@ -54,8 +54,8 @@ public class DeliverySlipEntity  {
 	private List<BarcodeEntity> barcodes;
 
 	@ManyToOne
-	@JoinColumn(name = "newsale_id")
-	private NewSaleEntity newsale;
+	@JoinColumn(name = "order_id")
+	private NewSaleEntity order;
 	
 
 }
