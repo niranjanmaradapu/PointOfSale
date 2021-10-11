@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.retail.connectionpool.common.Applicability;
 import com.otsi.retail.connectionpool.common.PromoApplyType;
-import com.otsi.retail.connectionpool.common.PromotionType;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,12 +41,14 @@ public class PromotionsVo {
 	private int buyItemsFromPool;
 
 	private Boolean isActive;
+	
+	/** These below 3 fields are store related fields **/
 
-	private PromotionType promoType;
+	//private PromotionType promoType;
 
-	private LocalDate startDate;
+	//private LocalDate startDate;
 
-	private LocalDate endDate;
+	///private LocalDate endDate;
 
 	private LocalDate createdDate;
 
@@ -58,6 +58,8 @@ public class PromotionsVo {
 
 	private List<ConnectionPoolVo> poolVo;
 	
-	private List<StoreVo> storeVo;
+	/** These below fields are store related fields **/
+	
+	//private List<StoreVo> storeVo;
 
 }
