@@ -16,10 +16,14 @@ import javax.persistence.Table;
 
 import com.otsi.retail.newSale.common.DSStatus;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "delivery_slip")
 @ToString
@@ -56,6 +60,4 @@ public class DeliverySlipEntity  {
 	@ManyToOne
 	@JoinColumn(name = "order_id")
 	private NewSaleEntity order;
-	
-
 }

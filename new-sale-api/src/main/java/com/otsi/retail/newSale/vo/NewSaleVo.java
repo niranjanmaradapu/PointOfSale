@@ -3,6 +3,7 @@ package com.otsi.retail.newSale.vo;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.otsi.retail.newSale.common.OrderStatus;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.common.PaymentType;
@@ -27,6 +28,8 @@ public class NewSaleVo {
 	private Long storeId;
 
 	private SaleNature natureOfSale;
+
+	private OrderStatus status;
 
 	private String invoiceNumber;
 
