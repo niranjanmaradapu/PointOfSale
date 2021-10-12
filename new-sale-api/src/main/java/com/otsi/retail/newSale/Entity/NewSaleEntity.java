@@ -85,7 +85,7 @@ public class NewSaleEntity {
 	@OneToMany(targetEntity = DeliverySlipEntity.class, mappedBy = "order", cascade = CascadeType.ALL)
 	private List<DeliverySlipEntity> dlSlip;
 	
-	@OneToMany( mappedBy  = "order", cascade = CascadeType.ALL)
+	@OneToMany( mappedBy  = "order")//, cascade = CascadeType.ALL)
 	private List<BarcodeEntity> lineItems;
 	
 

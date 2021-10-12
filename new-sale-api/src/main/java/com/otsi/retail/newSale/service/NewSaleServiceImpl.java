@@ -108,6 +108,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public String saveNewSaleRequest(NewSaleVo vo) {
 		log.debug("deugging saveNewSaleRequest" + vo);
+		NewSaleEntity entity = new NewSaleEntity();
 
 		if (vo.getCustomerDetails() != null) {
 //			CustomerDetailsEntity customerEntity = customerMapper.convertVoToEntity(vo.getCustomerDetails());
@@ -116,13 +117,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			// Need to get userId from Userdata table once user is saved.
 
+
 		} else {
 			throw new DataNotFoundException("data not found");
 		}
 
 		Random ran = new Random();
-		NewSaleEntity entity = new NewSaleEntity();
-
 		entity.setNatureOfSale(vo.getNatureOfSale());
 		entity.setDomainId(vo.getDomainId());
 		entity.setGrossValue(vo.getGrossAmount());
@@ -132,6 +132,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setDiscApprovedBy(vo.getDiscApprovedBy());
 		entity.setDiscType(vo.getDiscType());
 		entity.setCreationDate(LocalDate.now());
+		entity.setLastModified(LocalDate.now());
+		entity.setStatus(vo.getStatus());
 		entity.setOrderNumber(
 				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
 		entity.setNetValue(vo.getNetPayableAmount());
@@ -167,6 +169,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				dsList.stream().forEach(a -> {
 
 					a.setOrder(saveEntity);
+					a.setStatus(DSStatus.Completed);
 					a.setLastModified(LocalDateTime.now());
 
 					dsRepo.save(a);
