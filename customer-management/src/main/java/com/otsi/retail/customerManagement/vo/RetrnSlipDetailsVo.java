@@ -38,6 +38,8 @@ public class RetrnSlipDetailsVo {
 	 private LocalDate createdDate;
 	 
 	 private String mobileNumber;
+	 
+	 private String customerName;
 		
 	
 	

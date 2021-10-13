@@ -27,4 +27,5 @@ public class GenerateReturnSlipRequest {
 	private long amount;
 	private Boolean isUserTagged;
 	private String mobileNumber;
+	 private String customerName;
 }

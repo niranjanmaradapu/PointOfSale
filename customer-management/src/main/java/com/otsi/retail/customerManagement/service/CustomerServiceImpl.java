@@ -59,7 +59,6 @@ import com.otsi.retail.customerManagement.vo.NewSaleList;
 import com.otsi.retail.customerManagement.vo.RetrnSlipDetailsVo;
 import com.otsi.retail.customerManagement.vo.TaxVo;
 
-
 /**
  * @author vasavi
  */
@@ -71,8 +70,6 @@ public class CustomerServiceImpl implements CustomerService {
 	@Autowired
 	private BarcodeRepo barCodeRepo;
 
-	
-
 	@Autowired
 	private HSNVoService hsnService;
 
@@ -81,14 +78,13 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	private ReturnSlipMapper returnSlipMapper;
-	
+
 	@Autowired
 	Config config;
 
-
 	@Autowired
 	private RestTemplate restTemplate;
-	
+
 	@Override
 	public List<ListOfReturnSlipsVo> getListOfReturnSlips(ListOfReturnSlipsVo vo) {
 		log.debug("debugging getListOfReturnSlips():" + vo);
@@ -205,9 +201,8 @@ public class CustomerServiceImpl implements CustomerService {
 		}
 
 		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapReturnEntityToVo(retunSlipdetails);
-		
-		
-		if (rvo!=null) {
+
+		if (rvo != null) {
 			log.warn("we are checking if list of return slips is fetching...");
 			log.info("fetching list of return slips successfully:" + rvo);
 			return rvo;
@@ -218,7 +213,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	@CircuitBreaker(name="newSale", fallbackMethod = "getInvoiceFallback")
+	@CircuitBreaker(name = "newSale", fallbackMethod = "getInvoiceFallback")
 	public NewSaleList getInvoiceDetailsFromNewSale(InvoiceRequestVo vo) throws Exception {
 		log.debug("debugging getInvoiceDetailsFromNewSale():" + vo);
 		HttpHeaders headers = new HttpHeaders();
@@ -244,8 +239,8 @@ public class CustomerServiceImpl implements CustomerService {
 		}
 	}
 
-	public  NewSaleList  getInvoiceFallback(InvoiceRequestVo vo){
-		log.error("Invocie details service down" );
+	public NewSaleList getInvoiceFallback(InvoiceRequestVo vo) {
+		log.error("Invocie details service down");
 		throw new ServiceDownException("Invoice details are down");
 	}
 
@@ -259,23 +254,24 @@ public class CustomerServiceImpl implements CustomerService {
 
 		List<String> barcodes = tgItems.stream().map(x -> x.getBarCode()).collect(Collectors.toList());
 
-		
 		HttpHeaders headers = new HttpHeaders();
 
 		HttpEntity<List<String>> request1 = new HttpEntity<List<String>>(barcodes, headers);
 
-		ResponseEntity<GateWayResponse> newsaleResponse = restTemplate.exchange(config.getGetbarcodesUrl(), HttpMethod.POST, request1,
-				GateWayResponse.class);
+		ResponseEntity<GateWayResponse> newsaleResponse = restTemplate.exchange(config.getGetbarcodesUrl(),
+				HttpMethod.POST, request1, GateWayResponse.class);
 
 		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
-		ObjectMapper mapper=new ObjectMapper().registerModule(new JavaTimeModule())
-	            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+		ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
+				.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-		//GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
+		// GateWayResponse<?> gatewayResponse =
+		// mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
 
-		List<BarcodeVo> bvo = mapper.convertValue(newsaleResponse.getBody().getResult(), new TypeReference<List<BarcodeVo>>() {
-		});
-Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
+		List<BarcodeVo> bvo = mapper.convertValue(newsaleResponse.getBody().getResult(),
+				new TypeReference<List<BarcodeVo>>() {
+				});
+		Long totalAmount = bvo.stream().mapToLong(a -> a.getNetAmount()).sum();
 
 		ReturnSlip returnSlipDto = new ReturnSlip();
 		returnSlipDto.setCrNo(generateCrNumber());
@@ -288,6 +284,7 @@ Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 		returnSlipDto.setRtStatus(ReturnSlipStatus.PENDING.getId());
 		returnSlipDto.setAmount(totalAmount);
 		returnSlipDto.setMobileNumber(request.getMobileNumber());
+		returnSlipDto.setCustomerName(request.getCustomerName());
 		returnSlipRepo.save(returnSlipDto);
 
 		if (returnSlipDto.getTaggedItems() == null || request.getIsUserTagged() == null) {
@@ -307,10 +304,12 @@ Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 		HttpEntity entity = new HttpEntity(headers);
 		URI uri = null;
 		try {
-			uri = UriComponentsBuilder.fromUri(new URI(config.getTagCustomerToInvoice() + "/" + mobileNumber + "/" + invoiceNo))
-					.build().encode().toUri();
+			uri = UriComponentsBuilder
+					.fromUri(new URI(config.getTagCustomerToInvoice() + "/" + mobileNumber + "/" + invoiceNo)).build()
+					.encode().toUri();
 
-			ResponseEntity<GateWayResponse> res = restTemplate.exchange(uri, HttpMethod.GET, entity, GateWayResponse.class);
+			ResponseEntity<GateWayResponse> res = restTemplate.exchange(uri, HttpMethod.GET, entity,
+					GateWayResponse.class);
 			log.info("tagging user to invoice:" + res);
 		} catch (URISyntaxException e) {
 			throw new Exception(e.getMessage());
@@ -324,8 +323,8 @@ Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity entity = new HttpEntity(headers);
 		URI uri = null;
-		ObjectMapper mapper=new ObjectMapper().registerModule(new JavaTimeModule())
-	            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+		ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
+				.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		try {
 			uri = UriComponentsBuilder.fromUri(new URI(config.getCustomerDetails() + "/" + mobileNo)).build().encode()
 					.toUri();
@@ -334,8 +333,8 @@ Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 					GateWayResponse.class);
 			if (res.getStatusCode() == HttpStatus.OK) {
 				log.info("fetching customer details from invoice:" + res.getBody());
-				
-				CustomerDetailsVo vo=mapper.convertValue(res.getBody().getResult(), CustomerDetailsVo.class);
+
+				CustomerDetailsVo vo = mapper.convertValue(res.getBody().getResult(), CustomerDetailsVo.class);
 				return vo;
 			} else {
 				log.error("Mobile number not exists" + res.getBody());
@@ -423,7 +422,7 @@ Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 
 		RetrnSlipDetailsVo rrvo = new RetrnSlipDetailsVo();
 
-		//HsnDetailsVo HsnDetails = getHsnDetails(rts.getAmount());
+		// HsnDetailsVo HsnDetails = getHsnDetails(rts.getAmount());
 
 		rrvo.setBarcode(bvo);
 		rrvo.setHsnCode(list);
@@ -451,9 +450,18 @@ Long totalAmount=bvo.stream().mapToLong(a->a.getNetAmount()).sum();
 
 				if (a.getPriceFrom() <= netAmt && netAmt <= a.getPriceTo()) {
 
-					tvo.setSgst((float) ((a.getTaxVo().getSgst() * netAmt) / 100));
-					tvo.setIgst((float) ((a.getTaxVo().getIgst() * netAmt) / 100));
-					tvo.setCgst((float) ((a.getTaxVo().getCgst() * netAmt) / 100));
+					tvo.setTaxableAmount((float) netAmt / (1 + (a.getTaxVo().getCess() / 100)));
+
+					tvo.setGst(a.getTaxVo().getCess());
+					tvo.setSgst((float) ((netAmt - tvo.getTaxableAmount()) / 2));
+					tvo.setCgst((float) ((netAmt - tvo.getTaxableAmount()) / 2));
+					tvo.setTaxLabel(a.getTaxVo().getTaxLabel());
+					if (a.getTaxVo().getIgst() != 0.00) {
+						tvo.setIgst(tvo.getCgst() + tvo.getSgst());
+
+					} else {
+						tvo.setIgst((float) 0.00);
+					}
 					hvo.setHsnCode(x.getHsnCode());
 					hvo.setTaxVo(tvo);
 

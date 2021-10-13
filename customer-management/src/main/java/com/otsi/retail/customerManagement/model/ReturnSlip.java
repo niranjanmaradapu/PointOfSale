@@ -36,6 +36,7 @@ public class ReturnSlip {
 	private String settelmentInfo;
 	private Long amount;
 	private String mobileNumber;
+	private String customerName;
 	private Boolean isReviewed;
 	private int rtStatus;
 	private LocalDate createdDate;

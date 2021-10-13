@@ -32,6 +32,6 @@ public class BarcodeVo {
 
 	private Date createdDate;
 
-	private LocalDateTime lastModified;
+	private Date lastModified;
 
 }
