@@ -14,10 +14,12 @@ public class TaxVo {
 	
 	private long id;
 	private String taxLabel;
+	private float gst;
 	private float sgst;
 	private float cgst;
 	private float igst;
 	private float cess;
+	private float taxableAmount;
 
 }
 
