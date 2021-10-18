@@ -39,7 +39,7 @@ public interface NewSaleService {
 
 	DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws RecordNotFoundException;
 
-	ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo) throws RecordNotFoundException;
+	ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo) throws RecordNotFoundException, JsonMappingException, JsonProcessingException;
 
 	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws RecordNotFoundException;
 

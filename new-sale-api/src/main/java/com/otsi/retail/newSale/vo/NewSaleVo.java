@@ -60,10 +60,20 @@ public class NewSaleVo {
 	private Long offlineNumber;
 
 	private String approvedBy;
+	
+	private String biller;
 
 	private String reason;
 
 	private List<DeliverySlipVo> dlSlip;
 	
 	private List<BarcodeVo> lineItems;
+	
+	//private List<HsnDetailsVo> HsnDetailsVo;
+
+	
+
+	
+
+	
 }

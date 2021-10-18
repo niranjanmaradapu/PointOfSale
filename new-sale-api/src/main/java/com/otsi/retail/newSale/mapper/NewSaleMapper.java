@@ -15,8 +15,10 @@ import org.springframework.stereotype.Component;
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
+import com.otsi.retail.newSale.service.NewSaleServiceImpl;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
+import com.otsi.retail.newSale.vo.HsnDetailsVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
@@ -73,6 +75,8 @@ public class NewSaleMapper {
 
 		return null;
 	}
+	
+	//NewSaleServiceImpl newsaleImpl= new NewSaleServiceImpl();
 
 	public ListOfSaleBillsVo convertlistSalesEntityToVo(List<NewSaleEntity> saleDetails) {
 
@@ -82,46 +86,142 @@ public class NewSaleMapper {
 		saleDetails.stream().forEach(x -> {
 
 			NewSaleVo nsvo = new NewSaleVo();
+			List<BarcodeVo> listBarVo = new ArrayList<>();
+			
+			if (x.getLineItems() != null) {
+				x.getLineItems().stream().forEach(a -> {
 
-			// BeanUtils.copyProperties(x, nsvo);
+					BarcodeVo barvo = new BarcodeVo();
+
+					barvo.setCreatedDate(a.getCreatedDate());
+					barvo.setBarcode(a.getBarcode());
+					barvo.setItemDesc(a.getItemDesc());
+					barvo.setMrp(a.getMrp());
+					barvo.setNetAmount(a.getNetAmount());
+					barvo.setPromoDisc(a.getPromoDisc());
+					barvo.setQty(a.getQty());
+					barvo.setSalesMan(a.getSalesMan());
+					listBarVo.add(barvo);
+					nsvo.setLineItems(listBarVo);
+				});
+			}
 
 			nsvo.setInvoiceNumber(x.getOrderNumber());
-			//nsvo.setBiller(x.getBiller());
+			nsvo.setBiller(x.getCreatedBy());
 			nsvo.setCreatedDate(x.getCreationDate());
 			nsvo.setTotalManualDisc(x.getManualDisc());
 			nsvo.setApprovedBy(x.getCreatedBy());
-			//nsvo.setReason(x.getReason());
+			nsvo.setReason(x.getDiscType());
 			nsvo.setOfflineNumber(x.getOfflineNumber());
 
 			sVoList.add(nsvo);
 
+			lsvo.setNewSaleVo(sVoList);
+
 		});
+
 		lsvo.setAmount(saleDetails.stream().mapToLong(i -> i.getNetValue()).sum());
 
-		lsvo.setNewSaleVo(sVoList);
 		return lsvo;
+
 	}
+//});
+
+	/*
+	 * barEnt.stream().forEach(x -> {
+	 * 
+	 * BarcodeVo barvo = new BarcodeVo();
+	 * 
+	 * BeanUtils.copyProperties(x, barvo);
+	 * 
+	 * listBarVo.add(barvo);
+	 * 
+	 * });
+	 */
+
+	// lsvo.setBarcodeVo(listBarVo);
 
 	public ListOfDeliverySlipVo convertListDSToVo(List<DeliverySlipEntity> dsDetails) {
 
 		ListOfDeliverySlipVo vo = new ListOfDeliverySlipVo();
 
 		List<DeliverySlipVo> dsVoList = new ArrayList<>();
+		List<BarcodeEntity> barEnt = new ArrayList<>();
 
+		/*
+		 * dsDetails.stream().forEach(x -> {
+		 * 
+		 * x.getBarcodes().stream().forEach(y -> {
+		 * 
+		 * barEnt.add(y);
+		 * 
+		 * });
+		 * 
+		 * });
+		 */
 		dsDetails.stream().forEach(x -> {
 
+			List<BarcodeVo> listBarVo = new ArrayList<>();
+
+			x.getBarcodes().stream().forEach(b -> {
+
+				BarcodeVo barvo = new BarcodeVo();
+
+				BeanUtils.copyProperties(b, barvo);
+
+				listBarVo.add(barvo);
+			});
+
 			DeliverySlipVo dsvo = new DeliverySlipVo();
+			// x.getBarc.stream().forEach(y -> {
 
 			BeanUtils.copyProperties(x, dsvo);
+			dsvo.setBarcode(listBarVo);
 
 			dsVoList.add(dsvo);
 
+			// });
 		});
+
+		/*
+		 * barEnt.stream().forEach(x -> {
+		 * 
+		 * BarcodeVo barvo = new BarcodeVo();
+		 * 
+		 * BeanUtils.copyProperties(x, barvo);
+		 * 
+		 * listBarVo.add(barvo);
+		 * 
+		 * });
+		 */
 
 		vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i -> i.getPromoDisc()).sum());
 		vo.setTotalNetAmount(dsDetails.stream().mapToLong(i -> i.getNetAmount()).sum());
 		vo.setTotalGrossAmount(dsDetails.stream().mapToLong(i -> i.getMrp()).sum());
 		vo.setDeliverySlipVo(dsVoList);
+		// vo.setBarcodevo(listBarVo);
+		//////////////
+		dsDetails.stream().forEach(a -> {
+			// a.getBarcodes().stream().forEach(b -> {
+
+			vo.setBartoatalPromoDisc(a.getBarcodes().stream().mapToLong(i -> i.getPromoDisc()).sum());
+			vo.setBartotalNetAmount(a.getBarcodes().stream().mapToLong(i -> i.getNetAmount()).sum());
+			vo.setBartotalGrossAmount(a.getBarcodes().stream().mapToLong(i -> i.getMrp()).sum());
+			vo.setBarTotalQty(a.getBarcodes().stream().mapToInt(q -> q.getQty()).sum());
+
+		});
+		// });
+
+		////////////////////
+		/*
+		 * vo.setBartoatalPromoDisc(listBarVo.stream().mapToLong(i ->
+		 * i.getPromoDisc()).sum());
+		 * vo.setBartotalNetAmount(listBarVo.stream().mapToLong(i ->
+		 * i.getNetAmount()).sum());
+		 * vo.setBartotalGrossAmount(listBarVo.stream().mapToLong(i ->
+		 * i.getMrp()).sum()); vo.setBarTotalQty(listBarVo.stream().mapToInt(q ->
+		 * q.getQty()).sum());
+		 */
 
 		return vo;
 	}
@@ -132,7 +232,7 @@ public class NewSaleMapper {
 		vo.setInvoiceNumber(dto.getOrderNumber());
 		vo.setNetPayableAmount(dto.getGrossValue());
 		vo.setRecievedAmount(dto.getNetValue());
-		//vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
+		// vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
 		return vo;
 	}
 
@@ -154,8 +254,8 @@ public class NewSaleMapper {
 		NewSaleResponseVo vo = new NewSaleResponseVo();
 		List<PaymentAmountTypeVo> payVos = new ArrayList<>();
 		vo.setCustomerId(dto.getUserId());
-		//vo.setCustomerName(dto.getCustomerDetails().getName());
-		//vo.setMobileNumber(dto.getCustomerDetails().getMobileNumber());
+		// vo.setCustomerName(dto.getCustomerDetails().getName());
+		// vo.setMobileNumber(dto.getCustomerDetails().getMobileNumber());
 		vo.setNewsaleId(dto.getOrderId());
 //		dto.getPaymentType().forEach(p -> {
 //			PaymentAmountTypeVo payVo = new PaymentAmountTypeVo();
@@ -173,7 +273,7 @@ public class NewSaleMapper {
 	public NewSaleVo convertNewSaleDtoToVo(NewSaleEntity dto) {
 		NewSaleVo vo = new NewSaleVo();
 		vo.setApprovedBy(dto.getCreatedBy());
-		//vo.setBiller(dto.getBiller());
+		// vo.setBiller(dto.getBiller());
 		vo.setCreatedDate(dto.getCreationDate());
 //		if (dto.getDlSlip() != null) {
 //			vo.setDlSlip(deliverySlipMapper.convertDsEntityListToVoList(dto.getDlSlip()));
@@ -187,7 +287,7 @@ public class NewSaleMapper {
 //			vo.setPaymentAmountType(paymentAmountTypeMapper.EntityToVo(dto.getPaymentType()));
 //
 //		}
-		//vo.setRoundOff(dto.getRoundOff());
+		// vo.setRoundOff(dto.getRoundOff());
 		vo.setTaxAmount(dto.getTaxValue());
 		vo.setTotalManualDisc(dto.getManualDisc());
 		vo.setTotalPromoDisc(dto.getPromoDisc());
@@ -213,20 +313,18 @@ public class NewSaleMapper {
 		});
 		return barcodeList;
 	}
-	
+
 	public List<BarcodeVo> convertBarcodesEntityToVo(List<BarcodeEntity> barcodeDetails) {
 		return barcodeDetails.stream().map(dto -> barentityToVo(dto)).collect(Collectors.toList());
-	
-		
+
 	}
 
 	private BarcodeVo barentityToVo(BarcodeEntity dto) {
-		
+
 		BarcodeVo vo = new BarcodeVo();
 		BeanUtils.copyProperties(dto, vo);
-		
+
 		return vo;
 	}
-
 
 }

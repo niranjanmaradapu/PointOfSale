@@ -52,6 +52,7 @@ import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
+import com.otsi.retail.newSale.vo.TaxVo;
 
 /**
  * Service class contains all bussiness logics related to new sale , create
@@ -171,8 +172,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 					a.setOrder(saveEntity);
 					a.setStatus(DSStatus.Completed);
 					a.setLastModified(LocalDateTime.now());
-
 					dsRepo.save(a);
+					a.getBarcodes().stream().forEach(v -> {
+						v.setLastModified(LocalDateTime.now());
+						v.setOrder(saveEntity);
+						barcodeRepository.save(v);
+					});
 				});
 
 				// }
@@ -298,9 +303,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		} else if (enumName.equalsIgnoreCase(DSAttributes.METERS.getName())) {
 			barcodeDetails.stream().forEach(a -> {
-				entity.setQty(a.getQty());// change chesanu
-				Long mrp = (entity.getQty() * entity.getMrp());// change chesanu
-				a.setMrp(mrp);// change chesanu
+				entity.setQty(a.getQty());
+				Long mrp = (entity.getQty() * entity.getMrp());
+				a.setMrp(mrp);
 				a.setDeliverySlip(savedEntity);
 				a.setLastModified(LocalDateTime.now());
 
@@ -342,9 +347,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo) throws RecordNotFoundException {
+	public ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo) throws RecordNotFoundException, JsonMappingException, JsonProcessingException {
 		log.debug("deugging getListOfSaleBills:" + svo);
 		List<NewSaleEntity> saleDetails = new ArrayList<>();
+	//	ListOfSaleBillsVo lsvo =new ListOfSaleBillsVo();
 
 		/*
 		 * getting the data using between dates and bill status or custMobileNumber or
@@ -364,6 +370,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
 
 				Optional<CustomerDetailsEntity> customer = customerRepo.findByMobileNumber(svo.getCustMobileNumber());
+				///////////////
+				
+				
+				
+				///////////////////
 //				if (customer.isPresent()) {
 //					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
 //							.findByNewsaleId(customer.get().getNewsale().get(0).getOrderId());
@@ -386,11 +397,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 				BarcodeEntity bar = barcodeRepository.findByBarcode(svo.getBarcode());
 				if (bar != null) {
 
-//					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
-//							.findByNewsaleId(bar.getDeliverySlip().getNewsale().getOrderId());
-//					if (newSaleOpt.isPresent()) {
-//						saleDetails.add(newSaleOpt.get());
-//					}
+				Optional<NewSaleEntity> newSaleOpt = newSaleRepository
+							.findByOrderId(bar.getDeliverySlip().getOrder().getOrderId());
+				if (newSaleOpt.isPresent()) {
+						saleDetails.add(newSaleOpt.get());
+				}
 
 				} else {
 					log.error("No record found with given barcode");
@@ -419,13 +430,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() != null) {
 				DeliverySlipEntity ds = dsRepo.findByDsNumber(svo.getDsNumber());
 
-//				if (ds != null) {
-//					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
-//							.findByNewsaleId(ds.getNewsale().getOrderId());
-//					if (newSaleOpt.isPresent()) {
-//						saleDetails.add(newSaleOpt.get());
-//					}
-//				}
+				if (ds != null) {
+				Optional<NewSaleEntity> newSaleOpt = newSaleRepository
+						.findByOrderId(ds.getOrder().getOrderId());
+					if (newSaleOpt.isPresent()) {
+						saleDetails.add(newSaleOpt.get());
+					}
+				}
 			} else
 				saleDetails = newSaleRepository.findByCreationDateBetween(svo.getDateFrom(), svo.getDateTo());
 
@@ -436,7 +447,39 @@ public class NewSaleServiceImpl implements NewSaleService {
 			throw new RecordNotFoundException("No record found with given information");
 
 		} else {
-			ListOfSaleBillsVo lsvo = newSaleMapper.convertlistSalesEntityToVo(saleDetails);
+			
+			
+			ListOfSaleBillsVo	 lsvo = newSaleMapper.convertlistSalesEntityToVo(saleDetails);
+			////////////////////
+			
+			  //List<HsnDetailsVo> list = new ArrayList<>();
+				NewSaleVo nsvo = new NewSaleVo();
+				List<NewSaleVo> sVoList = new ArrayList<>();
+				
+				
+				
+				lsvo.getNewSaleVo().stream().forEach(x -> {
+					List<BarcodeVo> listBar= new ArrayList<>();
+					
+					if (x.getLineItems() != null) {
+						
+						
+						x.getLineItems().stream().forEach(l -> {
+							//BarcodeVo barVo = new BarcodeVo();
+
+							HsnDetailsVo hsnDetails = getHsnDetails(l.getNetAmount());
+
+							l.setHsnDetailsVo(hsnDetails);
+
+							listBar.add(l);
+
+						});
+					}
+					x.setLineItems(listBar);
+				});
+			 
+			//////////////////
+			
 			log.warn("we are fetching sale bills details");
 			log.info("after getting  sale bills details :" + lsvo);
 			return lsvo;
@@ -444,11 +487,73 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	}
 
+	public HsnDetailsVo getHsnDetails(double netAmt) {
+		log.debug("debugging getHsnDetails:" + netAmt);
+		List<HsnDetailsVo> vo = hsnService.getHsn();
+		if (vo == null) {
+			log.error("Record not found");
+			new RecordNotFoundException("Record not found");
+		}
+		TaxVo tvo = new TaxVo();
+		HsnDetailsVo hvo = new HsnDetailsVo();
+
+		vo.stream().forEach(x -> {
+
+			x.getSlabVos().stream().forEach(a -> {
+
+				if (a.getPriceFrom() <= netAmt && netAmt <= a.getPriceTo()) {
+					
+					//tvo.setGst((float) ((a.getTaxVo().getCess() * netAmt) / 100));
+					tvo.setTaxableAmount((float)netAmt/(1+(a.getTaxVo().getCess()/100)));
+					//tvo.setGst((tvo.getTaxableAmount()*a.getTaxVo().getGst())/100);
+					//tvo.setSgst((float) ((a.getTaxVo().getSgst() * netAmt) / 100));
+					tvo.setGst(a.getTaxVo().getCess());
+					tvo.setSgst((float) ((netAmt-tvo.getTaxableAmount())/2));
+					tvo.setCgst((float) ((netAmt-tvo.getTaxableAmount())/2));					//tvo.setIgst((float) ((a.getTaxVo().getIgst() * netAmt) / 100));
+					//tvo.setCgst((float) ((a.getTaxVo().getCgst() * netAmt) / 100));
+					if(a.getTaxVo().getIgst()!=0.00) {
+						tvo.setIgst(tvo.getCgst()+tvo.getSgst());
+						
+					}
+					else
+					{
+						tvo.setIgst((float) 0.00);
+					}
+					hvo.setHsnCode(x.getHsnCode());
+					hvo.setTaxVo(tvo);
+
+				}
+			});
+		});
+		log.warn("we are checking if hsn details is fetching...");
+		log.info("fetching hsn details successfuuly:" + hvo);
+		return hvo;
+
+	}
+
+
 	@Override
 	public ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo)
 			throws RecordNotFoundException {
 		log.debug("deugging getlistofDeliverySlips:" + listOfDeliverySlipVo);
 		List<DeliverySlipEntity> dsDetails = new ArrayList<DeliverySlipEntity>();
+		
+		if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
+				&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() != null
+				&& listOfDeliverySlipVo.getBarcode() != null) {
+
+			BarcodeEntity bar = barcodeRepository.findByBarcode(listOfDeliverySlipVo.getBarcode());
+
+			if (bar != null) {
+				dsDetails = dsRepo.findByCreatedDateBetweenAndDsIdAndDsNumberAndStatusOrderByCreatedDateAsc(
+						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
+						bar.getDeliverySlip().getDsId(),listOfDeliverySlipVo.getDsNumber(),listOfDeliverySlipVo.getStatus());
+
+			} else {
+				log.error("No record found with given barcode");
+				throw new RecordNotFoundException("No record found with given barcode");
+			}
+		}
 		/*
 		 * getting the record using barcode
 		 */
