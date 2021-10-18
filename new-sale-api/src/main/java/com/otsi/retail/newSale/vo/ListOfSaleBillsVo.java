@@ -32,6 +32,14 @@ public class ListOfSaleBillsVo {
 	
 	private List<NewSaleVo> newSaleVo;
 	
+	//private List<BarcodeVo> barcodeVo;
+	
+	//private List<HsnDetailsVo> HsnDetailsVo;
+
+
+
+	
+	
 	
  
 }

@@ -30,6 +30,15 @@ public class ListOfDeliverySlipVo {
 
 	private Long totalGrossAmount;
 	
+	private Long bartoatalPromoDisc;
+
+	private Long bartotalNetAmount;
+
+	private Long bartotalGrossAmount;
+	
+	private int barTotalQty;
+	
 	private List<DeliverySlipVo> deliverySlipVo;
 
+	//private List<BarcodeVo> barcodevo;
 }

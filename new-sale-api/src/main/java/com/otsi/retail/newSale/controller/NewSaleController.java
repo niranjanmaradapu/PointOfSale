@@ -141,7 +141,7 @@ public class NewSaleController {
 
 	// Method for getting list of sale bills
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
-	public GateWayResponse<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo) throws RecordNotFoundException {
+	public GateWayResponse<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo) throws RecordNotFoundException, JsonMappingException, JsonProcessingException {
 		log.info("Received Request to getListOfSaleBills :" + svo.toString());
 
 		ListOfSaleBillsVo listOfSaleBills = newSaleService.getListOfSaleBills(svo);
