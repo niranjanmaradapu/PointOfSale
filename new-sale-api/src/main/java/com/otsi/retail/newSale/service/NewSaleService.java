@@ -25,6 +25,7 @@ import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.SaleReportVo;
 
 @Component
 public interface NewSaleService {
@@ -67,6 +68,8 @@ public interface NewSaleService {
 	List<BarcodeVo> getAllBarcodes() throws DataNotFoundException;
 
 	List<BarcodeVo> getBarcodes(List<String> barCode) throws RecordNotFoundException;
+
+	SaleReportVo getSaleReport(SaleReportVo srvo) throws RecordNotFoundException;
 
 
 

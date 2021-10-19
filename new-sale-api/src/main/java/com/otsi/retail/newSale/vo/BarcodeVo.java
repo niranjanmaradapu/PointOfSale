@@ -27,6 +27,7 @@ public class BarcodeVo {
 
 	private Long salesMan;
 
+
 	private LocalDateTime createdDate;
 
 	private LocalDateTime lastModified;

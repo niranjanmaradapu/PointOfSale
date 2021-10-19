@@ -24,6 +24,7 @@ import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
+import com.otsi.retail.newSale.vo.SaleReportVo;
 
 @Component
 public class NewSaleMapper {
@@ -76,7 +77,6 @@ public class NewSaleMapper {
 		return null;
 	}
 	
-	//NewSaleServiceImpl newsaleImpl= new NewSaleServiceImpl();
 
 	public ListOfSaleBillsVo convertlistSalesEntityToVo(List<NewSaleEntity> saleDetails) {
 
@@ -101,6 +101,7 @@ public class NewSaleMapper {
 					barvo.setPromoDisc(a.getPromoDisc());
 					barvo.setQty(a.getQty());
 					barvo.setSalesMan(a.getSalesMan());
+					
 					listBarVo.add(barvo);
 					nsvo.setLineItems(listBarVo);
 				});
@@ -113,6 +114,7 @@ public class NewSaleMapper {
 			nsvo.setApprovedBy(x.getCreatedBy());
 			nsvo.setReason(x.getDiscType());
 			nsvo.setOfflineNumber(x.getOfflineNumber());
+			nsvo.setNetPayableAmount(x.getNetValue());
 
 			sVoList.add(nsvo);
 
@@ -120,26 +122,30 @@ public class NewSaleMapper {
 
 		});
 
-		lsvo.setAmount(saleDetails.stream().mapToLong(i -> i.getNetValue()).sum());
+		lsvo.setTotalAmount(saleDetails.stream().mapToLong(i -> i.getNetValue()).sum());
+		lsvo.setTotalDiscount(saleDetails.stream().mapToLong(d-> d.getManualDisc()).sum());
 
 		return lsvo;
 
 	}
-//});
 
-	/*
-	 * barEnt.stream().forEach(x -> {
-	 * 
-	 * BarcodeVo barvo = new BarcodeVo();
-	 * 
-	 * BeanUtils.copyProperties(x, barvo);
-	 * 
-	 * listBarVo.add(barvo);
-	 * 
-	 * });
-	 */
+	
+	 
+		public SaleReportVo convertlistSaleReportEntityToVo(List<NewSaleEntity> saleDetails) {
 
-	// lsvo.setBarcodeVo(listBarVo);
+				SaleReportVo srvo = new SaleReportVo();
+				
+				srvo.setBillValue(saleDetails.stream().mapToLong(b-> b.getNetValue()).sum());
+				srvo.setTotalMrp(saleDetails.stream().mapToLong(m->m.getGrossValue()).sum());
+				srvo.setTotalDiscount(saleDetails.stream().mapToLong(d-> d.getManualDisc()).sum());
+				return srvo;
+				
+				
+			}
+		 
+
+	
+	
 
 	public ListOfDeliverySlipVo convertListDSToVo(List<DeliverySlipEntity> dsDetails) {
 
@@ -148,17 +154,7 @@ public class NewSaleMapper {
 		List<DeliverySlipVo> dsVoList = new ArrayList<>();
 		List<BarcodeEntity> barEnt = new ArrayList<>();
 
-		/*
-		 * dsDetails.stream().forEach(x -> {
-		 * 
-		 * x.getBarcodes().stream().forEach(y -> {
-		 * 
-		 * barEnt.add(y);
-		 * 
-		 * });
-		 * 
-		 * });
-		 */
+		
 		dsDetails.stream().forEach(x -> {
 
 			List<BarcodeVo> listBarVo = new ArrayList<>();
@@ -173,36 +169,25 @@ public class NewSaleMapper {
 			});
 
 			DeliverySlipVo dsvo = new DeliverySlipVo();
-			// x.getBarc.stream().forEach(y -> {
+			
 
 			BeanUtils.copyProperties(x, dsvo);
 			dsvo.setBarcode(listBarVo);
 
 			dsVoList.add(dsvo);
 
-			// });
+		
 		});
 
-		/*
-		 * barEnt.stream().forEach(x -> {
-		 * 
-		 * BarcodeVo barvo = new BarcodeVo();
-		 * 
-		 * BeanUtils.copyProperties(x, barvo);
-		 * 
-		 * listBarVo.add(barvo);
-		 * 
-		 * });
-		 */
+		
 
 		vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i -> i.getPromoDisc()).sum());
 		vo.setTotalNetAmount(dsDetails.stream().mapToLong(i -> i.getNetAmount()).sum());
 		vo.setTotalGrossAmount(dsDetails.stream().mapToLong(i -> i.getMrp()).sum());
 		vo.setDeliverySlipVo(dsVoList);
-		// vo.setBarcodevo(listBarVo);
-		//////////////
+		
 		dsDetails.stream().forEach(a -> {
-			// a.getBarcodes().stream().forEach(b -> {
+			
 
 			vo.setBartoatalPromoDisc(a.getBarcodes().stream().mapToLong(i -> i.getPromoDisc()).sum());
 			vo.setBartotalNetAmount(a.getBarcodes().stream().mapToLong(i -> i.getNetAmount()).sum());
@@ -210,18 +195,7 @@ public class NewSaleMapper {
 			vo.setBarTotalQty(a.getBarcodes().stream().mapToInt(q -> q.getQty()).sum());
 
 		});
-		// });
-
-		////////////////////
-		/*
-		 * vo.setBartoatalPromoDisc(listBarVo.stream().mapToLong(i ->
-		 * i.getPromoDisc()).sum());
-		 * vo.setBartotalNetAmount(listBarVo.stream().mapToLong(i ->
-		 * i.getNetAmount()).sum());
-		 * vo.setBartotalGrossAmount(listBarVo.stream().mapToLong(i ->
-		 * i.getMrp()).sum()); vo.setBarTotalQty(listBarVo.stream().mapToInt(q ->
-		 * q.getQty()).sum());
-		 */
+		
 
 		return vo;
 	}
