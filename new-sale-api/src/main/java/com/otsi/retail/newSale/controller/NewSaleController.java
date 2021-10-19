@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
@@ -40,6 +39,7 @@ import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
 
 /**
@@ -312,6 +312,16 @@ public class NewSaleController {
 		return new GateWayResponse<>(HttpStatus.OK, listOfBarcodes, "Successfully fetched list of Barcodes");
 
 	}
+	
+	// Method for getting list of sale report
+			@PostMapping(CommonRequestMappigs.GET_SALE_REPORT)
+			public GateWayResponse<?> getSaleReport(@RequestBody SaleReportVo srvo) throws RecordNotFoundException {
+			
+
+				SaleReportVo saleReport = newSaleService.getSaleReport(srvo);
+				return new GateWayResponse<>(HttpStatus.OK, saleReport, "");
+
+			}
 
 	@PostMapping(CommonRequestMappigs.GET_BARCODES)
 	// @Consumes(MediaType.APPLICATION_FORM_URLENCODED)

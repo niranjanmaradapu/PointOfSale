@@ -64,6 +64,17 @@ public class NewSaleVo {
 	private String biller;
 
 	private String reason;
+	
+	private float TotaltaxableAmount;
+	private Long totalMrp; 
+
+	private int totalqQty;
+		
+		private float totalCgst;
+		private float totalSgst;
+		private float totalIgst;
+		
+		private Long totalNetAmount;
 
 	private List<DeliverySlipVo> dlSlip;
 	

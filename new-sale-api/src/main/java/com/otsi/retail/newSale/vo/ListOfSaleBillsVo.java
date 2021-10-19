@@ -28,7 +28,25 @@ public class ListOfSaleBillsVo {
 	private Long invoiceNumber;
 
 	private String billNumber;
-	private Long amount;
+	private Long totalAmount;
+	
+	
+	
+	private Long totalDiscount;
+	
+	
+ 
+
+	
+	
+	
+	
+	
+ 
+ 
+ 
+	
+	
 	
 	private List<NewSaleVo> newSaleVo;
 	

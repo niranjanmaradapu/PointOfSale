@@ -24,5 +24,11 @@ public class Config {
 
 	@Value("${getNewSaleWithHsn_url}")
 	private String HsnUrl;
+	
+	@Value("${getreturnslip_url}")
+    private String getListOfReturnSlips;
+	
+	@Value("${getCustomerDetailsFromURM_url}")
+	private String getCustomerDetails;
 
 }

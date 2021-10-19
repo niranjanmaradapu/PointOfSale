@@ -12,7 +12,7 @@ public class CommonRequestMappigs {
 	
 	public static final String GET_BARCODES = "getbarcodes";
 
-
+	public static final String GET_SALE_REPORT = "getsalereport";
 	public static final String CREATE_DS = "createdeliveryslip";
 
 	public static final String GET_DS = "getdeliveryslip";
