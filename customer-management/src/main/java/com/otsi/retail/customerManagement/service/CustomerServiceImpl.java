@@ -410,6 +410,7 @@ public class CustomerServiceImpl implements CustomerService {
 			try {
 				HsnDetailsVo hsnDetails = getHsnDetails(x.getNetAmount());
 				list.add(hsnDetails);
+				
 
 			} catch (JsonMappingException e) {
 				// TODO Auto-generated catch block
@@ -426,9 +427,16 @@ public class CustomerServiceImpl implements CustomerService {
 
 		rrvo.setBarcode(bvo);
 		rrvo.setHsnCode(list);
+		rrvo.setTotalQty(bvo.stream().mapToInt(q-> q.getQty()).sum());
+		rrvo.setTaxableAmount(list.stream().mapToDouble(t-> t.getTaxVo().getTaxableAmount()).sum());
+		rrvo.setTotalCgst(list.stream().mapToDouble(c->c.getTaxVo().getCgst()).sum());
+		rrvo.setTotalSgst(list.stream().mapToDouble(s-> s.getTaxVo().getSgst()).sum());
+		rrvo.setTotalIgst(list.stream().mapToDouble(i-> i.getTaxVo().getIgst()).sum());
+		rrvo.setTotalNetAmount(bvo.stream().mapToLong(n-> n.getNetAmount()).sum());
 		rrvo.setCreatedDate(rts.getCreatedDate());
 		rrvo.setRtNumber(rts.getRtNo());
 		rrvo.setMobileNumber(rts.getMobileNumber());
+		rrvo.setCustomerName(rts.getCustomerName());
 		log.info("return slip details:" + rrvo);
 		return rrvo;
 	}

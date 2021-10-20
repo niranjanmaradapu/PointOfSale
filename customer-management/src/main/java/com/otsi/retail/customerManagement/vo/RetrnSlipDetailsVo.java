@@ -40,6 +40,20 @@ public class RetrnSlipDetailsVo {
 	 private String mobileNumber;
 	 
 	 private String customerName;
+	 
+	 private int totalQty;
+	 
+	 private double taxableAmount;
+	 
+	 private double totalSgst;
+	 
+	 private double totalCgst;
+	 
+	 private double totalIgst;
+	 
+	 private double totalNetAmount;
+	 
+	 
 		
 	
 	
