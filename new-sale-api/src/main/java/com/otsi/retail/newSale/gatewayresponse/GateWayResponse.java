@@ -19,11 +19,12 @@ public class GateWayResponse<T> {
 	private int status;
 	private String message;
 	private T result;
+	private Long lineItemId;
 	/*
 	 * private List<String> errors; private List<FieldError> fieldErrors;
 	 */
 	// public final int HttpStatus_OK = 200;
-	
+
 	public GateWayResponse() {
 		super();
 	}
@@ -102,16 +103,23 @@ public class GateWayResponse<T> {
 		this.message = message;
 		this.isSuccess = "true";
 	}
+
 	public GateWayResponse(final HttpStatus status, String message) {
 		super();
 		this.status = 200;
-		//this.result = result;
+		// this.result = result;
 		// this.httpStatus = httpStatus;
 		this.message = message;
 		this.isSuccess = "true";
 	}
 
-
+	public GateWayResponse(Long lineItemId, String message) {
+		super();
+		this.isSuccess = "true";
+		this.status = 200;
+		this.message = message;
+		this.lineItemId=lineItemId;
+	}
 	/**
 	 * @param isSuccess
 	 * @param status
@@ -160,6 +168,12 @@ public class GateWayResponse<T> {
 		this.result = result;
 	}
 
+	public Long getLineItemId() {
+		return lineItemId;
+	}
+
+	public void setLineItemId(Long lineItemId) {
+		this.lineItemId = lineItemId;
+	}
+
 }
-
-

@@ -21,6 +21,7 @@ import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
+import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
@@ -70,6 +71,8 @@ public interface NewSaleService {
 	List<BarcodeVo> getBarcodes(List<String> barCode) throws RecordNotFoundException;
 
 	SaleReportVo getSaleReport(SaleReportVo srvo) throws RecordNotFoundException;
+
+	Long saveLineItems(LineItemVo lineItem);
 
 
 

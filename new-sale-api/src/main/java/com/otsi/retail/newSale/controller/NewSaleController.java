@@ -34,6 +34,7 @@ import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
+import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
@@ -116,6 +117,15 @@ public class NewSaleController {
 
 		return new GateWayResponse<>(HttpStatus.OK, barCodeDetails, "");
 
+	}
+	
+	// Method for creating Line Items
+	@PostMapping("/savelineitem")
+	public GateWayResponse<?> saveLineItems(@RequestBody LineItemVo lineItem) throws RecordNotFoundException {
+		log.info("Save Line items with values " + lineItem);
+		Long result = newSaleService.saveLineItems(lineItem);
+
+		return new GateWayResponse<>(result, "Successfully saved Line item..");
 	}
 
 	// Method for creating Delivery slip using List of Barcodes

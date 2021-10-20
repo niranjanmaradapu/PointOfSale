@@ -2,7 +2,7 @@ package com.otsi.retail.newSale.common;
 
 public enum DomainData {
 
-	RE(1, "Retail"), TE(2, "Textile"), DS(3, "Departmental Store");
+	TE(1, "Textile"), RE(2, "Retail"), DS(3, "Departmental Store");
 
 	private int id;
 	private String eName;
