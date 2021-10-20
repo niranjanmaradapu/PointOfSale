@@ -22,11 +22,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
+import com.otsi.retail.newSale.Entity.LineItemsEntity;
+import com.otsi.retail.newSale.Entity.LineItemsReEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
@@ -49,6 +50,8 @@ import com.otsi.retail.newSale.repository.BarcodeRepository;
 import com.otsi.retail.newSale.repository.CustomerDetailsRepo;
 import com.otsi.retail.newSale.repository.DeliverySlipRepository;
 import com.otsi.retail.newSale.repository.GiftVoucherRepo;
+import com.otsi.retail.newSale.repository.LineItemReRepo;
+import com.otsi.retail.newSale.repository.LineItemRepo;
 import com.otsi.retail.newSale.repository.NewSaleRepository;
 import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.vo.BarcodeVo;
@@ -57,6 +60,7 @@ import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.HsnDetailsVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
+import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
@@ -68,7 +72,6 @@ import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.SalesSummeryVo;
 import com.otsi.retail.newSale.vo.TaggedItems;
 import com.otsi.retail.newSale.vo.TaxVo;
-import com.otsi.retail.newSale.vo.UserDetailsVo;
 
 /**
  * Service class contains all bussiness logics related to new sale , create
@@ -123,6 +126,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private Config config;
+
+	@Autowired
+	private LineItemRepo lineItemRepo;
+
+	@Autowired
+	private LineItemReRepo lineItemReRepo;
 
 	// Method for saving order
 	@Override
@@ -387,11 +396,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() != null && svo.getBillNumber() == null
 					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
-				
-			
 
 				Optional<CustomerDetailsEntity> customer = customerRepo.findByMobileNumber(svo.getCustMobileNumber());
-				
+
 //				if (customer.isPresent()) {
 //					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
 //							.findByNewsaleId(customer.get().getNewsale().get(0).getOrderId());
@@ -1065,8 +1072,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 					});
 			Long rAmount = vo.stream().mapToLong(a -> a.getAmount()).sum();
 			ReturnSummeryVo retunVo = new ReturnSummeryVo();
-			
-			List<BarcodeVo> barVoList= new ArrayList<BarcodeVo>();
+
+			List<BarcodeVo> barVoList = new ArrayList<BarcodeVo>();
 			vo.stream().forEach(b -> {
 
 				List<TaggedItems> tgItems = b.getBarcodes();
@@ -1075,27 +1082,24 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				try {
 					List<BarcodeVo> barVo = getBarcodes(barcodes);
-					barVo.stream().forEach(r->{
-						
+					barVo.stream().forEach(r -> {
+
 						barVoList.add(r);
-						
+
 					});
-					
+
 				} catch (RecordNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			});
-			
-		
-			
 
 			System.out.println(vo);
 
 			HsnDetailsVo hsnDetails1 = getHsnDetails(rAmount);
-			
-			retunVo.setTotalDiscount(barVoList.stream().mapToLong(d->d.getPromoDisc()).sum());
-			retunVo.setTotalMrp(barVoList.stream().mapToLong(a->a.getMrp()).sum());
+
+			retunVo.setTotalDiscount(barVoList.stream().mapToLong(d -> d.getPromoDisc()).sum());
+			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getMrp()).sum());
 			retunVo.setTaxDescription(hsnDetails1.getTaxVo().getTaxLabel());
 			retunVo.setBillValue(rAmount);
 			retunVo.setTotalTaxableAmount(hsnDetails1.getTaxVo().getTaxableAmount());
@@ -1110,14 +1114,68 @@ public class NewSaleServiceImpl implements NewSaleService {
 			slr.setTotalCgst(slr.getSalesSummery().getTotalCgst() - slr.getRetunSummery().getTotalCgst());
 			slr.setTotalSgst(slr.getSalesSummery().getTotalSgst() - slr.getRetunSummery().getTotalSgst());
 			slr.setTotalIgst(slr.getSalesSummery().getTotalIgst() - slr.getRetunSummery().getTotalIgst());
-			slr.setTotalTaxableAmount(slr.getSalesSummery().getTotalTaxableAmount() - slr.getRetunSummery().getTotalTaxableAmount());
-			slr.setTotalDiscount(slr.getSalesSummery().getTotalDiscount()-slr.getRetunSummery().getTotalDiscount());
-			 slr.setTotalMrp(slr.getSalesSummery().getTotalMrp()-slr.getRetunSummery().getTotalMrp());
-			slr.setTotalTaxAmount(slr.getSalesSummery().getTotalTaxAmount() - slr.getRetunSummery().getTotalTaxAmount());
+			slr.setTotalTaxableAmount(
+					slr.getSalesSummery().getTotalTaxableAmount() - slr.getRetunSummery().getTotalTaxableAmount());
+			slr.setTotalDiscount(slr.getSalesSummery().getTotalDiscount() - slr.getRetunSummery().getTotalDiscount());
+			slr.setTotalMrp(slr.getSalesSummery().getTotalMrp() - slr.getRetunSummery().getTotalMrp());
+			slr.setTotalTaxAmount(
+					slr.getSalesSummery().getTotalTaxAmount() - slr.getRetunSummery().getTotalTaxAmount());
 
 			return slr;
 		}
 
+	}
+
+	// Method for saving Line items
+	@Override
+	public Long saveLineItems(LineItemVo lineItem) throws InvalidInputException {
+		log.debug("Debugging saveLineItems() " + lineItem);
+		try {
+			if (lineItem.getDomainId() == DomainData.TE.getId()) {
+
+				LineItemsEntity lineEntity = new LineItemsEntity();
+
+				lineEntity.setProductId(lineItem.getProductId());
+				lineEntity.setQuantity(lineItem.getQuantity());
+				lineEntity.setDiscount(lineItem.getDiscount());
+				lineEntity.setNetValue(lineItem.getNetValue());
+				lineEntity.setItemPrice(lineItem.getItemPrice());
+
+				// GrossValue is multiple of net value of product and quantity
+				lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
+
+				lineEntity.setCreationDate(LocalDateTime.now());
+				lineEntity.setLastModified(LocalDateTime.now());
+				LineItemsEntity saved = lineItemRepo.save(lineEntity);
+
+				log.info("successfully saved line item with id " + saved.getLineItemId());
+				return saved.getLineItemId();
+
+			} else {
+
+				LineItemsReEntity lineReEntity = new LineItemsReEntity();
+
+				lineReEntity.setProductId(lineItem.getProductId());
+				lineReEntity.setQuantity(lineItem.getQuantity());
+				lineReEntity.setDiscount(lineItem.getDiscount());
+				lineReEntity.setNetValue(lineItem.getNetValue());
+				lineReEntity.setItemPrice(lineItem.getItemPrice());
+
+				// GrossValue is multiple of net value of product and quantity
+				lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
+
+				lineReEntity.setCreationDate(LocalDateTime.now());
+				lineReEntity.setLastModified(LocalDateTime.now());
+				LineItemsReEntity saved = lineItemReRepo.save(lineReEntity);
+
+				log.info("successfully saved line item with id " + saved.getLineItemReId());
+				return saved.getLineItemReId();
+
+			}
+		} catch (Exception e) {
+			log.error("Getting exception while saving Line item..");
+			throw new InvalidInputException("Getting exception while saving Line item..");
+		}
 	}
 
 }
