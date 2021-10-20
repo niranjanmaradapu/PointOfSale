@@ -6,6 +6,8 @@ import java.util.Date;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.stereotype.Component;
 
+
+
 import lombok.Data;
 
 @Component
@@ -33,5 +35,8 @@ public class BarcodeVo {
 	private Date createdDate;
 
 	private Date lastModified;
+	
+	private HsnDetailsVo HsnDetailsVo;
+
 
 }
