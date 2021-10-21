@@ -56,6 +56,9 @@ public class DeliverySlipEntity  {
 
 	@OneToMany( mappedBy  = "deliverySlip", cascade = CascadeType.ALL)
 	private List<BarcodeEntity> barcodes;
+	
+	@OneToMany( mappedBy  = "dsEntity", cascade = CascadeType.ALL)
+	private List<LineItemsEntity> lineItems;
 
 	@ManyToOne
 	@JoinColumn(name = "order_id")
