@@ -140,11 +140,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 		NewSaleEntity entity = new NewSaleEntity();
 
 		if (vo.getCustomerDetails() != null) {
+			
+			if (vo.getCustomerDetails().getCustomerId() != null) {
+				entity.setUserId(vo.getCustomerDetails().getCustomerId());
+			} else {
+				// Need to get userId from Userdata table once user is saved.
+			}
 //			CustomerDetailsEntity customerEntity = customerMapper.convertVoToEntity(vo.getCustomerDetails());
 //			CustomerDetailsEntity savedDetails = customerRepo.save(customerEntity);
 //			entity.setCustomerDetails(savedDetails);
-
-			// Need to get userId from Userdata table once user is saved.
 
 		} else {
 			throw new DataNotFoundException("data not found");
@@ -166,6 +170,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
 		entity.setNetValue(vo.getNetPayableAmount());
 		entity.setStoreId(vo.getStoreId());
+		entity.setOfflineNumber(vo.getOfflineNumber());
 
 		// List<PaymentAmountTypeVo> paymentAmountTypeVos = vo.getPaymentAmountType();
 
@@ -200,12 +205,29 @@ public class NewSaleServiceImpl implements NewSaleService {
 					a.setStatus(DSStatus.Completed);
 					a.setLastModified(LocalDateTime.now());
 					dsRepo.save(a);
-					a.getBarcodes().stream().forEach(v -> {
-						v.setLastModified(LocalDateTime.now());
-						v.setOrder(saveEntity);
-						barcodeRepository.save(v);
+
+					a.getLineItems().stream().forEach(x -> {
+
+						x.setLastModified(LocalDateTime.now());
+						x.setDsEntity(a);
+						lineItemRepo.save(x);
+
 					});
+
 				});
+
+//				entity.getPaymentType().forEach(p -> {
+//				p.setOrderId(saveEntity.getNewsaleId());
+//				p.setPaymentAmount(p.getPaymentAmount());
+//				//p.setPaymentType(p.get);
+//				paymentAmountTypeRepository.save(p);
+//			});
+
+//					a.getBarcodes().stream().forEach(v -> {
+//						v.setLastModified(LocalDateTime.now());
+//						v.setOrder(saveEntity);
+//						barcodeRepository.save(v);
+//					});
 
 				// }
 
@@ -231,20 +253,38 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 		if (vo.getDomainId() == DomainData.RE.getId() || vo.getDomainId() == DomainData.DS.getId()) {
 
-			List<BarcodeVo> lineItems = vo.getLineItems();
+//			List<BarcodeVo> lineItems = vo.getLineItems();
+//
+//			List<String> lineItemsList = lineItems.stream().map(x -> x.getBarcode()).collect(Collectors.toList());
+//
+//			List<BarcodeEntity> lineItemsRecords = barcodeRepository.findByBarcodeIn(lineItemsList);
+//
+//			if (lineItemsList.size() == lineItemsRecords.size()) {
+//
+//				NewSaleEntity saveEntity = newSaleRepository.save(entity);
+//
+//				lineItemsRecords.stream().forEach(x -> {
+//					x.setOrder(saveEntity);
+//					x.setCreatedDate(LocalDateTime.now());
+//					barcodeRepository.save(x);
+//				});
 
-			List<String> lineItemsList = lineItems.stream().map(x -> x.getBarcode()).collect(Collectors.toList());
+			List<LineItemVo> lineItems = vo.getLineItemsReVo();
 
-			List<BarcodeEntity> lineItemsRecords = barcodeRepository.findByBarcodeIn(lineItemsList);
+			List<Long> lineItemIds = lineItems.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
 
-			if (lineItemsList.size() == lineItemsRecords.size()) {
+			List<LineItemsReEntity> lineItemsList = lineItemReRepo.findByLineItemReIdIn(lineItemIds);
+
+			if (lineItems.size() == lineItemsList.size()) {
 
 				NewSaleEntity saveEntity = newSaleRepository.save(entity);
 
-				lineItemsRecords.stream().forEach(x -> {
-					x.setOrder(saveEntity);
-					x.setCreatedDate(LocalDateTime.now());
-					barcodeRepository.save(x);
+				lineItemsList.stream().forEach(x -> {
+
+					x.setLastModified(LocalDateTime.now());
+					x.setOrderId(saveEntity);
+					lineItemReRepo.save(x);
+
 				});
 
 			} else {
@@ -257,7 +297,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 		log.warn("we are testing bill generated with number");
 		log.info("after generated bill with number:" + entity.getOrderNumber());
 		return "Bill generated with number :" + entity.getOrderNumber();
-
 	}
 
 	@Override

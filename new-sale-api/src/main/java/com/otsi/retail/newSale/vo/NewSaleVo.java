@@ -22,9 +22,9 @@ public class NewSaleVo {
 	private Long newsaleId;
 
 	private CustomerVo customerDetails;
-	
+
 	private Long domainId;
-	
+
 	private Long storeId;
 
 	private SaleNature natureOfSale;
@@ -33,7 +33,7 @@ public class NewSaleVo {
 
 	private String invoiceNumber;
 
-	//private String biller;
+	// private String biller;
 
 	private List<PaymentAmountTypeVo> paymentAmountType;
 
@@ -60,31 +60,31 @@ public class NewSaleVo {
 	private Long offlineNumber;
 
 	private String approvedBy;
-	
+
 	private String biller;
 
 	private String reason;
-	
+
 	private float TotaltaxableAmount;
-	private Long totalMrp; 
+	
+	private Long totalMrp;
 
 	private int totalqQty;
-		
-		private float totalCgst;
-		private float totalSgst;
-		private float totalIgst;
-		
-		private Long totalNetAmount;
+	
+	private float totalCgst;
+	
+	private float totalSgst;
+	
+	private float totalIgst;
+
+	private Long totalNetAmount;
 
 	private List<DeliverySlipVo> dlSlip;
-	
+
 	private List<BarcodeVo> lineItems;
-	
-	//private List<HsnDetailsVo> HsnDetailsVo;
 
-	
+	private List<LineItemVo> lineItemsReVo;
 
-	
+	// private List<HsnDetailsVo> HsnDetailsVo;
 
-	
 }
