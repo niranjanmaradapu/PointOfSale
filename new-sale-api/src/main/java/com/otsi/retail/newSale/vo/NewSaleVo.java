@@ -26,6 +26,8 @@ public class NewSaleVo {
 	private Long domainId;
 
 	private Long storeId;
+	
+	private Long UserId;
 
 	private SaleNature natureOfSale;
 
@@ -84,6 +86,10 @@ public class NewSaleVo {
 	private List<BarcodeVo> lineItems;
 
 	private List<LineItemVo> lineItemsReVo;
+	
+	private String customerName;
+	
+	private String mobileNumber;
 
 	// private List<HsnDetailsVo> HsnDetailsVo;
 

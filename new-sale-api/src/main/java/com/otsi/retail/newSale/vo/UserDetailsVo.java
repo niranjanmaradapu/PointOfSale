@@ -17,10 +17,11 @@ public class UserDetailsVo {
 	private LocalDate createdDate;
 	private LocalDate lastModifyedDate;
 	private long createdBy;
-	/*
-	 * private Role role; private List<UserAv> userAv; private List<StoreVo> stores;
-	 * private StoreVo ownerOf;
-	 */
+	
+	  private List<UserAv> userAv; 
+	  private List<StoreVo> stores;
+	//  private StoreVo ownerOf;
+	 
 	 
 
 
