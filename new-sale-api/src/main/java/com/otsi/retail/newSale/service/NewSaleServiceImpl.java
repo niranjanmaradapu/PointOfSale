@@ -13,9 +13,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -57,6 +61,7 @@ import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
+import com.otsi.retail.newSale.vo.GetUserRequestVo;
 import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.HsnDetailsVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
@@ -72,6 +77,7 @@ import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.SalesSummeryVo;
 import com.otsi.retail.newSale.vo.TaggedItems;
 import com.otsi.retail.newSale.vo.TaxVo;
+import com.otsi.retail.newSale.vo.UserDetailsVo;
 
 /**
  * Service class contains all bussiness logics related to new sale , create
@@ -438,6 +444,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				Optional<CustomerDetailsEntity> customer = customerRepo.findByMobileNumber(svo.getCustMobileNumber());
 
+				UserDetailsVo uvo = getUserDetailsFromURM(svo.getCustMobileNumber(),null);
+				if(uvo!=null)
+				{
+					saleDetails = newSaleRepository.findByUserId(uvo.getUserId());
+
+				}
 //				if (customer.isPresent()) {
 //					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
 //							.findByNewsaleId(customer.get().getNewsale().get(0).getOrderId());
@@ -445,10 +457,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 //						saleDetails.add(newSaleOpt.get());
 //					}
 //
-//				} else {
-//					log.error("No record found with given mobilenumber");
-//					throw new RecordNotFoundException("No record found with given mobilenumber");
-//				}
+			 else {
+				log.error("No record found with given mobilenumber");
+					throw new RecordNotFoundException("No record found with given mobilenumber");
+				}
 
 			}
 			/*
@@ -533,6 +545,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					});
 				}
+				/////////
+				UserDetailsVo uvo = getUserDetailsFromURM(null,x.getUserId());
+
+				
+				//////////
+				x.setCustomerName(uvo.getUserName());
+				x.setMobileNumber(uvo.getPhoneNumber());
 				x.setLineItems(listBar);
 				x.setTotalqQty(x.getLineItems().stream().mapToInt(q -> q.getQty()).sum());
 				x.setTotalMrp(x.getLineItems().stream().mapToLong(m -> m.getMrp()).sum());
@@ -1215,6 +1234,35 @@ public class NewSaleServiceImpl implements NewSaleService {
 			log.error("Getting exception while saving Line item..");
 			throw new InvalidInputException("Getting exception while saving Line item..");
 		}
+	}
+	
+public UserDetailsVo getUserDetailsFromURM(@RequestParam String MobileNumber,@RequestParam Long  UserId) {
+		
+		UserDetailsVo vo = new UserDetailsVo();
+		GetUserRequestVo uvo= new GetUserRequestVo();
+		uvo.setPhoneNo(MobileNumber);
+		uvo.setId(UserId);
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<GetUserRequestVo> entity = new HttpEntity<>(uvo, headers);
+		
+		ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetCustomerDetailsFromURM(),
+				HttpMethod.POST, entity, GateWayResponse.class);
+
+		ObjectMapper mapper = new ObjectMapper();
+
+		GateWayResponse<?> gatewayResponse = mapper.convertValue(returnSlipListResponse.getBody(),
+				GateWayResponse.class);
+
+		 vo = mapper.convertValue(gatewayResponse.getResult(),
+				new TypeReference<UserDetailsVo>() {
+				});
+		
+	
+		
+		return vo;
+		
 	}
 
 }

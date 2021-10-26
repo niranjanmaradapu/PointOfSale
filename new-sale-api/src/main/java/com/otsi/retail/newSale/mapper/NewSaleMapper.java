@@ -115,6 +115,8 @@ public class NewSaleMapper {
 			nsvo.setReason(x.getDiscType());
 			nsvo.setOfflineNumber(x.getOfflineNumber());
 			nsvo.setNetPayableAmount(x.getNetValue());
+			nsvo.setUserId(x.getUserId());
+			
 
 			sVoList.add(nsvo);
 

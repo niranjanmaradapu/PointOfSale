@@ -29,6 +29,6 @@ public class Config {
     private String getListOfReturnSlips;
 	
 	@Value("${getCustomerDetailsFromURM_url}")
-	private String getCustomerDetails;
+	private String getCustomerDetailsFromURM;
 
 }
