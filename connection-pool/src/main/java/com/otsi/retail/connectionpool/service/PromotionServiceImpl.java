@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.otsi.retail.connectionpool.entity.PoolEntity;
 import com.otsi.retail.connectionpool.entity.PromotionsEntity;
 import com.otsi.retail.connectionpool.exceptions.InvalidDataException;
@@ -168,5 +170,19 @@ public class PromotionServiceImpl implements PromotionService {
 		 * } catch (Exception e) { throw new
 		 * Exception("Exception occurs while modifying Promotion"); }
 		 */
+	}
+
+	@Override
+	public String deletePromotion(Long id) {
+		
+		Optional<PromotionsEntity> entity = promoRepo.findById(id);
+		
+		if(entity.isPresent())
+		{
+			promoRepo.deleteByPromoId(id);
+		}else {
+			throw new RecordNotFoundException("Given promotion is not exists");
+		}
+		return "Promotion Deleted Successfully";
 	}
 }

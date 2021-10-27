@@ -22,4 +22,6 @@ public interface PoolService {
 
 	String modifyPool(ConnectionPoolVo vo);
 
+	String deletePool(Long poolId);
+
 }

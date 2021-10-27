@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,6 +58,13 @@ public class PoolController {
 		log.info("Recieved request to modifyPool():" + vo);
 		String message = poolService.modifyPool(vo);
 		return new GateWayResponse<>("updated pool successfully", message);
+
+	}
+	@DeleteMapping(CommonRequestMappigs.DELETE_POOL)
+	public GateWayResponse<?> deletePool(@RequestParam Long poolId) {
+		log.info("Recieved request to modifyPool():" + poolId);
+		String message = poolService.deletePool(poolId);
+		return new GateWayResponse<>("deleted pool successfully", message);
 
 	}
 }

@@ -11,6 +11,8 @@ import com.otsi.retail.connectionpool.entity.PromotionsEntity;
 public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	List<PromotionsEntity> findByIsActive(Boolean status);
+
+	void deleteByPromoId(Long id);
 	
 
 }

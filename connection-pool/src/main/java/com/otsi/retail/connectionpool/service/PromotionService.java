@@ -15,5 +15,7 @@ public interface PromotionService {
 	List<PromotionsVo> getListOfPromotions(String flag);
 
 	String editPromotion(PromotionsVo vo);
+	
+	String deletePromotion(Long id);
 
 }
