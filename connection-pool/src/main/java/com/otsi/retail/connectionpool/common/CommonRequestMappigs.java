@@ -3,6 +3,13 @@ package com.otsi.retail.connectionpool.common;
 public class CommonRequestMappigs {
 
 	public static final String POOL = "pool";
+	
+	public static final String SEARCH_PROMOTION = "searchPromotion";
+
+	
+	public static final String ADD_PROMO_STORE = "addPromoToStore";
+
+	public static final String GET_ALL_STORES = "getAllStores";
 
 	public static final String CREATE_POOL = "createpool";
 

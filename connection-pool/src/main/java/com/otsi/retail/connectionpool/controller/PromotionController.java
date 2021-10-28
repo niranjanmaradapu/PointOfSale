@@ -20,6 +20,8 @@ import com.otsi.retail.connectionpool.common.CommonRequestMappigs;
 import com.otsi.retail.connectionpool.gatewayresponse.GateWayResponse;
 import com.otsi.retail.connectionpool.service.PromotionService;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
+import com.otsi.retail.connectionpool.vo.StoreVo;
+import com.otsi.retail.connectionpool.vo.searchPromotionsVo;
 import com.sun.istack.NotNull;
 
 /**
@@ -75,4 +77,28 @@ public class PromotionController {
 			return new GateWayResponse<>("promotion deleted successfully", result);
 
 		}
+		
+		@GetMapping(CommonRequestMappigs.GET_ALL_STORES)
+	public GateWayResponse<?> getAllStores() {
+			//log.info("Recieved request to getByStoreId():" + storeId);			
+			List<StoreVo> getAllStore = promoService.getAllStores();
+		return new GateWayResponse<>("fetching stores successfully", getAllStore);
+	
+		
+}
+		@PostMapping(CommonRequestMappigs.ADD_PROMO_STORE)
+		public GateWayResponse<?> addPromotionToStore(@RequestBody PromotionsVo vo) {
+			log.info("Recieved request to editPromotion():" + vo);
+			String result = promoService.addPromotionToStore(vo);
+			return new GateWayResponse<>("store added to promotion  successfully", result);
+
+		}
+		
+		@PostMapping(CommonRequestMappigs.SEARCH_PROMOTION)
+		public GateWayResponse<?> searchPromotion(@RequestBody searchPromotionsVo vo) {
+			log.info("Recieved request to editPromotion():" + vo);
+			List<searchPromotionsVo> result = promoService.searchPromotion(vo);
+			return new GateWayResponse<>("  successfully getting promotions", result);
+
+		} 
 }

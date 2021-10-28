@@ -3,6 +3,7 @@ package com.otsi.retail.connectionpool;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -15,6 +16,11 @@ public class ConnectionPoolApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ConnectionPoolApplication.class, args);
+	}
+	@Bean
+	// @LoadBalanced
+	public RestTemplate getRestResponse() {
+		return new RestTemplate();
 	}
 
 	@Bean
