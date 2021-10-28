@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.otsi.retail.connectionpool.entity.PoolEntity;
+import com.otsi.retail.connectionpool.exceptions.DuplicateRecordException;
 import com.otsi.retail.connectionpool.exceptions.InvalidDataException;
 import com.otsi.retail.connectionpool.exceptions.RecordNotFoundException;
 import com.otsi.retail.connectionpool.mapper.PoolMapper;
@@ -126,5 +127,21 @@ public class PoolServiceImpl implements PoolService {
 		log.info("Pool Modified Successfully...");
 		return "Pool Modified Successfully...";
 
+	}
+
+	@Override
+	public String deletePool(Long poolId) {
+		if(poolRepo.findByPoolId(poolId).isPresent()) {
+			if(poolRepo.findByPoolId(poolId).get().getPromoEntity().size()==0) {
+				poolRepo.deleteById(poolId);
+				}
+			else {
+				log.error("record not found");
+				throw new DuplicateRecordException("promotions mapped with existing pool");
+			}
+			
+		}
+		// TODO Auto-generated method stub
+		return "pool deleted sucessfully";
 	}
 }

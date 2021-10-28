@@ -5,18 +5,23 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.otsi.retail.connectionpool.common.CommonRequestMappigs;
 import com.otsi.retail.connectionpool.gatewayresponse.GateWayResponse;
 import com.otsi.retail.connectionpool.service.PromotionService;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
+import com.otsi.retail.connectionpool.vo.StoreVo;
+import com.otsi.retail.connectionpool.vo.searchPromotionsVo;
 import com.sun.istack.NotNull;
 
 /**
@@ -28,6 +33,7 @@ import com.sun.istack.NotNull;
 
 @RestController
 @CrossOrigin
+@Transactional
 @RequestMapping(CommonRequestMappigs.PROMO)
 public class PromotionController {
 
@@ -62,4 +68,37 @@ public class PromotionController {
 		return new GateWayResponse<>("updated promotion successfully", result);
 
 	}
+	
+	// Method for delete Promotion
+		@DeleteMapping(CommonRequestMappigs.DELETE_PROMO)
+		public GateWayResponse<?> deletePromotion(@RequestParam Long id) {
+			log.info("Recieved request deletePromotion():" + id);
+			String result = promoService.deletePromotion(id);
+			return new GateWayResponse<>("promotion deleted successfully", result);
+
+		}
+		
+		@GetMapping(CommonRequestMappigs.GET_ALL_STORES)
+	public GateWayResponse<?> getAllStores() {
+			//log.info("Recieved request to getByStoreId():" + storeId);			
+			List<StoreVo> getAllStore = promoService.getAllStores();
+		return new GateWayResponse<>("fetching stores successfully", getAllStore);
+	
+		
+}
+		@PostMapping(CommonRequestMappigs.ADD_PROMO_STORE)
+		public GateWayResponse<?> addPromotionToStore(@RequestBody PromotionsVo vo) {
+			log.info("Recieved request to editPromotion():" + vo);
+			String result = promoService.addPromotionToStore(vo);
+			return new GateWayResponse<>("store added to promotion  successfully", result);
+
+		}
+		
+		@PostMapping(CommonRequestMappigs.SEARCH_PROMOTION)
+		public GateWayResponse<?> searchPromotion(@RequestBody searchPromotionsVo vo) {
+			log.info("Recieved request to editPromotion():" + vo);
+			List<searchPromotionsVo> result = promoService.searchPromotion(vo);
+			return new GateWayResponse<>("  successfully getting promotions", result);
+
+		} 
 }

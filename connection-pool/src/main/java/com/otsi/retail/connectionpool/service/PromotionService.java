@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
+import com.otsi.retail.connectionpool.vo.StoreVo;
+import com.otsi.retail.connectionpool.vo.searchPromotionsVo;
 
 @Component
 public interface PromotionService {
@@ -15,5 +17,13 @@ public interface PromotionService {
 	List<PromotionsVo> getListOfPromotions(String flag);
 
 	String editPromotion(PromotionsVo vo);
+	
+	String deletePromotion(Long id);
+
+	List<StoreVo> getAllStores();
+
+	String addPromotionToStore(PromotionsVo vo);
+
+	List<searchPromotionsVo> searchPromotion(searchPromotionsVo vo);
 
 }

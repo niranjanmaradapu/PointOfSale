@@ -86,12 +86,40 @@ public class GateWayResponse<T> {
 	 * @param message
 	 */
 
-	public GateWayResponse(final HttpStatus status, final T result, String message) {
+	/*
+	 * public GateWayResponse(final HttpStatus status, final T result, String
+	 * message) { super(); // this.status = status; this.result = result; //
+	 * this.httpStatus = httpStatus; this.message = message; }
+	 */
+	public GateWayResponse(final HttpStatus status, final T result, String message,String isSuccess) {
 		super();
-		// this.status = status;
+		this.status = 200;
 		this.result = result;
 		// this.httpStatus = httpStatus;
 		this.message = message;
+		this.isSuccess = "true";
+	}
+
+
+	/**
+	 * 
+	 */
+	public GateWayResponse() {
+		super();
+	}
+
+	/**
+	 * @param isSuccess
+	 * @param status
+	 * @param message
+	 * @param result
+	 */
+	public GateWayResponse(String isSuccess, int status, String message, T result) {
+		super();
+		this.isSuccess = isSuccess;
+		this.status = status;
+		this.message = message;
+		this.result = result;
 	}
 
 	/**
