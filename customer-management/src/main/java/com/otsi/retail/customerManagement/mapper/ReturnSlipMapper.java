@@ -46,11 +46,11 @@ public class ReturnSlipMapper {
 		dtos.stream().forEach(dto -> {
 			ListOfReturnSlipsVo vo = new ListOfReturnSlipsVo();
 			// ListOfReturnSlipsVo vo= new ListOfReturnSlipsVo();
-			vo.setCreditNote(dto.getCrNo());
+			//vo.setCreditNote(dto.getCrNo());
 			vo.setRtNumber(dto.getRtNo());
 			vo.setAmount(dto.getAmount());
 			vo.setBarcodes(dto.getTaggedItems());
-			vo.setRtReviewStatus(dto.getIsReviewed());
+			//vo.setRtReviewStatus(dto.getIsReviewed());
 			vo.setCreatedInfo(dto.getCreatedDate());
 			vo.setCreatedBy(dto.getCreatedBy());
 			lvo.add(vo);

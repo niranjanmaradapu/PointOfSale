@@ -25,13 +25,13 @@ public class ListOfReturnSlipsVo {
 
 	private String barcode;
 
-	private String rtStatus;
+	//private String rtStatus;
 
 	private String rtNumber;
 
-	private String creditNote;
+	//private String creditNote;
 	private String createdBy;
-	private Boolean rtReviewStatus;
+	//private Boolean rtReviewStatus;
 
 	// private List<Barcode> barcode;
 
@@ -39,7 +39,7 @@ public class ListOfReturnSlipsVo {
 
 	private LocalDate createdInfo;
 
-	private String settelmentInfo;
+	//private String settelmentInfo;
 	
 	private Long totalAmount;
 
