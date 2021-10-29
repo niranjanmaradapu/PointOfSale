@@ -98,47 +98,27 @@ public class CustomerServiceImpl implements CustomerService {
 			 * getting the record using dates and RtNumber
 			 *
 			 */
-			if (vo.getRtNumber() != null && vo.getCreditNote() == null && vo.getRtStatus() == null
-					&& vo.getRtReviewStatus() == null) {
+			if (vo.getRtNumber() != null && vo.getBarcode()==null&& vo.getCreatedBy()==null ) 
+			{
 				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtNoOrderByCreatedDateAsc(vo.getDateFrom(),
 						vo.getDateTo(), vo.getRtNumber());
 			}
-			/**
-			 * getting the record using dates and creditNote
-			 *
-			 */
-			else if (vo.getRtNumber() == null && vo.getCreditNote() != null && vo.getRtStatus() == null
-					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndCrNoOrderByCreatedDateAsc(vo.getDateFrom(),
-						vo.getDateTo(), vo.getCreditNote());
-			}
-			/**
-			 * getting the record using dates and RtStatus
-			 *
-			 */
-			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() != null
-					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtStatusOrderByCreatedDateAsc(
-						vo.getDateFrom(), vo.getDateTo(), vo.getRtStatus());
-			}
-			/**
-			 * getting the record using dates and RtReviewStatus
-			 *
-			 */
-			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
-					&& vo.getRtReviewStatus() != null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndIsReviewedOrderByCreatedDateAsc(
-						vo.getDateFrom(), vo.getDateTo(), vo.getRtReviewStatus());
-			}
+			
+			
 			/**
 			 * getting the record using dates and barcode
 			 *
 			 */
-			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
-					&& vo.getRtReviewStatus() == null && vo.getBarcode() != null) {
+			else if (vo.getRtNumber() == null &&  vo.getCreatedBy() == null && vo.getBarcode() != null) {
 
 				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCodeOrderByCreatedDateAsc(
 						vo.getDateFrom(), vo.getDateTo(), vo.getBarcode());
+
+			}
+			else if (vo.getRtNumber() == null &&  vo.getCreatedBy() != null && vo.getBarcode() == null) {
+
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndCreatedByOrderByCreatedDateAsc(
+						vo.getDateFrom(), vo.getDateTo(), vo.getCreatedBy());
 
 			}
 			/**
@@ -157,33 +137,16 @@ public class CustomerServiceImpl implements CustomerService {
 			 * getting the record using RtNumber
 			 *
 			 */
-			if (vo.getRtNumber() != null && vo.getCreditNote() == null && vo.getRtStatus() == null
-					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
+			if (vo.getRtNumber() != null && vo.getCreatedBy() == null &&  vo.getBarcode() == null) {
 				retunSlipdetails = returnSlipRepo.findByRtNoOrderByCreatedDateAsc(vo.getRtNumber());
 			}
-			/**
-			 * getting the record using creditnote
-			 *
-			 */
-			else if (vo.getRtNumber() == null && vo.getCreditNote() != null && vo.getRtStatus() == null
-					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByRtNoOrderByCreatedDateAsc(vo.getCreditNote());
-			}
-			/**
-			 * getting the record using RtStatus
-			 *
-			 */
-			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() != null
-					&& vo.getRtReviewStatus() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByRtNoOrderByCreatedDateAsc(vo.getRtStatus());
-			}
+			
 			/**
 			 * getting the record using barcode
 			 *
 			 */
 
-			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
-					&& vo.getRtReviewStatus() == null && vo.getBarcode() != null) {
+			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null  && vo.getBarcode() != null) {
 
 				retunSlipdetails = returnSlipRepo.findByTaggedItems_barCodeOrderByCreatedDateAsc(vo.getBarcode());
 
@@ -193,9 +156,8 @@ public class CustomerServiceImpl implements CustomerService {
 			 * getting the record using RtReviewStatus
 			 *
 			 */
-			else if (vo.getRtNumber() == null && vo.getCreditNote() == null && vo.getRtStatus() == null
-					&& vo.getRtReviewStatus() != null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByIsReviewedOrderByCreatedDateAsc(vo.getRtReviewStatus());
+			else if (vo.getRtNumber() == null && vo.getCreatedBy() != null  && vo.getBarcode() == null) {
+				retunSlipdetails = returnSlipRepo.findByCreatedByOrderByCreatedDateAsc(vo.getCreatedBy());
 			}
 
 		}
@@ -211,6 +173,7 @@ public class CustomerServiceImpl implements CustomerService {
 		// throw new RuntimeException("no record found with the giveninformation");
 		throw new DataNotFoundException("No return slips are found");
 	}
+
 
 	@Override
 	@CircuitBreaker(name = "newSale", fallbackMethod = "getInvoiceFallback")

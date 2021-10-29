@@ -89,4 +89,9 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 
 	ReturnSlip findByRtNo(String rtNumber);
 
+	List<ReturnSlip> findByCreatedDateBetweenAndCreatedByOrderByCreatedDateAsc(LocalDate dateFrom, LocalDate dateTo,
+			String createdBy);
+
+	List<ReturnSlip> findByCreatedByOrderByCreatedDateAsc(String createdBy);
+
 }
