@@ -22,8 +22,6 @@ import com.otsi.retail.customerManagement.vo.ListOfReturnSlipsVo;
 @Component
 public class ReturnSlipMapper {
 
-	
-	
 	/*
 	 * public List<ListOfReturnSlipsVo> mapEntityToVo(List<ReturnSlip> dtos) {
 	 * return dtos.stream().map(dto ->
@@ -45,12 +43,11 @@ public class ReturnSlipMapper {
 
 		dtos.stream().forEach(dto -> {
 			ListOfReturnSlipsVo vo = new ListOfReturnSlipsVo();
-			// ListOfReturnSlipsVo vo= new ListOfReturnSlipsVo();
-			//vo.setCreditNote(dto.getCrNo());
+
 			vo.setRtNumber(dto.getRtNo());
 			vo.setAmount(dto.getAmount());
 			vo.setBarcodes(dto.getTaggedItems());
-			//vo.setRtReviewStatus(dto.getIsReviewed());
+
 			vo.setCreatedInfo(dto.getCreatedDate());
 			vo.setCreatedBy(dto.getCreatedBy());
 			lvo.add(vo);
@@ -60,6 +57,5 @@ public class ReturnSlipMapper {
 
 		return lvo;
 	}
-	
 
 }

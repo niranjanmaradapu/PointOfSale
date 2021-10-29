@@ -103,39 +103,8 @@ public class CustomerServiceImpl implements CustomerService {
 				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtNoOrderByCreatedDateAsc(vo.getDateFrom(),
 						vo.getDateTo(), vo.getRtNumber());
 			}
-			/**
-			 * getting the record using dates and creditNote
-			 *
-			 */
-			/*
-			 * else if (vo.getRtNumber() == null && vo.getCreditNote() != null &&
-			 * vo.getRtStatus() == null && vo.getRtReviewStatus() == null && vo.getBarcode()
-			 * == null) { retunSlipdetails =
-			 * returnSlipRepo.findByCreatedDateBetweenAndCrNoOrderByCreatedDateAsc(vo.
-			 * getDateFrom(), vo.getDateTo(), vo.getCreditNote()); }
-			 */
-			/**
-			 * getting the record using dates and RtStatus
-			 *
-			 */
-			/*
-			 * else if (vo.getRtNumber() == null && vo.getCreditNote() == null &&
-			 * vo.getRtStatus() != null && vo.getRtReviewStatus() == null && vo.getBarcode()
-			 * == null) { retunSlipdetails =
-			 * returnSlipRepo.findByCreatedDateBetweenAndRtStatusOrderByCreatedDateAsc(
-			 * vo.getDateFrom(), vo.getDateTo(), vo.getRtStatus()); }
-			 */
-			/**
-			 * getting the record using dates and RtReviewStatus
-			 *
-			 */
-			/*
-			 * else if (vo.getRtNumber() == null && vo.getCreditNote() == null &&
-			 * vo.getRtStatus() == null && vo.getRtReviewStatus() != null && vo.getBarcode()
-			 * == null) { retunSlipdetails =
-			 * returnSlipRepo.findByCreatedDateBetweenAndIsReviewedOrderByCreatedDateAsc(
-			 * vo.getDateFrom(), vo.getDateTo(), vo.getRtReviewStatus()); }
-			 */
+			
+			
 			/**
 			 * getting the record using dates and barcode
 			 *
