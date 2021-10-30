@@ -75,6 +75,10 @@ public class NewSaleEntity {
 
 	@OneToMany(mappedBy = "order") // , cascade = CascadeType.ALL)
 	private List<BarcodeEntity> lineItems;
+	
+	//added by lakshmi
+	@OneToMany(targetEntity = LineItemsReEntity.class,mappedBy = "orderId", cascade = CascadeType.ALL) 
+	private List<LineItemsReEntity> lineItemsRe;
 
 	@ManyToOne
 	@JoinColumn(name = "customerId")

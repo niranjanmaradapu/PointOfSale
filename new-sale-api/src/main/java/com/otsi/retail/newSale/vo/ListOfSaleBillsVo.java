@@ -11,9 +11,9 @@ import lombok.Data;
 @Component
 public class ListOfSaleBillsVo {
 
-	private String dsNumber;
+	
 
-	private String barcode;
+	
 
 	private LocalDate dateFrom;
 
@@ -26,8 +26,10 @@ public class ListOfSaleBillsVo {
 	private String custMobileNumber;
 
 	private Long invoiceNumber;
+	
+	private String EmpId;
 
-	private String billNumber;
+	
 	private Long totalAmount;
 	
 	

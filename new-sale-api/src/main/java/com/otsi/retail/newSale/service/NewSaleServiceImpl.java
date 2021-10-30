@@ -39,7 +39,7 @@ import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
 import com.otsi.retail.newSale.Exceptions.InvalidInputException;
 import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
-import com.otsi.retail.newSale.common.BillType;
+
 import com.otsi.retail.newSale.common.DSAttributes;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.DomainData;
@@ -344,11 +344,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		/*
 		 * getting the data using between dates and bill status or custMobileNumber or
-		 * barCode or billNumber or invoiceNumber or dsNumber
+		 * barCode or invoiceNumber
 		 */
 		if (svo.getDateFrom() != null && svo.getDateTo() != null) {
-			if (svo.getBillStatus() != null && svo.getCustMobileNumber() == null && svo.getBillNumber() == null
-					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
+			if (svo.getBillStatus() != null && svo.getCustMobileNumber() == null && svo.getEmpId() == null
+					&& svo.getInvoiceNumber() == null) {
 
 				saleDetails = newSaleRepository.findByCreationDateBetweenAndStatus(svo.getDateFrom(), svo.getDateTo(),
 						svo.getBillStatus());
@@ -356,77 +356,39 @@ public class NewSaleServiceImpl implements NewSaleService {
 			/*
 			 * getting the record using custmobilenumber
 			 */
-			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() != null && svo.getBillNumber() == null
-					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() != null && svo.getInvoiceNumber() == null
+					&& svo.getEmpId() == null) {
 
-				Optional<CustomerDetailsEntity> customer = customerRepo.findByMobileNumber(svo.getCustMobileNumber());
+				// Optional<CustomerDetailsEntity> customer =
+				// customerRepo.findByMobileNumber(svo.getCustMobileNumber());
 
 				UserDetailsVo uvo = getUserDetailsFromURM(svo.getCustMobileNumber(), null);
 				if (uvo != null) {
 					saleDetails = newSaleRepository.findByUserId(uvo.getUserId());
 
 				}
-//				if (customer.isPresent()) {
-//					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
-//							.findByNewsaleId(customer.get().getNewsale().get(0).getOrderId());
-//					if (newSaleOpt.isPresent()) {
-//						saleDetails.add(newSaleOpt.get());
-//					}
-//
+
 				else {
 					log.error("No record found with given mobilenumber");
 					throw new RecordNotFoundException("No record found with given mobilenumber");
 				}
 
 			}
-			/*
-			 * getting the record using barcode
-			 */
-			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getBillNumber() == null
-					&& svo.getBarcode() != null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
-
-				BarcodeEntity bar = barcodeRepository.findByBarcode(svo.getBarcode());
-				if (bar != null) {
-
-					Optional<NewSaleEntity> newSaleOpt = newSaleRepository
-							.findByOrderId(bar.getDeliverySlip().getOrder().getOrderId());
-					if (newSaleOpt.isPresent()) {
-						saleDetails.add(newSaleOpt.get());
-					}
-
-				} else {
-					log.error("No record found with given barcode");
-					throw new RecordNotFoundException("No record found with given barcode");
-				}
-
-			}
-			/*
-			 * getting the record using billNumber
-			 */
-			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getBillNumber() != null
-					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() == null) {
-				saleDetails = newSaleRepository.findByOrderNumber(svo.getBillNumber());
-			}
+			
 			/*
 			 * getting the record using invoice number
 			 */
-			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getBillNumber() == null
-					&& svo.getBarcode() == null && svo.getInvoiceNumber() != null && svo.getDsNumber() == null) {
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getEmpId()== null
+					 && svo.getInvoiceNumber() != null ) {
 				saleDetails = newSaleRepository.findByOrderNumber(svo.getInvoiceNumber());
 			}
 			/*
-			 * getting the record using dsNumber
+			 * getting the record using empId
 			 */
-			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getBillNumber() == null
-					&& svo.getBarcode() == null && svo.getInvoiceNumber() == null && svo.getDsNumber() != null) {
-				DeliverySlipEntity ds = dsRepo.findByDsNumber(svo.getDsNumber());
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null 
+					 && svo.getInvoiceNumber() == null && svo.getEmpId()!=null) {
+				saleDetails = newSaleRepository.findByCreatedBy(svo.getEmpId());
 
-				if (ds != null) {
-					Optional<NewSaleEntity> newSaleOpt = newSaleRepository.findByOrderId(ds.getOrder().getOrderId());
-					if (newSaleOpt.isPresent()) {
-						saleDetails.add(newSaleOpt.get());
-					}
-				}
 			} else
 				saleDetails = newSaleRepository.findByCreationDateBetween(svo.getDateFrom(), svo.getDateTo());
 
@@ -446,14 +408,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 			List<NewSaleVo> sVoList = new ArrayList<>();
 
 			lsvo.getNewSaleVo().stream().forEach(x -> {
-				List<BarcodeVo> listBar = new ArrayList<>();
+				List<LineItemVo> listBar = new ArrayList<>();
 
-				if (x.getLineItems() != null) {
+				if (x.getLineItemsReVo() != null) {
 
-					x.getLineItems().stream().forEach(l -> {
+					x.getLineItemsReVo().stream().forEach(l -> {
 						// BarcodeVo barVo = new BarcodeVo();
 
-						HsnDetailsVo hsnDetails = getHsnDetails(l.getNetAmount());
+						HsnDetailsVo hsnDetails = getHsnDetails(l.getNetValue());
 
 						l.setHsnDetailsVo(hsnDetails);
 
@@ -467,10 +429,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 				//////////
 				x.setCustomerName(uvo.getUserName());
 				x.setMobileNumber(uvo.getPhoneNumber());
-				x.setLineItems(listBar);
-				x.setTotalqQty(x.getLineItems().stream().mapToInt(q -> q.getQty()).sum());
-				x.setTotalMrp(x.getLineItems().stream().mapToLong(m -> m.getMrp()).sum());
-				x.setTotalNetAmount(x.getLineItems().stream().mapToLong(m -> m.getNetAmount()).sum());
+				x.setLineItemsReVo(listBar);
+				x.setTotalqQty(x.getLineItemsReVo().stream().mapToInt(q -> q.getQuantity()).sum());
+				x.setTotalMrp(x.getLineItemsReVo().stream().mapToLong(m -> m.getGrossValue()).sum());
+				x.setTotalNetAmount(x.getLineItemsReVo().stream().mapToLong(m -> m.getNetValue()).sum());
 
 				x.setTotaltaxableAmount((float) listBar.stream()
 						.mapToDouble(t -> t.getHsnDetailsVo().getTaxVo().getTaxableAmount()).sum());
@@ -491,7 +453,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 
 	}
-
 	public HsnDetailsVo getHsnDetails(double netAmt) {
 		log.debug("debugging getHsnDetails:" + netAmt);
 		List<HsnDetailsVo> vo = hsnService.getHsn();
@@ -1007,12 +968,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		List<NewSaleEntity> saleDetails = new ArrayList<>();
 
-		if ((srvo.getBillType().getId() == BillType.B2C_BILLS.getId())
-				|| srvo.getBillType().getId() == BillType.ALL_BILLS.getId()) {
-			if (srvo.getDateFrom() != null && srvo.getDateTo() != null) {
-				saleDetails = newSaleRepository.findByCreationDateBetween(srvo.getDateFrom(), srvo.getDateTo());
+		
+			if (srvo.getDateFrom() != null && srvo.getDateTo() != null&& srvo.getStore()!=null) {
+				saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreId(srvo.getDateFrom(), srvo.getDateTo(),srvo.getStore().getId());
 			}
-		}
+		
 
 		if (saleDetails.isEmpty()) {
 			throw new RecordNotFoundException("Sale bills are not exists");
@@ -1021,16 +981,16 @@ public class NewSaleServiceImpl implements NewSaleService {
 			SaleReportVo slr = newSaleMapper.convertlistSaleReportEntityToVo(saleDetails);
 			HsnDetailsVo hsnDetails = getHsnDetails(slr.getBillValue());
 			SalesSummeryVo salesSummery = new SalesSummeryVo();
-			salesSummery.setTotalTaxableAmount(hsnDetails.getTaxVo().getTaxableAmount());
-			salesSummery.setTotalCgst(hsnDetails.getTaxVo().getCgst());
-			salesSummery.setTotalSgst(hsnDetails.getTaxVo().getSgst());
-			salesSummery.setTotalIgst(hsnDetails.getTaxVo().getIgst());
-			salesSummery.setTaxDescription(hsnDetails.getTaxVo().getTaxLabel());
+			//salesSummery.setTotalTaxableAmount(hsnDetails.getTaxVo().getTaxableAmount());
+			//salesSummery.setTotalCgst(hsnDetails.getTaxVo().getCgst());
+			//salesSummery.setTotalSgst(hsnDetails.getTaxVo().getSgst());
+			//salesSummery.setTotalIgst(hsnDetails.getTaxVo().getIgst());
+			//salesSummery.setTaxDescription(hsnDetails.getTaxVo().getTaxLabel());
 			salesSummery.setBillValue(slr.getBillValue());
 			salesSummery.setTotalMrp(slr.getTotalMrp());
 			salesSummery.setTotalDiscount(slr.getTotalDiscount());
 
-			salesSummery.setTotalTaxAmount(hsnDetails.getTaxVo().getCgst() + hsnDetails.getTaxVo().getSgst());
+			//salesSummery.setTotalTaxAmount(hsnDetails.getTaxVo().getCgst() + hsnDetails.getTaxVo().getSgst());
 
 			ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetListOfReturnSlips(),
 					HttpMethod.GET, null, GateWayResponse.class);
@@ -1073,26 +1033,26 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			retunVo.setTotalDiscount(barVoList.stream().mapToLong(d -> d.getPromoDisc()).sum());
 			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getMrp()).sum());
-			retunVo.setTaxDescription(hsnDetails1.getTaxVo().getTaxLabel());
+			//retunVo.setTaxDescription(hsnDetails1.getTaxVo().getTaxLabel());
 			retunVo.setBillValue(rAmount);
-			retunVo.setTotalTaxableAmount(hsnDetails1.getTaxVo().getTaxableAmount());
-			retunVo.setTotalSgst(hsnDetails1.getTaxVo().getSgst());
-			retunVo.setTotalCgst(hsnDetails1.getTaxVo().getCgst());
-			retunVo.setTotalIgst(hsnDetails1.getTaxVo().getIgst());
-			retunVo.setTotalTaxAmount(hsnDetails1.getTaxVo().getSgst() + hsnDetails1.getTaxVo().getCgst());
+			//retunVo.setTotalTaxableAmount(hsnDetails1.getTaxVo().getTaxableAmount());
+			//retunVo.setTotalSgst(hsnDetails1.getTaxVo().getSgst());
+			//retunVo.setTotalCgst(hsnDetails1.getTaxVo().getCgst());
+			//retunVo.setTotalIgst(hsnDetails1.getTaxVo().getIgst());
+			//retunVo.setTotalTaxAmount(hsnDetails1.getTaxVo().getSgst() + hsnDetails1.getTaxVo().getCgst());
 
 			slr.setRetunSummery(retunVo);
 			slr.setSalesSummery(salesSummery);
 			slr.setBillValue(slr.getSalesSummery().getBillValue() - slr.getRetunSummery().getBillValue());
-			slr.setTotalCgst(slr.getSalesSummery().getTotalCgst() - slr.getRetunSummery().getTotalCgst());
-			slr.setTotalSgst(slr.getSalesSummery().getTotalSgst() - slr.getRetunSummery().getTotalSgst());
-			slr.setTotalIgst(slr.getSalesSummery().getTotalIgst() - slr.getRetunSummery().getTotalIgst());
-			slr.setTotalTaxableAmount(
-					slr.getSalesSummery().getTotalTaxableAmount() - slr.getRetunSummery().getTotalTaxableAmount());
+			//slr.setTotalCgst(slr.getSalesSummery().getTotalCgst() - slr.getRetunSummery().getTotalCgst());
+			//slr.setTotalSgst(slr.getSalesSummery().getTotalSgst() - slr.getRetunSummery().getTotalSgst());
+			//slr.setTotalIgst(slr.getSalesSummery().getTotalIgst() - slr.getRetunSummery().getTotalIgst());
+			//slr.setTotalTaxableAmount(
+					//slr.getSalesSummery().getTotalTaxableAmount() - slr.getRetunSummery().getTotalTaxableAmount());
 			slr.setTotalDiscount(slr.getSalesSummery().getTotalDiscount() - slr.getRetunSummery().getTotalDiscount());
 			slr.setTotalMrp(slr.getSalesSummery().getTotalMrp() - slr.getRetunSummery().getTotalMrp());
-			slr.setTotalTaxAmount(
-					slr.getSalesSummery().getTotalTaxAmount() - slr.getRetunSummery().getTotalTaxAmount());
+			//slr.setTotalTaxAmount(
+					//slr.getSalesSummery().getTotalTaxAmount() - slr.getRetunSummery().getTotalTaxAmount());
 
 			return slr;
 		}

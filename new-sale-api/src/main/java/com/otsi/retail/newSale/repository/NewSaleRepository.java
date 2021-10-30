@@ -29,5 +29,9 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 
 	Optional<CustomerDetailsEntity> findByCustomerDetailsMobileNumber(String mobileNo);
 
+	List<NewSaleEntity> findByCreatedBy(String empId);
+
+	List<NewSaleEntity> findByCreationDateBetweenAndStoreId(LocalDate dateFrom, LocalDate dateTo, long id);
+
 
 }

@@ -3,14 +3,16 @@ package com.otsi.retail.newSale.vo;
 import java.time.LocalDate;
 import java.util.List;
 
+import lombok.Data;
 
 
+@Data
 public class StoreVo {
 	
 	
-	/*private long id;
+	private long id;
 	private String name;
-	private String location;
+	/*private String location;
 	private LocalDate createdDate;
 	private LocalDate lastModifyedDate;
 	private long createdBy;
