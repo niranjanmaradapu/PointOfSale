@@ -35,6 +35,8 @@ public class DeliverySlipVo {
 	private LocalDate createdDate;
 
 	private LocalDateTime lastModified;
+	
+	private List<LineItemVo> lineItems;
 
 	// private Long salesMan;
 

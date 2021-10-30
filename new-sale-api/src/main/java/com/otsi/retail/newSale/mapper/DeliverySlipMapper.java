@@ -13,6 +13,7 @@ import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
+import com.otsi.retail.newSale.vo.LineItemVo;
 
 @Component
 public class DeliverySlipMapper {
@@ -28,7 +29,7 @@ public class DeliverySlipMapper {
 		entity.setSalesMan(vo.getSalesMan());
 		entity.setQty(vo.getQty());
 		entity.setType(vo.getType());
-		entity.setCreatedDate(LocalDate.now());
+		entity.setCreationDate(LocalDateTime.now());
 		entity.setLastModified(LocalDateTime.now());
 		entity.setStatus(DSStatus.Pending);
 
@@ -69,8 +70,40 @@ public class DeliverySlipMapper {
 	}
 
 	public List<DeliverySlipVo> convertDsEntityListToVoList(List<DeliverySlipEntity> dlSlip) {
-		List<DeliverySlipVo> dsSlipList=new ArrayList<>();
-		return dlSlip.stream().map(dto->convertDsEntityToVo(dto)).collect(Collectors.toList());
+		List<DeliverySlipVo> dsSlipList = new ArrayList<>();
+		return dlSlip.stream().map(dto -> convertDsEntityToVo(dto)).collect(Collectors.toList());
+	}
+
+	public DeliverySlipVo convertDsEntityToDsVo(DeliverySlipEntity dsEntity) {
+
+		DeliverySlipVo vo = new DeliverySlipVo();
+
+		vo.setDsNumber(dsEntity.getDsNumber());
+		vo.setSalesMan(dsEntity.getSalesMan());
+		vo.setCreatedDate(dsEntity.getCreationDate().toLocalDate());
+		vo.setLastModified(dsEntity.getLastModified());
+
+		List<LineItemVo> lineItems = new ArrayList<>();
+
+		dsEntity.getLineItems().stream().forEach(x -> {
+
+			LineItemVo lineVo = new LineItemVo();
+			// BeanUtils.copyProperties(x, lineVo);
+
+			lineVo.setBarCode(x.getBarCode());
+			lineVo.setQuantity(x.getQuantity());
+			lineVo.setNetValue(x.getNetValue());
+			lineVo.setLineItemId(x.getLineItemId());
+			lineVo.setItemPrice(x.getItemPrice());
+			lineVo.setGrossValue(x.getGrossValue());
+			lineVo.setDiscount(x.getDiscount());
+			lineVo.setCreationDate(x.getCreationDate());
+			lineVo.setLastModified(x.getLastModified());
+
+			lineItems.add(lineVo);
+		});
+		vo.setLineItems(lineItems);
+		return vo;
 	}
 
 }

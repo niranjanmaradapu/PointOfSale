@@ -18,7 +18,7 @@ public class LineItemVo {
 
 	private Long domainId;
 
-	private Long productId;
+	private String barCode;
 
 	private Long itemPrice;
 

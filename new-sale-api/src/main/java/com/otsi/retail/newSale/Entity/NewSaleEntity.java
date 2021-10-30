@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.otsi.retail.newSale.common.OrderStatus;
 import com.otsi.retail.newSale.common.SaleNature;
@@ -31,7 +32,6 @@ public class NewSaleEntity {
 
 	@Id
 	@GeneratedValue
-	// @Column(name = "orderId")
 	private Long orderId;
 
 	private SaleNature natureOfSale;
@@ -44,8 +44,6 @@ public class NewSaleEntity {
 
 	private Long orderTransactionId;// Payment related Id (orderTransaction table)
 
-	// private PaymentType payType;
-
 	private Long grossValue;
 
 	private Long promoDisc;
@@ -56,13 +54,9 @@ public class NewSaleEntity {
 
 	private String discApprovedBy;
 
-	// private float roundOff;
-
 	private Long netValue;
 
 	private Long taxValue;
-
-	// private String billNumber;
 
 	private String createdBy;// Application User(Cashier)
 
@@ -76,25 +70,15 @@ public class NewSaleEntity {
 
 	private LocalDate lastModified;
 
-	// private String approvedBy;
-
-	// private Long recievedAmount;
-
-	// private String reason;//Needed to move to AV table
-
 	@OneToMany(targetEntity = DeliverySlipEntity.class, mappedBy = "order", cascade = CascadeType.ALL)
 	private List<DeliverySlipEntity> dlSlip;
-	
-	@OneToMany( mappedBy  = "order")//, cascade = CascadeType.ALL)
+
+	@OneToMany(mappedBy = "order") // , cascade = CascadeType.ALL)
 	private List<BarcodeEntity> lineItems;
-	
 
 	@ManyToOne
 	@JoinColumn(name = "customerId")
+	//@Transient
 	private CustomerDetailsEntity customerDetails;
-
-//	 @OneToMany(targetEntity = PaymentAmountType.class, mappedBy = "newsaleId",
-//	 cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//	 private List<PaymentAmountType> paymentType;
 
 }

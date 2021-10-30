@@ -19,7 +19,7 @@ public class LineItemsEntity {
 	@GeneratedValue
 	private Long lineItemId;
 
-	private Long productId;
+	private String barCode;
 
 	private Long itemPrice;
 
