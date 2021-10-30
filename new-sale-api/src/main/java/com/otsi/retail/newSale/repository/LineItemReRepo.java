@@ -11,4 +11,6 @@ import com.otsi.retail.newSale.Entity.LineItemsReEntity;
 public interface LineItemReRepo extends JpaRepository<LineItemsReEntity, Long>{
 
 	List<LineItemsReEntity> findByLineItemReIdIn(List<Long> lineItemIds);
+	
+	LineItemsReEntity findByLineItemReId(Long lineItemId);
 }

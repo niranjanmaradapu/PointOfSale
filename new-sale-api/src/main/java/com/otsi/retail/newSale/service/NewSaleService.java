@@ -2,7 +2,6 @@ package com.otsi.retail.newSale.service;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,14 +15,11 @@ import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.GiftVoucherVo;
-import com.otsi.retail.newSale.vo.HsnDetailsVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
-import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
-import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
@@ -36,8 +32,6 @@ public interface NewSaleService {
 	String saveBarcode(BarcodeVo vo) throws DuplicateRecordException;
 
 	BarcodeVo getBarcodeDetails(String barCode, String smId) throws RecordNotFoundException;
-
-	String saveDeliverySlip(DeliverySlipVo vo,String enumName) throws RecordNotFoundException;
 
 	DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws RecordNotFoundException;
 
@@ -74,7 +68,8 @@ public interface NewSaleService {
 
 	Long saveLineItems(LineItemVo lineItem);
 
+	String saveDeliverySlip(DeliverySlipVo vo) throws RecordNotFoundException;
 
-
+	String editLineItem(LineItemVo lineItem);
 
 }

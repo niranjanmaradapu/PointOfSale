@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -93,7 +94,7 @@ public class NewSaleController {
 
 		String message = newSaleService.saveNewSaleRequest(vo);
 
-		return new GateWayResponse<>(HttpStatus.OK, message);
+		return new GateWayResponse<>("Successfully created order.", message);
 	}
 
 	// Method for create new Barcode..
@@ -118,24 +119,33 @@ public class NewSaleController {
 		return new GateWayResponse<>(HttpStatus.OK, barCodeDetails, "");
 
 	}
-	
+
 	// Method for creating Line Items
 	@PostMapping("/savelineitem")
 	public GateWayResponse<?> saveLineItems(@RequestBody LineItemVo lineItem) throws RecordNotFoundException {
 		log.info("Save Line items with values " + lineItem);
 		Long result = newSaleService.saveLineItems(lineItem);
 
-		return new GateWayResponse<>(result, "Successfully saved Line item..");
+		return new GateWayResponse<>("Successfully saved Line item..", result.toString());
 	}
 
-	// Method for creating Delivery slip using List of Barcodes
+	// Method for modifying line items
+	@PutMapping("/editlineitem")
+	public GateWayResponse<?> editLineItems(@RequestBody LineItemVo lineItem) throws RecordNotFoundException {
+		log.info("edit Line items with values " + lineItem);
+
+		String result = newSaleService.editLineItem(lineItem);
+
+		return new GateWayResponse<>(result, result);
+	}
+
+	// Method for creating Delivery slip using List of LineItems
 	@PostMapping(CommonRequestMappigs.CREATE_DS)
-	public GateWayResponse<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo, String enumName)
-			throws RecordNotFoundException {
+	public GateWayResponse<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo) throws RecordNotFoundException {
 		log.info("Received Request to saveDeliverySlip :" + vo.toString());
 
-		String saveDs = newSaleService.saveDeliverySlip(vo, enumName);
-		return new GateWayResponse<>(HttpStatus.OK, saveDs, "");
+		String saveDs = newSaleService.saveDeliverySlip(vo);
+		return new GateWayResponse<>("successfully created deliveryslip", saveDs);
 
 	}
 
@@ -151,7 +161,8 @@ public class NewSaleController {
 
 	// Method for getting list of sale bills
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
-	public GateWayResponse<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo) throws RecordNotFoundException, JsonMappingException, JsonProcessingException {
+	public GateWayResponse<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo)
+			throws RecordNotFoundException, JsonMappingException, JsonProcessingException {
 		log.info("Received Request to getListOfSaleBills :" + svo.toString());
 
 		ListOfSaleBillsVo listOfSaleBills = newSaleService.getListOfSaleBills(svo);
@@ -322,16 +333,15 @@ public class NewSaleController {
 		return new GateWayResponse<>(HttpStatus.OK, listOfBarcodes, "Successfully fetched list of Barcodes");
 
 	}
-	
+
 	// Method for getting list of sale report
-			@PostMapping(CommonRequestMappigs.GET_SALE_REPORT)
-			public GateWayResponse<?> getSaleReport(@RequestBody SaleReportVo srvo) throws RecordNotFoundException {
-			
+	@PostMapping(CommonRequestMappigs.GET_SALE_REPORT)
+	public GateWayResponse<?> getSaleReport(@RequestBody SaleReportVo srvo) throws RecordNotFoundException {
 
-				SaleReportVo saleReport = newSaleService.getSaleReport(srvo);
-				return new GateWayResponse<>(HttpStatus.OK, saleReport, "");
+		SaleReportVo saleReport = newSaleService.getSaleReport(srvo);
+		return new GateWayResponse<>(HttpStatus.OK, saleReport, "");
 
-			}
+	}
 
 	@PostMapping(CommonRequestMappigs.GET_BARCODES)
 	// @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
