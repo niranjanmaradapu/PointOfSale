@@ -301,9 +301,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 		} else {
 			throw new RecordNotFoundException("Provide line items");
 		}
-		List<LineItemsEntity> listLineItems = lineItemRepo.findByLineItemIdIn(lineItems);
+		List<LineItemsEntity> listLineItems = lineItemRepo.findByLineItemIdInAndDsEntityIsNull(lineItems);
 
-		if (!listLineItems.isEmpty()) {
+		if (lineItems.size() == listLineItems.size() && !listLineItems.isEmpty()) {
 
 			listLineItems.stream().forEach(x -> {
 
@@ -374,19 +374,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 				}
 
 			}
-			
+
 			/*
 			 * getting the record using invoice number
 			 */
-			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getEmpId()== null
-					 && svo.getInvoiceNumber() != null ) {
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getEmpId() == null
+					&& svo.getInvoiceNumber() != null) {
 				saleDetails = newSaleRepository.findByOrderNumber(svo.getInvoiceNumber());
 			}
 			/*
 			 * getting the record using empId
 			 */
-			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null 
-					 && svo.getInvoiceNumber() == null && svo.getEmpId()!=null) {
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getInvoiceNumber() == null
+					&& svo.getEmpId() != null) {
 				saleDetails = newSaleRepository.findByCreatedBy(svo.getEmpId());
 
 			} else
@@ -453,6 +453,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 
 	}
+
 	public HsnDetailsVo getHsnDetails(double netAmt) {
 		log.debug("debugging getHsnDetails:" + netAmt);
 		List<HsnDetailsVo> vo = hsnService.getHsn();
@@ -968,11 +969,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		List<NewSaleEntity> saleDetails = new ArrayList<>();
 
-		
-			if (srvo.getDateFrom() != null && srvo.getDateTo() != null&& srvo.getStore()!=null) {
-				saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreId(srvo.getDateFrom(), srvo.getDateTo(),srvo.getStore().getId());
-			}
-		
+		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() != null) {
+			saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreId(srvo.getDateFrom(), srvo.getDateTo(),
+					srvo.getStore().getId());
+		}
 
 		if (saleDetails.isEmpty()) {
 			throw new RecordNotFoundException("Sale bills are not exists");
@@ -981,16 +981,17 @@ public class NewSaleServiceImpl implements NewSaleService {
 			SaleReportVo slr = newSaleMapper.convertlistSaleReportEntityToVo(saleDetails);
 			HsnDetailsVo hsnDetails = getHsnDetails(slr.getBillValue());
 			SalesSummeryVo salesSummery = new SalesSummeryVo();
-			//salesSummery.setTotalTaxableAmount(hsnDetails.getTaxVo().getTaxableAmount());
-			//salesSummery.setTotalCgst(hsnDetails.getTaxVo().getCgst());
-			//salesSummery.setTotalSgst(hsnDetails.getTaxVo().getSgst());
-			//salesSummery.setTotalIgst(hsnDetails.getTaxVo().getIgst());
-			//salesSummery.setTaxDescription(hsnDetails.getTaxVo().getTaxLabel());
+			// salesSummery.setTotalTaxableAmount(hsnDetails.getTaxVo().getTaxableAmount());
+			// salesSummery.setTotalCgst(hsnDetails.getTaxVo().getCgst());
+			// salesSummery.setTotalSgst(hsnDetails.getTaxVo().getSgst());
+			// salesSummery.setTotalIgst(hsnDetails.getTaxVo().getIgst());
+			// salesSummery.setTaxDescription(hsnDetails.getTaxVo().getTaxLabel());
 			salesSummery.setBillValue(slr.getBillValue());
 			salesSummery.setTotalMrp(slr.getTotalMrp());
 			salesSummery.setTotalDiscount(slr.getTotalDiscount());
 
-			//salesSummery.setTotalTaxAmount(hsnDetails.getTaxVo().getCgst() + hsnDetails.getTaxVo().getSgst());
+			// salesSummery.setTotalTaxAmount(hsnDetails.getTaxVo().getCgst() +
+			// hsnDetails.getTaxVo().getSgst());
 
 			ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetListOfReturnSlips(),
 					HttpMethod.GET, null, GateWayResponse.class);
@@ -1033,26 +1034,32 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			retunVo.setTotalDiscount(barVoList.stream().mapToLong(d -> d.getPromoDisc()).sum());
 			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getMrp()).sum());
-			//retunVo.setTaxDescription(hsnDetails1.getTaxVo().getTaxLabel());
+			// retunVo.setTaxDescription(hsnDetails1.getTaxVo().getTaxLabel());
 			retunVo.setBillValue(rAmount);
-			//retunVo.setTotalTaxableAmount(hsnDetails1.getTaxVo().getTaxableAmount());
-			//retunVo.setTotalSgst(hsnDetails1.getTaxVo().getSgst());
-			//retunVo.setTotalCgst(hsnDetails1.getTaxVo().getCgst());
-			//retunVo.setTotalIgst(hsnDetails1.getTaxVo().getIgst());
-			//retunVo.setTotalTaxAmount(hsnDetails1.getTaxVo().getSgst() + hsnDetails1.getTaxVo().getCgst());
+			// retunVo.setTotalTaxableAmount(hsnDetails1.getTaxVo().getTaxableAmount());
+			// retunVo.setTotalSgst(hsnDetails1.getTaxVo().getSgst());
+			// retunVo.setTotalCgst(hsnDetails1.getTaxVo().getCgst());
+			// retunVo.setTotalIgst(hsnDetails1.getTaxVo().getIgst());
+			// retunVo.setTotalTaxAmount(hsnDetails1.getTaxVo().getSgst() +
+			// hsnDetails1.getTaxVo().getCgst());
 
 			slr.setRetunSummery(retunVo);
 			slr.setSalesSummery(salesSummery);
 			slr.setBillValue(slr.getSalesSummery().getBillValue() - slr.getRetunSummery().getBillValue());
-			//slr.setTotalCgst(slr.getSalesSummery().getTotalCgst() - slr.getRetunSummery().getTotalCgst());
-			//slr.setTotalSgst(slr.getSalesSummery().getTotalSgst() - slr.getRetunSummery().getTotalSgst());
-			//slr.setTotalIgst(slr.getSalesSummery().getTotalIgst() - slr.getRetunSummery().getTotalIgst());
-			//slr.setTotalTaxableAmount(
-					//slr.getSalesSummery().getTotalTaxableAmount() - slr.getRetunSummery().getTotalTaxableAmount());
+			// slr.setTotalCgst(slr.getSalesSummery().getTotalCgst() -
+			// slr.getRetunSummery().getTotalCgst());
+			// slr.setTotalSgst(slr.getSalesSummery().getTotalSgst() -
+			// slr.getRetunSummery().getTotalSgst());
+			// slr.setTotalIgst(slr.getSalesSummery().getTotalIgst() -
+			// slr.getRetunSummery().getTotalIgst());
+			// slr.setTotalTaxableAmount(
+			// slr.getSalesSummery().getTotalTaxableAmount() -
+			// slr.getRetunSummery().getTotalTaxableAmount());
 			slr.setTotalDiscount(slr.getSalesSummery().getTotalDiscount() - slr.getRetunSummery().getTotalDiscount());
 			slr.setTotalMrp(slr.getSalesSummery().getTotalMrp() - slr.getRetunSummery().getTotalMrp());
-			//slr.setTotalTaxAmount(
-					//slr.getSalesSummery().getTotalTaxAmount() - slr.getRetunSummery().getTotalTaxAmount());
+			// slr.setTotalTaxAmount(
+			// slr.getSalesSummery().getTotalTaxAmount() -
+			// slr.getRetunSummery().getTotalTaxAmount());
 
 			return slr;
 		}
@@ -1066,48 +1073,59 @@ public class NewSaleServiceImpl implements NewSaleService {
 		try {
 			if (lineItem.getDomainId() == DomainData.TE.getId()) {
 
-				LineItemsEntity lineEntity = new LineItemsEntity();
+				Optional<LineItemsEntity> line = lineItemRepo.findByBarCode(lineItem.getBarCode());
 
-				lineEntity.setBarCode(lineItem.getBarCode());
-				lineEntity.setQuantity(lineItem.getQuantity());
-				lineEntity.setDiscount(lineItem.getDiscount());
-				lineEntity.setNetValue(lineItem.getNetValue());
-				lineEntity.setItemPrice(lineItem.getItemPrice());
+				if (!line.isPresent()) {
+					LineItemsEntity lineEntity = new LineItemsEntity();
 
-				// GrossValue is multiple of net value of product and quantity
-				lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
+					lineEntity.setBarCode(lineItem.getBarCode());
+					lineEntity.setQuantity(lineItem.getQuantity());
+					lineEntity.setDiscount(lineItem.getDiscount());
+					lineEntity.setNetValue(lineItem.getNetValue());
+					lineEntity.setItemPrice(lineItem.getItemPrice());
 
-				lineEntity.setCreationDate(LocalDateTime.now());
-				lineEntity.setLastModified(LocalDateTime.now());
-				LineItemsEntity saved = lineItemRepo.save(lineEntity);
+					// GrossValue is multiple of net value of product and quantity
+					lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
 
-				log.info("successfully saved line item with id " + saved.getLineItemId());
-				return saved.getLineItemId();
+					lineEntity.setCreationDate(LocalDateTime.now());
+					lineEntity.setLastModified(LocalDateTime.now());
+					LineItemsEntity saved = lineItemRepo.save(lineEntity);
 
+					log.info("successfully saved line item with id " + saved.getLineItemId());
+					return saved.getLineItemId();
+				} else {
+					throw new InvalidInputException("Barcode should be unique");
+				}
 			} else {
 
-				LineItemsReEntity lineReEntity = new LineItemsReEntity();
+				Optional<LineItemsReEntity> line = lineItemReRepo.findByBarCode(lineItem.getBarCode());
+				if (!line.isPresent()) {
 
-				lineReEntity.setBarCode(lineItem.getBarCode());
-				lineReEntity.setQuantity(lineItem.getQuantity());
-				lineReEntity.setDiscount(lineItem.getDiscount());
-				lineReEntity.setNetValue(lineItem.getNetValue());
-				lineReEntity.setItemPrice(lineItem.getItemPrice());
+					LineItemsReEntity lineReEntity = new LineItemsReEntity();
 
-				// GrossValue is multiple of net value of product and quantity
-				lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
+					lineReEntity.setBarCode(lineItem.getBarCode());
+					lineReEntity.setQuantity(lineItem.getQuantity());
+					lineReEntity.setDiscount(lineItem.getDiscount());
+					lineReEntity.setNetValue(lineItem.getNetValue());
+					lineReEntity.setItemPrice(lineItem.getItemPrice());
 
-				lineReEntity.setCreationDate(LocalDateTime.now());
-				lineReEntity.setLastModified(LocalDateTime.now());
-				LineItemsReEntity saved = lineItemReRepo.save(lineReEntity);
+					// GrossValue is multiple of net value of product and quantity
+					lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
 
-				log.info("successfully saved line item with id " + saved.getLineItemReId());
-				return saved.getLineItemReId();
+					lineReEntity.setCreationDate(LocalDateTime.now());
+					lineReEntity.setLastModified(LocalDateTime.now());
+					LineItemsReEntity saved = lineItemReRepo.save(lineReEntity);
+
+					log.info("successfully saved line item with id " + saved.getLineItemReId());
+					return saved.getLineItemReId();
+				} else {
+					throw new InvalidInputException("Barcode should be unique");
+				}
 
 			}
-		} catch (Exception e) {
+		} catch (InvalidInputException e) {
 			log.error("Getting exception while saving Line item..");
-			throw new InvalidInputException("Getting exception while saving Line item..");
+			throw new InvalidInputException(e.getMsg());
 		}
 	}
 
@@ -1139,7 +1157,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// Method for modifying Line Item
 	@Override
-	public String editLineItem(LineItemVo lineItem) {
+	public String editLineItem(LineItemVo lineItem) throws RecordNotFoundException {
 
 		if (lineItem.getDomainId() == DomainData.TE.getId()) {
 
@@ -1163,7 +1181,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 
-				return "provide valid line item";
+				throw new RecordNotFoundException("provide valid line item");
 			}
 
 		} else {
@@ -1185,11 +1203,70 @@ public class NewSaleServiceImpl implements NewSaleService {
 				LineItemsReEntity saved = lineItemReRepo.save(line);
 			} else {
 
-				return "provide valid line item";
+				throw new RecordNotFoundException("provide valid line item");
 			}
 		}
 		return "Successfully modified Line Item.";
 
 	}
 
+	// Method for getting line item by using Bar code
+	@Override
+	public LineItemVo getLineItemByBarcode(String barCode, Long domainId) throws RecordNotFoundException {
+
+		if (domainId == DomainData.TE.getId()) {
+			Optional<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
+			if (lineItem.isPresent()) {
+
+				LineItemVo vo = new LineItemVo();
+				BeanUtils.copyProperties(lineItem.get(), vo);
+				return vo;
+
+			} else {
+				throw new RecordNotFoundException("provide valide barcode");
+			}
+
+		} else {
+			Optional<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode);
+			if (lineItem.isPresent()) {
+				LineItemVo vo = new LineItemVo();
+				BeanUtils.copyProperties(lineItem.get(), vo);
+				return vo;
+
+			} else {
+				throw new RecordNotFoundException("provide valide barcode");
+			}
+
+		}
+
+	}
+
+	// Method for deleting existing line item by using barcode
+	@Override
+	public String deleteLineItem(String barCode, Long domainId) throws RecordNotFoundException {
+
+		if (domainId == DomainData.TE.getId()) {
+			Optional<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
+			if (lineItem.isPresent()) {
+
+				lineItemRepo.delete(lineItem.get());
+				return "Successfully deleted";
+
+			} else {
+				throw new RecordNotFoundException("provide valid barcode");
+			}
+		} else {
+
+			Optional<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode);
+			if (lineItem.isPresent()) {
+
+				lineItemReRepo.delete(lineItem.get());
+				return "Successfully deleted";
+
+			} else {
+				throw new RecordNotFoundException("provide valid barcode");
+			}
+		}
+
+	}
 }

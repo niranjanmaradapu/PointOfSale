@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -122,11 +123,15 @@ public class NewSaleController {
 
 	// Method for creating Line Items
 	@PostMapping("/savelineitem")
-	public GateWayResponse<?> saveLineItems(@RequestBody LineItemVo lineItem) throws RecordNotFoundException {
+	public GateWayResponse<?> saveLineItems(@RequestBody LineItemVo lineItem) throws InvalidInputException {
 		log.info("Save Line items with values " + lineItem);
-		Long result = newSaleService.saveLineItems(lineItem);
+		try {
+			Long result = newSaleService.saveLineItems(lineItem);
 
-		return new GateWayResponse<>("Successfully saved Line item..", result.toString());
+			return new GateWayResponse<>("Successfully saved Line item..", result.toString());
+		} catch (InvalidInputException e) {
+			return new GateWayResponse<>(e.getMsg(), "Exception occurs");
+		}
 	}
 
 	// Method for modifying line items
@@ -143,10 +148,34 @@ public class NewSaleController {
 	@PostMapping(CommonRequestMappigs.CREATE_DS)
 	public GateWayResponse<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo) throws RecordNotFoundException {
 		log.info("Received Request to saveDeliverySlip :" + vo.toString());
+		try {
 
-		String saveDs = newSaleService.saveDeliverySlip(vo);
-		return new GateWayResponse<>("successfully created deliveryslip", saveDs);
+			String saveDs = newSaleService.saveDeliverySlip(vo);
+			return new GateWayResponse<>("successfully created deliveryslip", saveDs);
+		} catch (RecordNotFoundException e) {
+			return new GateWayResponse<>(e.getMsg(), "Exception occurs");
+		}
+	}
 
+	// Method getting line item by using Bar code based on their domain id
+	@GetMapping("/getlineitem")
+	public GateWayResponse<?> getLineItemByBarcode(@RequestParam String barCode, @RequestParam Long domainId)
+			throws RecordNotFoundException {
+
+		LineItemVo result = newSaleService.getLineItemByBarcode(barCode, domainId);
+
+		return new GateWayResponse<>("Success", result);
+
+	}
+
+	// Method for deleting line item by using Bar code based on domain id
+	@DeleteMapping("/deletelineitem")
+	public GateWayResponse<?> deleteLineItemByBarCode(@RequestParam String barCode, @RequestParam Long domainId)
+			throws RecordNotFoundException {
+
+		String result = newSaleService.deleteLineItem(barCode, domainId);
+
+		return new GateWayResponse<>("Success", result);
 	}
 
 	// Method for getting Delivery slip Data using DsNumber
