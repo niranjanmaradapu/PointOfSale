@@ -70,6 +70,11 @@ public interface NewSaleService {
 
 	String saveDeliverySlip(DeliverySlipVo vo) throws RecordNotFoundException;
 
-	String editLineItem(LineItemVo lineItem);
+	String editLineItem(LineItemVo lineItem) throws RecordNotFoundException;
+	
+	LineItemVo getLineItemByBarcode(String barCode, Long domainId) throws RecordNotFoundException;
+
+	String deleteLineItem(String barCode, Long domainId) throws RecordNotFoundException;
+
 
 }
