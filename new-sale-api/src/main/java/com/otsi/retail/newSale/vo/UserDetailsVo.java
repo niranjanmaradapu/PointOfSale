@@ -17,6 +17,8 @@ public class UserDetailsVo {
 	private LocalDate createdDate;
 	private LocalDate lastModifyedDate;
 	private long createdBy;
+	private boolean isActive;
+
 	
 	  private List<UserAv> userAv; 
 	  private List<StoreVo> stores;
