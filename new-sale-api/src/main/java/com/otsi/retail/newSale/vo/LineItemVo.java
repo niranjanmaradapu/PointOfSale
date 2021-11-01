@@ -33,5 +33,8 @@ public class LineItemVo {
 	private LocalDateTime creationDate;
 
 	private LocalDateTime lastModified;
+	
+	private HsnDetailsVo HsnDetailsVo;
+
 
 }

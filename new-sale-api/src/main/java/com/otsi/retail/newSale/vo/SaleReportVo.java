@@ -6,7 +6,6 @@ package com.otsi.retail.newSale.vo;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.otsi.retail.newSale.common.BillType;
 
 import lombok.Data;
 
@@ -21,7 +20,7 @@ private LocalDate dateFrom;
 	
 	private LocalDate dateTo;
 	
-	private BillType billType;
+	//private BillType billType;
 	
 	private Long TotalMrp;
 	
@@ -29,23 +28,27 @@ private LocalDate dateFrom;
 	
 	private Long totalDiscount;
 	
-	private float totalTaxableAmount;
-	
-	private float totalTaxAmount;
-	
-	private float totalSgst;
-	
-	private float totalCgst;
-	
-	private float totalIgst;
-	
-	private String taxDescription;
+	/*
+	 * private float totalTaxableAmount;
+	 * 
+	 * private float totalTaxAmount;
+	 * 
+	 * private float totalSgst;
+	 * 
+	 * private float totalCgst;
+	 * 
+	 * private float totalIgst;
+	 * 
+	 * private String taxDescription;
+	 */
 	
 	private ReturnSummeryVo retunSummery;
 	
 	private SalesSummeryVo salesSummery;
 	
 	private List<BarcodeVo> barcodes;
+	
+	private StoreVo store;
 	
 
 

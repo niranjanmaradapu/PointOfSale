@@ -80,6 +80,8 @@ public class NewSaleVo {
 	private float totalIgst;
 
 	private Long totalNetAmount;
+	
+	private String empId;
 
 	private List<DeliverySlipVo> dlSlip;
 

@@ -11,17 +11,19 @@ private Long TotalMrp;
 	
 	private Long totalDiscount;
 	
-	private float totalTaxableAmount;
-	
-	private float totalTaxAmount;
-	
-	private float totalSgst;
-	
-	private float totalCgst;
-	
-	private float totalIgst;
-	
-	private String taxDescription;
+	/*
+	 * private float totalTaxableAmount;
+	 * 
+	 * private float totalTaxAmount;
+	 * 
+	 * private float totalSgst;
+	 * 
+	 * private float totalCgst;
+	 * 
+	 * private float totalIgst;
+	 * 
+	 * private String taxDescription;
+	 */
 	
 
 }
