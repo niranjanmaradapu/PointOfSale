@@ -26,4 +26,13 @@ public interface PromotionService {
 
 	List<searchPromotionsVo> searchPromotion(searchPromotionsVo vo);
 
+	List<searchPromotionsVo> searchByStore(searchPromotionsVo vo);
+	
+	String updatePriority(searchPromotionsVo vo);
+	
+	String updatePromotionDates(searchPromotionsVo vo);
+	
+	String clonePromotionByStore(searchPromotionsVo vo);
+
+	
 }

@@ -57,6 +57,8 @@ public class PromotionsVo {
 	private LocalDate createdDate;
 
 	private LocalDate lastModified;
+	
+	private int priority;
 
 	private Boolean isForEdit;
 

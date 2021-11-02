@@ -1,12 +1,10 @@
 package com.otsi.retail.connectionpool.vo;
 
 import java.time.LocalDate;
-import java.util.List;
+
+import javax.persistence.Id;
 
 import org.springframework.stereotype.Component;
-
-import com.otsi.retail.connectionpool.common.PoolType;
-import com.otsi.retail.connectionpool.common.PromotionStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,9 +15,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class searchPromotionsVo {
+	
 	private Long promoId;
 	
 	private String promotionName;
+	
+	private int priority;
+	
+	private Long promotionsCount;
 	
 	private String storeName;
 	

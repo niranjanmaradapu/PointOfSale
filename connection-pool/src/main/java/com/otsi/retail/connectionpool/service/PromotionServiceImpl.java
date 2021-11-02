@@ -1,12 +1,17 @@
 package com.otsi.retail.connectionpool.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +24,7 @@ import com.otsi.retail.connectionpool.config.Config;
 import com.otsi.retail.connectionpool.entity.PoolEntity;
 import com.otsi.retail.connectionpool.entity.PromotionToStoreEntity;
 import com.otsi.retail.connectionpool.entity.PromotionsEntity;
+import com.otsi.retail.connectionpool.exceptions.DuplicateRecordException;
 import com.otsi.retail.connectionpool.exceptions.InvalidDataException;
 import com.otsi.retail.connectionpool.exceptions.RecordNotFoundException;
 import com.otsi.retail.connectionpool.gatewayresponse.GateWayResponse;
@@ -226,7 +232,7 @@ public class PromotionServiceImpl implements PromotionService {
 	@Override
 	public String addPromotionToStore(PromotionsVo vo) {
 
-		PromotionsEntity promotionEntity = promoRepo.findByPromoName(vo.getPromoName());
+		PromotionsEntity promotionEntity = promoRepo.findByPromoNameIs(vo.getPromoName());
 
 		if (promotionEntity != null) {
 
@@ -246,7 +252,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 		promostoreRepo.save(entity);
 
-		return "promoStore Mapped Successfully";
+		return "Promotion Mapped Successfully";
 	}
 
 	@Override
@@ -254,69 +260,185 @@ public class PromotionServiceImpl implements PromotionService {
 		List<searchPromotionsVo> searchPromoVo = new ArrayList<searchPromotionsVo>();
 		List<PromotionsEntity> promoDetails = new ArrayList<PromotionsEntity>();
 		PromotionsEntity promoEntity = new PromotionsEntity();
-		
-		if(vo.getStartDate()!=null && vo.getEndDate()!=null) {
-			if(vo.getPromotionName()!=null && vo.getStoreName()!=null) {
-				
-				 promoDetails= promoRepo.findByStartDateAndEndDateAndPromoNameAndStoreNameAndIsActive(vo.getStartDate(),vo.getEndDate(),vo.getPromotionName(),vo.getStoreName(),vo.isPromotionStatus());
-			}
-			else if(vo.getStoreName()!=null&& vo.getPromotionName()==null)
-			{
-				 promoDetails= promoRepo.findByStartDateAndEndDateAndStoreNameAndIsActive(vo.getStartDate(),vo.getEndDate(),vo.getStoreName(),vo.isPromotionStatus());
 
-			}
-			else if(vo.getPromotionName()!=null && vo.getStoreName()==null) {
-				 promoDetails= promoRepo.findByStartDateAndEndDateAndPromoNameAndIsActive(vo.getStartDate(),vo.getEndDate(),vo.getPromotionName(),vo.isPromotionStatus());
+		if (vo.getStartDate() != null && vo.getEndDate() != null) {
+			if (vo.getPromotionName() != null && vo.getStoreName() != null) {
 
+				promoDetails = promoRepo.findByStartDateAndEndDateAndPromoNameAndStoreNameAndIsActive(vo.getStartDate(),
+						vo.getEndDate(), vo.getPromotionName(), vo.getStoreName(), vo.isPromotionStatus());
+			} else if (vo.getStoreName() != null && vo.getPromotionName() == null) {
+				promoDetails = promoRepo.findByStartDateAndEndDateAndStoreNameAndIsActive(vo.getStartDate(),
+						vo.getEndDate(), vo.getStoreName(), vo.isPromotionStatus());
+
+			} else if (vo.getPromotionName() != null && vo.getStoreName() == null) {
+				promoDetails = promoRepo.findByStartDateAndEndDateAndPromoNameAndIsActive(vo.getStartDate(),
+						vo.getEndDate(), vo.getPromotionName(), vo.isPromotionStatus());
+
+			} else
+				promoDetails = promoRepo.findByStartDateAndEndDateAndIsActive(vo.getStartDate(), vo.getEndDate(),
+						vo.isPromotionStatus());
+
+		} else if (vo.getStartDate() == null && vo.getEndDate() == null) {
+			if (vo.getPromotionName() != null && vo.getStoreName() == null) {
+				promoDetails = promoRepo.findByPromoName(vo.getPromotionName());
+				// promoDetails.add(promoEntity);
+
+			} else if (vo.getStoreName() != null && vo.getPromotionName() == null) {
+				promoDetails = promoRepo.findByStoreName(vo.getStoreName());
+
+			} else if (vo.getPromotionName() != null && vo.getStoreName() != null) {
+				promoDetails = promoRepo.findByStoreNameAndPromoName(vo.getStoreName(), vo.getPromotionName());
 			}
+
 			else
-				 promoDetails= promoRepo.findByStartDateAndEndDateAndIsActive(vo.getStartDate(),vo.getEndDate(),vo.isPromotionStatus());
-
-			
-		}
-		else if(vo.getStartDate()==null && vo.getEndDate()==null) {
-			if(vo.getPromotionName()!=null&& vo.getStoreName()==null) {
-				 promoEntity= promoRepo.findByPromoName(vo.getPromotionName());
-				 promoDetails.add(promoEntity);
-
-			}
-			else if(vo.getStoreName()!=null&& vo.getPromotionName()==null) {
-				 promoDetails= promoRepo.findByStoreName(vo.getStoreName());
-
-			}
-			else if(vo.getPromotionName()!=null&& vo.getStoreName()!=null) {
-				promoDetails= promoRepo.findByStoreNameAndPromoName(vo.getStoreName(),vo.getPromotionName());
-			}
-			
-			else
-				 promoDetails= promoRepo.findByIsActive(vo.isPromotionStatus());
+				promoDetails = promoRepo.findByIsActive(vo.isPromotionStatus());
 
 		}
-		if(promoDetails.isEmpty()) {
+		if (promoDetails.isEmpty()) {
 			throw new RecordNotFoundException("No record found with given information");
-		
-		
+
 		}
-		
+
 		else {
-			
-			
-			promoDetails.stream().forEach(p->{
-				
-				vo.setPromotionName(p.getPromoName());
-				vo.setStoreName(p.getStoreName());
-				vo.setStartDate(p.getStartDate());
-				vo.setEndDate(p.getEndDate());
-				vo.setPromotionStatus(p.getIsActive());
-				vo.setPromoId(p.getPromoId());
-				
-				searchPromoVo.add(vo);
+			Long promoCount = promoDetails.stream().count();
+			promoDetails.stream().forEach(p -> {
+				searchPromotionsVo searchVo = new searchPromotionsVo();
+				searchVo.setPromotionName(p.getPromoName());
+				searchVo.setStoreName(p.getStoreName());
+				searchVo.setStartDate(p.getStartDate());
+				searchVo.setEndDate(p.getEndDate());
+				searchVo.setPromotionStatus(p.getIsActive());
+				searchVo.setPromoId(p.getPromoId());
+				searchVo.setPriority(p.getPriority());
+				searchVo.setPromotionsCount(promoCount);
+
+				searchPromoVo.add(searchVo);
 			});
-			
-			
+
 		}
-		
-		
+
 		return searchPromoVo;
 	}
+
+	@Override
+	public List<searchPromotionsVo> searchByStore(searchPromotionsVo vo) {
+
+		List<searchPromotionsVo> searchPromoVo = new ArrayList<searchPromotionsVo>();
+		List<PromotionsEntity> promoDetails = new ArrayList<PromotionsEntity>();
+
+		if (vo.getStoreName() != null) {
+			promoDetails = promoRepo.findByStoreName(vo.getStoreName());
+
+		}
+		if (promoDetails.isEmpty()) {
+			throw new RecordNotFoundException("No record found with given information");
+
+		} else {
+			Long promoCount = promoDetails.stream().count();
+			promoDetails.stream().forEach(p -> {
+				searchPromotionsVo searchVo = new searchPromotionsVo();
+				searchVo.setPromotionName(p.getPromoName());
+				searchVo.setStoreName(p.getStoreName());
+				searchVo.setStartDate(p.getStartDate());
+				searchVo.setEndDate(p.getEndDate());
+				searchVo.setPromotionStatus(p.getIsActive());
+				searchVo.setPromoId(p.getPromoId());
+				searchVo.setPriority(p.getPriority());
+				searchVo.setPromotionsCount(promoCount);
+
+				searchPromoVo.add(searchVo);
+			});
+
+		}
+
+		return searchPromoVo;
+
+	}
+
+	@Override
+	public String updatePriority(searchPromotionsVo vo) {
+
+		if (vo == null) {
+			throw new InvalidDataException("Please enter valid data");
+		}
+
+		PromotionsEntity dto = promoRepo.findById(vo.getPromoId()).get();
+
+		if (Objects.nonNull(vo.getPriority())) {
+			dto.setPriority(vo.getPriority());
+		}
+		PromotionsEntity entity = promoRepo.save(dto);
+
+		return "Promotion Priority Updated Successfully";
+
+	}
+
+	@Override
+	public String updatePromotionDates(searchPromotionsVo vo) {
+		if (vo == null) {
+			throw new InvalidDataException("Please enter valid data");
+		}
+
+		PromotionsEntity dto = promoRepo.findById(vo.getPromoId()).get();
+
+		if (Objects.nonNull(vo.getStartDate()) && Objects.nonNull(vo.getEndDate())
+				&& Objects.nonNull(vo.isPromotionStatus())) {
+			dto.setPromoId(vo.getPromoId());
+			dto.setStartDate(vo.getStartDate());
+			;
+			dto.setEndDate(vo.getEndDate());
+			dto.setIsActive(vo.isPromotionStatus());
+		}
+
+		PromotionsEntity pEntity = promoRepo.save(dto);
+
+		return "Promotion Dates Updated Successfully";
+	}
+
+	@Override
+	public String clonePromotionByStore(searchPromotionsVo vo) {
+
+		if (vo == null) {
+			throw new InvalidDataException("Please enter valid data");
+		}
+		if (promoRepo.existsByStoreName(vo.getStoreName())) {
+
+			throw new DuplicateRecordException("Store name already exists");
+
+		}
+
+		// Random number generator and fixed ranges are setted
+		int min = 100, max = 1000;
+		int randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);
+
+		searchPromotionsVo svo = new searchPromotionsVo();
+		Optional<PromotionsEntity> dto = promoRepo.findById(vo.getPromoId());
+		PromotionsEntity newDto = new PromotionsEntity();
+		System.out.println(dto.get().getStoreName());
+		if (!(dto.get().getStoreName().equals(vo.getStoreName()))) {
+			BeanUtils.copyProperties(dto, newDto);
+			newDto.setStartDate(dto.get().getStartDate());
+			newDto.setEndDate(dto.get().getEndDate());
+			newDto.setPromoName(dto.get().getPromoName());
+			newDto.setIsActive(true);
+			newDto.setPriority(randomNum);
+			newDto.setStoreName(vo.getStoreName());
+			newDto.setCreatedDate(LocalDate.now());
+			newDto.setPromoType(dto.get().getPromoType());
+			newDto.setDescription(dto.get().getDescription());
+			newDto.setPromoApplyType(dto.get().getPromoApplyType());
+			newDto.setIsTaxExtra(dto.get().getIsTaxExtra());
+			newDto.setLastModified(LocalDate.now());
+			newDto.setPrintNameOnBill(dto.get().getPrintNameOnBill());
+			newDto.setApplicability(dto.get().getApplicability());
+			newDto.setBuyItemsFromPool(dto.get().getBuyItemsFromPool());
+			promoRepo.save(newDto);
+		} else {
+
+			throw new InvalidDataException("Given Store are already mapped to the promotion");
+		}
+
+		return "Promotion Cloned Successfully";
+	}
+
 }

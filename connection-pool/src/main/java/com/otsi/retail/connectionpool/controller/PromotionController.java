@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -88,17 +89,49 @@ public class PromotionController {
 }
 		@PostMapping(CommonRequestMappigs.ADD_PROMO_STORE)
 		public GateWayResponse<?> addPromotionToStore(@RequestBody PromotionsVo vo) {
-			log.info("Recieved request to editPromotion():" + vo);
+			log.info("Recieved request to addPromotionToStore():" + vo);
 			String result = promoService.addPromotionToStore(vo);
-			return new GateWayResponse<>("store added to promotion  successfully", result);
+			return new GateWayResponse<>("promotion mapped to store successfully", result);
 
 		}
 		
 		@PostMapping(CommonRequestMappigs.SEARCH_PROMOTION)
 		public GateWayResponse<?> searchPromotion(@RequestBody searchPromotionsVo vo) {
-			log.info("Recieved request to editPromotion():" + vo);
+			log.info("Recieved request to searchPromotion():" + vo);
 			List<searchPromotionsVo> result = promoService.searchPromotion(vo);
-			return new GateWayResponse<>("  successfully getting promotions", result);
+			return new GateWayResponse<>("successfully getting promotions", result);
+
+		} 
+		
+		@PostMapping(CommonRequestMappigs.SEARCH_BY_STORE)
+		public GateWayResponse<?> searchByStore(@RequestBody searchPromotionsVo vo) {
+			log.info("Recieved request to searchByStore():" + vo);
+			List<searchPromotionsVo> result = promoService.searchByStore(vo);
+			return new GateWayResponse<>("  successfully getting store mapped promotions", result);
+
+		} 
+		
+		@PutMapping(CommonRequestMappigs.UPDATE_PRIORITY)
+		public GateWayResponse<?> updatePrioriy( @RequestBody searchPromotionsVo vo) {
+			log.info("Recieved request to updatePriority():" + vo);
+			String result = promoService.updatePriority(vo);
+			return new GateWayResponse<>(" priority updated successfully", result);
+
+		} 
+		
+		@PutMapping(CommonRequestMappigs.UPDATE_PROMO_DATES)
+		public GateWayResponse<?> updatePromoDates( @RequestBody searchPromotionsVo vo) {
+			log.info("Recieved request to updatePromoDates():" + vo);
+			String result = promoService.updatePromotionDates(vo);
+			return new GateWayResponse<>(" promotion dates updated successfully", result);
+
+		} 
+		
+		@PostMapping(CommonRequestMappigs.CLONE_PROMO_BY_STORE)
+		public GateWayResponse<?> clonePromotionByStore( @RequestBody searchPromotionsVo vo) {
+			log.info("Recieved request clonePromotionByStore():" + vo);
+			String result = promoService.clonePromotionByStore(vo);
+			return new GateWayResponse<>(" promotion cloned successfully", result);
 
 		} 
 }

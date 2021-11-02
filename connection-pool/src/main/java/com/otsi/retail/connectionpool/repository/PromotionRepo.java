@@ -2,6 +2,7 @@ package com.otsi.retail.connectionpool.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,7 +19,9 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	//PromotionsEntity findByPromoId(Long promoId);
 
-	PromotionsEntity findByPromoName(String promoName);
+	List<PromotionsEntity> findByPromoName(String promoName);
+	PromotionsEntity findByPromoNameIs(String promoName);
+	
 
 	List<PromotionsEntity> findByStartDateAndEndDateAndPromoNameAndStoreNameAndIsActive(LocalDate startDate,
 			LocalDate endDate, String promotionName, String storeName, boolean promotionStatus);
@@ -39,6 +42,16 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 	List<PromotionsEntity> findByStoreName(String storeName);
 
 	List<PromotionsEntity> findByStoreNameAndPromoName(String storeName, String promotionName);
+
+	PromotionsEntity findByPromoId(Long promoId);
+
+	boolean existsByStoreName(String storeName);
+
+	
+
+	
+
+	
 
 	
 
