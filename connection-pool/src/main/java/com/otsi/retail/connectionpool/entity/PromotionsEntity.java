@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -28,7 +29,7 @@ import lombok.NoArgsConstructor;
 public class PromotionsEntity {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long promoId;
 
 	private String promoName;
@@ -56,6 +57,8 @@ public class PromotionsEntity {
 	private LocalDate endDate;
 	
 	private String storeName;
+	
+	private int priority;
 
 	private LocalDate createdDate;
 
@@ -63,7 +66,7 @@ public class PromotionsEntity {
 	
 	
 
-	@ManyToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
 	@JoinTable(name = "pool_promo", joinColumns = @JoinColumn(name = "promoId"), inverseJoinColumns = @JoinColumn(name = "poolId"))
 	private List<PoolEntity> poolEntity;
 	

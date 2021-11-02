@@ -42,7 +42,7 @@ public class PoolEntity {
 	@OneToMany(targetEntity = RuleEntity.class, mappedBy = "poolEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<RuleEntity> ruleEntity;
 	
-	@ManyToMany(mappedBy = "poolEntity",cascade = CascadeType.PERSIST)
+	@ManyToMany(mappedBy = "poolEntity",cascade ={CascadeType.PERSIST, CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
 	private List<PromotionsEntity> promoEntity;
 	
 	

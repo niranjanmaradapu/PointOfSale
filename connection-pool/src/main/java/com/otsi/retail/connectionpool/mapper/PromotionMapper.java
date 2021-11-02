@@ -37,6 +37,7 @@ public class PromotionMapper {
 		promo.setIsActive(Boolean.TRUE);
 		promo.setCreatedDate(LocalDate.now());
 		promo.setLastModified(LocalDate.now());
+		promo.setPriority(vo.getPriority());
 		promo.setPoolEntity(poolList);// Mapping all poolIds to Promotions
 		
 		/** Store Mapping **/
@@ -64,6 +65,7 @@ public class PromotionMapper {
 			vo.setLastModified(x.getLastModified());
 			vo.setPromoId(x.getPromoId());
 			vo.setPromoApplyType(x.getPromoApplyType());
+			vo.setPriority(x.getPriority());
 			listOfPromoVos.add(vo);
 
 			List<ConnectionPoolVo> poolList = new ArrayList<>();
@@ -84,4 +86,5 @@ public class PromotionMapper {
 		return listOfPromoVos;
 	}
 
+	
 }

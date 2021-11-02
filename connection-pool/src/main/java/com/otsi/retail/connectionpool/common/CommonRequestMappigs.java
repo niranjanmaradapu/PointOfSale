@@ -3,10 +3,7 @@ package com.otsi.retail.connectionpool.common;
 public class CommonRequestMappigs {
 
 	public static final String POOL = "pool";
-	
-	public static final String SEARCH_PROMOTION = "searchPromotion";
 
-	
 	public static final String ADD_PROMO_STORE = "addPromoToStore";
 
 	public static final String GET_ALL_STORES = "getAllStores";
@@ -29,12 +26,16 @@ public class CommonRequestMappigs {
 	
 	public static final String DELETE_PROMO = "deletepromo";
 	
-	//public static final String STORE = "store";
+	public static final String SEARCH_PROMOTION = "searchPromotion";
 	
-	//public static final String ADD_STORE = "addstore";
+	public static final String SEARCH_BY_STORE = "searchByStore";
 	
-	//public static final String GET_STORE_BY_ID = "getStoreById";
+	public static final String UPDATE_PRIORITY = "updatePriority";
 	
-	//public static final String GET_STORE_BY_NAME = "getStoreByName";
+	public static final String UPDATE_PROMO_DATES = "updatePromotionDates";
+	
+	public static final String CLONE_PROMO_BY_STORE = "clonePromotionByStore";
+	
+	
 
 }
