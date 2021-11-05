@@ -1070,14 +1070,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// Method for saving Line items
 	@Override
-	public Long saveLineItems(LineItemVo lineItem) throws InvalidInputException {
-		log.debug("Debugging saveLineItems() " + lineItem);
+	public List<Long> saveLineItems(List<LineItemVo> lineItems, Long domainId) throws InvalidInputException {
+		log.debug("Debugging saveLineItems() " + lineItems);
 		try {
-			if (lineItem.getDomainId() == DomainData.TE.getId()) {
+			if (domainId == DomainData.TE.getId()) {
 
-				Optional<LineItemsEntity> line = lineItemRepo.findByBarCode(lineItem.getBarCode());
+				List<LineItemsEntity> list = new ArrayList<>();
 
-				if (!line.isPresent()) {
+				lineItems.stream().forEach(lineItem -> {
+
 					LineItemsEntity lineEntity = new LineItemsEntity();
 
 					lineEntity.setBarCode(lineItem.getBarCode());
@@ -1091,17 +1092,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					lineEntity.setCreationDate(LocalDateTime.now());
 					lineEntity.setLastModified(LocalDateTime.now());
-					LineItemsEntity saved = lineItemRepo.save(lineEntity);
 
-					log.info("successfully saved line item with id " + saved.getLineItemId());
-					return saved.getLineItemId();
-				} else {
-					throw new InvalidInputException("Barcode should be unique");
-				}
+					list.add(lineEntity);
+				});
+				List<LineItemsEntity> saved = lineItemRepo.saveAll(list);
+
+				log.info("successfully saved line items " + saved);
+				return saved.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
+
 			} else {
 
-				Optional<LineItemsReEntity> line = lineItemReRepo.findByBarCode(lineItem.getBarCode());
-				if (!line.isPresent()) {
+				List<LineItemsReEntity> list = new ArrayList<>();
+
+				lineItems.stream().forEach(lineItem -> {
 
 					LineItemsReEntity lineReEntity = new LineItemsReEntity();
 
@@ -1116,14 +1119,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					lineReEntity.setCreationDate(LocalDateTime.now());
 					lineReEntity.setLastModified(LocalDateTime.now());
-					LineItemsReEntity saved = lineItemReRepo.save(lineReEntity);
+					list.add(lineReEntity);
 
-					log.info("successfully saved line item with id " + saved.getLineItemReId());
-					return saved.getLineItemReId();
-				} else {
-					throw new InvalidInputException("Barcode should be unique");
-				}
+				});
 
+				List<LineItemsReEntity> saved = lineItemReRepo.saveAll(list);
+
+				log.info("successfully saved line items " + saved);
+				return saved.stream().map(x -> x.getLineItemReId()).collect(Collectors.toList());
 			}
 		} catch (InvalidInputException e) {
 			log.error("Getting exception while saving Line item..");

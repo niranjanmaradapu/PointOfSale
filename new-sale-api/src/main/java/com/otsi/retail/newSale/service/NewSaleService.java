@@ -35,18 +35,21 @@ public interface NewSaleService {
 
 	DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws RecordNotFoundException;
 
-	ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo) throws RecordNotFoundException, JsonMappingException, JsonProcessingException;
+	ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo)
+			throws RecordNotFoundException, JsonMappingException, JsonProcessingException;
 
-	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo) throws RecordNotFoundException;
+	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo)
+			throws RecordNotFoundException;
 
 	String posDayClose();
 
-	double getNewSaleWithHsn(double netAmt) throws JsonMappingException, JsonProcessingException,DataNotFoundException;
+	double getNewSaleWithHsn(double netAmt) throws JsonMappingException, JsonProcessingException, DataNotFoundException;
 
 	List<NewSaleResponseVo> getNewsaleByCustomerId(Long customerId) throws DataNotFoundException;
 
 	NewSaleVo updateNewSale(NewSaleResponseVo vo) throws RecordNotFoundException;
-	NewSaleList getInvoicDetails(InvoiceRequestVo vo) throws  RecordNotFoundException;
+
+	NewSaleList getInvoicDetails(InvoiceRequestVo vo) throws RecordNotFoundException;
 
 	CustomerVo getCustomerFromNewSale(String mobileNo) throws DataNotFoundException;
 
@@ -58,7 +61,7 @@ public interface NewSaleService {
 
 	GiftVoucherVo getGiftVoucher(String gvNumber) throws InvalidInputException;
 
-	String tagCustomerToGv(Long userId, Long gvId) throws InvalidInputException,DataNotFoundException;
+	String tagCustomerToGv(Long userId, Long gvId) throws InvalidInputException, DataNotFoundException;
 
 	List<BarcodeVo> getAllBarcodes() throws DataNotFoundException;
 
@@ -66,15 +69,14 @@ public interface NewSaleService {
 
 	SaleReportVo getSaleReport(SaleReportVo srvo) throws RecordNotFoundException;
 
-	Long saveLineItems(LineItemVo lineItem);
+	List<Long> saveLineItems(List<LineItemVo> lineItems, Long domainId);
 
 	String saveDeliverySlip(DeliverySlipVo vo) throws RecordNotFoundException;
 
 	String editLineItem(LineItemVo lineItem) throws RecordNotFoundException;
-	
+
 	LineItemVo getLineItemByBarcode(String barCode, Long domainId) throws RecordNotFoundException;
 
 	String deleteLineItem(String barCode, Long domainId) throws RecordNotFoundException;
-
 
 }

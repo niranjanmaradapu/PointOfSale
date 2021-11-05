@@ -122,11 +122,12 @@ public class NewSaleController {
 	}
 
 	// Method for creating Line Items
-	@PostMapping("/savelineitem")
-	public GateWayResponse<?> saveLineItems(@RequestBody LineItemVo lineItem) throws InvalidInputException {
-		log.info("Save Line items with values " + lineItem);
+	@PostMapping("/savelineitems/{domainId}")
+	public GateWayResponse<?> saveLineItems(@PathVariable Long domainId, @RequestBody List<LineItemVo> lineItems)
+			throws InvalidInputException {
+		log.info("Save Line items with values " + lineItems);
 		try {
-			Long result = newSaleService.saveLineItems(lineItem);
+			List<Long> result = newSaleService.saveLineItems(lineItems, domainId);
 
 			return new GateWayResponse<>("Successfully saved Line item..", result.toString());
 		} catch (InvalidInputException e) {
