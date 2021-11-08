@@ -90,12 +90,16 @@ public class NewSaleController {
 
 	// Method for saving new sale items...
 	@PostMapping(CommonRequestMappigs.SALE)
-	public GateWayResponse<?> saveNewSale(@RequestBody NewSaleVo vo) {
+	public GateWayResponse<?> saveNewSale(@RequestBody NewSaleVo vo) throws InvalidInputException {
 		log.info("Received Request to saveNewSale :" + vo.toString());
 
-		String message = newSaleService.saveNewSaleRequest(vo);
+		try {
+			String message = newSaleService.saveNewSaleRequest(vo);
 
-		return new GateWayResponse<>("Successfully created order.", message);
+			return new GateWayResponse<>("Successfully created order.", message);
+		} catch (InvalidInputException e) {
+			return new GateWayResponse<>(e.getMsg(), "Exception occurs while creating order");
+		}
 	}
 
 	// Method for create new Barcode..
