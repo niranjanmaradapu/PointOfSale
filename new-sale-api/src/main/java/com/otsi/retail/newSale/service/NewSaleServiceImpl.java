@@ -143,7 +143,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// Method for saving order
 	@Override
-	public String saveNewSaleRequest(NewSaleVo vo) {
+	public String saveNewSaleRequest(NewSaleVo vo) throws InvalidInputException{
 		log.debug("deugging saveNewSaleRequest" + vo);
 		NewSaleEntity entity = new NewSaleEntity();
 
@@ -184,7 +184,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			List<String> dlsList = dlSlips.stream().map(x -> x.getDsNumber()).collect(Collectors.toList());
 
-			List<DeliverySlipEntity> dsList = dsRepo.findByDsNumberIn(dlsList);
+			List<DeliverySlipEntity> dsList = dsRepo.findByDsNumberInAndOrderIsNull(dlsList);
 
 			if (dsList.size() == vo.getDlSlip().size()) {
 
@@ -218,7 +218,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			List<Long> lineItemIds = lineItems.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
 
-			List<LineItemsReEntity> lineItemsList = lineItemReRepo.findByLineItemReIdIn(lineItemIds);
+			List<LineItemsReEntity> lineItemsList = lineItemReRepo.findByLineItemReIdInAndOrderIdIsNull(lineItemIds);
 
 			if (lineItems.size() == lineItemsList.size()) {
 

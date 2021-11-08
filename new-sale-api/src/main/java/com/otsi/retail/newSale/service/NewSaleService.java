@@ -27,7 +27,7 @@ import com.otsi.retail.newSale.vo.SaleReportVo;
 @Component
 public interface NewSaleService {
 
-	String saveNewSaleRequest(NewSaleVo vo);
+	String saveNewSaleRequest(NewSaleVo vo) throws InvalidInputException;
 
 	String saveBarcode(BarcodeVo vo) throws DuplicateRecordException;
 
