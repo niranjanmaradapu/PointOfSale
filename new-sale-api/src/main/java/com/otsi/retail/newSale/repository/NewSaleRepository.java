@@ -3,6 +3,7 @@ package com.otsi.retail.newSale.repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.LongStream;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -23,7 +24,7 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 
 	List<NewSaleEntity> findByCreationDateBetween(LocalDate dateFrom, LocalDate dateTo);
 	
-	List<NewSaleEntity> findByUserId(Long customerId);
+	List<NewSaleEntity> findByUserId(Long userId);
 
 	List<NewSaleEntity> findByCustomerDetailsMobileNumberAndCreationDateBetween(String mobileNo, LocalDate fromDate, LocalDate toDate);
 
@@ -32,6 +33,10 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 	List<NewSaleEntity> findByCreatedBy(String empId);
 
 	List<NewSaleEntity> findByCreationDateBetweenAndStoreId(LocalDate dateFrom, LocalDate dateTo, long id);
+
+	List<NewSaleEntity> findByUserId(LongStream userId);
+
+	List<NewSaleEntity> findByUserIdIn(List<Long> userIds);
 
 
 }

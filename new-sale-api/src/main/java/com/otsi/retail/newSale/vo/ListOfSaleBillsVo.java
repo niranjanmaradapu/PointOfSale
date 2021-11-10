@@ -11,55 +11,28 @@ import lombok.Data;
 @Component
 public class ListOfSaleBillsVo {
 
-	
-
-	
-
 	private LocalDate dateFrom;
 
 	private LocalDate dateTo;
 
 	private LocalDate createdDate;
-	
+
 	private String billStatus;
 
 	private String custMobileNumber;
 
 	private Long invoiceNumber;
-	
+
 	private String EmpId;
 
-	
 	private Long totalAmount;
-	
-	
-	
+
 	private Long totalDiscount;
-	
-	
- 
 
-	
-	
-	
-	
-	
- 
- 
- 
-	
-	
-	
 	private List<NewSaleVo> newSaleVo;
-	
-	//private List<BarcodeVo> barcodeVo;
-	
-	//private List<HsnDetailsVo> HsnDetailsVo;
 
+	// private List<BarcodeVo> barcodeVo;
 
+	// private List<HsnDetailsVo> HsnDetailsVo;
 
-	
-	
-	
- 
 }
