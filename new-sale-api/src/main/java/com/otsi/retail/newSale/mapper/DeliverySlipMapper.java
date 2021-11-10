@@ -29,8 +29,8 @@ public class DeliverySlipMapper {
 		entity.setSalesMan(vo.getSalesMan());
 		entity.setQty(vo.getQty());
 		entity.setType(vo.getType());
-		entity.setCreationDate(LocalDateTime.now());
-		entity.setLastModified(LocalDateTime.now());
+		entity.setCreationDate(LocalDate.now());
+		entity.setLastModified(LocalDate.now());
 		entity.setStatus(DSStatus.Pending);
 
 		return entity;
@@ -80,7 +80,7 @@ public class DeliverySlipMapper {
 
 		vo.setDsNumber(dsEntity.getDsNumber());
 		vo.setSalesMan(dsEntity.getSalesMan());
-		vo.setCreatedDate(dsEntity.getCreationDate().toLocalDate());
+		vo.setCreatedDate(dsEntity.getCreationDate());
 		vo.setLastModified(dsEntity.getLastModified());
 
 		List<LineItemVo> lineItems = new ArrayList<>();

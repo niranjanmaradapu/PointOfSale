@@ -194,12 +194,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					a.setOrder(saveEntity);
 					a.setStatus(DSStatus.Completed);
-					a.setLastModified(LocalDateTime.now());
+					a.setLastModified(LocalDate.now());
 					dsRepo.save(a);
 
 					a.getLineItems().stream().forEach(x -> {
 
-						x.setLastModified(LocalDateTime.now());
+						x.setLastModified(LocalDate.now());
 						x.setDsEntity(a);
 						lineItemRepo.save(x);
 
@@ -226,7 +226,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				lineItemsList.stream().forEach(x -> {
 
-					x.setLastModified(LocalDateTime.now());
+					x.setLastModified(LocalDate.now());
 					x.setOrderId(saveEntity);
 					lineItemReRepo.save(x);
 
@@ -288,8 +288,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 		Random ran = new Random();
 		entity.setDsNumber("DS/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
 		entity.setStatus(DSStatus.Pending);
-		entity.setCreationDate(LocalDateTime.now());
-		entity.setLastModified(LocalDateTime.now());
+		entity.setCreationDate(LocalDate.now());
+		entity.setLastModified(LocalDate.now());
 		entity.setSalesMan(vo.getSalesMan());
 
 		DeliverySlipEntity savedEntity = dsRepo.save(entity);
@@ -309,7 +309,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			listLineItems.stream().forEach(x -> {
 
-				x.setLastModified(LocalDateTime.now());
+				x.setLastModified(LocalDate.now());
 				x.setDsEntity(savedEntity);
 				lineItemRepo.save(x);
 			});
@@ -511,12 +511,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() != null
 				&& listOfDeliverySlipVo.getBarcode() != null) {
 
-			BarcodeEntity bar = barcodeRepository.findByBarcode(listOfDeliverySlipVo.getBarcode());
+			Optional<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
 
 			if (bar != null) {
 				dsDetails = dsRepo.findByCreationDateBetweenAndDsIdAndDsNumberAndStatusOrderByCreationDateAsc(
 						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-						bar.getDeliverySlip().getDsId(), listOfDeliverySlipVo.getDsNumber(),
+						bar.get().getDsEntity().getDsId(), listOfDeliverySlipVo.getDsNumber(),
 						listOfDeliverySlipVo.getStatus());
 
 			} else {
@@ -532,10 +532,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
 				&& listOfDeliverySlipVo.getBarcode() != null) {
 
-			BarcodeEntity bar = barcodeRepository.findByBarcode(listOfDeliverySlipVo.getBarcode());
+			Optional<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
 
 			if (bar != null) {
-				dsDetails = dsRepo.findByDsId(bar.getDeliverySlip().getDsId());
+				dsDetails = dsRepo.findByDsId(bar.get().getDsEntity().getDsId());
 
 			} else {
 				log.error("No record found with given barcode");
@@ -550,12 +550,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
 				&& listOfDeliverySlipVo.getBarcode() != null) {
 
-			BarcodeEntity bar = barcodeRepository.findByBarcode(listOfDeliverySlipVo.getBarcode());
+			Optional<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
 
 			if (bar != null) {
 				dsDetails = dsRepo.findByCreationDateBetweenAndDsIdOrderByCreationDateAsc(
 						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-						bar.getDeliverySlip().getDsId());
+						bar.get().getDsEntity().getDsId());
 
 			} else {
 				log.error("No record found with given barcode");
@@ -1090,8 +1090,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 					// GrossValue is multiple of net value of product and quantity
 					lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
 
-					lineEntity.setCreationDate(LocalDateTime.now());
-					lineEntity.setLastModified(LocalDateTime.now());
+					lineEntity.setCreationDate(LocalDate.now());
+					lineEntity.setLastModified(LocalDate.now());
 
 					list.add(lineEntity);
 				});
@@ -1117,8 +1117,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 					// GrossValue is multiple of net value of product and quantity
 					lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
 
-					lineReEntity.setCreationDate(LocalDateTime.now());
-					lineReEntity.setLastModified(LocalDateTime.now());
+					lineReEntity.setCreationDate(LocalDate.now());
+					lineReEntity.setLastModified(LocalDate.now());
 					list.add(lineReEntity);
 
 				});
@@ -1181,8 +1181,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 				// GrossValue is multiple of net value of product and quantity
 				line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
 
-				line.setCreationDate(LocalDateTime.now());
-				line.setLastModified(LocalDateTime.now());
+				line.setCreationDate(LocalDate.now());
+				line.setLastModified(LocalDate.now());
 				LineItemsEntity saved = lineItemRepo.save(line);
 
 			} else {
@@ -1204,8 +1204,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 				// GrossValue is multiple of net value of product and quantity
 				line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
 
-				line.setCreationDate(LocalDateTime.now());
-				line.setLastModified(LocalDateTime.now());
+				line.setCreationDate(LocalDate.now());
+				line.setLastModified(LocalDate.now());
 				LineItemsReEntity saved = lineItemReRepo.save(line);
 			} else {
 
