@@ -20,6 +20,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
@@ -75,6 +76,7 @@ import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.ReturnSummeryVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.SalesSummeryVo;
@@ -380,9 +382,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					List<Long> userIds = uvo.stream().map(x -> x.getUserId()).collect(Collectors.toList());
 
-					 saleDetails = newSaleRepository.findByUserIdIn(userIds);
-					
-					
+					saleDetails = newSaleRepository.findByUserIdIn(userIds);
 
 				}
 
@@ -773,34 +773,103 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public NewSaleList getInvoicDetails(InvoiceRequestVo vo) throws RecordNotFoundException {
+	public List<ReturnSlipVo> getInvoicDetails(InvoiceRequestVo vo) throws RecordNotFoundException {
+
 		log.debug(" debugging getInvoicDetails:" + vo);
-		NewSaleList newSaleList1 = new NewSaleList();
-		List<NewSaleVo> newSaleList = new ArrayList<>();
+		// NewSaleList newSaleList1 = new NewSaleList();
+		// List<NewSaleVo> newSaleList = new ArrayList<>();
+
 		if (null != vo.getInvoiceNo() && !vo.getInvoiceNo().isEmpty()) {
+			if (vo.getDomianId() != 0) {
+				List<ReturnSlipVo> rtSlipVoList = new ArrayList<>();
+				List<NewSaleEntity> newSaleEntity = newSaleRepository.findByOrderNumber(vo.getInvoiceNo());
+				if (!CollectionUtils.isEmpty(newSaleEntity)) {
+					newSaleEntity.stream().forEach(a -> {
+						if (vo.getDomianId() == DomainData.TE.getId()) {
+							a.getDlSlip().stream().forEach(dSlip -> {
+								dSlip.getLineItems().stream().forEach(lItem -> {
+									ReturnSlipVo rtSlipVo = new ReturnSlipVo();
+									rtSlipVo.setBarcode(lItem.getBarCode());
+									rtSlipVo.setNetValue(lItem.getNetValue());
+									rtSlipVo.setQuantity(lItem.getQuantity());
+									rtSlipVoList.add(rtSlipVo);
+								});
+							});
+						}
+						if (vo.getDomianId() == DomainData.RE.getId()) {
+							newSaleEntity.stream().forEach(newSale -> {
+								newSale.getLineItemsRe().stream().forEach(lItem -> {
+									ReturnSlipVo rtSlipVo = new ReturnSlipVo();
+									rtSlipVo.setBarcode(lItem.getBarCode());
+									rtSlipVo.setNetValue(lItem.getNetValue());
+									rtSlipVo.setQuantity(lItem.getQuantity());
+									rtSlipVoList.add(rtSlipVo);
+								});
+							});
+						}
+					});
+					return rtSlipVoList;
+				} else {
+					throw new RuntimeException("Invoice details not found with this OrderId : " + vo.getInvoiceNo());
+				}
 
-			List<NewSaleEntity> newSaleEntity = newSaleRepository.findByOrderNumber(vo.getInvoiceNo());
-			newSaleList = newSaleEntity.stream().map(dto -> newSaleMapper.convertNewSaleDtoToVo(dto))
-					.collect(Collectors.toList());
-			newSaleList1.setNewSaleVo(newSaleList);
-			return newSaleList1;
+			} else {
+				throw new RuntimeException("DomianId should not be null");
+			}
 		}
-		if (null != vo.getBarCode() && !vo.getBarCode().isEmpty()) {
-			BarcodeEntity barcode = barcodeRepository.findByBarcode(vo.getBarCode());
-			DeliverySlipEntity dsSlip = dsRepo.findByDsNumber(barcode.getDeliverySlip().getDsNumber());
-			// newSaleList.add(newSaleMapper.convertNewSaleDtoToVo(dsSlip.getNewsale()));
-			newSaleList1.setNewSaleVo(newSaleList);
-			return newSaleList1;
-		}
+
 		if (null != vo.getMobileNo() && !vo.getMobileNo().isEmpty()) {
+			if (0 == vo.getDomianId()) {
+				throw new RuntimeException("DomianId should not be null");
+			}
+			// get customer details from URM
+			List<UserDetailsVo> customers = getUserDetailsFromURM(vo.getMobileNo(), 0L);
+			Optional<UserDetailsVo> customer = customers.stream().findFirst();
+			if (customer.isPresent()) {
+				List<ReturnSlipVo> rtSlipVoList = new ArrayList<>();
 
-			List<NewSaleEntity> newSaleEntity = newSaleRepository
-					.findByCustomerDetailsMobileNumberAndCreationDateBetween(vo.getMobileNo(), vo.getFromDate(),
-							vo.getToDate());
-			newSaleList = newSaleEntity.stream().map(dto -> newSaleMapper.convertNewSaleDtoToVo(dto))
-					.collect(Collectors.toList());
-			newSaleList1.setNewSaleVo(newSaleList);
-			return newSaleList1;
+				List<NewSaleEntity> newSaleEntity = newSaleRepository.findByUserId(customer.get().getUserId());
+				/*
+				 * newSaleList = newSaleEntity.stream().map(dto ->
+				 * newSaleMapper.convertNewSaleDtoToVo(dto)) .collect(Collectors.toList());
+				 * newSaleList1.setNewSaleVo(newSaleList);
+				 * 
+				 */
+				if (!CollectionUtils.isEmpty(newSaleEntity)) {
+
+					newSaleEntity.stream().forEach(a -> {
+						if (vo.getDomianId() == DomainData.TE.getId()) {
+							a.getDlSlip().stream().forEach(dSlip -> {
+								dSlip.getLineItems().stream().forEach(lItem -> {
+									ReturnSlipVo rtSlipVo = new ReturnSlipVo();
+									rtSlipVo.setBarcode(lItem.getBarCode());
+									rtSlipVo.setNetValue(lItem.getNetValue());
+									rtSlipVo.setQuantity(lItem.getQuantity());
+									rtSlipVoList.add(rtSlipVo);
+								});
+							});
+						}
+						if (vo.getDomianId() == DomainData.RE.getId()) {
+							newSaleEntity.stream().forEach(newSale -> {
+								newSale.getLineItemsRe().stream().forEach(lItem -> {
+									ReturnSlipVo rtSlipVo = new ReturnSlipVo();
+									rtSlipVo.setBarcode(lItem.getBarCode());
+									rtSlipVo.setNetValue(lItem.getNetValue());
+									rtSlipVo.setQuantity(lItem.getQuantity());
+									rtSlipVoList.add(rtSlipVo);
+								});
+							});
+						}
+					});
+					return rtSlipVoList;
+				} else {
+					throw new RuntimeException(
+							"No Invoice details not found with this Mobile number : " + vo.getMobileNo());
+				}
+
+			} else {
+				throw new RuntimeException("Customer details not found with this mobile number : " + vo.getMobileNo());
+			}
 		}
 		log.error("No records found with your inputs");
 		throw new RecordNotFoundException("No records found with your inputs");
@@ -1296,4 +1365,26 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 
 	}
+
+	@Override
+	public String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo) {
+
+		
+		/*
+		 * List<UserDetailsVo> userVo=getUserDetailsFromURM(mobileNo, 0L);
+		 * if(!CollectionUtils.isEmpty(userVo)) { Optional<UserDetailsVo>
+		 * userFromUrm=userVo.stream().findFirst();
+		 * 
+		 * List<NewSaleEntity> newSale=newSaleRepository.findByOrderNumber(invoiceNo);
+		 * if(!CollectionUtils.isEmpty(newSale)) { Optional<NewSaleEntity>
+		 * newSaleEntity= newSale.stream().findFirst();
+		 * if(newSaleEntity.get().getUserId()==userFromUrm.get().getUserId()) {
+		 * 
+		 * } } }
+		 */
+
+return null;
+	}
+	
+	
 }

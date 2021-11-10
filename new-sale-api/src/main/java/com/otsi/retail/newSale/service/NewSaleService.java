@@ -22,6 +22,7 @@ import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 
 @Component
@@ -49,7 +50,7 @@ public interface NewSaleService {
 
 	NewSaleVo updateNewSale(NewSaleResponseVo vo) throws RecordNotFoundException;
 
-	NewSaleList getInvoicDetails(InvoiceRequestVo vo) throws RecordNotFoundException;
+	List<ReturnSlipVo> getInvoicDetails(InvoiceRequestVo vo) throws RecordNotFoundException;
 
 	CustomerVo getCustomerFromNewSale(String mobileNo) throws DataNotFoundException;
 
@@ -78,5 +79,7 @@ public interface NewSaleService {
 	LineItemVo getLineItemByBarcode(String barCode, Long domainId) throws RecordNotFoundException;
 
 	String deleteLineItem(String barCode, Long domainId) throws RecordNotFoundException;
+
+	String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo);
 
 }

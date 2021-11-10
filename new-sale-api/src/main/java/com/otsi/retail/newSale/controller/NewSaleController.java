@@ -42,6 +42,7 @@ import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
 
@@ -264,7 +265,7 @@ public class NewSaleController {
 	@PostMapping(value = "getInvoiceDetails", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public GateWayResponse<?> getInvoiceDetails(@RequestBody InvoiceRequestVo vo) throws RecordNotFoundException {
 		log.info("Recieved request to getInvoiceDetails():" + vo.toString());
-		NewSaleList newSaleList = newSaleService.getInvoicDetails(vo);
+		List<ReturnSlipVo> newSaleList = newSaleService.getInvoicDetails(vo);
 		return new GateWayResponse<>(HttpStatus.OK, newSaleList, "");
 
 	}
@@ -388,5 +389,14 @@ public class NewSaleController {
 
 		return new GateWayResponse<>(HttpStatus.OK, barCodeDetails, "");
 
+	}
+	
+	@GetMapping("/isCustomerTaggedToNewSale/{mobileNo}/{invoiceNo}")
+	public GateWayResponse<?> getTaggedCustomerForInvoice(@PathVariable String mobileNo,@PathVariable String invoiceNo){
+		/*
+		 * try { String result=
+		 * newSaleService.getTaggedCustomerForInvoice(mobileNo,invoiceNo); }
+		 */
+		return null;
 	}
 }
