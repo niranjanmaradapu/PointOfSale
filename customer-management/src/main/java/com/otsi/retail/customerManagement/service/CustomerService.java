@@ -26,7 +26,7 @@ public interface CustomerService {
 
 	List<ListOfReturnSlipsVo> getListOfReturnSlips(ListOfReturnSlipsVo vo);
 
-	NewSaleList getInvoiceDetailsFromNewSale(InvoiceRequestVo searchVo) throws Exception;
+	List<ReturnSlipVo> getInvoiceDetailsFromNewSale(InvoiceRequestVo searchVo) throws Exception;
 
 	String createReturnSlip(GenerateReturnSlipRequest request) throws Exception;
 

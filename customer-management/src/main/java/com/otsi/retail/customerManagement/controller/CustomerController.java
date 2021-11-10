@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.otsi.retail.customerManagement.gatewayresponse.GateWayResponse;
 import com.otsi.retail.customerManagement.service.CustomerService;
+import com.otsi.retail.customerManagement.service.ReturnSlipVo;
 import com.otsi.retail.customerManagement.vo.CustomerDetailsVo;
 import com.otsi.retail.customerManagement.vo.GenerateReturnSlipRequest;
 import com.otsi.retail.customerManagement.vo.HsnDetailsVo;
@@ -59,7 +60,7 @@ public class CustomerController {
 	@PostMapping("/getInvoiceDetails")
 	public GateWayResponse<?> getInvoiceDetails(@RequestBody InvoiceRequestVo searchVo) throws Exception {
 		log.info("Received request to getInvoiceDetails:" + searchVo);
-		NewSaleList newSale = customerService.getInvoiceDetailsFromNewSale(searchVo);
+		List<ReturnSlipVo> newSale = customerService.getInvoiceDetailsFromNewSale(searchVo);
 		return new GateWayResponse<>(HttpStatus.OK, newSale, "");
 
 	}

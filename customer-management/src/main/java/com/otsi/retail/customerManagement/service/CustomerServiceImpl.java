@@ -98,24 +98,21 @@ public class CustomerServiceImpl implements CustomerService {
 			 * getting the record using dates and RtNumber
 			 *
 			 */
-			if (vo.getRtNumber() != null && vo.getBarcode()==null&& vo.getCreatedBy()==null ) 
-			{
+			if (vo.getRtNumber() != null && vo.getBarcode() == null && vo.getCreatedBy() == null) {
 				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtNoOrderByCreatedDateAsc(vo.getDateFrom(),
 						vo.getDateTo(), vo.getRtNumber());
 			}
-			
-			
+
 			/**
 			 * getting the record using dates and barcode
 			 *
 			 */
-			else if (vo.getRtNumber() == null &&  vo.getCreatedBy() == null && vo.getBarcode() != null) {
+			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null && vo.getBarcode() != null) {
 
 				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCodeOrderByCreatedDateAsc(
 						vo.getDateFrom(), vo.getDateTo(), vo.getBarcode());
 
-			}
-			else if (vo.getRtNumber() == null &&  vo.getCreatedBy() != null && vo.getBarcode() == null) {
+			} else if (vo.getRtNumber() == null && vo.getCreatedBy() != null && vo.getBarcode() == null) {
 
 				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndCreatedByOrderByCreatedDateAsc(
 						vo.getDateFrom(), vo.getDateTo(), vo.getCreatedBy());
@@ -137,16 +134,16 @@ public class CustomerServiceImpl implements CustomerService {
 			 * getting the record using RtNumber
 			 *
 			 */
-			if (vo.getRtNumber() != null && vo.getCreatedBy() == null &&  vo.getBarcode() == null) {
+			if (vo.getRtNumber() != null && vo.getCreatedBy() == null && vo.getBarcode() == null) {
 				retunSlipdetails = returnSlipRepo.findByRtNoOrderByCreatedDateAsc(vo.getRtNumber());
 			}
-			
+
 			/**
 			 * getting the record using barcode
 			 *
 			 */
 
-			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null  && vo.getBarcode() != null) {
+			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null && vo.getBarcode() != null) {
 
 				retunSlipdetails = returnSlipRepo.findByTaggedItems_barCodeOrderByCreatedDateAsc(vo.getBarcode());
 
@@ -156,7 +153,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 * getting the record using RtReviewStatus
 			 *
 			 */
-			else if (vo.getRtNumber() == null && vo.getCreatedBy() != null  && vo.getBarcode() == null) {
+			else if (vo.getRtNumber() == null && vo.getCreatedBy() != null && vo.getBarcode() == null) {
 				retunSlipdetails = returnSlipRepo.findByCreatedByOrderByCreatedDateAsc(vo.getCreatedBy());
 			}
 
@@ -174,10 +171,9 @@ public class CustomerServiceImpl implements CustomerService {
 		throw new DataNotFoundException("No return slips are found");
 	}
 
-
 	@Override
 	@CircuitBreaker(name = "newSale", fallbackMethod = "getInvoiceFallback")
-	public NewSaleList getInvoiceDetailsFromNewSale(InvoiceRequestVo vo) throws Exception {
+	public List<ReturnSlipVo> getInvoiceDetailsFromNewSale(InvoiceRequestVo vo) throws Exception {
 		log.debug("debugging getInvoiceDetailsFromNewSale():" + vo);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -186,12 +182,17 @@ public class CustomerServiceImpl implements CustomerService {
 		try {
 			uri = UriComponentsBuilder.fromUri(new URI(config.getInvoiceDetails())).build().encode().toUri();
 
-			ResponseEntity<NewSaleList> responce = restTemplate.exchange(uri, HttpMethod.POST, entity,
-					NewSaleList.class);
+			ResponseEntity<GateWayResponse> responce = restTemplate.exchange(uri, HttpMethod.POST, entity,
+					GateWayResponse.class);
+
 			if (responce.getStatusCode() == HttpStatus.OK && responce.getStatusCode().equals(HttpStatus.OK)) {
 				log.warn("we are checking if invoice details is fetching from newsale...");
 				log.info("fetching invoice details from newsale:" + responce.getBody());
-				return responce.getBody();
+				ObjectMapper mapper = new ObjectMapper();
+				List<ReturnSlipVo> bvo = mapper.convertValue(responce.getBody().getResult(),
+						new TypeReference<List<ReturnSlipVo>>() {
+						});
+				return bvo;
 			} else {
 				log.error("Invoice details are not exists" + responce.getBody());
 				throw new RecordNotFoundException("Invoice details are not exists" + responce.getBody());
@@ -209,33 +210,37 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public String createReturnSlip(GenerateReturnSlipRequest request) throws Exception {
-		log.debug("debugging createReturnSlip:" + request);
-		if (!request.getIsUserTagged()) {
-			tagUserToInvoice(request.getMobileNumber(), request.getInvoiceNo());
-		}
-		List<TaggedItems> tgItems = request.getBarcodes();
-
-		List<String> barcodes = tgItems.stream().map(x -> x.getBarCode()).collect(Collectors.toList());
-
-		HttpHeaders headers = new HttpHeaders();
-
-		HttpEntity<List<String>> request1 = new HttpEntity<List<String>>(barcodes, headers);
-
-		ResponseEntity<GateWayResponse> newsaleResponse = restTemplate.exchange(config.getGetbarcodesUrl(),
-				HttpMethod.POST, request1, GateWayResponse.class);
-
-		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
-		ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
-				.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
+		/*
+		 * log.debug("debugging createReturnSlip:" + request); if
+		 * (!request.getIsUserTagged()) { tagUserToInvoice(request.getMobileNumber(),
+		 * request.getInvoiceNo()); } List<TaggedItems> tgItems = request.getBarcodes();
+		 * 
+		 * List<String> barcodes = tgItems.stream().map(x ->
+		 * x.getBarCode()).collect(Collectors.toList());
+		 * 
+		 * HttpHeaders headers = new HttpHeaders();
+		 * 
+		 * HttpEntity<List<String>> request1 = new HttpEntity<List<String>>(barcodes,
+		 * headers);
+		 * 
+		 * ResponseEntity<GateWayResponse> newsaleResponse =
+		 * restTemplate.exchange(config.getGetbarcodesUrl(), HttpMethod.POST, request1,
+		 * GateWayResponse.class);
+		 */
+		/*
+		 * System.out.println("Received Request to getBarcodeDetails:" +
+		 * newsaleResponse); ObjectMapper mapper = new ObjectMapper().registerModule(new
+		 * JavaTimeModule()) .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+		 * false);
+		 */
 		// GateWayResponse<?> gatewayResponse =
 		// mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
 
-		List<BarcodeVo> bvo = mapper.convertValue(newsaleResponse.getBody().getResult(),
-				new TypeReference<List<BarcodeVo>>() {
-				});
-		Long totalAmount = bvo.stream().mapToLong(a -> a.getNetAmount()).sum();
-
+		/*
+		 * List<BarcodeVo> bvo =
+		 * mapper.convertValue(newsaleResponse.getBody().getResult(), new
+		 * TypeReference<List<BarcodeVo>>() { });
+		 */
 		ReturnSlip returnSlipDto = new ReturnSlip();
 		returnSlipDto.setCrNo(generateCrNumber());
 		returnSlipDto.setRtNo(generateRtNumber());
@@ -245,7 +250,7 @@ public class CustomerServiceImpl implements CustomerService {
 		returnSlipDto.setCreatedBy(request.getCreatedBy());
 		returnSlipDto.setTaggedItems(request.getBarcodes());
 		returnSlipDto.setRtStatus(ReturnSlipStatus.PENDING.getId());
-		returnSlipDto.setAmount(totalAmount);
+		returnSlipDto.setAmount(request.getTotalAmount());
 		returnSlipDto.setMobileNumber(request.getMobileNumber());
 		returnSlipDto.setCustomerName(request.getCustomerName());
 		returnSlipRepo.save(returnSlipDto);
@@ -373,7 +378,6 @@ public class CustomerServiceImpl implements CustomerService {
 			try {
 				HsnDetailsVo hsnDetails = getHsnDetails(x.getNetAmount());
 				list.add(hsnDetails);
-				
 
 			} catch (JsonMappingException e) {
 				// TODO Auto-generated catch block
@@ -390,12 +394,12 @@ public class CustomerServiceImpl implements CustomerService {
 
 		rrvo.setBarcode(bvo);
 		rrvo.setHsnCode(list);
-		rrvo.setTotalQty(bvo.stream().mapToInt(q-> q.getQty()).sum());
-		rrvo.setTaxableAmount(list.stream().mapToDouble(t-> t.getTaxVo().getTaxableAmount()).sum());
-		rrvo.setTotalCgst(list.stream().mapToDouble(c->c.getTaxVo().getCgst()).sum());
-		rrvo.setTotalSgst(list.stream().mapToDouble(s-> s.getTaxVo().getSgst()).sum());
-		rrvo.setTotalIgst(list.stream().mapToDouble(i-> i.getTaxVo().getIgst()).sum());
-		rrvo.setTotalNetAmount(bvo.stream().mapToLong(n-> n.getNetAmount()).sum());
+		rrvo.setTotalQty(bvo.stream().mapToInt(q -> q.getQty()).sum());
+		rrvo.setTaxableAmount(list.stream().mapToDouble(t -> t.getTaxVo().getTaxableAmount()).sum());
+		rrvo.setTotalCgst(list.stream().mapToDouble(c -> c.getTaxVo().getCgst()).sum());
+		rrvo.setTotalSgst(list.stream().mapToDouble(s -> s.getTaxVo().getSgst()).sum());
+		rrvo.setTotalIgst(list.stream().mapToDouble(i -> i.getTaxVo().getIgst()).sum());
+		rrvo.setTotalNetAmount(bvo.stream().mapToLong(n -> n.getNetAmount()).sum());
 		rrvo.setCreatedDate(rts.getCreatedDate());
 		rrvo.setRtNumber(rts.getRtNo());
 		rrvo.setMobileNumber(rts.getMobileNumber());

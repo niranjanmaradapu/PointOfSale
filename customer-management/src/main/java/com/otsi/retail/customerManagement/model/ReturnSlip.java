@@ -39,6 +39,7 @@ public class ReturnSlip {
 	private String customerName;
 	private Boolean isReviewed;
 	private int rtStatus;
+	private long domianId;
 	private LocalDate createdDate;
 	private LocalDate modifiedDate;
 	private String reviewedBy;
