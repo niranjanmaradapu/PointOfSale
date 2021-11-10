@@ -511,12 +511,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() != null
 				&& listOfDeliverySlipVo.getBarcode() != null) {
 
-			BarcodeEntity bar = barcodeRepository.findByBarcode(listOfDeliverySlipVo.getBarcode());
+			Optional<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
 
 			if (bar != null) {
 				dsDetails = dsRepo.findByCreationDateBetweenAndDsIdAndDsNumberAndStatusOrderByCreationDateAsc(
 						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-						bar.getDeliverySlip().getDsId(), listOfDeliverySlipVo.getDsNumber(),
+						bar.get().getDsEntity().getDsId(), listOfDeliverySlipVo.getDsNumber(),
 						listOfDeliverySlipVo.getStatus());
 
 			} else {
@@ -532,10 +532,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
 				&& listOfDeliverySlipVo.getBarcode() != null) {
 
-			BarcodeEntity bar = barcodeRepository.findByBarcode(listOfDeliverySlipVo.getBarcode());
+			Optional<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
 
 			if (bar != null) {
-				dsDetails = dsRepo.findByDsId(bar.getDeliverySlip().getDsId());
+				dsDetails = dsRepo.findByDsId(bar.get().getDsEntity().getDsId());
 
 			} else {
 				log.error("No record found with given barcode");
@@ -550,12 +550,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
 				&& listOfDeliverySlipVo.getBarcode() != null) {
 
-			BarcodeEntity bar = barcodeRepository.findByBarcode(listOfDeliverySlipVo.getBarcode());
+			Optional<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
 
 			if (bar != null) {
 				dsDetails = dsRepo.findByCreationDateBetweenAndDsIdOrderByCreationDateAsc(
 						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-						bar.getDeliverySlip().getDsId());
+						bar.get().getDsEntity().getDsId());
 
 			} else {
 				log.error("No record found with given barcode");
