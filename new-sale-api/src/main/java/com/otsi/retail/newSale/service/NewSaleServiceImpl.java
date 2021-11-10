@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,7 +144,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// Method for saving order
 	@Override
-	public String saveNewSaleRequest(NewSaleVo vo) throws InvalidInputException{
+	public String saveNewSaleRequest(NewSaleVo vo) throws InvalidInputException {
 		log.debug("deugging saveNewSaleRequest" + vo);
 		NewSaleEntity entity = new NewSaleEntity();
 
@@ -364,9 +365,24 @@ public class NewSaleServiceImpl implements NewSaleService {
 				// Optional<CustomerDetailsEntity> customer =
 				// customerRepo.findByMobileNumber(svo.getCustMobileNumber());
 
-				UserDetailsVo uvo = getUserDetailsFromURM(svo.getCustMobileNumber(), null);
+				List<UserDetailsVo> uvo = getUserDetailsFromURM(svo.getCustMobileNumber(), 0L);
+				// List< NewSaleEntity> saleDetail = new ArrayList();
 				if (uvo != null) {
-					saleDetails = newSaleRepository.findByUserId(uvo.getUserId());
+
+//					//Long userId = uvo.stream().mapToLong(i -> i.getUserId()).;
+//					uvo.stream().forEach(l->{
+//						List< NewSaleEntity> saleDetail = new  ArrayList();
+//						
+//					Long userId = l.getUserId();
+//					saleDetail =	newSaleRepository.findByUserId(userId);
+//						
+//					});
+
+					List<Long> userIds = uvo.stream().map(x -> x.getUserId()).collect(Collectors.toList());
+
+					 saleDetails = newSaleRepository.findByUserIdIn(userIds);
+					
+					
 
 				}
 
@@ -426,11 +442,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 					});
 				}
 				/////////
-				UserDetailsVo uvo = getUserDetailsFromURM(null, x.getUserId());
+				List<UserDetailsVo> uvo = getUserDetailsFromURM(null, x.getUserId());
 
-				//////////
-				x.setCustomerName(uvo.getUserName());
-				x.setMobileNumber(uvo.getPhoneNumber());
+				/////////
+				uvo.stream().forEach(u -> {
+					x.setCustomerName(u.getUserName());
+					x.setMobileNumber(u.getPhoneNumber());
+				});
+
 				x.setLineItemsReVo(listBar);
 				x.setTotalqQty(x.getLineItemsReVo().stream().mapToInt(q -> q.getQuantity()).sum());
 				x.setTotalMrp(x.getLineItemsReVo().stream().mapToLong(m -> m.getGrossValue()).sum());
@@ -1134,11 +1153,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 	}
 
-	public UserDetailsVo getUserDetailsFromURM(@RequestParam String MobileNumber, @RequestParam Long UserId) {
+	public List<UserDetailsVo> getUserDetailsFromURM(@RequestParam String MobileNumber, @RequestParam Long UserId) {
 
-		UserDetailsVo vo = new UserDetailsVo();
+		// UserDetailsVo vo = new UserDetailsVo();
 		GetUserRequestVo uvo = new GetUserRequestVo();
 		uvo.setPhoneNo(MobileNumber);
+
 		uvo.setId(UserId);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -1154,8 +1174,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 		GateWayResponse<?> gatewayResponse = mapper.convertValue(returnSlipListResponse.getBody(),
 				GateWayResponse.class);
 
-		vo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<UserDetailsVo>() {
-		});
+		List<UserDetailsVo> vo = mapper.convertValue(gatewayResponse.getResult(),
+				new TypeReference<List<UserDetailsVo>>() {
+				});
 
 		return vo;
 
