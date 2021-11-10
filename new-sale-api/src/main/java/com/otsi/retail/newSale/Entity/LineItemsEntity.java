@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import javax.naming.Name;
 import javax.persistence.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -31,9 +33,9 @@ public class LineItemsEntity {
 
 	private Long netValue;
 
-	private LocalDateTime creationDate;
+	private LocalDate creationDate;
 
-	private LocalDateTime lastModified;
+	private LocalDate lastModified;
 
 //    @ManyToOne
 //    @JoinColumn(name = "order_id")

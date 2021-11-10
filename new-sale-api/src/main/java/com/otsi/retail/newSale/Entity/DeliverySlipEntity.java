@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.Entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,9 +55,9 @@ public class DeliverySlipEntity  {
 	
 	private Long salesMan;
 
-	private LocalDateTime creationDate;
+	private LocalDate creationDate;
 
-	private LocalDateTime lastModified;
+	private LocalDate lastModified;
 
 	@Transient
 	@OneToMany( mappedBy  = "deliverySlip", cascade = CascadeType.ALL)

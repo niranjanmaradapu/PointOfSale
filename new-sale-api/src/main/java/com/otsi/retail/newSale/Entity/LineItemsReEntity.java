@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.Entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
@@ -36,9 +37,9 @@ public class LineItemsReEntity {
 
 	private Long netValue;
 
-	private LocalDateTime creationDate;
+	private LocalDate creationDate;
 
-	private LocalDateTime lastModified;
+	private LocalDate lastModified;
 
 	@ManyToOne
 	@JoinColumn(name = "order_id")

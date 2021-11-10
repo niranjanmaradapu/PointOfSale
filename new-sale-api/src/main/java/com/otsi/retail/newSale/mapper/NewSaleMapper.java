@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
+import com.otsi.retail.newSale.Entity.LineItemsEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.common.DomainData;
 import com.otsi.retail.newSale.service.NewSaleServiceImpl;
@@ -169,15 +170,15 @@ public class NewSaleMapper {
 		ListOfDeliverySlipVo vo = new ListOfDeliverySlipVo();
 
 		List<DeliverySlipVo> dsVoList = new ArrayList<>();
-		List<BarcodeEntity> barEnt = new ArrayList<>();
+		List<LineItemsEntity> barEnt = new ArrayList<>();
 
 		dsDetails.stream().forEach(x -> {
 
-			List<BarcodeVo> listBarVo = new ArrayList<>();
+			List<LineItemVo> listBarVo = new ArrayList<>();
 
-			x.getBarcodes().stream().forEach(b -> {
+			x.getLineItems().stream().forEach(b -> {
 
-				BarcodeVo barvo = new BarcodeVo();
+				LineItemVo barvo = new LineItemVo();
 
 				BeanUtils.copyProperties(b, barvo);
 
@@ -187,23 +188,23 @@ public class NewSaleMapper {
 			DeliverySlipVo dsvo = new DeliverySlipVo();
 
 			BeanUtils.copyProperties(x, dsvo);
-			dsvo.setBarcode(listBarVo);
+			dsvo.setLineItems(listBarVo);
 
 			dsVoList.add(dsvo);
 
 		});
 
-		vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i -> i.getPromoDisc()).sum());
-		vo.setTotalNetAmount(dsDetails.stream().mapToLong(i -> i.getNetAmount()).sum());
-		vo.setTotalGrossAmount(dsDetails.stream().mapToLong(i -> i.getMrp()).sum());
+		//vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i -> i.getPromoDisc()).sum());
+		//vo.setTotalNetAmount(dsDetails.stream().mapToLong(i -> i.getNetAmount()).sum());
+		//vo.setTotalGrossAmount(dsDetails.stream().mapToLong(i -> i.getMrp()).sum());
 		vo.setDeliverySlipVo(dsVoList);
 
 		dsDetails.stream().forEach(a -> {
 
-			vo.setBartoatalPromoDisc(a.getBarcodes().stream().mapToLong(i -> i.getPromoDisc()).sum());
-			vo.setBartotalNetAmount(a.getBarcodes().stream().mapToLong(i -> i.getNetAmount()).sum());
-			vo.setBartotalGrossAmount(a.getBarcodes().stream().mapToLong(i -> i.getMrp()).sum());
-			vo.setBarTotalQty(a.getBarcodes().stream().mapToInt(q -> q.getQty()).sum());
+			vo.setBartoatalPromoDisc(a.getLineItems().stream().mapToLong(i -> i.getDiscount()).sum());
+			vo.setBartotalNetAmount(a.getLineItems().stream().mapToLong(i -> i.getNetValue()).sum());
+			vo.setBartotalGrossAmount(a.getLineItems().stream().mapToLong(i -> i.getGrossValue()).sum());
+			vo.setBarTotalQty(a.getLineItems().stream().mapToInt(q -> q.getQuantity()).sum());
 
 		});
 

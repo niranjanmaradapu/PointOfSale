@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Component;
@@ -30,9 +31,9 @@ public class LineItemVo {
 
 	private Long netValue;
 
-	private LocalDateTime creationDate;
+	private LocalDate creationDate;
 
-	private LocalDateTime lastModified;
+	private LocalDate lastModified;
 	
 	private HsnDetailsVo HsnDetailsVo;
 
