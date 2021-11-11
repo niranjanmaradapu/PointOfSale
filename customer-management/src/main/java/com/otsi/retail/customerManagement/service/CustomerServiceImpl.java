@@ -253,12 +253,9 @@ public class CustomerServiceImpl implements CustomerService {
 		returnSlipDto.setAmount(request.getTotalAmount());
 		returnSlipDto.setMobileNumber(request.getMobileNumber());
 		returnSlipDto.setCustomerName(request.getCustomerName());
+		returnSlipDto.setDomianId(request.getDomianId());
 		returnSlipRepo.save(returnSlipDto);
 
-		if (returnSlipDto.getTaggedItems() == null || request.getIsUserTagged() == null) {
-			log.error("Please enter some data");
-			throw new InvalidDataException("Please enter some data");
-		}
 		log.warn("we are checking if return slip is saved...");
 		log.info("Successfully saved " + returnSlipDto.getRtNo());
 		return "Successfully saved " + returnSlipDto.getRtNo();

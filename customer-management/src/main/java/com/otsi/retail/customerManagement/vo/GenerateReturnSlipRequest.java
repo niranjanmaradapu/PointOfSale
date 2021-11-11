@@ -29,4 +29,5 @@ public class GenerateReturnSlipRequest {
 	private String mobileNumber;
 	 private String customerName;
 	 private Long totalAmount;
+	 private Long domianId;
 }
