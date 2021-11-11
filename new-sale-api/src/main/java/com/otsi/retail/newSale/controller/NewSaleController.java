@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
@@ -193,7 +194,15 @@ public class NewSaleController {
 		return new GateWayResponse<>(HttpStatus.OK, dsDetails, "");
 
 	}
+    //method for deleting pending delivery slip data
+	@DeleteMapping(CommonRequestMappigs.DELETE_DS)
+	public GateWayResponse<?> deleteDeliverySlipDetails(@RequestParam Long dsId) throws RecordNotFoundException {
+		log.info("Received Request to getDeliverySlipDetails :" + dsId);
 
+		String dsDetails = newSaleService.deleteDeliverySlipDetails(dsId);
+		return new GateWayResponse<>("Success", dsDetails);
+	}
+	
 	// Method for getting list of sale bills
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
 	public GateWayResponse<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo)
@@ -224,8 +233,8 @@ public class NewSaleController {
 	public GateWayResponse<?> dayclose() {
 		log.info("Recieved request to dayclose()");
 		try {
-			String dayclose = newSaleService.posDayClose();
-			return new GateWayResponse<>(HttpStatus.OK, dayclose, "");
+			List<DeliverySlipEntity> dayclose = newSaleService.posDayClose();
+			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -238,7 +247,7 @@ public class NewSaleController {
 	public GateWayResponse<?> posclose(@RequestParam Boolean posclose) {
 		try {
 			String dayclose = newSaleService.posClose(posclose);
-			return new GateWayResponse<>(HttpStatus.OK, dayclose, "");
+			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
 		}

@@ -339,6 +339,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			throw new RecordNotFoundException("Provide valid DS Number");
 		}
 	}
+	
 
 	@Override
 	public ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo)
@@ -684,21 +685,16 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public String posDayClose() {
+	public List<DeliverySlipEntity> posDayClose() {
 		log.debug(" debugging posDayClose");
 
 		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreationDate(DSStatus.Pending, LocalDate.now());
 
-		if (DsList.isEmpty()) {
+		
 			log.info("successfully we can close the day of pos " + " uncleared delivery Slips count :" + DsList.size());
-			return "successfully we can close the day of pos " + " uncleared delivery Slips count :  " + DsList.size();
+			return DsList ;
 
-		} else
-			log.error("to  close the day of pos please clear pending  delivery Slips"
-					+ " uncleared delivery Slips count   " + DsList.size());
-		return "to  close the day of pos please clear pending  delivery Slips" + " uncleared delivery Slips count   "
-				+ DsList.size();
-
+		
 	}
 
 	@Override
@@ -1384,6 +1380,22 @@ public class NewSaleServiceImpl implements NewSaleService {
 		 */
 
 return null;
+	}
+
+	
+	@Override
+	public String deleteDeliverySlipDetails(Long dsId) {
+		
+		Optional<DeliverySlipEntity>  dsVo= dsRepo.findById(dsId);
+		
+		if(dsVo.get() != null && dsVo.get().getOrder()==null) {
+			
+			dsRepo.deleteById(dsId);
+			
+		}
+		
+		// TODO Auto-generated method stub
+		return " delivery Slip sucessfully deleted ";
 	}
 	
 	
