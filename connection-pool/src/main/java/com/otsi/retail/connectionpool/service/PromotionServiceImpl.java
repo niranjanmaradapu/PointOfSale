@@ -494,15 +494,18 @@ public class PromotionServiceImpl implements PromotionService {
 							range.put(i++, z.getGivenValue());
 
 						});
-						if (range.get(0) >= x.getGrossValue() && x.getGrossValue() <= range.get(1)) {
+						if (range.get(0) <= x.getItemPrice() && x.getItemPrice() <= range.get(1)) {
 
-							x.setDiscount(y.getPoolPrice());
+							// x.setItemPrice(y.getPoolPrice());
+							x.setNetValue(x.getQuantity() * y.getPoolPrice());
+							x.setDiscount(x.getGrossValue() - x.getNetValue());
+
 						}
 						i = 0;
 					});
 				}
-				
-			} 
+
+			}
 			result.add(x);
 		});
 		return result;
