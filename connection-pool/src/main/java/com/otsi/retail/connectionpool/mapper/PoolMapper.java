@@ -24,6 +24,7 @@ public class PoolMapper {
 		ent.setCreatedDate(LocalDate.now());
 		ent.setLastModified(LocalDate.now());
 		ent.setIsActive(Boolean.TRUE);
+		ent.setPoolPrice(vo.getPoolPrice());
 
 		List<RuleEntity> ruleEntity = new ArrayList<>();
 
@@ -61,6 +62,7 @@ public class PoolMapper {
 			vo.setPoolType(x.getPoolType());
 			vo.setIsActive(x.getIsActive());
 			vo.setLastModified(x.getLastModified());
+			vo.setPoolPrice(x.getPoolPrice());
 			listOfPool.add(vo);
 
 			List<RuleVo> ruleVo = new ArrayList<>();

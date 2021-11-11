@@ -38,6 +38,8 @@ public class PoolEntity {
 	private LocalDate lastModified;
 
 	private Boolean isActive;
+	
+	private Long poolPrice;
 
 	@OneToMany(targetEntity = RuleEntity.class, mappedBy = "poolEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<RuleEntity> ruleEntity;

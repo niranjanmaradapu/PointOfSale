@@ -32,5 +32,7 @@ public class ConnectionPoolVo {
 	private Boolean isActive;
 
 	private Boolean isForEdit;
+	
+	private Long poolPrice;
 
 }

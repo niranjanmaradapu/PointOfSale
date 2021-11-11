@@ -2,10 +2,11 @@ package com.otsi.retail.connectionpool.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.connectionpool.config.Config;
 import com.otsi.retail.connectionpool.entity.PoolEntity;
+import com.otsi.retail.connectionpool.entity.PromoBarcodeEntity;
 import com.otsi.retail.connectionpool.entity.PromotionToStoreEntity;
 import com.otsi.retail.connectionpool.entity.PromotionsEntity;
 import com.otsi.retail.connectionpool.exceptions.DuplicateRecordException;
@@ -30,9 +32,11 @@ import com.otsi.retail.connectionpool.exceptions.RecordNotFoundException;
 import com.otsi.retail.connectionpool.gatewayresponse.GateWayResponse;
 import com.otsi.retail.connectionpool.mapper.PromotionMapper;
 import com.otsi.retail.connectionpool.repository.PoolRepo;
+import com.otsi.retail.connectionpool.repository.PromoBarcodeEntityRepository;
 import com.otsi.retail.connectionpool.repository.PromotionRepo;
 import com.otsi.retail.connectionpool.repository.PromotionToStoreRepo;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
+import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
 import com.otsi.retail.connectionpool.vo.StoreVo;
 import com.otsi.retail.connectionpool.vo.searchPromotionsVo;
@@ -66,6 +70,9 @@ public class PromotionServiceImpl implements PromotionService {
 
 	@Autowired
 	private RestTemplate template;
+
+	@Autowired
+	private PromoBarcodeEntityRepository promoBarcodeRepo;
 
 //	@Autowired
 //	private StoreRepo storeRepo;
@@ -439,6 +446,66 @@ public class PromotionServiceImpl implements PromotionService {
 		}
 
 		return "Promotion Cloned Successfully";
+	}
+
+	// Method for adding promotion to product
+	@Override
+	public String addPromtionToBarcode(Long promoId, String barcode) {
+
+		PromotionsEntity promo = promoRepo.findByPromoId(promoId);
+
+		if (promo != null) {
+
+			PromoBarcodeEntity entity = new PromoBarcodeEntity();
+			entity.setPromoId(promoId);
+			entity.setBarCode(barcode);
+
+			promoBarcodeRepo.save(entity);
+
+		} else {
+			return "Promotion is not valid";
+		}
+
+		return "Successfully add promotion to Barcode";
+	}
+
+	public static Integer i;
+
+	// Method for checking promotion to all line items
+	@Override
+	public List<LineItemVo> checkPromtion(List<LineItemVo> lineItems) {
+
+		List<LineItemVo> result = new ArrayList<>();
+
+		lineItems.stream().forEach(x -> {
+
+			PromoBarcodeEntity promoBar = promoBarcodeRepo.findByBarCode(x.getBarCode());
+
+			if (promoBar != null) {
+
+				PromotionsEntity promotion = promoRepo.findByPromoId(promoBar.getPromoId());
+
+				if (promotion != null) {
+					promotion.getPoolEntity().stream().forEach(y -> {
+						Map<Integer, Long> range = new HashMap<>();
+
+						y.getRuleEntity().stream().forEach(z -> {
+
+							range.put(i++, z.getGivenValue());
+
+						});
+						if (range.get(0) >= x.getGrossValue() && x.getGrossValue() <= range.get(1)) {
+
+							x.setDiscount(y.getPoolPrice());
+						}
+						i = 0;
+					});
+				}
+				
+			} 
+			result.add(x);
+		});
+		return result;
 	}
 
 }
