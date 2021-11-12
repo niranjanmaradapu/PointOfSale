@@ -14,11 +14,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class searchPromotionsVo {
+public class SearchPromotionsVo {
 	
 	private Long promoId;
 	
 	private String promotionName;
+	
+	private String description;
 	
 	private int priority;
 	

@@ -36,6 +36,8 @@ public class CommonRequestMappigs {
 	
 	public static final String CLONE_PROMO_BY_STORE = "clonePromotionByStore";
 	
+	public static final String LIST_OF_PROMOTIONS_BY_SEARCH_CRITERIA = "listOfPromotionsBySearch";
+	
 	
 
 }
