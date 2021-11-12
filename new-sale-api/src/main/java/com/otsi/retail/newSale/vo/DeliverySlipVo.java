@@ -15,6 +15,8 @@ import lombok.Data;
 public class DeliverySlipVo {
 
 	private List<BarcodeVo> barcode;
+	
+	private Long dsId;
 
 	private int qty;
 	

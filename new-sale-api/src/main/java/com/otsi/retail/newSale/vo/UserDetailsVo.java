@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.otsi.retail.authservice.Entity.ClientDomains;
 
 import lombok.Data;
 
@@ -20,7 +21,8 @@ public class UserDetailsVo {
 	private boolean isActive;
 	@JsonIgnore
     private Role role;
-	
+	@JsonIgnore
+	private List<ClientDomains> clientDomians;	
 	  private List<UserAv> userAv; 
 	  private List<StoreVo> stores;
 	 private StoreVo ownerOf;

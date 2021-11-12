@@ -140,6 +140,7 @@ public class NewSaleMapper {
 			nsvo.setUserId(x.getUserId());
 			nsvo.setEmpId(x.getCreatedBy());
 			nsvo.setStatus(x.getStatus());
+			nsvo.setNewsaleId(x.getOrderId());
 
 			sVoList.add(nsvo);
 

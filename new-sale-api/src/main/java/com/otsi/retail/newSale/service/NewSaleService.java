@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
@@ -42,7 +43,7 @@ public interface NewSaleService {
 	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo)
 			throws RecordNotFoundException;
 
-	String posDayClose();
+	List<DeliverySlipEntity> posDayClose();
 
 	double getNewSaleWithHsn(double netAmt) throws JsonMappingException, JsonProcessingException, DataNotFoundException;
 
@@ -81,5 +82,9 @@ public interface NewSaleService {
 	String deleteLineItem(String barCode, Long domainId) throws RecordNotFoundException;
 
 	String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo);
+
+	
+
+	String deleteDeliverySlipDetails(Long dsId);
 
 }
