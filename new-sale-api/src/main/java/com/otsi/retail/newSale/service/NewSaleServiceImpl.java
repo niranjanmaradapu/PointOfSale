@@ -1,13 +1,13 @@
 package com.otsi.retail.newSale.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +43,6 @@ import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
 import com.otsi.retail.newSale.Exceptions.InvalidInputException;
 import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
-
-import com.otsi.retail.newSale.common.DSAttributes;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.DomainData;
 import com.otsi.retail.newSale.common.PaymentType;
@@ -73,7 +71,6 @@ import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
-import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
@@ -183,6 +180,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		if (vo.getDomainId() == DomainData.TE.getId()) {
 
+			List<String> inventUpdate = new ArrayList<>();
+
 			List<DeliverySlipVo> dlSlips = vo.getDlSlip();
 
 			List<String> dlsList = dlSlips.stream().map(x -> x.getDsNumber()).collect(Collectors.toList());
@@ -202,6 +201,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					a.getLineItems().stream().forEach(x -> {
 
+						inventUpdate.add(x.getBarCode());
+						
 						x.setLastModified(LocalDate.now());
 						x.setDsEntity(a);
 						lineItemRepo.save(x);
@@ -209,6 +210,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					});
 
 				});
+				requestForUpdateInInventoryForTextile(inventUpdate); // Request to update inventory for textile
 
 			} else {
 				log.error("Please provide Valid delivery slips..");
@@ -216,6 +218,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			}
 		}
 		if (vo.getDomainId() != DomainData.TE.getId()) {
+
+			Map<String, Integer> map = new HashMap<>();
 
 			List<LineItemVo> lineItems = vo.getLineItemsReVo();
 
@@ -229,11 +233,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				lineItemsList.stream().forEach(x -> {
 
+					map.put(x.getBarCode(), x.getQuantity());
+
 					x.setLastModified(LocalDate.now());
 					x.setOrderId(saveEntity);
 					lineItemReRepo.save(x);
 
 				});
+				requestForUpdateInInventoryForRetail(map);// Request to update inventory for retail
 
 			} else {
 				log.error("Please provide valid LineItems..");
@@ -245,6 +252,35 @@ public class NewSaleServiceImpl implements NewSaleService {
 		log.warn("we are testing bill generated with number");
 		log.info("after generated bill with number:" + entity.getOrderNumber());
 		return entity.getOrderNumber();
+	}
+
+	// Method for Update inventory for Textile
+	private void requestForUpdateInInventoryForTextile(List<String> inventUpdate) {
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<List<String>> request = new HttpEntity<>(inventUpdate, headers);
+
+		ResponseEntity<GateWayResponse> response = template.exchange(config.getInventoryUpdateForTextile(),
+				HttpMethod.POST, request, GateWayResponse.class);
+		String message = response.getBody().getMessage();
+		// String message = gatewayBody.getMessage();
+
+	}
+
+	// Method for Update inventory for retail
+	private void requestForUpdateInInventoryForRetail(Map<String, Integer> map) {
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Map<String, Integer>> request = new HttpEntity<>(map, headers);
+
+		ResponseEntity<GateWayResponse> response = template.exchange(config.getInventoryUpdateForRetail(),
+				HttpMethod.POST, request, GateWayResponse.class);
+		String message = response.getBody().getMessage();
+
 	}
 
 	@Override
