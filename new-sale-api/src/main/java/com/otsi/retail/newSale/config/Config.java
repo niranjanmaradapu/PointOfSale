@@ -30,5 +30,13 @@ public class Config {
 	
 	@Value("${getCustomerDetailsFromURM_url}")
 	private String getCustomerDetailsFromURM;
+	
+	@Value("${inventoryUpdateTextile_url}")
+	private String inventoryUpdateForTextile;
+	
+	@Value("${inventoryUpdateRetail_url}")
+	private String inventoryUpdateForRetail;
+	
+	
 
 }
