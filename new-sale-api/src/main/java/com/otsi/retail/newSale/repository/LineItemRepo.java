@@ -18,4 +18,8 @@ public interface LineItemRepo extends JpaRepository<LineItemsEntity, Long> {
 	List<LineItemsEntity> findByLineItemIdInAndDsEntityIsNull(List<Long> lineItems);
 
 	Optional<LineItemsEntity> findByBarCode(String barCode);
+
+	//List<LineItemsEntity> findByBarcodeIn(List<String> barCode);
+
+	List<LineItemsEntity> findByBarCodeIn(List<String> barCode);
 }

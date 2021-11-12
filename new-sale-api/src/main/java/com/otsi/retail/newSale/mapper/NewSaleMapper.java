@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Entity.LineItemsEntity;
+import com.otsi.retail.newSale.Entity.LineItemsReEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.common.DomainData;
 import com.otsi.retail.newSale.service.NewSaleServiceImpl;
@@ -165,6 +166,8 @@ public class NewSaleMapper {
 		return srvo;
 
 	}
+	
+	
 
 	public ListOfDeliverySlipVo convertListDSToVo(List<DeliverySlipEntity> dsDetails) {
 
@@ -300,14 +303,25 @@ public class NewSaleMapper {
 		return barcodeList;
 	}
 
-	public List<BarcodeVo> convertBarcodesEntityToVo(List<BarcodeEntity> barcodeDetails) {
+	public List<LineItemVo> convertBarcodesEntityToVo(List<LineItemsEntity> barcodeDetails) {
 		return barcodeDetails.stream().map(dto -> barentityToVo(dto)).collect(Collectors.toList());
 
 	}
+	public List<LineItemVo> convertBarcodesReEntityToVo(List<LineItemsReEntity> barcodeDetails) {
+		return barcodeDetails.stream().map(dto -> barentityToVo(dto)).collect(Collectors.toList());
 
-	private BarcodeVo barentityToVo(BarcodeEntity dto) {
+	}
+	private LineItemVo barentityToVo(LineItemsReEntity dto) {
 
-		BarcodeVo vo = new BarcodeVo();
+		LineItemVo vo = new LineItemVo();
+		BeanUtils.copyProperties(dto, vo);
+
+		return vo;
+	}
+
+	private LineItemVo barentityToVo(LineItemsEntity dto) {
+
+		LineItemVo vo = new LineItemVo();
 		BeanUtils.copyProperties(dto, vo);
 
 		return vo;

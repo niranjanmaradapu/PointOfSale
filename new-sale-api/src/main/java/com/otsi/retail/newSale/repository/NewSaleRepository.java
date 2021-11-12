@@ -1,6 +1,7 @@
 package com.otsi.retail.newSale.repository;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.LongStream;
@@ -32,7 +33,7 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 
 	List<NewSaleEntity> findByCreatedBy(String empId);
 
-	List<NewSaleEntity> findByCreationDateBetweenAndStoreId(LocalDate dateFrom, LocalDate dateTo, long id);
+	List<NewSaleEntity> findByCreationDateBetweenAndStoreId(LocalDate localDate, LocalDate localDate2, long id);
 
 	List<NewSaleEntity> findByUserId(LongStream userId);
 

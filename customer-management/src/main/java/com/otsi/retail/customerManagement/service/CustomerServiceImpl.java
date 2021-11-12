@@ -54,6 +54,7 @@ import com.otsi.retail.customerManagement.vo.CustomerDetailsVo;
 import com.otsi.retail.customerManagement.vo.GenerateReturnSlipRequest;
 import com.otsi.retail.customerManagement.vo.HsnDetailsVo;
 import com.otsi.retail.customerManagement.vo.InvoiceRequestVo;
+import com.otsi.retail.customerManagement.vo.LineItemVo;
 import com.otsi.retail.customerManagement.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.customerManagement.vo.NewSaleList;
 import com.otsi.retail.customerManagement.vo.RetrnSlipDetailsVo;
@@ -337,13 +338,14 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 
-	public RetrnSlipDetailsVo ReturnSlipsDeatils(String rtNumber) throws JsonMappingException, JsonProcessingException {
+	public RetrnSlipDetailsVo ReturnSlipsDeatils(String rtNumber) throws JsonMappingException, JsonProcessingException, URISyntaxException {
 		log.debug("debugging ReturnSlipsDeatils():" + rtNumber);
 		ReturnSlip rts = returnSlipRepo.findByRtNo(rtNumber);
 		if (rts == null) {
 			log.error("given RT number is not exists");
 			throw new RecordNotFoundException("given RT number is not exists");
 		}
+		URI uri = null;
 
 		List<RetrnSlipDetailsVo> lvo = new ArrayList<>();
 
@@ -354,10 +356,13 @@ public class CustomerServiceImpl implements CustomerService {
 		System.out.println("Received Request to getBarcodeDetails:" + barcodes);
 
 		HttpHeaders headers = new HttpHeaders();
+		uri = UriComponentsBuilder.fromUri(new URI(config.getGetbarcodesUrl() + "/" + rts.getDomianId())).build()
+				.encode().toUri();
+		
 
 		HttpEntity<List<String>> request = new HttpEntity<List<String>>(barcodes, headers);
 
-		ResponseEntity<?> newsaleResponse = restTemplate.exchange(config.getGetbarcodesUrl(), HttpMethod.POST, request,
+		ResponseEntity<?> newsaleResponse = restTemplate.exchange(uri, HttpMethod.POST, request,
 				GateWayResponse.class);
 
 		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
@@ -365,7 +370,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 		GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
 
-		List<BarcodeVo> bvo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<List<BarcodeVo>>() {
+		List<LineItemVo> bvo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<List<LineItemVo>>() {
 		});
 
 		List<HsnDetailsVo> list = new ArrayList<>();
@@ -373,7 +378,7 @@ public class CustomerServiceImpl implements CustomerService {
 		bvo.stream().forEach(x -> {
 
 			try {
-				HsnDetailsVo hsnDetails = getHsnDetails(x.getNetAmount());
+				HsnDetailsVo hsnDetails = getHsnDetails(x.getNetValue());
 				list.add(hsnDetails);
 
 			} catch (JsonMappingException e) {
@@ -391,12 +396,12 @@ public class CustomerServiceImpl implements CustomerService {
 
 		rrvo.setBarcode(bvo);
 		rrvo.setHsnCode(list);
-		rrvo.setTotalQty(bvo.stream().mapToInt(q -> q.getQty()).sum());
+		rrvo.setTotalQty(bvo.stream().mapToInt(q -> q.getQuantity()).sum());
 		rrvo.setTaxableAmount(list.stream().mapToDouble(t -> t.getTaxVo().getTaxableAmount()).sum());
 		rrvo.setTotalCgst(list.stream().mapToDouble(c -> c.getTaxVo().getCgst()).sum());
 		rrvo.setTotalSgst(list.stream().mapToDouble(s -> s.getTaxVo().getSgst()).sum());
 		rrvo.setTotalIgst(list.stream().mapToDouble(i -> i.getTaxVo().getIgst()).sum());
-		rrvo.setTotalNetAmount(bvo.stream().mapToLong(n -> n.getNetAmount()).sum());
+		rrvo.setTotalNetAmount(bvo.stream().mapToLong(n -> n.getNetValue()).sum());
 		rrvo.setCreatedDate(rts.getCreatedDate());
 		rrvo.setRtNumber(rts.getRtNo());
 		rrvo.setMobileNumber(rts.getMobileNumber());
