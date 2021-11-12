@@ -15,7 +15,7 @@ spring:
     name: connection-pool
  datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/connectionpool
+    url: jdbc:postgresql://localhost:5432/connection-pool
     username: postgres
     password: root
  jpa:

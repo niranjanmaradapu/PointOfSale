@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
 import com.otsi.retail.connectionpool.vo.StoreVo;
-import com.otsi.retail.connectionpool.vo.searchPromotionsVo;
+import com.otsi.retail.connectionpool.vo.SearchPromotionsVo;
 
 @Component
 public interface PromotionService {
@@ -25,19 +25,21 @@ public interface PromotionService {
 
 	String addPromotionToStore(PromotionsVo vo);
 
-	List<searchPromotionsVo> searchPromotion(searchPromotionsVo vo);
+	List<SearchPromotionsVo> searchPromotion(SearchPromotionsVo vo);
 
-	List<searchPromotionsVo> searchByStore(searchPromotionsVo vo);
+	List<SearchPromotionsVo> searchByStore(SearchPromotionsVo vo);
 	
-	String updatePriority(searchPromotionsVo vo);
+	String updatePriority(SearchPromotionsVo vo);
 	
-	String updatePromotionDates(searchPromotionsVo vo);
+	String updatePromotionDates(SearchPromotionsVo vo);
 	
-	String clonePromotionByStore(searchPromotionsVo vo);
+	String clonePromotionByStore(SearchPromotionsVo vo);
 
 	String addPromtionToBarcode(Long promoId, String barcode);
 
 	List<LineItemVo> checkPromtion(List<LineItemVo> lineItmes);
+	
+	List<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo);
 
 	
 }

@@ -46,6 +46,21 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 	PromotionsEntity findByPromoId(Long promoId);
 
 	boolean existsByStoreName(String storeName);
+	//
+
+	List<PromotionsEntity> findByStartDateAndEndDateAndStoreName(LocalDate startDate, LocalDate endDate,
+			String storeName);
+
+	List<PromotionsEntity> findByStartDateAndEndDateAndPromoIdAndStoreName(LocalDate startDate, LocalDate endDate,
+			Long promoId, String storeName);
+
+	List<PromotionsEntity> findByPromoIdIs(Long promoId);
+
+	List<PromotionsEntity> findByPromoIdAndStoreName(Long promoId, String storeName);
+
+	List<PromotionsEntity> findByStartDateAndEndDate(LocalDate startDate, LocalDate endDate);
+
+	List<PromotionsEntity> findByStartDateAndEndDateAndPromoId(LocalDate startDate, LocalDate endDate, Long promoId);
 
 	
 

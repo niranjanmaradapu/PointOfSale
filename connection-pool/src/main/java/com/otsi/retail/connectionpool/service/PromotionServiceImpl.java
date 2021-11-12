@@ -38,8 +38,8 @@ import com.otsi.retail.connectionpool.repository.PromotionToStoreRepo;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
+import com.otsi.retail.connectionpool.vo.SearchPromotionsVo;
 import com.otsi.retail.connectionpool.vo.StoreVo;
-import com.otsi.retail.connectionpool.vo.searchPromotionsVo;
 
 /**
  * This class contains all Bussiness logics regarding promotions and their
@@ -263,8 +263,8 @@ public class PromotionServiceImpl implements PromotionService {
 	}
 
 	@Override
-	public List<searchPromotionsVo> searchPromotion(searchPromotionsVo vo) {
-		List<searchPromotionsVo> searchPromoVo = new ArrayList<searchPromotionsVo>();
+	public List<SearchPromotionsVo> searchPromotion(SearchPromotionsVo vo) {
+		List<SearchPromotionsVo> searchPromoVo = new ArrayList<SearchPromotionsVo>();
 		List<PromotionsEntity> promoDetails = new ArrayList<PromotionsEntity>();
 		PromotionsEntity promoEntity = new PromotionsEntity();
 
@@ -309,7 +309,7 @@ public class PromotionServiceImpl implements PromotionService {
 		else {
 			Long promoCount = promoDetails.stream().count();
 			promoDetails.stream().forEach(p -> {
-				searchPromotionsVo searchVo = new searchPromotionsVo();
+				SearchPromotionsVo searchVo = new SearchPromotionsVo();
 				searchVo.setPromotionName(p.getPromoName());
 				searchVo.setStoreName(p.getStoreName());
 				searchVo.setStartDate(p.getStartDate());
@@ -328,9 +328,9 @@ public class PromotionServiceImpl implements PromotionService {
 	}
 
 	@Override
-	public List<searchPromotionsVo> searchByStore(searchPromotionsVo vo) {
+	public List<SearchPromotionsVo> searchByStore(SearchPromotionsVo vo) {
 
-		List<searchPromotionsVo> searchPromoVo = new ArrayList<searchPromotionsVo>();
+		List<SearchPromotionsVo> searchPromoVo = new ArrayList<SearchPromotionsVo>();
 		List<PromotionsEntity> promoDetails = new ArrayList<PromotionsEntity>();
 
 		if (vo.getStoreName() != null) {
@@ -343,7 +343,7 @@ public class PromotionServiceImpl implements PromotionService {
 		} else {
 			Long promoCount = promoDetails.stream().count();
 			promoDetails.stream().forEach(p -> {
-				searchPromotionsVo searchVo = new searchPromotionsVo();
+				SearchPromotionsVo searchVo = new SearchPromotionsVo();
 				searchVo.setPromotionName(p.getPromoName());
 				searchVo.setStoreName(p.getStoreName());
 				searchVo.setStartDate(p.getStartDate());
@@ -363,7 +363,7 @@ public class PromotionServiceImpl implements PromotionService {
 	}
 
 	@Override
-	public String updatePriority(searchPromotionsVo vo) {
+	public String updatePriority(SearchPromotionsVo vo) {
 
 		if (vo == null) {
 			throw new InvalidDataException("Please enter valid data");
@@ -381,7 +381,7 @@ public class PromotionServiceImpl implements PromotionService {
 	}
 
 	@Override
-	public String updatePromotionDates(searchPromotionsVo vo) {
+	public String updatePromotionDates(SearchPromotionsVo vo) {
 		if (vo == null) {
 			throw new InvalidDataException("Please enter valid data");
 		}
@@ -403,7 +403,7 @@ public class PromotionServiceImpl implements PromotionService {
 	}
 
 	@Override
-	public String clonePromotionByStore(searchPromotionsVo vo) {
+	public String clonePromotionByStore(SearchPromotionsVo vo) {
 
 		if (vo == null) {
 			throw new InvalidDataException("Please enter valid data");
@@ -418,7 +418,7 @@ public class PromotionServiceImpl implements PromotionService {
 		int min = 100, max = 1000;
 		int randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);
 
-		searchPromotionsVo svo = new searchPromotionsVo();
+		SearchPromotionsVo svo = new SearchPromotionsVo();
 		Optional<PromotionsEntity> dto = promoRepo.findById(vo.getPromoId());
 		PromotionsEntity newDto = new PromotionsEntity();
 		System.out.println(dto.get().getStoreName());
@@ -509,6 +509,73 @@ public class PromotionServiceImpl implements PromotionService {
 			result.add(x);
 		});
 		return result;
+	}
+
+	@Override
+	public List<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo) {
+
+		List<SearchPromotionsVo> searchPromotions = new ArrayList<>();
+		List<PromotionsEntity> promotionsList = new ArrayList<>();
+
+		if ((svo.getStartDate() != null) && (svo.getEndDate() != null)) 
+		{
+
+			if ((svo.getPromoId() != null) && (svo.getStoreName() != null)) {
+
+				promotionsList = promoRepo.findByStartDateAndEndDateAndPromoIdAndStoreName(svo.getStartDate(),
+						svo.getEndDate(), svo.getPromoId(), svo.getStoreName());
+
+			} else if((svo.getPromoId() ==null) && (svo.getStoreName()!=null))
+			{
+				promotionsList = promoRepo.findByStartDateAndEndDateAndStoreName(svo.getStartDate(), svo.getEndDate(), svo.getStoreName());
+			}else if((svo.getPromoId() !=null) && (svo.getStoreName()==null)){
+					
+				promotionsList = promoRepo.findByStartDateAndEndDateAndPromoId(svo.getStartDate(), svo.getEndDate(), svo.getPromoId());
+				
+			}
+			else {
+				
+				promotionsList = promoRepo.findByStartDateAndEndDate(svo.getStartDate(), svo.getEndDate());
+			}
+
+		}else if((svo.getStartDate() == null) && (svo.getEndDate() ==null))			  
+		{
+			 if((svo.getPromoId()!=null) && (svo.getStoreName() ==null))
+			 {
+				 promotionsList = promoRepo.findByPromoIdIs(svo.getPromoId());
+			 }
+			 else if((svo.getPromoId()!=null) && (svo.getStoreName()!=null))
+			 {
+				 promotionsList = promoRepo.findByPromoIdAndStoreName(svo.getPromoId(),svo.getStoreName());
+			 }else {
+				 
+				 promotionsList = promoRepo.findByStoreName(svo.getStoreName());
+			 }
+			
+		}
+		
+		if(promotionsList.isEmpty())
+		{
+			throw new RecordNotFoundException("Promotins are not exists");
+		}
+		else {
+			
+			promotionsList.stream().forEach( r ->{
+				
+				SearchPromotionsVo searchVo = new SearchPromotionsVo();
+				searchVo.setPromoId(r.getPromoId());
+				searchVo.setPromotionName(r.getPromoName());
+				searchVo.setDescription(r.getDescription());
+				searchVo.setStoreName(r.getStoreName());
+				searchVo.setStartDate(r.getStartDate());
+				searchVo.setEndDate(r.getEndDate());
+				searchPromotions.add(searchVo);
+			});
+			
+			
+		}
+
+		return searchPromotions;
 	}
 
 }
