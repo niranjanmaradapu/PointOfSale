@@ -1070,18 +1070,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public List<BarcodeVo> getBarcodes(List<String> barCode) throws RecordNotFoundException {
+	public List<LineItemVo> getBarcodes(List<String> barCode,Long domainId) throws RecordNotFoundException {
 		log.debug("deugging getBarcodeDetails" + barCode);
-		List<BarcodeEntity> barcodeDetails = barcodeRepository.findByBarcodeIn(barCode);
-		if (barcodeDetails.isEmpty()) {
-			log.error("Barcode with number " + barCode + " is not exists");
-			throw new RecordNotFoundException("Barcode with number " + barCode + " is not exists");
-		} else {
-			List<BarcodeVo> vo = newSaleMapper.convertBarcodesEntityToVo(barcodeDetails);
-			log.warn("we are fetching barcode details...");
-			log.info("after getting barcode details :" + vo);
-			return vo;
+		 List<LineItemVo> vo= new ArrayList<LineItemVo>();
+		
+		if(domainId==1) {
+			List<LineItemsEntity> barcodeDetails = lineItemRepo.findByBarCodeIn(barCode);
+		  vo = newSaleMapper.convertBarcodesEntityToVo(barcodeDetails);
 		}
+		else {
+			List<LineItemsReEntity> barcodeDetails1 = lineItemReRepo.findByBarCodeIn(barCode);
+		  vo = newSaleMapper.convertBarcodesReEntityToVo(barcodeDetails1);
+		}
+		return vo;
 	}
 
 	/////////////
@@ -1129,7 +1130,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			Long rAmount = vo.stream().mapToLong(a -> a.getAmount()).sum();
 			ReturnSummeryVo retunVo = new ReturnSummeryVo();
 
-			List<BarcodeVo> barVoList = new ArrayList<BarcodeVo>();
+			List<LineItemVo> barVoList = new ArrayList<LineItemVo>();
 			vo.stream().forEach(b -> {
 
 				List<TaggedItems> tgItems = b.getBarcodes();
@@ -1137,7 +1138,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				List<String> barcodes = tgItems.stream().map(x -> x.getBarCode()).collect(Collectors.toList());
 
 				try {
-					List<BarcodeVo> barVo = getBarcodes(barcodes);
+					List<LineItemVo> barVo = getBarcodes(barcodes,b.getDomainId());
 					barVo.stream().forEach(r -> {
 
 						barVoList.add(r);
@@ -1154,8 +1155,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			HsnDetailsVo hsnDetails1 = getHsnDetails(rAmount);
 
-			retunVo.setTotalDiscount(barVoList.stream().mapToLong(d -> d.getPromoDisc()).sum());
-			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getMrp()).sum());
+			retunVo.setTotalDiscount(barVoList.stream().mapToLong(d -> d.getDiscount()).sum());
+			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getGrossValue()).sum());
 			// retunVo.setTaxDescription(hsnDetails1.getTaxVo().getTaxLabel());
 			retunVo.setBillValue(rAmount);
 			// retunVo.setTotalTaxableAmount(hsnDetails1.getTaxVo().getTaxableAmount());

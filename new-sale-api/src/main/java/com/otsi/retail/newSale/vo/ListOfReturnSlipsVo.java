@@ -18,9 +18,11 @@ import lombok.Data;
 @Data
 public class ListOfReturnSlipsVo {
 
-	private Date dateFrom;
+	private LocalDate dateFrom;
 
-	private Date dateTo;
+	private LocalDate dateTo;
+	
+	private Long domainId;
 
 	private String barcode;
 

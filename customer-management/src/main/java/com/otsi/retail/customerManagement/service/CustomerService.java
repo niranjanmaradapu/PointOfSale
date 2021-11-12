@@ -3,6 +3,7 @@
  */
 package com.otsi.retail.customerManagement.service;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ HsnDetailsVo getHsnDetails(double netAmt) throws JsonMappingException, JsonProce
 
 	
 
-	RetrnSlipDetailsVo ReturnSlipsDeatils(String RtNumber) throws JsonMappingException, JsonProcessingException;
+	RetrnSlipDetailsVo ReturnSlipsDeatils(String RtNumber) throws JsonMappingException, JsonProcessingException, URISyntaxException;
 
 	String updateReturnSlip(String rtNumber, GenerateReturnSlipRequest request);;
 }

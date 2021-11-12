@@ -3,6 +3,7 @@
  */
 package com.otsi.retail.customerManagement.controller;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -101,7 +102,7 @@ public class CustomerController {
 	}
 
 	@GetMapping("/getReturnSlipsDetails")
-	public GateWayResponse<?> ReturnSlipsDeatils(String rtNumber) throws JsonMappingException, JsonProcessingException {
+	public GateWayResponse<?> ReturnSlipsDeatils(@RequestParam String rtNumber) throws JsonMappingException, JsonProcessingException, URISyntaxException {
 		log.info("Received request to ReturnSlipsDeatils():" + rtNumber);
 		RetrnSlipDetailsVo listVo = null;
 

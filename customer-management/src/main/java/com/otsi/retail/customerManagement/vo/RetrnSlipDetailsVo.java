@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class RetrnSlipDetailsVo {
 	
-	 private List<BarcodeVo>  barcode;
+	 private List<LineItemVo>  barcode;
 	 
 	 private List<HsnDetailsVo>  hsnCode;
 

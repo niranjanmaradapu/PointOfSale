@@ -67,7 +67,7 @@ public interface NewSaleService {
 
 	List<BarcodeVo> getAllBarcodes() throws DataNotFoundException;
 
-	List<BarcodeVo> getBarcodes(List<String> barCode) throws RecordNotFoundException;
+	
 
 	SaleReportVo getSaleReport(SaleReportVo srvo) throws RecordNotFoundException;
 
@@ -86,5 +86,7 @@ public interface NewSaleService {
 	
 
 	String deleteDeliverySlipDetails(Long dsId);
+
+	List<LineItemVo> getBarcodes(List<String> barCode, Long domainId) throws RecordNotFoundException;
 
 }

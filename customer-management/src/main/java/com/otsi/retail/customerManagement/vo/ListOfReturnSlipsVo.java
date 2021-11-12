@@ -24,6 +24,8 @@ public class ListOfReturnSlipsVo {
 	private LocalDate dateTo;
 
 	private String barcode;
+	
+	private Long domainId;
 
 	//private String rtStatus;
 

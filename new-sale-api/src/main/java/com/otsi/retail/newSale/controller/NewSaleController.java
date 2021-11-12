@@ -387,14 +387,14 @@ public class NewSaleController {
 
 	}
 
-	@PostMapping(CommonRequestMappigs.GET_BARCODES)
+	@PostMapping("/getbarcodes/{domainId}")
 	// @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 
-	public GateWayResponse<?> getBarcodes(@RequestBody List<String> barCode) throws RecordNotFoundException {
+	public GateWayResponse<?> getBarcodes(@RequestBody List<String> barCode, @PathVariable Long domainId) throws RecordNotFoundException {
 		log.info("Received Request to getBarcodeDetails:" + barCode);
 		System.out.println("Received Request to getBarcodeDetails:" + barCode);
 
-		List<BarcodeVo> barCodeDetails = newSaleService.getBarcodes(barCode);
+		List<LineItemVo> barCodeDetails = newSaleService.getBarcodes(barCode,domainId);
 
 		return new GateWayResponse<>(HttpStatus.OK, barCodeDetails, "");
 
