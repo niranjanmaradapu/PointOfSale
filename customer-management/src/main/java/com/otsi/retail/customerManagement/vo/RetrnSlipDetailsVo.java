@@ -14,7 +14,7 @@ public class RetrnSlipDetailsVo {
 	
 	 private List<LineItemVo>  barcode;
 	 
-	 private List<HsnDetailsVo>  hsnCode;
+	// private List<HsnDetailsVo>  hsnCode;
 
 	 
 		/*
@@ -41,6 +41,7 @@ public class RetrnSlipDetailsVo {
 	 
 	 private String customerName;
 	 
+	 private String createdBy;
 	 private int totalQty;
 	 
 	 private double taxableAmount;

@@ -374,12 +374,28 @@ public class CustomerServiceImpl implements CustomerService {
 		});
 
 		List<HsnDetailsVo> list = new ArrayList<>();
+		List<LineItemVo> liVo = new ArrayList<>();
+		
 
 		bvo.stream().forEach(x -> {
 
 			try {
 				HsnDetailsVo hsnDetails = getHsnDetails(x.getNetValue());
+				LineItemVo iVo = new LineItemVo() ;
+				iVo.setBarCode(x.getBarCode());
+				iVo.setCreationDate(x.getCreationDate());
+				iVo.setDiscount(x.getDiscount());
+				iVo.setDomainId(x.getDomainId());
+				iVo.setGrossValue(x.getGrossValue());
+				iVo.setItemPrice(x.getItemPrice());
+				iVo.setNetValue(x.getNetValue());
+				iVo.setLastModified(x.getLastModified());
+				iVo.setQuantity(x.getQuantity());
+				iVo.setSection(x.getSection());
 				list.add(hsnDetails);
+				iVo.setHsnDetailsVo(hsnDetails);
+				liVo.add(iVo);
+				
 
 			} catch (JsonMappingException e) {
 				// TODO Auto-generated catch block
@@ -394,8 +410,8 @@ public class CustomerServiceImpl implements CustomerService {
 
 		// HsnDetailsVo HsnDetails = getHsnDetails(rts.getAmount());
 
-		rrvo.setBarcode(bvo);
-		rrvo.setHsnCode(list);
+		rrvo.setBarcode(liVo);
+		//rrvo.setHsnCode(list);
 		rrvo.setTotalQty(bvo.stream().mapToInt(q -> q.getQuantity()).sum());
 		rrvo.setTaxableAmount(list.stream().mapToDouble(t -> t.getTaxVo().getTaxableAmount()).sum());
 		rrvo.setTotalCgst(list.stream().mapToDouble(c -> c.getTaxVo().getCgst()).sum());
@@ -406,6 +422,7 @@ public class CustomerServiceImpl implements CustomerService {
 		rrvo.setRtNumber(rts.getRtNo());
 		rrvo.setMobileNumber(rts.getMobileNumber());
 		rrvo.setCustomerName(rts.getCustomerName());
+		rrvo.setCreatedBy(rts.getCreatedBy());
 		log.info("return slip details:" + rrvo);
 		return rrvo;
 	}

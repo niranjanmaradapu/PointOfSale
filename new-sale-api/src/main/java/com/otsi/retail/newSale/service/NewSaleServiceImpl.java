@@ -1207,6 +1207,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineEntity.setDiscount(lineItem.getDiscount());
 					lineEntity.setNetValue(lineItem.getNetValue());
 					lineEntity.setItemPrice(lineItem.getItemPrice());
+					lineEntity.setSection(lineItem.getSection());
 
 					// GrossValue is multiple of net value of product and quantity
 					lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -1234,7 +1235,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineReEntity.setDiscount(lineItem.getDiscount());
 					lineReEntity.setNetValue(lineItem.getNetValue());
 					lineReEntity.setItemPrice(lineItem.getItemPrice());
-
+					lineReEntity.setSection(lineItem.getSection());
+					
 					// GrossValue is multiple of net value of product and quantity
 					lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
 

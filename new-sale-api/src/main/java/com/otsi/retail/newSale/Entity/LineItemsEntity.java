@@ -20,6 +20,8 @@ public class LineItemsEntity {
 	@Id
 	@GeneratedValue
 	private Long lineItemId;
+	
+	private String section;
 
 	private String barCode;
 

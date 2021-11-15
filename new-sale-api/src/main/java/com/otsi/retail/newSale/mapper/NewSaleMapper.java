@@ -98,6 +98,7 @@ public class NewSaleMapper {
 
 						barvo.setCreationDate(a.getCreationDate());
 						barvo.setBarCode(a.getBarCode());
+						barvo.setSection(a.getSection());
 						barvo.setItemPrice(a.getItemPrice());
 						barvo.setGrossValue(a.getGrossValue());
 						barvo.setNetValue(a.getNetValue());
@@ -122,6 +123,7 @@ public class NewSaleMapper {
 							linevo.setNetValue(b.getNetValue());
 							linevo.setQuantity(b.getQuantity());
 							linevo.setDiscount(b.getDiscount());
+							linevo.setSection(b.getSection());
 
 							listBarVo.add(linevo);
 							nsvo.setLineItemsReVo(listBarVo);
