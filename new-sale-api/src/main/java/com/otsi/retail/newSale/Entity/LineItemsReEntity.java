@@ -26,6 +26,8 @@ public class LineItemsReEntity {
 	private Long lineItemReId;
 
 	private String barCode;
+	
+	private String section;
 
 	private Long itemPrice;
 
