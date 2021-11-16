@@ -482,11 +482,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 				List<UserDetailsVo> uvo = getUserDetailsFromURM(null, x.getUserId());
 
 				/////////
+				if(uvo!=null) {
 				uvo.stream().forEach(u -> {
 					x.setCustomerName(u.getUserName());
 					x.setMobileNumber(u.getPhoneNumber());
 				});
-
+				}
+			
 				x.setLineItemsReVo(listBar);
 				x.setTotalqQty(x.getLineItemsReVo().stream().mapToInt(q -> q.getQuantity()).sum());
 				x.setTotalMrp(x.getLineItemsReVo().stream().mapToLong(m -> m.getGrossValue()).sum());
@@ -1115,9 +1117,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			// salesSummery.setTotalTaxAmount(hsnDetails.getTaxVo().getCgst() +
 			// hsnDetails.getTaxVo().getSgst());
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			ListOfReturnSlipsVo rvo=new ListOfReturnSlipsVo();
+			rvo.setDateFrom(srvo.getDateFrom());
+			rvo.setDateTo(srvo.getDateTo());;
+			HttpEntity<ListOfReturnSlipsVo> entity = new HttpEntity<>(rvo, headers);
 
 			ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetListOfReturnSlips(),
-					HttpMethod.GET, null, GateWayResponse.class);
+					HttpMethod.POST, entity, GateWayResponse.class);
 
 			ObjectMapper mapper = new ObjectMapper();
 
