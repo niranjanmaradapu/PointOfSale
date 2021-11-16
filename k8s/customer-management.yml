@@ -5,8 +5,8 @@ metadata:
   namespace: default
 data:
   postgres_user: postgres
-  postgres_password: Vasavi
-  postgres_host: jdbc:postgresql://postgres:5432/postgres
+  postgres_password: Otsi@123
+  postgres_host: jdbc:postgresql://postgres:5432/customerManagement
   
 ---
 #apiVersion: v1
@@ -53,7 +53,7 @@ spec:
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
             - name: POSTGRES_DB
-              value: postgres
+              value: customerManagement
           ports:
             - containerPort: 5432
               name: postgres
@@ -131,6 +131,6 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - port: 0
+    - port: 8082
   selector:
     app: customer-management        

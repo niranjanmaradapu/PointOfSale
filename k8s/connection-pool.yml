@@ -5,8 +5,8 @@ metadata:
   namespace: default
 data:
   postgres_user: postgres
-  postgres_password: "1234"
-  postgres_host: jdbc:postgresql://postgres:5432/klm
+  postgres_password: root
+  postgres_host: jdbc:postgresql://postgres:5432/connectionpool
   
 ---
 #apiVersion: v1
@@ -53,7 +53,7 @@ spec:
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
             - name: POSTGRES_DB
-              value: klm
+              value: connectionpool
           ports:
             - containerPort: 5432
               name: postgres
@@ -131,6 +131,6 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - port: 8083
+    - port: 8085
   selector:
     app: connection-pool-app    

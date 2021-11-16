@@ -5,8 +5,8 @@ metadata:
   namespace: default
 data:
   postgres_user: postgres
-  postgres_password: Vasavi
-  postgres_host: jdbc:postgresql://postgres:5432/debit-notes
+  postgres_password: "12345678"
+  postgres_host: jdbc:postgresql://postgres:5432/newSale
   
 ---
 #apiVersion: v1
@@ -23,7 +23,7 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-dn
+  name: postgres-pe
 spec:
   selector:
     matchLabels:
@@ -53,7 +53,7 @@ spec:
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
             - name: POSTGRES_DB
-              value: debit-notes
+              value: newSale
           ports:
             - containerPort: 5432
               name: postgres
@@ -72,7 +72,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-dn
+  name: postgres-pe
 spec:
   type: ClusterIP
   ports:
@@ -83,21 +83,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: debit-notes
+  name: new-sale-api-app
   namespace: default
 spec:
   selector:
     matchLabels: 
-      app: debit-notes
+      app: new-sale-api-app
   replicas: 1
   template:
     metadata:
-      name: debit-notes
+      name: new-sale-api-app
       labels:
-        app: debit-notes
+        app: new-sale-api-app
     spec:
       containers:
-      - name: debit-notes
+      - name: new-sale-api-app
         env:
           - name: SPRING_DATASOURCE_USERNAME
             valueFrom:
@@ -114,7 +114,7 @@ spec:
               configMapKeyRef:
                 name: postgres-config
                 key: postgres_host
-        image: 881289302514.dkr.ecr.ap-south-1.amazonaws.com/debit-notes:latest
+        image: 881289302514.dkr.ecr.ap-south-1.amazonaws.com/new-sale-api:latest  
         resources:
           limits:
             memory: 512Mi
@@ -127,10 +127,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: debit-notes
+  name: new-sale-api-app
 spec:
   type: LoadBalancer
   ports:
-    - port: 8084
+    - port: 8081
   selector:
-    app: debit-notes        
+    app: new-sale-api-app        
