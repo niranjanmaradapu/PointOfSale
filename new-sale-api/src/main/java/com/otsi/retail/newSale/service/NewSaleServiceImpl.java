@@ -210,7 +210,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					});
 
 				});
-				requestForUpdateInInventoryForTextile(inventUpdate); // Request to update inventory for textile
+				//requestForUpdateInInventoryForTextile(inventUpdate); // Request to update inventory for textile
 
 			} else {
 				log.error("Please provide Valid delivery slips..");
@@ -240,7 +240,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineItemReRepo.save(x);
 
 				});
-				requestForUpdateInInventoryForRetail(map);// Request to update inventory for retail
+				//requestForUpdateInInventoryForRetail(map);// Request to update inventory for retail
 
 			} else {
 				log.error("Please provide valid LineItems..");
