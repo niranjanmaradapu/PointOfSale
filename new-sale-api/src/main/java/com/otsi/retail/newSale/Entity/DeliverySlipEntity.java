@@ -36,6 +36,8 @@ public class DeliverySlipEntity  {
 
 	private String dsNumber;
 	
+	private Long userId;
+	
 	@Transient
 	private int qty;
 	
