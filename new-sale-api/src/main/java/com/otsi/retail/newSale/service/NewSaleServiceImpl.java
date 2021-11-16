@@ -329,8 +329,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setStatus(DSStatus.Pending);
 		entity.setCreationDate(LocalDate.now());
 		entity.setLastModified(LocalDate.now());
-		entity.setSalesMan(vo.getSalesMan());
-
+		entity.setUserId(vo.getSalesMan());
+		
+		
 		DeliverySlipEntity savedEntity = dsRepo.save(entity);
 
 		List<Long> lineItems = new ArrayList<>();
@@ -1244,6 +1245,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineReEntity.setNetValue(lineItem.getNetValue());
 					lineReEntity.setItemPrice(lineItem.getItemPrice());
 					lineReEntity.setSection(lineItem.getSection());
+					lineReEntity.setUserId(lineItem.getUserId());
 					
 					// GrossValue is multiple of net value of product and quantity
 					lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -1333,6 +1335,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				line.setDiscount(lineItem.getDiscount());
 				line.setNetValue(lineItem.getNetValue());
 				line.setItemPrice(lineItem.getItemPrice());
+				line.setUserId(lineItem.getUserId());
 
 				// GrossValue is multiple of net value of product and quantity
 				line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());

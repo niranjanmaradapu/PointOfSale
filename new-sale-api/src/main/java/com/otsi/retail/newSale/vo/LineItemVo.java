@@ -22,6 +22,8 @@ public class LineItemVo {
 	private String barCode;
 	
 	private String section;
+	
+	private Long userId;
 
 	private Long itemPrice;
 

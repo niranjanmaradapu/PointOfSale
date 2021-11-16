@@ -28,6 +28,8 @@ public class LineItemsReEntity {
 	private String barCode;
 	
 	private String section;
+	
+	private Long userId;
 
 	private Long itemPrice;
 
