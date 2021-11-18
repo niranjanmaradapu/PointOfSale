@@ -202,7 +202,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					a.getLineItems().stream().forEach(x -> {
 
 						inventUpdate.add(x.getBarCode());
-						
+
 						x.setLastModified(LocalDate.now());
 						x.setDsEntity(a);
 						lineItemRepo.save(x);
@@ -210,7 +210,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 					});
 
 				});
-				//requestForUpdateInInventoryForTextile(inventUpdate); // Request to update inventory for textile
+				// requestForUpdateInInventoryForTextile(inventUpdate); // Request to update
+				// inventory for textile
 
 			} else {
 				log.error("Please provide Valid delivery slips..");
@@ -240,7 +241,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineItemReRepo.save(x);
 
 				});
-				//requestForUpdateInInventoryForRetail(map);// Request to update inventory for retail
+				// requestForUpdateInInventoryForRetail(map);// Request to update inventory for
+				// retail
 
 			} else {
 				log.error("Please provide valid LineItems..");
@@ -330,8 +332,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setCreationDate(LocalDate.now());
 		entity.setLastModified(LocalDate.now());
 		entity.setUserId(vo.getSalesMan());
-		
-		
+
 		DeliverySlipEntity savedEntity = dsRepo.save(entity);
 
 		List<Long> lineItems = new ArrayList<>();
@@ -376,7 +377,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 			throw new RecordNotFoundException("Provide valid DS Number");
 		}
 	}
-	
 
 	@Override
 	public ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo)
@@ -483,13 +483,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 				List<UserDetailsVo> uvo = getUserDetailsFromURM(null, x.getUserId());
 
 				/////////
-				if(uvo!=null) {
-				uvo.stream().forEach(u -> {
-					x.setCustomerName(u.getUserName());
-					x.setMobileNumber(u.getPhoneNumber());
-				});
+				if (uvo != null) {
+					uvo.stream().forEach(u -> {
+						x.setCustomerName(u.getUserName());
+						x.setMobileNumber(u.getPhoneNumber());
+					});
 				}
-			
+
 				x.setLineItemsReVo(listBar);
 				x.setTotalqQty(x.getLineItemsReVo().stream().mapToInt(q -> q.getQuantity()).sum());
 				x.setTotalMrp(x.getLineItemsReVo().stream().mapToLong(m -> m.getGrossValue()).sum());
@@ -729,11 +729,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreationDate(DSStatus.Pending, LocalDate.now());
 
-		
-			log.info("successfully we can close the day of pos " + " uncleared delivery Slips count :" + DsList.size());
-			return DsList ;
+		log.info("successfully we can close the day of pos " + " uncleared delivery Slips count :" + DsList.size());
+		return DsList;
 
-		
 	}
 
 	@Override
@@ -1073,17 +1071,16 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public List<LineItemVo> getBarcodes(List<String> barCode,Long domainId) throws RecordNotFoundException {
+	public List<LineItemVo> getBarcodes(List<String> barCode, Long domainId) throws RecordNotFoundException {
 		log.debug("deugging getBarcodeDetails" + barCode);
-		 List<LineItemVo> vo= new ArrayList<LineItemVo>();
-		
-		if(domainId==1) {
+		List<LineItemVo> vo = new ArrayList<LineItemVo>();
+
+		if (domainId == 1) {
 			List<LineItemsEntity> barcodeDetails = lineItemRepo.findByBarCodeIn(barCode);
-		  vo = newSaleMapper.convertBarcodesEntityToVo(barcodeDetails);
-		}
-		else {
+			vo = newSaleMapper.convertBarcodesEntityToVo(barcodeDetails);
+		} else {
 			List<LineItemsReEntity> barcodeDetails1 = lineItemReRepo.findByBarCodeIn(barCode);
-		  vo = newSaleMapper.convertBarcodesReEntityToVo(barcodeDetails1);
+			vo = newSaleMapper.convertBarcodesReEntityToVo(barcodeDetails1);
 		}
 		return vo;
 	}
@@ -1120,15 +1117,17 @@ public class NewSaleServiceImpl implements NewSaleService {
 			// hsnDetails.getTaxVo().getSgst());
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			ListOfReturnSlipsVo rvo=new ListOfReturnSlipsVo();
+			ListOfReturnSlipsVo rvo = new ListOfReturnSlipsVo();
 			rvo.setDateFrom(srvo.getDateFrom());
-			rvo.setDateTo(srvo.getDateTo());;
+			rvo.setDateTo(srvo.getDateTo());
+			;
 			HttpEntity<ListOfReturnSlipsVo> entity = new HttpEntity<>(rvo, headers);
 
 			ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetListOfReturnSlips(),
 					HttpMethod.POST, entity, GateWayResponse.class);
 
-			ObjectMapper mapper = new ObjectMapper();
+			ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
+					.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
 			GateWayResponse<?> gatewayResponse = mapper.convertValue(returnSlipListResponse.getBody(),
 					GateWayResponse.class);
@@ -1147,7 +1146,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				List<String> barcodes = tgItems.stream().map(x -> x.getBarCode()).collect(Collectors.toList());
 
 				try {
-					List<LineItemVo> barVo = getBarcodes(barcodes,b.getDomainId());
+					List<LineItemVo> barVo = getBarcodes(barcodes, b.getDomainId());
 					barVo.stream().forEach(r -> {
 
 						barVoList.add(r);
@@ -1246,7 +1245,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineReEntity.setItemPrice(lineItem.getItemPrice());
 					lineReEntity.setSection(lineItem.getSection());
 					lineReEntity.setUserId(lineItem.getUserId());
-					
+
 					// GrossValue is multiple of net value of product and quantity
 					lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
 
@@ -1415,7 +1414,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo) {
 
-		
 		/*
 		 * List<UserDetailsVo> userVo=getUserDetailsFromURM(mobileNo, 0L);
 		 * if(!CollectionUtils.isEmpty(userVo)) { Optional<UserDetailsVo>
@@ -1429,24 +1427,22 @@ public class NewSaleServiceImpl implements NewSaleService {
 		 * } } }
 		 */
 
-return null;
+		return null;
 	}
 
-	
 	@Override
 	public String deleteDeliverySlipDetails(Long dsId) {
-		
-		Optional<DeliverySlipEntity>  dsVo= dsRepo.findById(dsId);
-		
-		if(dsVo.get() != null && dsVo.get().getOrder()==null) {
-			
+
+		Optional<DeliverySlipEntity> dsVo = dsRepo.findById(dsId);
+
+		if (dsVo.get() != null && dsVo.get().getOrder() == null) {
+
 			dsRepo.deleteById(dsId);
-			
+
 		}
-		
+
 		// TODO Auto-generated method stub
 		return " delivery Slip sucessfully deleted ";
 	}
-	
-	
+
 }
