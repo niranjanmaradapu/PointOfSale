@@ -40,5 +40,7 @@ HsnDetailsVo getHsnDetails(double netAmt) throws JsonMappingException, JsonProce
 
 	RetrnSlipDetailsVo ReturnSlipsDeatils(String RtNumber) throws JsonMappingException, JsonProcessingException, URISyntaxException;
 
-	String updateReturnSlip(String rtNumber, GenerateReturnSlipRequest request);;
+	String updateReturnSlip(String rtNumber, GenerateReturnSlipRequest request);
+
+	String deleteReturnSlips(int rsId);;
 }
