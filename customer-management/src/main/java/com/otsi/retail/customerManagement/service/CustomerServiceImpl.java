@@ -171,6 +171,10 @@ public class CustomerServiceImpl implements CustomerService {
 		// throw new RuntimeException("no record found with the giveninformation");
 		throw new DataNotFoundException("No return slips are found");
 	}
+	
+	
+	
+	
 
 	@Override
 	@CircuitBreaker(name = "newSale", fallbackMethod = "getInvoiceFallback")
@@ -483,6 +487,26 @@ public class CustomerServiceImpl implements CustomerService {
 		log.warn("we wre checking if return slip is updated..");
 		log.info("Successfully updated " + rts.getRtNo());
 		return "Successfully updated " + rts.getRtNo();
+	}
+
+
+
+
+
+	@Override
+	public String deleteReturnSlips(int rsId) {
+		ReturnSlip lvo=new ReturnSlip();
+		lvo = returnSlipRepo.findByRsId(rsId);
+		if(lvo!=null) {
+			
+			returnSlipRepo.delete(lvo);
+		}
+		else
+		{
+			throw new RecordNotFoundException("Record not found");		
+		}
+		
+		return "Record Deleted successfully";
 	}
 
 }

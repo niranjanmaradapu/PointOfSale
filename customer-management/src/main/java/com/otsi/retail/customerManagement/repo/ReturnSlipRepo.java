@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.otsi.retail.customerManagement.model.ReturnSlip;
+import com.otsi.retail.customerManagement.vo.ListOfReturnSlipsVo;
 
 /**
  * @author lakshmi
@@ -48,7 +49,7 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 	// List<listOfReturnSlipsModel> findByCreatedInfoBetweenAndId(LocalDate
 	// dateFrom, LocalDate dateTo, int id);
 
-	List<ReturnSlip> findByRsId(int rsId);
+	ReturnSlip findByRsId(int rsId);
 
 //	List<ReturnSlip> findByCreatedDateBetweenAndCrNo(LocalDate dateFrom, LocalDate dateTo,
 //			String creditNote);
