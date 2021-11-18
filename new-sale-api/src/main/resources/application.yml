@@ -7,9 +7,9 @@ spring:
     name: new-sale-service 
  datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/newSale
+    url: jdbc:postgresql://localhost:5432/new-sale-api
     username: postgres
-    password: 12345678
+    password: root
  jpa:
    hibernate:
     ddl-auto: update
