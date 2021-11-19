@@ -23,6 +23,7 @@ import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.PaymentDetailsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 
@@ -83,10 +84,11 @@ public interface NewSaleService {
 
 	String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo);
 
-	
-
 	String deleteDeliverySlipDetails(Long dsId);
 
 	List<LineItemVo> getBarcodes(List<String> barCode, Long domainId) throws RecordNotFoundException;
+
+	String setPaymentDetailsForOrder(List<PaymentDetailsVo> paymentDetails);
+
 
 }
