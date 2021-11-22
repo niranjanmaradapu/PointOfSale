@@ -40,9 +40,9 @@ import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
-import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.PaymentDetailsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
@@ -102,6 +102,14 @@ public class NewSaleController {
 		} catch (InvalidInputException e) {
 			return new GateWayResponse<>(e.getMsg(), "Exception occurs while creating order");
 		}
+	}
+
+	// Method for payment in new sale(Order)
+	@PostMapping("/razorpaydetailstonewsale")
+	public GateWayResponse<?> razorPayrequest(@RequestBody List<PaymentDetailsVo> paymentDetails) {
+
+		String result = newSaleService.setPaymentDetailsForOrder(paymentDetails);
+		return new GateWayResponse<>(result, "Success");
 	}
 
 	// Method for create new Barcode..
@@ -194,7 +202,8 @@ public class NewSaleController {
 		return new GateWayResponse<>(HttpStatus.OK, dsDetails, "");
 
 	}
-    //method for deleting pending delivery slip data
+
+	// method for deleting pending delivery slip data
 	@DeleteMapping(CommonRequestMappigs.DELETE_DS)
 	public GateWayResponse<?> deleteDeliverySlipDetails(@RequestParam Long dsId) throws RecordNotFoundException {
 		log.info("Received Request to getDeliverySlipDetails :" + dsId);
@@ -202,7 +211,7 @@ public class NewSaleController {
 		String dsDetails = newSaleService.deleteDeliverySlipDetails(dsId);
 		return new GateWayResponse<>("Success", dsDetails);
 	}
-	
+
 	// Method for getting list of sale bills
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
 	public GateWayResponse<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo)
@@ -390,18 +399,20 @@ public class NewSaleController {
 	@PostMapping("/getbarcodes/{domainId}")
 	// @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 
-	public GateWayResponse<?> getBarcodes(@RequestBody List<String> barCode, @PathVariable Long domainId) throws RecordNotFoundException {
+	public GateWayResponse<?> getBarcodes(@RequestBody List<String> barCode, @PathVariable Long domainId)
+			throws RecordNotFoundException {
 		log.info("Received Request to getBarcodeDetails:" + barCode);
 		System.out.println("Received Request to getBarcodeDetails:" + barCode);
 
-		List<LineItemVo> barCodeDetails = newSaleService.getBarcodes(barCode,domainId);
+		List<LineItemVo> barCodeDetails = newSaleService.getBarcodes(barCode, domainId);
 
 		return new GateWayResponse<>(HttpStatus.OK, barCodeDetails, "");
 
 	}
-	
+
 	@GetMapping("/isCustomerTaggedToNewSale/{mobileNo}/{invoiceNo}")
-	public GateWayResponse<?> getTaggedCustomerForInvoice(@PathVariable String mobileNo,@PathVariable String invoiceNo){
+	public GateWayResponse<?> getTaggedCustomerForInvoice(@PathVariable String mobileNo,
+			@PathVariable String invoiceNo) {
 		/*
 		 * try { String result=
 		 * newSaleService.getTaggedCustomerForInvoice(mobileNo,invoiceNo); }

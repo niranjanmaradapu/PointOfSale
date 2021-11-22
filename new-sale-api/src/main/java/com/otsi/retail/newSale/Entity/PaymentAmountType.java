@@ -30,19 +30,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PaymentAmountType {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Id
+	@GeneratedValue // (strategy = GenerationType.AUTO)
+	private Long id;
 
-    //@Enumerated(EnumType.ORDINAL)
-    private String paymentType;
+	// @Enumerated(EnumType.ORDINAL)
+	private String paymentType;
 
-    private Long paymentAmount;
+	private Long paymentAmount;
 
-	private Long orderId;
+	@ManyToOne
+	@JoinColumn(name = "order_id")
+	private NewSaleEntity orderId;
+
+	// private Long orderId;
+
 //    @ManyToOne
 //    @JoinColumn(name = "order_id")
 //    private Long newSale;
-    private String razorPayId;
-}
+	private String razorPayId;
 
+	private Boolean razorPayStatus;
+}

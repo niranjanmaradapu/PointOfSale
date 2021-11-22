@@ -45,6 +45,7 @@ import com.otsi.retail.newSale.Exceptions.InvalidInputException;
 import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.DomainData;
+import com.otsi.retail.newSale.common.OrderStatus;
 import com.otsi.retail.newSale.common.PaymentType;
 import com.otsi.retail.newSale.config.Config;
 import com.otsi.retail.newSale.gatewayresponse.GateWayResponse;
@@ -73,6 +74,8 @@ import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
+import com.otsi.retail.newSale.vo.PaymentDetailsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.ReturnSummeryVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
@@ -171,9 +174,20 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setDiscType(vo.getDiscType());
 		entity.setCreationDate(LocalDate.now());
 		entity.setLastModified(LocalDate.now());
+		entity.setStatus(OrderStatus.New);// Initial Order status should be new
 		entity.setStatus(vo.getStatus());
 		entity.setOrderNumber(
 				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
+		// Check for payment type
+		List<PaymentAmountTypeVo> checkList = new ArrayList<>();
+		if (vo.getPaymentAmountType() != null) {
+//			checkList = vo.getPaymentAmountType().stream()
+//					.filter(x -> x.getPaymentType().equals("Cash")).collect(Collectors.toList());
+
+			if (vo.getPaymentAmountType().size() == 1 && checkList.size() == 1) {
+				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
+			}
+		}
 		entity.setNetValue(vo.getNetPayableAmount());
 		entity.setStoreId(vo.getStoreId());
 		entity.setOfflineNumber(vo.getOfflineNumber());
@@ -210,8 +224,21 @@ public class NewSaleServiceImpl implements NewSaleService {
 					});
 
 				});
-				// requestForUpdateInInventoryForTextile(inventUpdate); // Request to update
-				// inventory for textile
+				// Saving order details in order_transaction table only for cash
+
+				if (vo.getPaymentAmountType() != null && vo.getPaymentAmountType().size() == 1
+				/* && checkList.size() == 1 */) {
+
+					PaymentAmountType type = new PaymentAmountType();
+					type.setOrderId(saveEntity);
+					type.setPaymentAmount(saveEntity.getNetValue());
+					type.setPaymentType(PaymentType.Cash.getType());
+
+					paymentAmountTypeRepository.save(type);
+
+				}
+				// Request to update inventory for textile
+				// requestForUpdateInInventoryForTextile(inventUpdate);
 
 			} else {
 				log.error("Please provide Valid delivery slips..");
@@ -241,8 +268,23 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineItemReRepo.save(x);
 
 				});
-				// requestForUpdateInInventoryForRetail(map);// Request to update inventory for
-				// retail
+
+				// Saving order details in order_transaction table only for cash
+
+				if (vo.getPaymentAmountType() != null && vo.getPaymentAmountType().size() == 1
+						&& checkList.size() == 1) {
+
+					PaymentAmountType type = new PaymentAmountType();
+					type.setOrderId(saveEntity);
+					type.setPaymentAmount(saveEntity.getNetValue());
+					type.setPaymentType(PaymentType.Cash.getType());
+
+					paymentAmountTypeRepository.save(type);
+
+				}
+
+				// Request to update inventory for retail
+				// requestForUpdateInInventoryForRetail(map);
 
 			} else {
 				log.error("Please provide valid LineItems..");
@@ -254,6 +296,30 @@ public class NewSaleServiceImpl implements NewSaleService {
 		log.warn("we are testing bill generated with number");
 		log.info("after generated bill with number:" + entity.getOrderNumber());
 		return entity.getOrderNumber();
+	}
+
+	// Method for saving payment details
+	@Override
+	public String setPaymentDetailsForOrder(List<PaymentDetailsVo> paymentDetailsList) {
+
+		paymentDetailsList.stream().forEach(paymentDetails -> {
+
+			List<NewSaleEntity> entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
+			NewSaleEntity orderRecord = entity.stream().findFirst().get();
+
+			if (orderRecord != null) {
+
+				PaymentAmountType payDetails = new PaymentAmountType();
+				payDetails.setOrderId(orderRecord);
+				payDetails.setPaymentType(paymentDetails.getPayType());
+				payDetails.setPaymentAmount(paymentDetails.getAmount());
+				payDetails.setRazorPayId(paymentDetails.getRazorPayId());
+				payDetails.setRazorPayStatus(true);
+
+				PaymentAmountType savedPayment = paymentAmountTypeRepository.save(payDetails);
+			}
+		});
+		return "Successfully updated payment status";
 	}
 
 	// Method for Update inventory for Textile
