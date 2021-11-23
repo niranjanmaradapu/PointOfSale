@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -144,6 +145,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private LineItemReRepo lineItemReRepo;
+
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
 
 	// Method for saving order
 	@Override
@@ -314,36 +318,37 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			paymentAmountTypeRepository.save(payDetails);
 
-			System.out.println("Saved payments for the order : " + orderRecord.getOrderNumber());
+			log.info("save payment details for order : " + orderRecord.getOrderNumber());
+			//updateOrderItemsInInventory(orderRecord);// Method for update order item into inventory
+
 		}
 	}
+	// Method for update order item into inventory
+	private void updateOrderItemsInInventory(NewSaleEntity orderRecord) {
 
-	// Method for Update inventory for Textile
-	private void requestForUpdateInInventoryForTextile(List<String> inventUpdate) {
+		if (orderRecord.getDomainId() == DomainData.TE.getId()) {
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
+			Map<String, Integer> map = new HashMap<>();
 
-		HttpEntity<List<String>> request = new HttpEntity<>(inventUpdate, headers);
+			List<LineItemsEntity> lineItems = orderRecord.getDlSlip().stream().flatMap(x -> x.getLineItems().stream())
+					.collect(Collectors.toList());
 
-		ResponseEntity<GateWayResponse> response = template.exchange(config.getInventoryUpdateForTextile(),
-				HttpMethod.POST, request, GateWayResponse.class);
-		String message = response.getBody().getMessage();
-		// String message = gatewayBody.getMessage();
+			lineItems.stream().forEach(x -> {
+				map.put(x.getBarCode(), x.getQuantity());
 
-	}
-
-	// Method for Update inventory for retail
-	private void requestForUpdateInInventoryForRetail(Map<String, Integer> map) {
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-
-		HttpEntity<Map<String, Integer>> request = new HttpEntity<>(map, headers);
-
-		ResponseEntity<GateWayResponse> response = template.exchange(config.getInventoryUpdateForRetail(),
-				HttpMethod.POST, request, GateWayResponse.class);
-		String message = response.getBody().getMessage();
+			});
+			// rabbitTemplate.convertAndSend(exchange, routingKey, object);
+		} else {
+			
+			Map<String, Integer> map = new HashMap<>();
+			List<LineItemsReEntity> lineItemRes = orderRecord.getLineItemsRe();
+			
+			lineItemRes.stream().forEach(x->{
+				
+				map.put(x.getBarCode(), x.getQuantity());
+			});
+			// rabbitTemplate.convertAndSend(exchange, routingKey, object);
+		}
 
 	}
 
