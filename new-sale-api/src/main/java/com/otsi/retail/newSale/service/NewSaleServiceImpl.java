@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -181,9 +182,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 		// Check for payment type
 		List<PaymentAmountTypeVo> checkList = new ArrayList<>();
 		if (vo.getPaymentAmountType() != null) {
-//			checkList = vo.getPaymentAmountType().stream()
-//					.filter(x -> x.getPaymentType().equals("Cash")).collect(Collectors.toList());
-
 			if (vo.getPaymentAmountType().size() == 1 && checkList.size() == 1) {
 				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
 			}
@@ -298,28 +296,26 @@ public class NewSaleServiceImpl implements NewSaleService {
 		return entity.getOrderNumber();
 	}
 
-	// Method for saving payment details
-	@Override
-	public String setPaymentDetailsForOrder(List<PaymentDetailsVo> paymentDetailsList) {
+	@RabbitListener(queues = "newsale_queue")
+	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
 
-		paymentDetailsList.stream().forEach(paymentDetails -> {
+		System.out.println("Got payments for the order : " + paymentDetails.getNewsaleOrder());
+		List<NewSaleEntity> entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
+		NewSaleEntity orderRecord = entity.stream().findFirst().get();
 
-			List<NewSaleEntity> entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
-			NewSaleEntity orderRecord = entity.stream().findFirst().get();
+		if (orderRecord != null) {
 
-			if (orderRecord != null) {
+			PaymentAmountType payDetails = new PaymentAmountType();
+			payDetails.setOrderId(orderRecord);
+			payDetails.setPaymentType(paymentDetails.getPayType());
+			payDetails.setPaymentAmount(paymentDetails.getAmount());
+			payDetails.setRazorPayId(paymentDetails.getRazorPayId());
+			payDetails.setRazorPayStatus(true);
 
-				PaymentAmountType payDetails = new PaymentAmountType();
-				payDetails.setOrderId(orderRecord);
-				payDetails.setPaymentType(paymentDetails.getPayType());
-				payDetails.setPaymentAmount(paymentDetails.getAmount());
-				payDetails.setRazorPayId(paymentDetails.getRazorPayId());
-				payDetails.setRazorPayStatus(true);
+			paymentAmountTypeRepository.save(payDetails);
 
-				PaymentAmountType savedPayment = paymentAmountTypeRepository.save(payDetails);
-			}
-		});
-		return "Successfully updated payment status";
+			System.out.println("Saved payments for the order : " + orderRecord.getOrderNumber());
+		}
 	}
 
 	// Method for Update inventory for Textile

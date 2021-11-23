@@ -104,14 +104,6 @@ public class NewSaleController {
 		}
 	}
 
-	// Method for payment in new sale(Order)
-	@PostMapping("/razorpaydetailstonewsale")
-	public GateWayResponse<?> razorPayrequest(@RequestBody List<PaymentDetailsVo> paymentDetails) {
-
-		String result = newSaleService.setPaymentDetailsForOrder(paymentDetails);
-		return new GateWayResponse<>(result, "Success");
-	}
-
 	// Method for create new Barcode..
 	@PostMapping(CommonRequestMappigs.CREATE_BARCODE)
 	public GateWayResponse<?> saveBarcode(@RequestBody BarcodeVo vo) throws DuplicateRecordException {
