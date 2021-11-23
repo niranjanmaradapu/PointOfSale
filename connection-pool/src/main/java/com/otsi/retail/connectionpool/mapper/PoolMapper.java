@@ -21,6 +21,7 @@ public class PoolMapper {
 
 		ent.setPoolName(vo.getPoolName());
 		ent.setPoolType(vo.getPoolType());
+		ent.setCreatedBy(vo.getCreatedBy());
 		ent.setCreatedDate(LocalDate.now());
 		ent.setLastModified(LocalDate.now());
 		ent.setIsActive(Boolean.TRUE);
@@ -58,6 +59,7 @@ public class PoolMapper {
 
 			vo.setPoolName(x.getPoolName());
 			vo.setPoolId(x.getPoolId());
+			vo.setCreatedBy(x.getCreatedBy());
 			vo.setCreatedDate(x.getCreatedDate());
 			vo.setPoolType(x.getPoolType());
 			vo.setIsActive(x.getIsActive());
