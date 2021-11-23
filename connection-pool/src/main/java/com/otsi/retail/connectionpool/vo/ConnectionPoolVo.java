@@ -24,6 +24,8 @@ public class ConnectionPoolVo {
 	private PoolType poolType;
 
 	private List<RuleVo> ruleVo;
+	
+	private String createdBy;
 
 	private LocalDate createdDate;
 
