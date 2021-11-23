@@ -88,7 +88,4 @@ public interface NewSaleService {
 
 	List<LineItemVo> getBarcodes(List<String> barCode, Long domainId) throws RecordNotFoundException;
 
-	String setPaymentDetailsForOrder(List<PaymentDetailsVo> paymentDetails);
-
-
 }
