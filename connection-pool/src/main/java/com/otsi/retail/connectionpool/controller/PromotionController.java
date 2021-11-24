@@ -35,7 +35,6 @@ import com.sun.istack.NotNull;
  */
 
 @RestController
-@CrossOrigin
 @Transactional
 @RequestMapping(CommonRequestMappigs.PROMO)
 public class PromotionController {

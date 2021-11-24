@@ -25,7 +25,6 @@ import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
  *
  */
 @RestController
-@CrossOrigin
 @RequestMapping(CommonRequestMappigs.POOL)
 public class PoolController {
 
