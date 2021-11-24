@@ -53,7 +53,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env: 
-      MODULE_NAME: usermanagement
+      MODULE_NAME: new-sale-api
     permissions:
       contents: read
       packages: write
