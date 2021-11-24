@@ -1059,6 +1059,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public String saveGiftVoucher(GiftVoucherVo vo) throws DuplicateRecordException {
 		log.debug(" debugging saveGiftVoucher:" + vo);
+
 		// Check condition for Duplicate GiftVoucher Numbers
 		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumber(vo.getGvNumber());
 
@@ -1101,24 +1102,22 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public String tagCustomerToGv(Long userId, Long gvId) throws InvalidInputException, DataNotFoundException {
 		log.debug(" debugging tagCustomerToGv:" + userId + "and the gv id is :" + gvId);
-		Optional<CustomerDetailsEntity> user = customerRepo.findById(userId);
-		if (user.isPresent()) {
-			Optional<GiftVoucherEntity> gv = gvRepo.findById(gvId);
-			// Gift voucher should not be tagged and expiry date should greater than today
-			if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
-				gv.get().setUserId(userId);
-				gv.get().setIsTagged(Boolean.TRUE);
-				gvRepo.save(gv.get());
-			} else {
-				log.error("Gift voucher is not valid");
-				throw new InvalidInputException("Gift voucher is not valid");
-			}
+
+		Optional<GiftVoucherEntity> gv = gvRepo.findById(gvId);
+		
+		// Gift voucher should not be tagged and expirydate should greater than today
+		if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
+			gv.get().setUserId(userId);
+			gv.get().setIsTagged(Boolean.TRUE);
+			gvRepo.save(gv.get());
 		} else {
-			throw new DataNotFoundException("User data is not Available..");
+			log.error("Gift voucher is not valid");
+			throw new InvalidInputException("Gift voucher is not valid");
 		}
+		
 		log.warn("we are testing if customer is tagged to gv voucher...");
-		log.info("after tagging customer to  gift voucher:" + user.get().getName());
-		return "Gift vocher tagged successfully to " + user.get().getName();
+		log.info("after tagging customer to  gift voucher");
+		return "Gift vocher tagged successfully  " + gv.get().getGvNumber();
 	}
 
 	// Method for Return all Bar code items
