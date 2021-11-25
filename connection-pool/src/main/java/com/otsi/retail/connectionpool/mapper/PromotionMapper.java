@@ -28,6 +28,7 @@ public class PromotionMapper {
 			promo.setPromoId(vo.getPromoId());
 		}
 		promo.setPromoName(vo.getPromoName());
+		promo.setDomainId(vo.getDomainId());
 		promo.setDescription(vo.getDescription());
 		promo.setPrintNameOnBill(vo.getPrintNameOnBill());
 		promo.setIsTaxExtra(vo.getIsTaxExtra());
@@ -55,6 +56,7 @@ public class PromotionMapper {
 			PromotionsVo vo = new PromotionsVo();
 
 			vo.setPromoName(x.getPromoName());
+			vo.setDomainId(x.getDomainId());
 			vo.setDescription(x.getDescription());
 			vo.setPrintNameOnBill(x.getPrintNameOnBill());
 			vo.setApplicability(x.getApplicability());
@@ -74,6 +76,7 @@ public class PromotionMapper {
 
 				ConnectionPoolVo pool = new ConnectionPoolVo();
 				pool.setPoolId(a.getPoolId());
+				pool.setDomainId(a.getDomainId());
 				pool.setPoolName(a.getPoolName());
 				pool.setPoolType(a.getPoolType());
 				pool.setIsActive(a.getIsActive());

@@ -20,6 +20,8 @@ public class ConnectionPoolVo {
 	private String poolName;
 
 	private Long poolId;
+	
+	private Long domainId;
 
 	private PoolType poolType;
 

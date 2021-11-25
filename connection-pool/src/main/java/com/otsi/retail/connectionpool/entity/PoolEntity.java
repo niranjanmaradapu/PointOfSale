@@ -28,6 +28,8 @@ public class PoolEntity {
 	@Id
 	@GeneratedValue
 	private Long poolId;
+	
+	private Long domainId;
 
 	private String poolName;
 

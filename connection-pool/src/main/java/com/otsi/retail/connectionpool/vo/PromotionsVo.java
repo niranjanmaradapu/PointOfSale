@@ -29,6 +29,8 @@ public class PromotionsVo {
 	private Long promoId;
 	
 	private Long storeId;
+	
+	private Long domainId;
 
 	private String promoName;
 
