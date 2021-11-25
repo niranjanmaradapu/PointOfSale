@@ -88,4 +88,6 @@ public interface NewSaleService {
 
 	List<LineItemVo> getBarcodes(List<String> barCode, Long domainId) throws RecordNotFoundException;
 
+	String paymentConfirmationFromRazorpay(String razorPayId, boolean payStatus);
+
 }
