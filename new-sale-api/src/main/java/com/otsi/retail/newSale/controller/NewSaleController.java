@@ -104,6 +104,19 @@ public class NewSaleController {
 		}
 	}
 
+	// Method to confirm payment status based on Razorpay Id
+	@PostMapping("payconfirmation")
+	public GateWayResponse<?> paymentConfirmationFromRazorpay(@RequestParam String razorPayId,
+			@RequestParam boolean payStatus) {
+		try {
+			String result = newSaleService.paymentConfirmationFromRazorpay(razorPayId, payStatus);
+			return new GateWayResponse<>(result, "Success..");
+			
+		} catch (Exception e) {
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(), "Exception occurs");
+		}
+	}
+	
 	// Method for create new Barcode..
 	@PostMapping(CommonRequestMappigs.CREATE_BARCODE)
 	public GateWayResponse<?> saveBarcode(@RequestBody BarcodeVo vo) throws DuplicateRecordException {

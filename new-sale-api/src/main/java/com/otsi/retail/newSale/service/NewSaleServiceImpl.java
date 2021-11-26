@@ -314,15 +314,39 @@ public class NewSaleServiceImpl implements NewSaleService {
 			payDetails.setPaymentType(paymentDetails.getPayType());
 			payDetails.setPaymentAmount(paymentDetails.getAmount());
 			payDetails.setRazorPayId(paymentDetails.getRazorPayId());
-			payDetails.setRazorPayStatus(true);
+			payDetails.setRazorPayStatus(false);
 
 			paymentAmountTypeRepository.save(payDetails);
 
 			log.info("save payment details for order : " + orderRecord.getOrderNumber());
-			//updateOrderItemsInInventory(orderRecord);// Method for update order item into inventory
 
 		}
 	}
+
+	// Method for update the payment status in order_transaction table
+	@Override
+	public String paymentConfirmationFromRazorpay(String razorPayId, boolean payStatus) {
+
+		if (payStatus) {
+
+			PaymentAmountType payment = paymentAmountTypeRepository.findByRazorPayId(razorPayId);
+			payment.setRazorPayStatus(payStatus);
+
+			paymentAmountTypeRepository.save(payment);
+
+			log.info("update payment details for razorpay Id: " + razorPayId);
+			Optional<NewSaleEntity> order = newSaleRepository.findById(payment.getOrderId().getOrderId());
+
+			// Call method to update order items into inventory
+			updateOrderItemsInInventory(order.get());
+			return "successfully updated payment deatils";
+
+		} else {
+			return "please do payment again";
+		}
+
+	}
+
 	// Method for update order item into inventory
 	private void updateOrderItemsInInventory(NewSaleEntity orderRecord) {
 
@@ -339,12 +363,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 			});
 			// rabbitTemplate.convertAndSend(exchange, routingKey, object);
 		} else {
-			
+
 			Map<String, Integer> map = new HashMap<>();
 			List<LineItemsReEntity> lineItemRes = orderRecord.getLineItemsRe();
-			
-			lineItemRes.stream().forEach(x->{
-				
+
+			lineItemRes.stream().forEach(x -> {
+
 				map.put(x.getBarCode(), x.getQuantity());
 			});
 			// rabbitTemplate.convertAndSend(exchange, routingKey, object);
@@ -1104,7 +1128,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		log.debug(" debugging tagCustomerToGv:" + userId + "and the gv id is :" + gvId);
 
 		Optional<GiftVoucherEntity> gv = gvRepo.findById(gvId);
-		
+
 		// Gift voucher should not be tagged and expirydate should greater than today
 		if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
 			gv.get().setUserId(userId);
@@ -1114,7 +1138,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			log.error("Gift voucher is not valid");
 			throw new InvalidInputException("Gift voucher is not valid");
 		}
-		
+
 		log.warn("we are testing if customer is tagged to gv voucher...");
 		log.info("after tagging customer to  gift voucher");
 		return "Gift vocher tagged successfully  " + gv.get().getGvNumber();
