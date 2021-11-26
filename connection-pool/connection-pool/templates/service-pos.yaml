@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "connection-pool.fullname" . }}-pos
+  labels:
+    {{- include "connection-pool.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.postgres.type }}
+  ports:
+    - port: {{ .Values.service.postgres.port }}
+  selector:
+    {{- include "connection-pool.selectorLabels" . | nindent 4 }}

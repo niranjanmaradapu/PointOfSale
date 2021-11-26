@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "promo-exchange.fullname" . }}-pos
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "promo-exchange.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "promo-exchange.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "promo-exchange.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "promo-exchange.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.postgres.repository }}:{{ .Values.image.postgres.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.env.postgres_user }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.env.postgres_password }}
+            - name: PGDATA
+              value: {{ .Values.env.postgres_data }}
+            - name: POSTGRES_DB
+              value: {{ .Values.env.postgres_db }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.postgres.port }}
+              protocol: TCP
+          #livenessProbe:
+          # httpGet:
+          #    path: /
+          #    port: {{ .Values.service.nodePort }}
+          #readinessProbe:
+          #  httpGet:
+          #    path: /
+          #    port: http
+          volumeMounts:
+            - name: promo-exchange-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: promo-exchange-data
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "promo-exchange.fullname" . }}-pos
+        {{- else }}
+          emptyDir: {}
+        {{- end -}}

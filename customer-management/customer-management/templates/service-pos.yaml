@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "customer-management.fullname" . }}-pos
+  labels:
+    {{- include "customer-management.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.postgres.type }}
+  ports:
+    - port: {{ .Values.service.postgres.port }}
+  selector:
+    {{- include "customer-management.selectorLabels" . | nindent 4 }}

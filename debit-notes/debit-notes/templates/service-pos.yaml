@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "debit-notes.fullname" . }}-pos
+  labels:
+    {{- include "debit-notes.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.postgres.type }}
+  ports:
+    - port: {{ .Values.service.postgres.port }}
+  selector:
+    {{- include "debit-notes.selectorLabels" . | nindent 4 }}
