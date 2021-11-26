@@ -20,10 +20,14 @@ import lombok.Data;
 public class ListOfReturnSlipsVo {
 
 	private LocalDate dateFrom;
+	
+	private int rsId;
 
 	private LocalDate dateTo;
 
 	private String barcode;
+	
+	private Long domainId;
 
 	//private String rtStatus;
 
@@ -45,4 +49,5 @@ public class ListOfReturnSlipsVo {
 
 	private List<TaggedItems> barcodes;
 
+	
 }

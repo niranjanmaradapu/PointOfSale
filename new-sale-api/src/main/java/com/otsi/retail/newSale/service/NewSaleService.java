@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
@@ -22,6 +23,7 @@ import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.PaymentDetailsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 
@@ -42,7 +44,7 @@ public interface NewSaleService {
 	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo)
 			throws RecordNotFoundException;
 
-	String posDayClose();
+	List<DeliverySlipEntity> posDayClose();
 
 	double getNewSaleWithHsn(double netAmt) throws JsonMappingException, JsonProcessingException, DataNotFoundException;
 
@@ -66,7 +68,7 @@ public interface NewSaleService {
 
 	List<BarcodeVo> getAllBarcodes() throws DataNotFoundException;
 
-	List<BarcodeVo> getBarcodes(List<String> barCode) throws RecordNotFoundException;
+	
 
 	SaleReportVo getSaleReport(SaleReportVo srvo) throws RecordNotFoundException;
 
@@ -81,5 +83,9 @@ public interface NewSaleService {
 	String deleteLineItem(String barCode, Long domainId) throws RecordNotFoundException;
 
 	String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo);
+
+	String deleteDeliverySlipDetails(Long dsId);
+
+	List<LineItemVo> getBarcodes(List<String> barCode, Long domainId) throws RecordNotFoundException;
 
 }

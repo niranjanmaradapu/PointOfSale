@@ -42,7 +42,11 @@ public class NewSaleEntity {
 
 	private Long domainId;// Which type of store (Textail,Retail etc., )
 
-	private Long orderTransactionId;// Payment related Id (orderTransaction table)
+	// private Long orderTransactionId;// Payment related Id (orderTransaction
+	// table)
+
+	@OneToMany(mappedBy = "orderId", cascade = CascadeType.ALL)
+	private List<PaymentAmountType> paymentTransaction;
 
 	private Long grossValue;
 
@@ -75,14 +79,14 @@ public class NewSaleEntity {
 
 	@OneToMany(mappedBy = "order") // , cascade = CascadeType.ALL)
 	private List<BarcodeEntity> lineItems;
-	
-	//added by lakshmi
-	@OneToMany(targetEntity = LineItemsReEntity.class,mappedBy = "orderId", cascade = CascadeType.ALL) 
+
+	// added by lakshmi
+	@OneToMany(targetEntity = LineItemsReEntity.class, mappedBy = "orderId", cascade = CascadeType.ALL)
 	private List<LineItemsReEntity> lineItemsRe;
 
 	@ManyToOne
 	@JoinColumn(name = "customerId")
-	//@Transient
+	// @Transient
 	private CustomerDetailsEntity customerDetails;
 
 }

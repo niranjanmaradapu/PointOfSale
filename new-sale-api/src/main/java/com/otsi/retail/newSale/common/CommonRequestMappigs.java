@@ -16,7 +16,8 @@ public class CommonRequestMappigs {
 	public static final String CREATE_DS = "createdeliveryslip";
 
 	public static final String GET_DS = "getdeliveryslip";
-
+	
+	public static final String DELETE_DS = "deletedeliveryslip";
 	public static final String CUSTOMER = "customer";
 
 	public static final String SAVE_CUSTOMERDETAILS = "savecustomerdetails";

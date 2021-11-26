@@ -1,11 +1,11 @@
-package com.otsi.retail.newSale.vo;
+package com.otsi.retail.customerManagement.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+
+import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
@@ -18,12 +18,10 @@ public class LineItemVo {
 	private Long lineItemId;
 
 	private Long domainId;
-
-	private String barCode;
 	
 	private String section;
-	
-	private Long userId;
+
+	private String barCode;
 
 	private Long itemPrice;
 
@@ -35,9 +33,9 @@ public class LineItemVo {
 
 	private Long netValue;
 
-	private LocalDate creationDate;
+	private Date creationDate;
 
-	private LocalDate lastModified;
+	private Date lastModified;
 	
 	private HsnDetailsVo HsnDetailsVo;
 

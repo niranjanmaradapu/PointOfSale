@@ -3,6 +3,7 @@
  */
 package com.otsi.retail.customerManagement.controller;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,6 +58,14 @@ public class CustomerController {
 		listVo = customerService.getListOfReturnSlips(vo);
 		return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
 	}
+	@DeleteMapping("/DeleteReturnSlip")
+	public GateWayResponse<?> deleteReturnSlip(@RequestParam int rsId) {
+		log.info("Received request to deleteReturnSlips:" + rsId);
+		//List<ListOfReturnSlipsVo> listVo = null;
+
+		String msg = customerService.deleteReturnSlips(rsId);
+		return new GateWayResponse<>(HttpStatus.OK, msg, "Success");
+	}
 
 	@PostMapping("/getInvoiceDetails")
 	public GateWayResponse<?> getInvoiceDetails(@RequestBody InvoiceRequestVo searchVo) throws Exception {
@@ -101,7 +111,7 @@ public class CustomerController {
 	}
 
 	@GetMapping("/getReturnSlipsDetails")
-	public GateWayResponse<?> ReturnSlipsDeatils(String rtNumber) throws JsonMappingException, JsonProcessingException {
+	public GateWayResponse<?> ReturnSlipsDeatils(@RequestParam String rtNumber) throws JsonMappingException, JsonProcessingException, URISyntaxException {
 		log.info("Received request to ReturnSlipsDeatils():" + rtNumber);
 		RetrnSlipDetailsVo listVo = null;
 

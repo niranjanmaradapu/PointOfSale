@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
@@ -39,9 +40,9 @@ import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
-import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.PaymentDetailsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
@@ -194,6 +195,15 @@ public class NewSaleController {
 
 	}
 
+	// method for deleting pending delivery slip data
+	@DeleteMapping(CommonRequestMappigs.DELETE_DS)
+	public GateWayResponse<?> deleteDeliverySlipDetails(@RequestParam Long dsId) throws RecordNotFoundException {
+		log.info("Received Request to getDeliverySlipDetails :" + dsId);
+
+		String dsDetails = newSaleService.deleteDeliverySlipDetails(dsId);
+		return new GateWayResponse<>("Success", dsDetails);
+	}
+
 	// Method for getting list of sale bills
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
 	public GateWayResponse<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo)
@@ -224,8 +234,8 @@ public class NewSaleController {
 	public GateWayResponse<?> dayclose() {
 		log.info("Recieved request to dayclose()");
 		try {
-			String dayclose = newSaleService.posDayClose();
-			return new GateWayResponse<>(HttpStatus.OK, dayclose, "");
+			List<DeliverySlipEntity> dayclose = newSaleService.posDayClose();
+			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -238,7 +248,7 @@ public class NewSaleController {
 	public GateWayResponse<?> posclose(@RequestParam Boolean posclose) {
 		try {
 			String dayclose = newSaleService.posClose(posclose);
-			return new GateWayResponse<>(HttpStatus.OK, dayclose, "");
+			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -378,21 +388,23 @@ public class NewSaleController {
 
 	}
 
-	@PostMapping(CommonRequestMappigs.GET_BARCODES)
+	@PostMapping("/getbarcodes/{domainId}")
 	// @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 
-	public GateWayResponse<?> getBarcodes(@RequestBody List<String> barCode) throws RecordNotFoundException {
+	public GateWayResponse<?> getBarcodes(@RequestBody List<String> barCode, @PathVariable Long domainId)
+			throws RecordNotFoundException {
 		log.info("Received Request to getBarcodeDetails:" + barCode);
 		System.out.println("Received Request to getBarcodeDetails:" + barCode);
 
-		List<BarcodeVo> barCodeDetails = newSaleService.getBarcodes(barCode);
+		List<LineItemVo> barCodeDetails = newSaleService.getBarcodes(barCode, domainId);
 
 		return new GateWayResponse<>(HttpStatus.OK, barCodeDetails, "");
 
 	}
-	
+
 	@GetMapping("/isCustomerTaggedToNewSale/{mobileNo}/{invoiceNo}")
-	public GateWayResponse<?> getTaggedCustomerForInvoice(@PathVariable String mobileNo,@PathVariable String invoiceNo){
+	public GateWayResponse<?> getTaggedCustomerForInvoice(@PathVariable String mobileNo,
+			@PathVariable String invoiceNo) {
 		/*
 		 * try { String result=
 		 * newSaleService.getTaggedCustomerForInvoice(mobileNo,invoiceNo); }

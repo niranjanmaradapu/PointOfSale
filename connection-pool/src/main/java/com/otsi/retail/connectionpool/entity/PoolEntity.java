@@ -32,6 +32,8 @@ public class PoolEntity {
 	private String poolName;
 
 	private PoolType poolType;
+	
+	private String createdBy;
 
 	private LocalDate createdDate;
 

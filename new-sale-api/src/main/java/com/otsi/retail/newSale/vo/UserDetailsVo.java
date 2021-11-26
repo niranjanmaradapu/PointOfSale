@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
-
 @Data
 public class UserDetailsVo {
 	private Long userId;
@@ -19,13 +18,13 @@ public class UserDetailsVo {
 	private long createdBy;
 	private boolean isActive;
 	@JsonIgnore
-    private Role role;
-	
-	  private List<UserAv> userAv; 
-	  private List<StoreVo> stores;
-	 private StoreVo ownerOf;
-	 
-	 
-
+	private Role role;
+	@JsonIgnore
+	private List<ClientDomains> clientDomians;
+	private List<UserAv> userAv;
+	private List<StoreVo> stores;
+	private StoreVo ownerOf;
+	private boolean isSuperAdmin;
+	private boolean isCustomer;
 
 }

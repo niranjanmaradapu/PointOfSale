@@ -1,16 +1,18 @@
 package com.otsi.retail.newSale.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -43,10 +45,9 @@ import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
 import com.otsi.retail.newSale.Exceptions.InvalidInputException;
 import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
-
-import com.otsi.retail.newSale.common.DSAttributes;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.DomainData;
+import com.otsi.retail.newSale.common.OrderStatus;
 import com.otsi.retail.newSale.common.PaymentType;
 import com.otsi.retail.newSale.config.Config;
 import com.otsi.retail.newSale.gatewayresponse.GateWayResponse;
@@ -73,9 +74,10 @@ import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
-import com.otsi.retail.newSale.vo.NewSaleList;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
+import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
+import com.otsi.retail.newSale.vo.PaymentDetailsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.ReturnSummeryVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
@@ -144,6 +146,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Autowired
 	private LineItemReRepo lineItemReRepo;
 
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
+
 	// Method for saving order
 	@Override
 	public String saveNewSaleRequest(NewSaleVo vo) throws InvalidInputException {
@@ -174,14 +179,24 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setDiscType(vo.getDiscType());
 		entity.setCreationDate(LocalDate.now());
 		entity.setLastModified(LocalDate.now());
+		entity.setStatus(OrderStatus.New);// Initial Order status should be new
 		entity.setStatus(vo.getStatus());
 		entity.setOrderNumber(
 				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
+		// Check for payment type
+		List<PaymentAmountTypeVo> checkList = new ArrayList<>();
+		if (vo.getPaymentAmountType() != null) {
+			if (vo.getPaymentAmountType().size() == 1 && checkList.size() == 1) {
+				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
+			}
+		}
 		entity.setNetValue(vo.getNetPayableAmount());
 		entity.setStoreId(vo.getStoreId());
 		entity.setOfflineNumber(vo.getOfflineNumber());
 
 		if (vo.getDomainId() == DomainData.TE.getId()) {
+
+			List<String> inventUpdate = new ArrayList<>();
 
 			List<DeliverySlipVo> dlSlips = vo.getDlSlip();
 
@@ -202,6 +217,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					a.getLineItems().stream().forEach(x -> {
 
+						inventUpdate.add(x.getBarCode());
+
 						x.setLastModified(LocalDate.now());
 						x.setDsEntity(a);
 						lineItemRepo.save(x);
@@ -209,6 +226,21 @@ public class NewSaleServiceImpl implements NewSaleService {
 					});
 
 				});
+				// Saving order details in order_transaction table only for cash
+
+				if (vo.getPaymentAmountType() != null && vo.getPaymentAmountType().size() == 1
+				/* && checkList.size() == 1 */) {
+
+					PaymentAmountType type = new PaymentAmountType();
+					type.setOrderId(saveEntity);
+					type.setPaymentAmount(saveEntity.getNetValue());
+					type.setPaymentType(PaymentType.Cash.getType());
+
+					paymentAmountTypeRepository.save(type);
+
+				}
+				// Request to update inventory for textile
+				// requestForUpdateInInventoryForTextile(inventUpdate);
 
 			} else {
 				log.error("Please provide Valid delivery slips..");
@@ -216,6 +248,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			}
 		}
 		if (vo.getDomainId() != DomainData.TE.getId()) {
+
+			Map<String, Integer> map = new HashMap<>();
 
 			List<LineItemVo> lineItems = vo.getLineItemsReVo();
 
@@ -229,11 +263,30 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				lineItemsList.stream().forEach(x -> {
 
+					map.put(x.getBarCode(), x.getQuantity());
+
 					x.setLastModified(LocalDate.now());
 					x.setOrderId(saveEntity);
 					lineItemReRepo.save(x);
 
 				});
+
+				// Saving order details in order_transaction table only for cash
+
+				if (vo.getPaymentAmountType() != null && vo.getPaymentAmountType().size() == 1
+						&& checkList.size() == 1) {
+
+					PaymentAmountType type = new PaymentAmountType();
+					type.setOrderId(saveEntity);
+					type.setPaymentAmount(saveEntity.getNetValue());
+					type.setPaymentType(PaymentType.Cash.getType());
+
+					paymentAmountTypeRepository.save(type);
+
+				}
+
+				// Request to update inventory for retail
+				// requestForUpdateInInventoryForRetail(map);
 
 			} else {
 				log.error("Please provide valid LineItems..");
@@ -245,6 +298,58 @@ public class NewSaleServiceImpl implements NewSaleService {
 		log.warn("we are testing bill generated with number");
 		log.info("after generated bill with number:" + entity.getOrderNumber());
 		return entity.getOrderNumber();
+	}
+
+	@RabbitListener(queues = "newsale_queue")
+	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
+
+		System.out.println("Got payments for the order : " + paymentDetails.getNewsaleOrder());
+		List<NewSaleEntity> entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
+		NewSaleEntity orderRecord = entity.stream().findFirst().get();
+
+		if (orderRecord != null) {
+
+			PaymentAmountType payDetails = new PaymentAmountType();
+			payDetails.setOrderId(orderRecord);
+			payDetails.setPaymentType(paymentDetails.getPayType());
+			payDetails.setPaymentAmount(paymentDetails.getAmount());
+			payDetails.setRazorPayId(paymentDetails.getRazorPayId());
+			payDetails.setRazorPayStatus(true);
+
+			paymentAmountTypeRepository.save(payDetails);
+
+			log.info("save payment details for order : " + orderRecord.getOrderNumber());
+			//updateOrderItemsInInventory(orderRecord);// Method for update order item into inventory
+
+		}
+	}
+	// Method for update order item into inventory
+	private void updateOrderItemsInInventory(NewSaleEntity orderRecord) {
+
+		if (orderRecord.getDomainId() == DomainData.TE.getId()) {
+
+			Map<String, Integer> map = new HashMap<>();
+
+			List<LineItemsEntity> lineItems = orderRecord.getDlSlip().stream().flatMap(x -> x.getLineItems().stream())
+					.collect(Collectors.toList());
+
+			lineItems.stream().forEach(x -> {
+				map.put(x.getBarCode(), x.getQuantity());
+
+			});
+			// rabbitTemplate.convertAndSend(exchange, routingKey, object);
+		} else {
+			
+			Map<String, Integer> map = new HashMap<>();
+			List<LineItemsReEntity> lineItemRes = orderRecord.getLineItemsRe();
+			
+			lineItemRes.stream().forEach(x->{
+				
+				map.put(x.getBarCode(), x.getQuantity());
+			});
+			// rabbitTemplate.convertAndSend(exchange, routingKey, object);
+		}
+
 	}
 
 	@Override
@@ -293,7 +398,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setStatus(DSStatus.Pending);
 		entity.setCreationDate(LocalDate.now());
 		entity.setLastModified(LocalDate.now());
-		entity.setSalesMan(vo.getSalesMan());
+		entity.setUserId(vo.getSalesMan());
 
 		DeliverySlipEntity savedEntity = dsRepo.save(entity);
 
@@ -445,10 +550,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				List<UserDetailsVo> uvo = getUserDetailsFromURM(null, x.getUserId());
 
 				/////////
-				uvo.stream().forEach(u -> {
-					x.setCustomerName(u.getUserName());
-					x.setMobileNumber(u.getPhoneNumber());
-				});
+				if (uvo != null) {
+					uvo.stream().forEach(u -> {
+						x.setCustomerName(u.getUserName());
+						x.setMobileNumber(u.getPhoneNumber());
+					});
+				}
 
 				x.setLineItemsReVo(listBar);
 				x.setTotalqQty(x.getLineItemsReVo().stream().mapToInt(q -> q.getQuantity()).sum());
@@ -684,20 +791,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public String posDayClose() {
+	public List<DeliverySlipEntity> posDayClose() {
 		log.debug(" debugging posDayClose");
 
 		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreationDate(DSStatus.Pending, LocalDate.now());
 
-		if (DsList.isEmpty()) {
-			log.info("successfully we can close the day of pos " + " uncleared delivery Slips count :" + DsList.size());
-			return "successfully we can close the day of pos " + " uncleared delivery Slips count :  " + DsList.size();
-
-		} else
-			log.error("to  close the day of pos please clear pending  delivery Slips"
-					+ " uncleared delivery Slips count   " + DsList.size());
-		return "to  close the day of pos please clear pending  delivery Slips" + " uncleared delivery Slips count   "
-				+ DsList.size();
+		log.info("successfully we can close the day of pos " + " uncleared delivery Slips count :" + DsList.size());
+		return DsList;
 
 	}
 
@@ -1038,18 +1138,18 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public List<BarcodeVo> getBarcodes(List<String> barCode) throws RecordNotFoundException {
+	public List<LineItemVo> getBarcodes(List<String> barCode, Long domainId) throws RecordNotFoundException {
 		log.debug("deugging getBarcodeDetails" + barCode);
-		List<BarcodeEntity> barcodeDetails = barcodeRepository.findByBarcodeIn(barCode);
-		if (barcodeDetails.isEmpty()) {
-			log.error("Barcode with number " + barCode + " is not exists");
-			throw new RecordNotFoundException("Barcode with number " + barCode + " is not exists");
+		List<LineItemVo> vo = new ArrayList<LineItemVo>();
+
+		if (domainId == 1) {
+			List<LineItemsEntity> barcodeDetails = lineItemRepo.findByBarCodeIn(barCode);
+			vo = newSaleMapper.convertBarcodesEntityToVo(barcodeDetails);
 		} else {
-			List<BarcodeVo> vo = newSaleMapper.convertBarcodesEntityToVo(barcodeDetails);
-			log.warn("we are fetching barcode details...");
-			log.info("after getting barcode details :" + vo);
-			return vo;
+			List<LineItemsReEntity> barcodeDetails1 = lineItemReRepo.findByBarCodeIn(barCode);
+			vo = newSaleMapper.convertBarcodesReEntityToVo(barcodeDetails1);
 		}
+		return vo;
 	}
 
 	/////////////
@@ -1082,11 +1182,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			// salesSummery.setTotalTaxAmount(hsnDetails.getTaxVo().getCgst() +
 			// hsnDetails.getTaxVo().getSgst());
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			ListOfReturnSlipsVo rvo = new ListOfReturnSlipsVo();
+			rvo.setDateFrom(srvo.getDateFrom());
+			rvo.setDateTo(srvo.getDateTo());
+			;
+			HttpEntity<ListOfReturnSlipsVo> entity = new HttpEntity<>(rvo, headers);
 
 			ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetListOfReturnSlips(),
-					HttpMethod.GET, null, GateWayResponse.class);
+					HttpMethod.POST, entity, GateWayResponse.class);
 
-			ObjectMapper mapper = new ObjectMapper();
+			ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
+					.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
 			GateWayResponse<?> gatewayResponse = mapper.convertValue(returnSlipListResponse.getBody(),
 					GateWayResponse.class);
@@ -1097,7 +1205,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			Long rAmount = vo.stream().mapToLong(a -> a.getAmount()).sum();
 			ReturnSummeryVo retunVo = new ReturnSummeryVo();
 
-			List<BarcodeVo> barVoList = new ArrayList<BarcodeVo>();
+			List<LineItemVo> barVoList = new ArrayList<LineItemVo>();
 			vo.stream().forEach(b -> {
 
 				List<TaggedItems> tgItems = b.getBarcodes();
@@ -1105,7 +1213,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				List<String> barcodes = tgItems.stream().map(x -> x.getBarCode()).collect(Collectors.toList());
 
 				try {
-					List<BarcodeVo> barVo = getBarcodes(barcodes);
+					List<LineItemVo> barVo = getBarcodes(barcodes, b.getDomainId());
 					barVo.stream().forEach(r -> {
 
 						barVoList.add(r);
@@ -1122,8 +1230,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			HsnDetailsVo hsnDetails1 = getHsnDetails(rAmount);
 
-			retunVo.setTotalDiscount(barVoList.stream().mapToLong(d -> d.getPromoDisc()).sum());
-			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getMrp()).sum());
+			retunVo.setTotalDiscount(barVoList.stream().mapToLong(d -> d.getDiscount()).sum());
+			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getGrossValue()).sum());
 			// retunVo.setTaxDescription(hsnDetails1.getTaxVo().getTaxLabel());
 			retunVo.setBillValue(rAmount);
 			// retunVo.setTotalTaxableAmount(hsnDetails1.getTaxVo().getTaxableAmount());
@@ -1174,6 +1282,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineEntity.setDiscount(lineItem.getDiscount());
 					lineEntity.setNetValue(lineItem.getNetValue());
 					lineEntity.setItemPrice(lineItem.getItemPrice());
+					lineEntity.setSection(lineItem.getSection());
 
 					// GrossValue is multiple of net value of product and quantity
 					lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -1201,6 +1310,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineReEntity.setDiscount(lineItem.getDiscount());
 					lineReEntity.setNetValue(lineItem.getNetValue());
 					lineReEntity.setItemPrice(lineItem.getItemPrice());
+					lineReEntity.setSection(lineItem.getSection());
+					lineReEntity.setUserId(lineItem.getUserId());
 
 					// GrossValue is multiple of net value of product and quantity
 					lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -1290,6 +1401,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				line.setDiscount(lineItem.getDiscount());
 				line.setNetValue(lineItem.getNetValue());
 				line.setItemPrice(lineItem.getItemPrice());
+				line.setUserId(lineItem.getUserId());
 
 				// GrossValue is multiple of net value of product and quantity
 				line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -1369,7 +1481,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo) {
 
-		
 		/*
 		 * List<UserDetailsVo> userVo=getUserDetailsFromURM(mobileNo, 0L);
 		 * if(!CollectionUtils.isEmpty(userVo)) { Optional<UserDetailsVo>
@@ -1383,8 +1494,22 @@ public class NewSaleServiceImpl implements NewSaleService {
 		 * } } }
 		 */
 
-return null;
+		return null;
 	}
-	
-	
+
+	@Override
+	public String deleteDeliverySlipDetails(Long dsId) {
+
+		Optional<DeliverySlipEntity> dsVo = dsRepo.findById(dsId);
+
+		if (dsVo.get() != null && dsVo.get().getOrder() == null) {
+
+			dsRepo.deleteById(dsId);
+
+		}
+
+		// TODO Auto-generated method stub
+		return " delivery Slip sucessfully deleted ";
+	}
+
 }
