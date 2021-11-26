@@ -7,7 +7,6 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.5.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
-		<packaging>war</packaging>
 	</parent>
 	<groupId>com.otsi.kalamandhir</groupId>
 	<artifactId>customer-management</artifactId>
@@ -82,7 +81,7 @@
 
 
 	</dependencies>
-        <distributionManagement>
+       <!--  <distributionManagement>
 		<dependencies>
                 <dependency>
 	              <repository>
@@ -93,7 +92,7 @@
                         </repository>
 		</dependency>
                 </dependencies>
-	</distributionManagement>	
+	</distributionManagement> -->	
 	
 	<build>
 		<plugins>
