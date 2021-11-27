@@ -314,15 +314,39 @@ public class NewSaleServiceImpl implements NewSaleService {
 			payDetails.setPaymentType(paymentDetails.getPayType());
 			payDetails.setPaymentAmount(paymentDetails.getAmount());
 			payDetails.setRazorPayId(paymentDetails.getRazorPayId());
-			payDetails.setRazorPayStatus(true);
+			payDetails.setRazorPayStatus(false);
 
 			paymentAmountTypeRepository.save(payDetails);
 
 			log.info("save payment details for order : " + orderRecord.getOrderNumber());
-			//updateOrderItemsInInventory(orderRecord);// Method for update order item into inventory
 
 		}
 	}
+
+	// Method for update the payment status in order_transaction table
+	@Override
+	public String paymentConfirmationFromRazorpay(String razorPayId, boolean payStatus) {
+
+		if (payStatus) {
+
+			PaymentAmountType payment = paymentAmountTypeRepository.findByRazorPayId(razorPayId);
+			payment.setRazorPayStatus(payStatus);
+
+			paymentAmountTypeRepository.save(payment);
+
+			log.info("update payment details for razorpay Id: " + razorPayId);
+			Optional<NewSaleEntity> order = newSaleRepository.findById(payment.getOrderId().getOrderId());
+
+			// Call method to update order items into inventory
+			updateOrderItemsInInventory(order.get());
+			return "successfully updated payment deatils";
+
+		} else {
+			return "please do payment again";
+		}
+
+	}
+
 	// Method for update order item into inventory
 	private void updateOrderItemsInInventory(NewSaleEntity orderRecord) {
 
@@ -339,12 +363,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 			});
 			// rabbitTemplate.convertAndSend(exchange, routingKey, object);
 		} else {
-			
+
 			Map<String, Integer> map = new HashMap<>();
 			List<LineItemsReEntity> lineItemRes = orderRecord.getLineItemsRe();
-			
-			lineItemRes.stream().forEach(x->{
-				
+
+			lineItemRes.stream().forEach(x -> {
+
 				map.put(x.getBarCode(), x.getQuantity());
 			});
 			// rabbitTemplate.convertAndSend(exchange, routingKey, object);
@@ -1059,6 +1083,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public String saveGiftVoucher(GiftVoucherVo vo) throws DuplicateRecordException {
 		log.debug(" debugging saveGiftVoucher:" + vo);
+
 		// Check condition for Duplicate GiftVoucher Numbers
 		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumber(vo.getGvNumber());
 
@@ -1101,24 +1126,22 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public String tagCustomerToGv(Long userId, Long gvId) throws InvalidInputException, DataNotFoundException {
 		log.debug(" debugging tagCustomerToGv:" + userId + "and the gv id is :" + gvId);
-		Optional<CustomerDetailsEntity> user = customerRepo.findById(userId);
-		if (user.isPresent()) {
-			Optional<GiftVoucherEntity> gv = gvRepo.findById(gvId);
-			// Gift voucher should not be tagged and expiry date should greater than today
-			if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
-				gv.get().setUserId(userId);
-				gv.get().setIsTagged(Boolean.TRUE);
-				gvRepo.save(gv.get());
-			} else {
-				log.error("Gift voucher is not valid");
-				throw new InvalidInputException("Gift voucher is not valid");
-			}
+
+		Optional<GiftVoucherEntity> gv = gvRepo.findById(gvId);
+
+		// Gift voucher should not be tagged and expirydate should greater than today
+		if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
+			gv.get().setUserId(userId);
+			gv.get().setIsTagged(Boolean.TRUE);
+			gvRepo.save(gv.get());
 		} else {
-			throw new DataNotFoundException("User data is not Available..");
+			log.error("Gift voucher is not valid");
+			throw new InvalidInputException("Gift voucher is not valid");
 		}
+
 		log.warn("we are testing if customer is tagged to gv voucher...");
-		log.info("after tagging customer to  gift voucher:" + user.get().getName());
-		return "Gift vocher tagged successfully to " + user.get().getName();
+		log.info("after tagging customer to  gift voucher");
+		return "Gift vocher tagged successfully  " + gv.get().getGvNumber();
 	}
 
 	// Method for Return all Bar code items

@@ -20,6 +20,7 @@ public class PoolMapper {
 		PoolEntity ent = new PoolEntity();
 
 		ent.setPoolName(vo.getPoolName());
+		ent.setDomainId(vo.getDomainId());
 		ent.setPoolType(vo.getPoolType());
 		ent.setCreatedBy(vo.getCreatedBy());
 		ent.setCreatedDate(LocalDate.now());
@@ -59,6 +60,7 @@ public class PoolMapper {
 
 			vo.setPoolName(x.getPoolName());
 			vo.setPoolId(x.getPoolId());
+			vo.setDomainId(x.getDomainId());
 			vo.setCreatedBy(x.getCreatedBy());
 			vo.setCreatedDate(x.getCreatedDate());
 			vo.setPoolType(x.getPoolType());

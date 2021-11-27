@@ -82,8 +82,8 @@
 
 
 	</dependencies>
-        <distributionManagement>
-		<!-- <dependencies> 
+       <!--  <distributionManagement>
+		<dependencies>
                 <dependency>
 	              <repository>
                          <id>github</id>
@@ -93,8 +93,7 @@
                         </repository>
 		</dependency>
                 </dependencies>
-               -->
-	</distributionManagement>	
+	</distributionManagement> -->	
 	
 	<build>
 		<plugins>

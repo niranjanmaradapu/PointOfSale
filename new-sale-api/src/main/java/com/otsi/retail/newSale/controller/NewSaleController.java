@@ -104,6 +104,19 @@ public class NewSaleController {
 		}
 	}
 
+	// Method to confirm payment status based on Razorpay Id
+	@PostMapping("payconfirmation")
+	public GateWayResponse<?> paymentConfirmationFromRazorpay(@RequestParam String razorPayId,
+			@RequestParam boolean payStatus) {
+		try {
+			String result = newSaleService.paymentConfirmationFromRazorpay(razorPayId, payStatus);
+			return new GateWayResponse<>(result, "Success..");
+			
+		} catch (Exception e) {
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(), "Exception occurs");
+		}
+	}
+	
 	// Method for create new Barcode..
 	@PostMapping(CommonRequestMappigs.CREATE_BARCODE)
 	public GateWayResponse<?> saveBarcode(@RequestBody BarcodeVo vo) throws DuplicateRecordException {
@@ -327,17 +340,24 @@ public class NewSaleController {
 	@PostMapping("/saveGv")
 	public GateWayResponse<?> saveGiftVoucher(@RequestBody GiftVoucherVo vo) throws DuplicateRecordException {
 		log.info("Recieved request to saveGiftVoucher():" + vo);
-		String result = newSaleService.saveGiftVoucher(vo);
-		return new GateWayResponse<>(HttpStatus.OK, result);
-
+		try {
+			String result = newSaleService.saveGiftVoucher(vo);
+			return new GateWayResponse<>(result, "Successfully saved");
+		} catch (DuplicateRecordException dre) {
+			return new GateWayResponse<>(dre.getMsg(), "Duplicate Record");
+		}
 	}
 
 	// Method for getting Gift voucher by GV Number
 	@GetMapping("/getGv")
 	public GateWayResponse<?> getGiftVoucher(@RequestParam String gvNumber) throws InvalidInputException {
 		log.info("Recieved request to getGiftVoucher():" + gvNumber);
-		GiftVoucherVo result = newSaleService.getGiftVoucher(gvNumber);
-		return new GateWayResponse<>(HttpStatus.OK, result, "");
+		try {
+			GiftVoucherVo result = newSaleService.getGiftVoucher(gvNumber);
+			return new GateWayResponse<>("Successfully fetch record", result);
+		} catch (InvalidInputException iie) {
+			return new GateWayResponse<>(iie.getMsg(), "Record not found");
+		}
 
 	}
 
@@ -365,9 +385,12 @@ public class NewSaleController {
 	public GateWayResponse<?> tagCustomerToGv(@PathVariable Long userId, @PathVariable Long gvId)
 			throws InvalidInputException, DataNotFoundException {
 		log.info("Recieved request to tagCustomerToGv():" + userId + "and the gv is:" + gvId);
-		String message = newSaleService.tagCustomerToGv(userId, gvId);
-		return new GateWayResponse<>(HttpStatus.OK, message, "");
-
+		try {
+			String message = newSaleService.tagCustomerToGv(userId, gvId);
+			return new GateWayResponse<>(message, "Success");
+		} catch (DataNotFoundException dfe) {
+			return new GateWayResponse<>(dfe.getMsg(), "Please provide valid inputs");
+		}
 	}
 
 	// Method for getting all Bar codes list
