@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-
-
 import lombok.Data;
 
 /**
@@ -21,7 +19,7 @@ public class ListOfReturnSlipsVo {
 	private LocalDate dateFrom;
 
 	private LocalDate dateTo;
-	
+
 	private Long domainId;
 
 	private String barcode;
@@ -43,12 +41,9 @@ public class ListOfReturnSlipsVo {
 	private Date createdInfo;
 
 	private String settelmentInfo;
-	
+
 	private Long totalAmount;
 
 	private List<TaggedItems> barcodes;
-
-	
-	
 
 }
