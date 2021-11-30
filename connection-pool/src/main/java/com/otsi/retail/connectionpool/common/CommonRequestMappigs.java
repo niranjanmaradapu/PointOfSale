@@ -1,6 +1,9 @@
 package com.otsi.retail.connectionpool.common;
 
 public class CommonRequestMappigs {
+	
+	
+	/********************* POOLS *********************/
 
 	public static final String POOL = "pool";
 
@@ -15,7 +18,13 @@ public class CommonRequestMappigs {
 	public static final String MODIFY_POOL = "modifypool";
 	
 	public static final String DELETE_POOL = "deletepool";
-
+	
+	public static final String SEARCH_POOLS = "poolSearching";	
+	
+	
+	
+	/********************* PROMOTIONS *********************/
+	
 	public static final String PROMO = "promo";
 
 	public static final String ADD_PROMO = "addpromo";
