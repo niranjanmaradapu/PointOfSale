@@ -1,11 +1,10 @@
 package com.otsi.retail.connectionpool.controller;
 
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,10 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.otsi.retail.connectionpool.common.CommonRequestMappigs;
 import com.otsi.retail.connectionpool.gatewayresponse.GateWayResponse;
 import com.otsi.retail.connectionpool.service.PoolService;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
+import com.otsi.retail.connectionpool.vo.PoolVo;
 import com.otsi.retail.connectionpool.vo.SearchPoolVo;
 
 /**
@@ -45,10 +46,10 @@ public class PoolController {
 
 	// Method for getting List of Pools from status flag
 	@GetMapping(CommonRequestMappigs.GET_POOL_LIST)
-	public GateWayResponse<?> getListOfPools(@RequestParam String isActive) {
+	public GateWayResponse<?> getListOfPools(@RequestParam String isActive, Long domainId) {
 		log.info("Recieved request to getListOfPools():" + isActive);
-		List<ConnectionPoolVo> vo = poolService.getListOfPools(isActive);
-		return new GateWayResponse<>("fetching list of pools successfully", vo);
+		PoolVo poolvo = poolService.getListOfPools(isActive,domainId);
+		return new GateWayResponse<>("fetching list of pools successfully", poolvo);
 
 	}
 
@@ -79,4 +80,7 @@ public class PoolController {
 		return new GateWayResponse<>("successfully getting pools", vo);
 
 	}
+	
+	
+	
 }
