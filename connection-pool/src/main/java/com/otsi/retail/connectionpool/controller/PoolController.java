@@ -17,6 +17,7 @@ import com.otsi.retail.connectionpool.common.CommonRequestMappigs;
 import com.otsi.retail.connectionpool.gatewayresponse.GateWayResponse;
 import com.otsi.retail.connectionpool.service.PoolService;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
+import com.otsi.retail.connectionpool.vo.SearchPoolVo;
 
 /**
  * This Controller class is for Connection pool related API's
@@ -59,11 +60,23 @@ public class PoolController {
 		return new GateWayResponse<>("updated pool successfully", message);
 
 	}
+
+	// Method for delete the pool
 	@DeleteMapping(CommonRequestMappigs.DELETE_POOL)
 	public GateWayResponse<?> deletePool(@RequestParam Long poolId) {
 		log.info("Recieved request to modifyPool():" + poolId);
 		String message = poolService.deletePool(poolId);
 		return new GateWayResponse<>("deleted pool successfully", message);
+
+	}
+
+	// Method for pool searching
+	@PostMapping(CommonRequestMappigs.SEARCH_POOLS)
+	public GateWayResponse<?> searchPool(@RequestBody SearchPoolVo pvo) {
+
+		List<SearchPoolVo> vo = poolService.searchPool(pvo);
+
+		return new GateWayResponse<>("successfully getting pools", vo);
 
 	}
 }
