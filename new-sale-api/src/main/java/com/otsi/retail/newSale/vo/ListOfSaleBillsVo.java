@@ -21,7 +21,7 @@ public class ListOfSaleBillsVo {
 
 	private String custMobileNumber;
 
-	private Long invoiceNumber;
+	private String invoiceNumber;
 
 	private String EmpId;
 

@@ -511,6 +511,66 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					List<Long> userIds = uvo.stream().map(x -> x.getUserId()).collect(Collectors.toList());
 
+					saleDetails = newSaleRepository.findByUserIdInAndCreationDateBetween(userIds,svo.getDateFrom(), svo.getDateTo());
+
+				}
+
+				else {
+					log.error("No record found with given mobilenumber");
+					throw new RecordNotFoundException("No record found with given mobilenumber");
+				}
+
+			}
+
+			/*
+			 * getting the record using invoice number
+			 */
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getEmpId() == null
+					&& svo.getInvoiceNumber() != null) {
+				saleDetails = newSaleRepository.findByOrderNumberAndCreationDateBetween(svo.getInvoiceNumber(),svo.getDateFrom(), svo.getDateTo());
+			}
+			/*
+			 * getting the record using empId
+			 */
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getInvoiceNumber() == null
+					&& svo.getEmpId() != null) {
+				saleDetails = newSaleRepository.findByCreatedByAndCreationDateBetween(svo.getEmpId(),svo.getDateFrom(), svo.getDateTo());
+
+			} else
+				saleDetails = newSaleRepository.findByCreationDateBetween(svo.getDateFrom(), svo.getDateTo());
+
+		}
+
+		if (svo.getDateFrom() == null && svo.getDateTo() == null) {
+			if (svo.getBillStatus() != null && svo.getCustMobileNumber() == null && svo.getEmpId() == null
+					&& svo.getInvoiceNumber() == null) {
+
+				saleDetails = newSaleRepository.findByStatus(svo.getBillStatus());
+			}
+			/*
+			 * getting the record using custmobilenumber
+			 */
+			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() != null && svo.getInvoiceNumber() == null
+					&& svo.getEmpId() == null) {
+
+				// Optional<CustomerDetailsEntity> customer =
+				// customerRepo.findByMobileNumber(svo.getCustMobileNumber());
+
+				List<UserDetailsVo> uvo = getUserDetailsFromURM(svo.getCustMobileNumber(), 0L);
+				// List< NewSaleEntity> saleDetail = new ArrayList();
+				if (uvo != null) {
+
+//					//Long userId = uvo.stream().mapToLong(i -> i.getUserId()).;
+//					uvo.stream().forEach(l->{
+//						List< NewSaleEntity> saleDetail = new  ArrayList();
+//						
+//					Long userId = l.getUserId();
+//					saleDetail =	newSaleRepository.findByUserId(userId);
+//						
+//					});
+
+					List<Long> userIds = uvo.stream().map(x -> x.getUserId()).collect(Collectors.toList());
+
 					saleDetails = newSaleRepository.findByUserIdIn(userIds);
 
 				}
@@ -536,10 +596,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 					&& svo.getEmpId() != null) {
 				saleDetails = newSaleRepository.findByCreatedBy(svo.getEmpId());
 
-			} else
-				saleDetails = newSaleRepository.findByCreationDateBetween(svo.getDateFrom(), svo.getDateTo());
-
+			}
 		}
+		
+		
 		if (saleDetails.isEmpty()) {
 
 			log.error("No record found with given information");
@@ -570,6 +630,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					});
 				}
+			
+				
 				/////////
 				List<UserDetailsVo> uvo = getUserDetailsFromURM(null, x.getUserId());
 
@@ -603,6 +665,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			log.info("after getting  sale bills details :" + lsvo);
 			return lsvo;
 		}
+		
 
 	}
 

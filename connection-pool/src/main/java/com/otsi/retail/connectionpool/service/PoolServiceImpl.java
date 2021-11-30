@@ -16,6 +16,7 @@ import com.otsi.retail.connectionpool.mapper.PoolMapper;
 import com.otsi.retail.connectionpool.repository.PoolRepo;
 import com.otsi.retail.connectionpool.repository.RuleRepo;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
+import com.otsi.retail.connectionpool.vo.SearchPoolVo;
 
 /**
  * This class having Bussiness logics for all pool services
@@ -45,23 +46,23 @@ public class PoolServiceImpl implements PoolService {
 			throw new InvalidDataException("please enter valid data");
 		}
 		/* try { */
-			PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
+		PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
 
-			PoolEntity savedPool = poolRepo.save(poolEntity);
+		PoolEntity savedPool = poolRepo.save(poolEntity);
 
-			poolEntity.getRuleEntity().forEach(x -> {
+		poolEntity.getRuleEntity().forEach(x -> {
 
-				x.setPoolEntity(savedPool);
-				ruleRepo.save(x);
-			});
-			log.warn("we are checking if pool is saved...");
-			log.info("pool saved Successfully");
-			return "Pool saved Successfully";
+			x.setPoolEntity(savedPool);
+			ruleRepo.save(x);
+		});
+		log.warn("we are checking if pool is saved...");
+		log.info("pool saved Successfully");
+		return "Pool saved Successfully";
 
-		 /*catch (Exception e) {
-			log.error("please give valid data");
-			throw new InvalidDataException("please give valid data");
-		}*/
+		/*
+		 * catch (Exception e) { log.error("please give valid data"); throw new
+		 * InvalidDataException("please give valid data"); }
+		 */
 	}
 
 	// Method for getting list of pools based on the status flag
@@ -131,17 +132,83 @@ public class PoolServiceImpl implements PoolService {
 
 	@Override
 	public String deletePool(Long poolId) {
-		if(poolRepo.findByPoolId(poolId).isPresent()) {
-			if(poolRepo.findByPoolId(poolId).get().getPromoEntity().size()==0) {
+		if (poolRepo.findByPoolId(poolId).isPresent()) {
+			if (poolRepo.findByPoolId(poolId).get().getPromoEntity().size() == 0) {
 				poolRepo.deleteById(poolId);
-				}
-			else {
+			} else {
 				log.error("record not found");
 				throw new DuplicateRecordException("promotions mapped with existing pool");
 			}
-			
+
 		}
 		// TODO Auto-generated method stub
 		return "pool deleted sucessfully";
+	}
+
+	@Override
+	public List<SearchPoolVo> searchPool(SearchPoolVo pvo) {
+
+		List<SearchPoolVo> searchPoolvo = new ArrayList<>();
+		List<PoolEntity> pools = new ArrayList<>();
+		if (pvo.getIsActive() != null) {
+			if (pvo.getCreatedBy() != null && pvo.getPoolType() != null) {
+
+				pools = poolRepo.findByCreatedByAndPoolTypeAndIsActive(pvo.getCreatedBy(), pvo.getPoolType(),
+						pvo.getIsActive());
+
+			} else if (pvo.getCreatedBy() != null && pvo.getPoolType() == null) {
+
+				pools = poolRepo.findByCreatedByAndIsActive(pvo.getCreatedBy(), pvo.getIsActive());
+			} else if (pvo.getPoolType() != null && pvo.getCreatedBy() == null) {
+				pools = poolRepo.findByPoolTypeAndIsActive(pvo.getPoolType(), pvo.getIsActive());
+			} else {
+
+				pools = poolRepo.findByIsActive(pvo.getIsActive());
+			}
+
+		} else if (pvo.getIsActive() == null) {
+
+			if (pvo.getCreatedBy() != null && pvo.getPoolType() == null) {
+
+				pools = poolRepo.findByCreatedBy(pvo.getCreatedBy());
+
+			}else if(pvo.getCreatedBy() == null && pvo.getPoolType() !=null)
+			{
+				
+				pools = poolRepo.findByPoolType(pvo.getPoolType());
+				
+			}
+			else {
+				
+				pools = poolRepo.findByCreatedByAndPoolType(pvo.getCreatedBy(), pvo.getPoolType());
+			}
+
+		}
+		
+		if(pools.isEmpty())
+		{
+			
+			 throw new RecordNotFoundException("Records not exists");
+			
+		}
+		else
+		{
+			
+			pools.stream().forEach(p ->{
+				
+				SearchPoolVo spvo = new SearchPoolVo();
+				spvo.setPoolId(p.getPoolId());
+				spvo.setPoolName(p.getPoolName());
+				spvo.setPoolType(p.getPoolType());
+				spvo.setCreatedBy(p.getCreatedBy());
+				spvo.setCreatedDate(p.getCreatedDate());
+				spvo.setIsActive(p.getIsActive());
+				searchPoolvo.add(spvo);
+				
+			});
+			
+		}
+
+		return searchPoolvo;
 	}
 }

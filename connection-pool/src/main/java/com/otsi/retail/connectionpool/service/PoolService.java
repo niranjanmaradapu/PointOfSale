@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
+import com.otsi.retail.connectionpool.vo.SearchPoolVo;
 
 /**
  * This interface is implemented by PoolServiceImpl
@@ -23,5 +24,9 @@ public interface PoolService {
 	String modifyPool(ConnectionPoolVo vo);
 
 	String deletePool(Long poolId);
+
+	List<SearchPoolVo> searchPool(SearchPoolVo pvo);
+
+	
 
 }
