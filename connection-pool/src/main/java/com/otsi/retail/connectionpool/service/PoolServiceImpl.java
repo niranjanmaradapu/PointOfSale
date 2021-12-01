@@ -167,7 +167,7 @@ public class PoolServiceImpl implements PoolService {
 	}
 
 	@Override
-	public List<SearchPoolVo> searchPool(SearchPoolVo pvo) {
+	public List<ConnectionPoolVo> searchPool(SearchPoolVo pvo) {
 
 		List<SearchPoolVo> searchPoolvo = new ArrayList<>();
 		List<PoolEntity> pools = new ArrayList<>();
@@ -207,25 +207,10 @@ public class PoolServiceImpl implements PoolService {
 		if (pools.isEmpty()) {
 
 			throw new RecordNotFoundException("Records not exists");
-
-		} else {
-
-			pools.stream().forEach(p -> {
-
-				SearchPoolVo spvo = new SearchPoolVo();
-				spvo.setPoolId(p.getPoolId());
-				spvo.setPoolName(p.getPoolName());
-				spvo.setPoolType(p.getPoolType());
-				spvo.setCreatedBy(p.getCreatedBy());
-				spvo.setCreatedDate(p.getCreatedDate());
-				spvo.setIsActive(p.getIsActive());
-				searchPoolvo.add(spvo);
-
-			});
-
 		}
 
-		return searchPoolvo;
-	}
+		List<ConnectionPoolVo> vo = poolMapper.convertPoolEntityToVo(pools);
 
+		return vo;
+	}
 }

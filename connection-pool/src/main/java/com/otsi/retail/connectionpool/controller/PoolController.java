@@ -75,7 +75,7 @@ public class PoolController {
 	@PostMapping(CommonRequestMappigs.SEARCH_POOLS)
 	public GateWayResponse<?> searchPool(@RequestBody SearchPoolVo pvo) {
 
-		List<SearchPoolVo> vo = poolService.searchPool(pvo);
+		List<ConnectionPoolVo> vo = poolService.searchPool(pvo);
 
 		return new GateWayResponse<>("successfully getting pools", vo);
 
