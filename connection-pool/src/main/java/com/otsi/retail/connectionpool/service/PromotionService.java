@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.otsi.retail.connectionpool.vo.ConnectionPromoVo;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
 import com.otsi.retail.connectionpool.vo.StoreVo;
@@ -15,7 +16,7 @@ public interface PromotionService {
 
 	String addPromotion(PromotionsVo vo);
 
-	List<PromotionsVo> getListOfPromotions(String flag);
+	ConnectionPromoVo getListOfPromotions(String flag, Long domainId);
 
 	String editPromotion(PromotionsVo vo);
 	

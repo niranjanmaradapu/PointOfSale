@@ -16,6 +16,7 @@ import com.otsi.retail.connectionpool.mapper.PoolMapper;
 import com.otsi.retail.connectionpool.repository.PoolRepo;
 import com.otsi.retail.connectionpool.repository.RuleRepo;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
+import com.otsi.retail.connectionpool.vo.PoolVo;
 import com.otsi.retail.connectionpool.vo.SearchPoolVo;
 
 /**
@@ -67,7 +68,7 @@ public class PoolServiceImpl implements PoolService {
 
 	// Method for getting list of pools based on the status flag
 	@Override
-	public List<ConnectionPoolVo> getListOfPools(String isActive) {
+	public PoolVo getListOfPools(String isActive, Long domainId) {
 		log.debug("debugging savePool():" + isActive);
 		List<PoolEntity> poolEntity = new ArrayList<>();
 		Boolean flag = null;
@@ -79,17 +80,37 @@ public class PoolServiceImpl implements PoolService {
 			flag = Boolean.FALSE;
 		}
 
-		if (isActive.equalsIgnoreCase("ALL")) {
+		if (isActive.equalsIgnoreCase("ALL") && domainId == null) {
 			poolEntity = poolRepo.findAll();
-		} else {
+
+		} else if (!(isActive.isEmpty()) && domainId == null) {
 			poolEntity = poolRepo.findByIsActive(flag);
+		} else if (isActive.isEmpty() && domainId != null) {
+
+			poolEntity = poolRepo.findByDomainId(domainId);
+			poolEntity.stream().forEach(p -> {
+
+				p.setDomainId(null);
+			});
+		}
+
+		else {
+			poolEntity = poolRepo.findByIsActiveAndDomainId(flag, domainId);
+			poolEntity.stream().forEach(p -> {
+
+				p.setDomainId(null);
+			});
+
 		}
 		if (!poolEntity.isEmpty()) {
-
+			PoolVo poolvo = new PoolVo();
 			List<ConnectionPoolVo> poolVo = poolMapper.convertPoolEntityToVo(poolEntity);
 			log.warn("we are checking if pool is fetching...");
 			log.info("fetching list of pools");
-			return poolVo;
+
+			poolvo.setPoolvo(poolVo);
+			poolvo.setDomainId(domainId);
+			return poolvo;
 
 		} else {
 			log.error("record not found");
@@ -172,30 +193,25 @@ public class PoolServiceImpl implements PoolService {
 
 				pools = poolRepo.findByCreatedBy(pvo.getCreatedBy());
 
-			}else if(pvo.getCreatedBy() == null && pvo.getPoolType() !=null)
-			{
-				
+			} else if (pvo.getCreatedBy() == null && pvo.getPoolType() != null) {
+
 				pools = poolRepo.findByPoolType(pvo.getPoolType());
-				
-			}
-			else {
-				
+
+			} else {
+
 				pools = poolRepo.findByCreatedByAndPoolType(pvo.getCreatedBy(), pvo.getPoolType());
 			}
 
 		}
-		
-		if(pools.isEmpty())
-		{
-			
-			 throw new RecordNotFoundException("Records not exists");
-			
-		}
-		else
-		{
-			
-			pools.stream().forEach(p ->{
-				
+
+		if (pools.isEmpty()) {
+
+			throw new RecordNotFoundException("Records not exists");
+
+		} else {
+
+			pools.stream().forEach(p -> {
+
 				SearchPoolVo spvo = new SearchPoolVo();
 				spvo.setPoolId(p.getPoolId());
 				spvo.setPoolName(p.getPoolName());
@@ -204,11 +220,12 @@ public class PoolServiceImpl implements PoolService {
 				spvo.setCreatedDate(p.getCreatedDate());
 				spvo.setIsActive(p.getIsActive());
 				searchPoolvo.add(spvo);
-				
+
 			});
-			
+
 		}
 
 		return searchPoolvo;
 	}
+
 }

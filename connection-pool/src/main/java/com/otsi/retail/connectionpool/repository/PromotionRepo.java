@@ -62,16 +62,10 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	List<PromotionsEntity> findByStartDateAndEndDateAndPromoId(LocalDate startDate, LocalDate endDate, Long promoId);
 
-	
+	List<PromotionsEntity> findByDomainId(Long domainId);
 
-	
+	List<PromotionsEntity> findByIsActiveAndDomainId(Boolean status, Long domainId);
 
-	
-
-	
-
-	
-	
 	
 
 }
