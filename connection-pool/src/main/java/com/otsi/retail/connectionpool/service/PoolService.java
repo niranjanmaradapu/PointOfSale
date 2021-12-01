@@ -26,7 +26,7 @@ public interface PoolService {
 
 	String deletePool(Long poolId);
 
-	List<SearchPoolVo> searchPool(SearchPoolVo pvo);
+	List<ConnectionPoolVo> searchPool(SearchPoolVo pvo);
 
 	
 
