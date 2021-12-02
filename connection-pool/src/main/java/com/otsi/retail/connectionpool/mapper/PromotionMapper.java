@@ -33,6 +33,7 @@ public class PromotionMapper {
 		promo.setPrintNameOnBill(vo.getPrintNameOnBill());
 		promo.setIsTaxExtra(vo.getIsTaxExtra());
 		promo.setApplicability(vo.getApplicability());
+		promo.setCreatedBy(vo.getCreatedBy());
 		promo.setPromoApplyType(vo.getPromoApplyType());
 		promo.setBuyItemsFromPool(vo.getBuyItemsFromPool());
 		promo.setIsActive(Boolean.TRUE);
@@ -60,6 +61,7 @@ public class PromotionMapper {
 			vo.setDescription(x.getDescription());
 			vo.setPrintNameOnBill(x.getPrintNameOnBill());
 			vo.setApplicability(x.getApplicability());
+			vo.setCreatedBy(x.getCreatedBy());
 			vo.setIsTaxExtra(x.getIsTaxExtra());
 			vo.setIsActive(x.getIsActive());
 			vo.setBuyItemsFromPool(x.getBuyItemsFromPool());

@@ -31,7 +31,7 @@ public class PromotionsEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long promoId;
-	
+
 	private Long domainId;
 
 	private String promoName;
@@ -39,6 +39,8 @@ public class PromotionsEntity {
 	private String description;
 
 	private String printNameOnBill;
+
+	private String createdBy;
 
 	private Applicability applicability;
 
@@ -49,34 +51,31 @@ public class PromotionsEntity {
 	private int buyItemsFromPool;
 
 	private Boolean isActive;
-	
+
 	/** These below 3 fields are store related fields **/
-	
-     private PromotionType promoType;
-	
+
+	private PromotionType promoType;
+
 	private LocalDate startDate;
-	
+
 	private LocalDate endDate;
-	
+
 	private String storeName;
-	
+
 	private int priority;
 
 	private LocalDate createdDate;
 
 	private LocalDate lastModified;
-	
-	
 
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
+	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
 	@JoinTable(name = "pool_promo", joinColumns = @JoinColumn(name = "promoId"), inverseJoinColumns = @JoinColumn(name = "poolId"))
 	private List<PoolEntity> poolEntity;
-	
-	
+
 	/**
 	 * @Many_To_Many mapping For Stores
 	 */
-	
+
 	/*
 	 * @ManyToMany(cascade = { CascadeType.ALL})
 	 * 
