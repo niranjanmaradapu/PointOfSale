@@ -144,16 +144,16 @@ public class PromotionServiceImpl implements PromotionService {
 
 			promoList = promoRepo.findByDomainId(domainId);
 			
-			promoList.stream().forEach( d->{
-			  d.setDomainId(null);
-			});
+//			promoList.stream().forEach( d->{
+//			  d.setDomainId(null);
+//			});
 		}
 		else {
 			promoList = promoRepo.findByIsActiveAndDomainId(status, domainId);
 			
-			promoList.stream().forEach( d->{
-				  d.setDomainId(null);
-				});
+//			promoList.stream().forEach( d->{
+//				  d.setDomainId(null);
+//				});
 		}
 		if (!promoList.isEmpty()) {
 			ConnectionPromoVo promoVo = new ConnectionPromoVo();

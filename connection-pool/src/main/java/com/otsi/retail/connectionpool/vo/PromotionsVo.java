@@ -37,6 +37,8 @@ public class PromotionsVo {
 	private String description;
 
 	private String printNameOnBill;
+	
+	private String createdBy;
 
 	private Applicability applicability;
 
