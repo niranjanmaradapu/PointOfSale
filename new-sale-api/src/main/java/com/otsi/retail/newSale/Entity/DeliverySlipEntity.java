@@ -55,7 +55,7 @@ public class DeliverySlipEntity  {
 
 	private DSStatus status;
 	
-	private Long salesMan;
+	//private Long salesMan;
 
 	private LocalDate creationDate;
 
