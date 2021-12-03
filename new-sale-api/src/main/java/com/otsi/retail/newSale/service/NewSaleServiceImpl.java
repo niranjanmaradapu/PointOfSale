@@ -155,7 +155,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 		log.debug("deugging saveNewSaleRequest" + vo);
 		NewSaleEntity entity = new NewSaleEntity();
 
-		Random ran = new Random();
 		entity.setUserId(vo.getUserId());
 		entity.setNatureOfSale(vo.getNatureOfSale());
 		entity.setDomainId(vo.getDomainId());
@@ -170,6 +169,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setLastModified(LocalDate.now());
 		entity.setStatus(OrderStatus.New);// Initial Order status should be new
 		entity.setStatus(vo.getStatus());
+		Random ran = new Random();
 		entity.setOrderNumber(
 				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
 		// Check for payment type
