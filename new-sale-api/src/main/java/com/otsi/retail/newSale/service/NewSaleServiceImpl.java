@@ -155,19 +155,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		log.debug("deugging saveNewSaleRequest" + vo);
 		NewSaleEntity entity = new NewSaleEntity();
 
-		if (vo.getCustomerDetails() != null) {
-
-			if (vo.getCustomerDetails().getCustomerId() != null) {
-				entity.setUserId(vo.getCustomerDetails().getCustomerId());
-			} else {
-				// Need to get userId from Userdata table once user is saved.
-			}
-
-		} else {
-			throw new DataNotFoundException("data not found");
-		}
-
-		Random ran = new Random();
+		entity.setUserId(vo.getUserId());
 		entity.setNatureOfSale(vo.getNatureOfSale());
 		entity.setDomainId(vo.getDomainId());
 		entity.setGrossValue(vo.getGrossAmount());
@@ -181,6 +169,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setLastModified(LocalDate.now());
 		entity.setStatus(OrderStatus.New);// Initial Order status should be new
 		entity.setStatus(vo.getStatus());
+		Random ran = new Random();
 		entity.setOrderNumber(
 				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
 		// Check for payment type
