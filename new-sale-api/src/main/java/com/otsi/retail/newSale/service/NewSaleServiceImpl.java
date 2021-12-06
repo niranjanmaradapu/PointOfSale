@@ -69,6 +69,7 @@ import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.GetUserRequestVo;
 import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.HsnDetailsVo;
+import com.otsi.retail.newSale.vo.InventoryUpdateVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
@@ -341,16 +342,20 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		if (orderRecord.getDomainId() == DomainData.TE.getId()) {
 
-			Map<String, Integer> map = new HashMap<>();
-
 			List<LineItemsEntity> lineItems = orderRecord.getDlSlip().stream().flatMap(x -> x.getLineItems().stream())
 					.collect(Collectors.toList());
 
-			lineItems.stream().forEach(x -> {
-				map.put(x.getBarCode(), x.getQuantity());
+			List<InventoryUpdateVo> updateVo = new ArrayList<>();
 
+			lineItems.stream().forEach(x -> {
+				
+				InventoryUpdateVo vo = new InventoryUpdateVo();
+				vo.setBarCode(x.getBarCode());
+				vo.setLineItemId(x.getLineItemId());
+				vo.setQuantity(x.getQuantity());
+				updateVo.add(vo);
 			});
-			// rabbitTemplate.convertAndSend(exchange, routingKey, object);
+			//rabbitTemplate.convertAndSend(exchange, routingKey, updateVo);
 		} else {
 
 			Map<String, Integer> map = new HashMap<>();
@@ -500,7 +505,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					List<Long> userIds = uvo.stream().map(x -> x.getUserId()).collect(Collectors.toList());
 
-					saleDetails = newSaleRepository.findByUserIdInAndCreationDateBetween(userIds,svo.getDateFrom(), svo.getDateTo());
+					saleDetails = newSaleRepository.findByUserIdInAndCreationDateBetween(userIds, svo.getDateFrom(),
+							svo.getDateTo());
 
 				}
 
@@ -516,14 +522,16 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getEmpId() == null
 					&& svo.getInvoiceNumber() != null) {
-				saleDetails = newSaleRepository.findByOrderNumberAndCreationDateBetween(svo.getInvoiceNumber(),svo.getDateFrom(), svo.getDateTo());
+				saleDetails = newSaleRepository.findByOrderNumberAndCreationDateBetween(svo.getInvoiceNumber(),
+						svo.getDateFrom(), svo.getDateTo());
 			}
 			/*
 			 * getting the record using empId
 			 */
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getInvoiceNumber() == null
 					&& svo.getEmpId() != null) {
-				saleDetails = newSaleRepository.findByCreatedByAndCreationDateBetween(svo.getEmpId(),svo.getDateFrom(), svo.getDateTo());
+				saleDetails = newSaleRepository.findByCreatedByAndCreationDateBetween(svo.getEmpId(), svo.getDateFrom(),
+						svo.getDateTo());
 
 			} else
 				saleDetails = newSaleRepository.findByCreationDateBetween(svo.getDateFrom(), svo.getDateTo());
@@ -587,8 +595,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			}
 		}
-		
-		
+
 		if (saleDetails.isEmpty()) {
 
 			log.error("No record found with given information");
@@ -619,8 +626,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					});
 				}
-			
-				
+
 				/////////
 				List<UserDetailsVo> uvo = getUserDetailsFromURM(null, x.getUserId());
 
@@ -654,7 +660,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 			log.info("after getting  sale bills details :" + lsvo);
 			return lsvo;
 		}
-		
 
 	}
 
@@ -1358,6 +1363,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineEntity.setNetValue(lineItem.getNetValue());
 					lineEntity.setItemPrice(lineItem.getItemPrice());
 					lineEntity.setSection(lineItem.getSection());
+					lineEntity.setHsnCode(lineEntity.getHsnCode());
+					lineEntity.setActualValue(lineItem.getActualValue());
+					lineEntity.setTaxValue(lineItem.getTaxValue());
 
 					// GrossValue is multiple of net value of product and quantity
 					lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
