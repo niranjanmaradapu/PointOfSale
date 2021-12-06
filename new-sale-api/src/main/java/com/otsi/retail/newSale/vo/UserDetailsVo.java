@@ -15,7 +15,8 @@ public class UserDetailsVo {
 	private String gender;
 	private LocalDate createdDate;
 	private LocalDate lastModifyedDate;
-	private long createdBy;
+	private String createdBy;
+	private String modifiedBy;
 	private boolean isActive;
 	@JsonIgnore
 	private Role role;
