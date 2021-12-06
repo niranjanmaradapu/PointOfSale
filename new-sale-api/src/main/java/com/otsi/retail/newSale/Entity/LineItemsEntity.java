@@ -30,6 +30,12 @@ public class LineItemsEntity {
 	private int quantity;
 
 	private Long grossValue;
+	
+	private String hsnCode;
+	
+	private Long actualValue;
+	
+	private Long taxValue;
 
 	private Long discount;
 
