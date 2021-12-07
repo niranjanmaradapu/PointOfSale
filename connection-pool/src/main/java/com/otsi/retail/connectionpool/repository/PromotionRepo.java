@@ -68,4 +68,6 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	
 
+	
+
 }
