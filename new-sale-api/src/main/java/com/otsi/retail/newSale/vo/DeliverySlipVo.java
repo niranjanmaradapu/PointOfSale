@@ -8,10 +8,16 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.common.DSStatus;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Component
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class DeliverySlipVo {
 
 	private List<BarcodeVo> barcode;

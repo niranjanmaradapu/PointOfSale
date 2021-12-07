@@ -7,11 +7,13 @@ import org.springframework.stereotype.Component;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Component
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class GiftVoucherVo {// Don't change these field names because these are mapped with entity object
 
 	private Long gvId;

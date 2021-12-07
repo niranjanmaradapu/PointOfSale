@@ -93,13 +93,14 @@ public class NewSaleController {
 	// Method for saving new sale items...
 	@PostMapping(CommonRequestMappigs.SALE)
 	public GateWayResponse<?> saveNewSale(@RequestBody NewSaleVo vo) throws InvalidInputException {
-		log.info("Received Request to saveNewSale :" + vo.toString());
+		log.info("Received Request to saveNewSale :" + vo);
 
 		try {
 			String message = newSaleService.saveNewSaleRequest(vo);
 
 			return new GateWayResponse<>("Successfully created order.", message);
 		} catch (InvalidInputException e) {
+			log.error("Exception occurs while creating order : " + vo);
 			return new GateWayResponse<>(e.getMsg(), "Exception occurs while creating order");
 		}
 	}
@@ -108,11 +109,13 @@ public class NewSaleController {
 	@PostMapping("payconfirmation")
 	public GateWayResponse<?> paymentConfirmationFromRazorpay(@RequestParam String razorPayId,
 			@RequestParam boolean payStatus) {
+		log.info("Received payment confirmation for razorpayId :" +razorPayId);
 		try {
 			String result = newSaleService.paymentConfirmationFromRazorpay(razorPayId, payStatus);
 			return new GateWayResponse<>(result, "Success..");
 			
 		} catch (Exception e) {
+			log.error("Exception occurs while confirming payment for Id : " + razorPayId);
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(), "Exception occurs");
 		}
 	}
@@ -144,12 +147,13 @@ public class NewSaleController {
 	@PostMapping("/savelineitems/{domainId}")
 	public GateWayResponse<?> saveLineItems(@PathVariable Long domainId, @RequestBody List<LineItemVo> lineItems)
 			throws InvalidInputException {
-		log.info("Save Line items with values " + lineItems);
+		log.info("Save Line items with values " + lineItems.toString());
 		try {
 			List<Long> result = newSaleService.saveLineItems(lineItems, domainId);
 
 			return new GateWayResponse<>("Successfully saved Line item..", result.toString());
 		} catch (InvalidInputException e) {
+			log.error("Exception occurs while line items " + lineItems.toString());
 			return new GateWayResponse<>(e.getMsg(), "Exception occurs");
 		}
 	}
@@ -157,7 +161,7 @@ public class NewSaleController {
 	// Method for modifying line items
 	@PutMapping("/editlineitem")
 	public GateWayResponse<?> editLineItems(@RequestBody LineItemVo lineItem) throws RecordNotFoundException {
-		log.info("edit Line items with values " + lineItem);
+		log.info("edit Line item with values " + lineItem);
 
 		String result = newSaleService.editLineItem(lineItem);
 
@@ -167,12 +171,13 @@ public class NewSaleController {
 	// Method for creating Delivery slip using List of LineItems
 	@PostMapping(CommonRequestMappigs.CREATE_DS)
 	public GateWayResponse<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo) throws RecordNotFoundException {
-		log.info("Received Request to saveDeliverySlip :" + vo.toString());
+		log.info("Received Request to saveDeliverySlip :" + vo);
 		try {
 
 			String saveDs = newSaleService.saveDeliverySlip(vo);
 			return new GateWayResponse<>("successfully created deliveryslip", saveDs);
 		} catch (RecordNotFoundException e) {
+			log.error("Exception occurs while saving delivery slip : " + vo );
 			return new GateWayResponse<>(e.getMsg(), "Exception occurs");
 		}
 	}
@@ -182,6 +187,7 @@ public class NewSaleController {
 	public GateWayResponse<?> getLineItemByBarcode(@RequestParam String barCode, @RequestParam Long domainId)
 			throws RecordNotFoundException {
 
+		log.info("Recieved request for getting line item : " + barCode);
 		LineItemVo result = newSaleService.getLineItemByBarcode(barCode, domainId);
 
 		return new GateWayResponse<>("Success", result);
@@ -193,6 +199,7 @@ public class NewSaleController {
 	public GateWayResponse<?> deleteLineItemByBarCode(@RequestParam String barCode, @RequestParam Long domainId)
 			throws RecordNotFoundException {
 
+		log.info("Recieved request to delete line item : " + barCode);
 		String result = newSaleService.deleteLineItem(barCode, domainId);
 
 		return new GateWayResponse<>("Success", result);
@@ -344,6 +351,7 @@ public class NewSaleController {
 			String result = newSaleService.saveGiftVoucher(vo);
 			return new GateWayResponse<>(result, "Successfully saved");
 		} catch (DuplicateRecordException dre) {
+			log.error("Getting error while saving giftvoucher : " + vo );
 			return new GateWayResponse<>(dre.getMsg(), "Duplicate Record");
 		}
 	}
@@ -351,11 +359,12 @@ public class NewSaleController {
 	// Method for getting Gift voucher by GV Number
 	@GetMapping("/getGv")
 	public GateWayResponse<?> getGiftVoucher(@RequestParam String gvNumber) throws InvalidInputException {
-		log.info("Recieved request to getGiftVoucher():" + gvNumber);
+		log.info("Recieved request to getting giftVoucher : " + gvNumber);
 		try {
 			GiftVoucherVo result = newSaleService.getGiftVoucher(gvNumber);
 			return new GateWayResponse<>("Successfully fetch record", result);
 		} catch (InvalidInputException iie) {
+			log.error("Getting error while fetching giftvoucher : " + gvNumber);
 			return new GateWayResponse<>(iie.getMsg(), "Record not found");
 		}
 
@@ -384,11 +393,12 @@ public class NewSaleController {
 	@PostMapping("/tagCustomerToGv/{userId}/{gvId}")
 	public GateWayResponse<?> tagCustomerToGv(@PathVariable Long userId, @PathVariable Long gvId)
 			throws InvalidInputException, DataNotFoundException {
-		log.info("Recieved request to tagCustomerToGv():" + userId + "and the gv is:" + gvId);
+		log.info("Recieved request to tagCustomerToGv " + userId + "and the gv is : " + gvId);
 		try {
 			String message = newSaleService.tagCustomerToGv(userId, gvId);
 			return new GateWayResponse<>(message, "Success");
 		} catch (DataNotFoundException dfe) {
+			log.error("Getting error while tag customer to giftvoucher : " + userId + " " + gvId);
 			return new GateWayResponse<>(dfe.getMsg(), "Please provide valid inputs");
 		}
 	}

@@ -3,6 +3,7 @@ package com.otsi.retail.newSale.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.naming.Name;
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Table(name = "line_items")
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class LineItemsEntity {
 
 	@Id
