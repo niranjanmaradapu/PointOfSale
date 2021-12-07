@@ -12,11 +12,13 @@ import com.otsi.retail.newSale.common.SaleNature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Component
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class NewSaleVo {
 
 	private Long newsaleId;

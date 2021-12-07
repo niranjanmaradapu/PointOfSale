@@ -1,17 +1,17 @@
 package com.otsi.retail.newSale.vo;
 
-import java.time.LocalDate;
-
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
+@ToString
 public class InventoryUpdateVo {
 
 	private int quantity;
@@ -19,5 +19,7 @@ public class InventoryUpdateVo {
 	private Long lineItemId;
 
 	private String barCode;
+	
+	private String userId;
 
 }

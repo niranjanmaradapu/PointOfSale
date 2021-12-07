@@ -153,7 +153,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 	// Method for saving order
 	@Override
 	public String saveNewSaleRequest(NewSaleVo vo) throws InvalidInputException {
-		log.debug("deugging saveNewSaleRequest" + vo);
 		NewSaleEntity entity = new NewSaleEntity();
 
 		entity.setUserId(vo.getUserId());
@@ -197,6 +196,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			if (dsList.size() == vo.getDlSlip().size()) {
 
 				NewSaleEntity saveEntity = newSaleRepository.save(entity);
+				log.info("Saved order :" + saveEntity);
 
 				dsList.stream().forEach(a -> {
 
@@ -227,13 +227,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 					type.setPaymentType(PaymentType.Cash.getType());
 
 					paymentAmountTypeRepository.save(type);
+					log.info("Cash payment is done for order : " + saveEntity.getOrderNumber());
 
 				}
 				// Request to update inventory for textile
 				// requestForUpdateInInventoryForTextile(inventUpdate);
 
 			} else {
-				log.error("Please provide Valid delivery slips..");
+				log.error("Delivery slips are not valid" + vo);
 				throw new InvalidInputException("Please provide Valid delivery slips..");
 			}
 		}
@@ -272,21 +273,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 					type.setPaymentType(PaymentType.Cash.getType());
 
 					paymentAmountTypeRepository.save(type);
-
+					log.info("Cash payment is done for order : " + saveEntity.getOrderNumber());
 				}
 
 				// Request to update inventory for retail
 				// requestForUpdateInInventoryForRetail(map);
 
 			} else {
-				log.error("Please provide valid LineItems..");
+				log.error("LineItems are not valid : " + vo);
 				throw new InvalidInputException("Please provide Valid delivery slips..");
 
 			}
 		}
-
-		log.warn("we are testing bill generated with number");
-		log.info("after generated bill with number:" + entity.getOrderNumber());
+		log.info("Order generated with number : " + entity.getOrderNumber());
 		return entity.getOrderNumber();
 	}
 
@@ -309,7 +308,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 			paymentAmountTypeRepository.save(payDetails);
 
 			log.info("save payment details for order : " + orderRecord.getOrderNumber());
-
 		}
 	}
 
@@ -325,13 +323,16 @@ public class NewSaleServiceImpl implements NewSaleService {
 			paymentAmountTypeRepository.save(payment);
 
 			log.info("update payment details for razorpay Id: " + razorPayId);
+
 			Optional<NewSaleEntity> order = newSaleRepository.findById(payment.getOrderId().getOrderId());
 
 			// Call method to update order items into inventory
 			updateOrderItemsInInventory(order.get());
+			log.info("Successfully updated payment deatails : " + order.get());
 			return "successfully updated payment deatils";
 
 		} else {
+			log.info("Payment failed for razoe pay id : " + razorPayId);
 			return "please do payment again";
 		}
 
@@ -348,14 +349,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 			List<InventoryUpdateVo> updateVo = new ArrayList<>();
 
 			lineItems.stream().forEach(x -> {
-				
+
 				InventoryUpdateVo vo = new InventoryUpdateVo();
 				vo.setBarCode(x.getBarCode());
 				vo.setLineItemId(x.getLineItemId());
 				vo.setQuantity(x.getQuantity());
+				vo.setUserId(orderRecord.getCreatedBy());
 				updateVo.add(vo);
 			});
-			//rabbitTemplate.convertAndSend(exchange, routingKey, updateVo);
+			// rabbitTemplate.convertAndSend(exchange, routingKey, updateVo);
 		} else {
 
 			Map<String, Integer> map = new HashMap<>();
@@ -407,7 +409,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	// Method for saving delivery slip
 	@Override
 	public String saveDeliverySlip(DeliverySlipVo vo) throws RecordNotFoundException {
-		log.debug("deugging saveDeliverySlip:" + vo);
+		log.info("Save request for delivery slip : " + vo);
 
 		DeliverySlipEntity entity = new DeliverySlipEntity();
 
@@ -427,6 +429,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			lineItems = vo.getLineItems().stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
 
 		} else {
+			log.error("Line items are not valid : " + vo.getLineItems().toString());
 			throw new RecordNotFoundException("Provide line items");
 		}
 		List<LineItemsEntity> listLineItems = lineItemRepo.findByLineItemIdInAndDsEntityIsNull(lineItems);
@@ -442,6 +445,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			return entity.getDsNumber();
 		} else {
+			log.error("Line items are not valid : " + vo.getLineItems().toString());
 			throw new RecordNotFoundException("Provide valid line items");
 		}
 
@@ -449,7 +453,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Override
 	public DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws RecordNotFoundException {
-		log.debug("deugging getDeliverySlipDetails:" + dsNumber);
+		log.info("Request for getting Delivery slip : " + dsNumber);
 
 		DeliverySlipEntity ds = dsRepo.findByDsNumber(dsNumber);
 
@@ -459,6 +463,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			return dsVo;
 
 		} else {
+			log.error("Deliveryslip number is not valid : " + dsNumber);
 			throw new RecordNotFoundException("Provide valid DS Number");
 		}
 	}
@@ -1139,7 +1144,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	// Method to save Gift vouchers and GiftVoucher Number should be unique
 	@Override
 	public String saveGiftVoucher(GiftVoucherVo vo) throws DuplicateRecordException {
-		log.debug(" debugging saveGiftVoucher:" + vo);
+		log.info("Getting save request for saving giftvoucher : " + vo);
 
 		// Check condition for Duplicate GiftVoucher Numbers
 		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumber(vo.getGvNumber());
@@ -1151,11 +1156,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 			entity.setCreatedDate(LocalDate.now());
 			entity.setIsTagged(Boolean.FALSE);
 			GiftVoucherEntity savedGf = gvRepo.save(entity);
-			log.warn("we are testing if gv voucher is saved...");
-			log.info("after Succesfully saving gift voucher:" + savedGf);
+			log.info("Gift voucher saved successfully : " + savedGf);
 			return "Gift voucher saved succesfully..";
 		} else {
-			log.error("Given Giftvoucher number is already in records.." + gvEntity.get().getGvNumber());
+			log.error("Given Giftvoucher number is already in records : " + gvEntity.get().getGvNumber());
 			throw new DuplicateRecordException(
 					"Given Giftvoucher number is already in records.." + gvEntity.get().getGvNumber());
 		}
@@ -1164,17 +1168,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 	// Method for getting Gift voucher details by Gv Number
 	@Override
 	public GiftVoucherVo getGiftVoucher(String gvNumber) throws InvalidInputException {
-		log.debug(" debugging getGiftVoucher:" + gvNumber);
+
 		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumber(gvNumber);
 
 		if (gvEntity.isPresent()) {
 			GiftVoucherVo vo = new GiftVoucherVo();
 			BeanUtils.copyProperties(gvEntity.get(), vo);
-			log.warn("we are testing if gv voucher is fetching...");
-			log.info("after fetching  gift voucher:" + vo);
 			return vo;
 		} else {
-			log.error("please enter valid Gift Voucher number.");
+			log.error("Entered Invalid Gift Voucher number : " + gvNumber);
 			throw new InvalidInputException("please enter valid Gift Voucher number.");
 		}
 	}
@@ -1182,22 +1184,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 	// Method for tagging Gift voucher to Customer
 	@Override
 	public String tagCustomerToGv(Long userId, Long gvId) throws InvalidInputException, DataNotFoundException {
-		log.debug(" debugging tagCustomerToGv:" + userId + "and the gv id is :" + gvId);
 
 		Optional<GiftVoucherEntity> gv = gvRepo.findById(gvId);
 
-		// Gift voucher should not be tagged and expirydate should greater than today
+		// Gift voucher should not be tagged and expiry date should greater than today
 		if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
 			gv.get().setUserId(userId);
 			gv.get().setIsTagged(Boolean.TRUE);
 			gvRepo.save(gv.get());
+			log.info("Tagged giftvoucher " + gvId + "to user " + userId);
 		} else {
-			log.error("Gift voucher is not valid");
+			log.error("Entered Gift voucher is not valid : " + gvId);
 			throw new InvalidInputException("Gift voucher is not valid");
 		}
-
-		log.warn("we are testing if customer is tagged to gv voucher...");
-		log.info("after tagging customer to  gift voucher");
 		return "Gift vocher tagged successfully  " + gv.get().getGvNumber();
 	}
 
@@ -1347,7 +1346,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 	// Method for saving Line items
 	@Override
 	public List<Long> saveLineItems(List<LineItemVo> lineItems, Long domainId) throws InvalidInputException {
-		log.debug("Debugging saveLineItems() " + lineItems);
 		try {
 			if (domainId == DomainData.TE.getId()) {
 
@@ -1376,7 +1374,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 					list.add(lineEntity);
 				});
 				List<LineItemsEntity> saved = lineItemRepo.saveAll(list);
-
 				log.info("successfully saved line items " + saved);
 				return saved.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
 
@@ -1411,7 +1408,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				return saved.stream().map(x -> x.getLineItemReId()).collect(Collectors.toList());
 			}
 		} catch (InvalidInputException e) {
-			log.error("Getting exception while saving Line item..");
+			log.error("Getting exception while saving Line item.." + lineItems.toString());
 			throw new InvalidInputException(e.getMsg());
 		}
 	}
@@ -1468,9 +1465,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 				line.setCreationDate(LocalDate.now());
 				line.setLastModified(LocalDate.now());
 				LineItemsEntity saved = lineItemRepo.save(line);
+				log.info("Successfully modified line item : " + line);
 
 			} else {
-
+				log.error("Passing invalid line item " + line);
 				throw new RecordNotFoundException("provide valid line item");
 			}
 
@@ -1492,13 +1490,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 				line.setCreationDate(LocalDate.now());
 				line.setLastModified(LocalDate.now());
 				LineItemsReEntity saved = lineItemReRepo.save(line);
+				log.info("Successfully modified line item " + line);
 			} else {
-
+				log.error("Passing invalid line items " + line);
 				throw new RecordNotFoundException("provide valid line item");
 			}
 		}
 		return "Successfully modified Line Item.";
-
 	}
 
 	// Method for getting line item by using Bar code
@@ -1514,6 +1512,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				return vo;
 
 			} else {
+				log.info("Provide valid barcode for getting line item : " + barCode);
 				throw new RecordNotFoundException("provide valide barcode");
 			}
 
@@ -1525,6 +1524,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				return vo;
 
 			} else {
+				log.info("Provide valid barcode for getting line item : " + barCode);
 				throw new RecordNotFoundException("provide valide barcode");
 			}
 
@@ -1552,9 +1552,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 			if (lineItem.isPresent()) {
 
 				lineItemReRepo.delete(lineItem.get());
+				log.info("Successfully deleted line item : " + lineItem);
 				return "Successfully deleted";
 
 			} else {
+				log.error("Entered Invalid barcode for delete line item : " + barCode);
 				throw new RecordNotFoundException("provide valid barcode");
 			}
 		}
