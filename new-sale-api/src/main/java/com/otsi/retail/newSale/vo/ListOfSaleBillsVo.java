@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.otsi.retail.newSale.common.OrderStatus;
+
 import lombok.Data;
 
 @Data
@@ -17,7 +19,7 @@ public class ListOfSaleBillsVo {
 
 	private LocalDate createdDate;
 
-	private String billStatus;
+	private OrderStatus billStatus;
 
 	private String custMobileNumber;
 
