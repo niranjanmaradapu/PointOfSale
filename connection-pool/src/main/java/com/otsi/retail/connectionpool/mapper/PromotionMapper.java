@@ -27,7 +27,7 @@ public class PromotionMapper {
 		if (vo.getIsForEdit()) {
 			promo.setPromoId(vo.getPromoId());
 		}
-		promo.setPromoName(vo.getPromoName());
+		promo.setPromoName(vo.getPromotionName());
 		promo.setDomainId(vo.getDomainId());
 		promo.setDescription(vo.getDescription());
 		promo.setPrintNameOnBill(vo.getPrintNameOnBill());
@@ -56,7 +56,7 @@ public class PromotionMapper {
 		promoList.stream().forEach(x -> {
 			PromotionsVo vo = new PromotionsVo();
 
-			vo.setPromoName(x.getPromoName());
+			vo.setPromotionName(x.getPromoName());
 			vo.setDomainId(x.getDomainId());
 			vo.setDescription(x.getDescription());
 			vo.setPrintNameOnBill(x.getPrintNameOnBill());

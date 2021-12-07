@@ -259,7 +259,7 @@ public class PromotionServiceImpl implements PromotionService {
 	@Override
 	public String addPromotionToStore(PromotionsVo vo) {
 
-		PromotionsEntity promotionEntity = promoRepo.findByPromoNameIs(vo.getPromoName());
+		PromotionsEntity promotionEntity = promoRepo.findByPromoNameIs(vo.getPromotionName());
 
 		if (promotionEntity != null) {
 
