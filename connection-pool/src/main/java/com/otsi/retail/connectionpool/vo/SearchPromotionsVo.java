@@ -32,7 +32,7 @@ public class SearchPromotionsVo {
 	
 	private LocalDate endDate;
 	
-	private boolean promotionStatus;
+	private Boolean isActive;
 	
 	
 
