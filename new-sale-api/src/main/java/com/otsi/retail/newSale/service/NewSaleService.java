@@ -90,4 +90,6 @@ public interface NewSaleService {
 
 	String paymentConfirmationFromRazorpay(String razorPayId, boolean payStatus);
 
+	List<GiftVoucherVo> getListOfGiftvouchers() throws RecordNotFoundException;
+
 }

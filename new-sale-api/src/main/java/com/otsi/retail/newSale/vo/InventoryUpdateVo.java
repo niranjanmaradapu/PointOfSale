@@ -20,6 +20,6 @@ public class InventoryUpdateVo {
 
 	private String barCode;
 	
-	private String userId;
+	private Long storeId;
 
 }
