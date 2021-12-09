@@ -42,7 +42,6 @@ import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
-import com.otsi.retail.newSale.vo.PaymentDetailsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
@@ -107,6 +106,17 @@ public class NewSaleController {
 		} catch (InvalidInputException e) {
 			log.error("Exception occurs while creating order : " + vo);
 			return new GateWayResponse<>(e.getMsg(), "Exception occurs while creating order");
+		}
+	}
+
+	// Method for getting invoice details using Order number
+	@GetMapping("/getinvoicedata")
+	public GateWayResponse<?> getInvoicedetails(@RequestParam String orderNumber) throws RecordNotFoundException {
+		try {
+			NewSaleVo result = newSaleService.getInvoiceDetails(orderNumber);
+			return new GateWayResponse<>("Success..", result);
+		} catch (RecordNotFoundException re) {
+			return new GateWayResponse<>(re.getMsg(), "Exception occurs while fetching invoice details");
 		}
 	}
 

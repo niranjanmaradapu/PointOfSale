@@ -1632,4 +1632,18 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 	}
 
+	// Method for fetching invoice details by using order number
+	@Override
+	public NewSaleVo getInvoiceDetails(String orderNumber) throws RecordNotFoundException {
+
+		log.info("Request for fetching invoice details : " + orderNumber);
+		List<NewSaleEntity> orderRecord = newSaleRepository.findByOrderNumber(orderNumber);
+		if (!orderRecord.isEmpty()) {
+			NewSaleEntity order = orderRecord.stream().findFirst().get();
+			NewSaleVo result = newSaleMapper.convertNewSaleDtoToVo(order);
+			return result;
+		} else {
+			throw new RecordNotFoundException("Provide valid order number");
+		}
+	}
 }

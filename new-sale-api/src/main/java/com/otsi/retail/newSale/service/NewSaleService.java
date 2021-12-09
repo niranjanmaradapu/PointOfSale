@@ -92,4 +92,6 @@ public interface NewSaleService {
 
 	List<GiftVoucherVo> getListOfGiftvouchers() throws RecordNotFoundException;
 
+	NewSaleVo getInvoiceDetails(String orderNumber) throws RecordNotFoundException;
+
 }
