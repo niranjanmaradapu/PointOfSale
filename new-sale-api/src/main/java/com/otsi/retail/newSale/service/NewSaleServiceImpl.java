@@ -38,6 +38,7 @@ import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
 import com.otsi.retail.newSale.Entity.LineItemsEntity;
 import com.otsi.retail.newSale.Entity.LineItemsReEntity;
+import com.otsi.retail.newSale.Entity.LoyalityPointsEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
@@ -61,6 +62,7 @@ import com.otsi.retail.newSale.repository.DeliverySlipRepository;
 import com.otsi.retail.newSale.repository.GiftVoucherRepo;
 import com.otsi.retail.newSale.repository.LineItemReRepo;
 import com.otsi.retail.newSale.repository.LineItemRepo;
+import com.otsi.retail.newSale.repository.LoyalityPointsRepo;
 import com.otsi.retail.newSale.repository.NewSaleRepository;
 import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.vo.BarcodeVo;
@@ -75,9 +77,9 @@ import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
+import com.otsi.retail.newSale.vo.LoyalityPointsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
-import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
 import com.otsi.retail.newSale.vo.PaymentDetailsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.ReturnSummeryVo;
@@ -149,6 +151,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
+	
+	@Autowired
+	private LoyalityPointsRepo loyalityRepo;
 
 	// Method for saving order
 	@Override
@@ -1645,5 +1650,68 @@ public class NewSaleServiceImpl implements NewSaleService {
 		} else {
 			throw new RecordNotFoundException("Provide valid order number");
 		}
+	}
+	
+	@Override
+	public String saveLoyaltyPoints(LoyalityPointsVo loyalityVo)  {
+
+		LoyalityPointsEntity entity = newSaleMapper.convertLoyaltyVoToEntity(loyalityVo);
+		LoyalityPointsEntity save = loyalityRepo.save(entity);
+
+		return "Loyality Points Saved Successfully";
+	}
+
+	@Override
+	public LoyalityPointsVo getLoyaltyPointsByLoyaltyId(Long loyaltyId) throws RecordNotFoundException {
+
+		LoyalityPointsEntity loyalityIds = loyalityRepo.findByLoyaltyId(loyaltyId);
+
+		if (loyalityIds == null) {
+
+			throw new RecordNotFoundException("Records not found");
+
+		} else {
+
+			LoyalityPointsVo result = newSaleMapper.convertLoyaltyEntityToVo(loyalityIds);
+
+			return result;
+
+		}
+
+	}
+
+	@Override
+	public List<LoyalityPointsVo> getAllLoyaltyPoints() throws RecordNotFoundException {
+
+		List<LoyalityPointsEntity> entity = loyalityRepo.findAll();
+
+		if (entity == null) {
+			throw new RecordNotFoundException("Records not found");
+		} else {
+
+			List<LoyalityPointsVo> result = newSaleMapper.convertLoyaltyEntityToVo(entity);
+
+			return result;
+		}
+
+	}
+
+	@Override
+	public LoyalityPointsVo getLoyaltyPointsByUserId(Long userId) throws RecordNotFoundException {
+		
+		LoyalityPointsEntity userIdValue = loyalityRepo.findByUserId(userId);
+
+		if (userIdValue == null) {
+
+			throw new RecordNotFoundException("Records not found");
+
+		} else {
+
+			LoyalityPointsVo result = newSaleMapper.convertLoyaltyEntityToVo(userIdValue);
+
+			return result;
+
+		}
+		
 	}
 }

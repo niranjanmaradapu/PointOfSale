@@ -40,6 +40,7 @@ import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
+import com.otsi.retail.newSale.vo.LoyalityPointsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
@@ -470,5 +471,54 @@ public class NewSaleController {
 		 * newSaleService.getTaggedCustomerForInvoice(mobileNo,invoiceNo); }
 		 */
 		return null;
+	}
+
+	/** Loyalty Points APIs **/
+
+	@PostMapping(CommonRequestMappigs.SAVE_LOYALTY)
+	public GateWayResponse<?> saveLoyalityPoints(@RequestBody LoyalityPointsVo vo) {
+		log.info("Recieved request to saveLoyaltyPoints()" + vo);
+		String result = newSaleService.saveLoyaltyPoints(vo);
+		return new GateWayResponse<>("loyality points saved successfully", result);
+
+	}
+
+	@GetMapping(CommonRequestMappigs.GET_LOYALTY_POINTS_BY_LOYALTY_ID)
+	public GateWayResponse<?> getLoyaltyPoints(@RequestParam Long loyaltyId) throws RecordNotFoundException {
+		log.info("Recieved request to getLoyaltyPointsByLoyaltyId()");
+		try {
+			LoyalityPointsVo loyaltyPoints = newSaleService.getLoyaltyPointsByLoyaltyId(loyaltyId);
+			return new GateWayResponse<>(HttpStatus.OK, loyaltyPoints, "");
+		} catch (DataNotFoundException dfe) {
+			log.error("Getting error while getting loyalty points by loyaltyId : " + loyaltyId);
+			return new GateWayResponse<>(dfe.getMsg(), "Please provide valid inputs");
+		}
+
+	}
+
+	@GetMapping(CommonRequestMappigs.GET_ALL_LOYALTY_POINTS)
+	public GateWayResponse<?> getAllLoyaltyPoints() throws RecordNotFoundException {
+		log.info("Recieved request to getAllLoyaltyPoints()");
+		try {
+			List<LoyalityPointsVo> loyaltyPointsList = newSaleService.getAllLoyaltyPoints();
+			return new GateWayResponse<>(HttpStatus.OK, loyaltyPointsList, "");
+		} catch (DataNotFoundException dfe) {
+			log.error("Getting error while getting all loyalty points");
+			return new GateWayResponse<>(dfe.getMsg(), "Please provide valid inputs");
+		}
+
+	}
+
+	@GetMapping(CommonRequestMappigs.GET_LOYALTY_POINTS_BY_USER_ID)
+	public GateWayResponse<?> getLoyaltyPointsByUserId(@RequestParam Long userId) throws RecordNotFoundException {
+		log.info("Recieved request to getLoyaltyPointsByUserId()");
+		try {
+			LoyalityPointsVo result = newSaleService.getLoyaltyPointsByUserId(userId);
+			return new GateWayResponse<>(HttpStatus.OK, result, "");
+		} catch (DataNotFoundException dfe) {
+			log.error("Getting error while getting loyalty points by userId : " + userId);
+			return new GateWayResponse<>(dfe.getMsg(), "Please provide valid inputs");
+		}
+
 	}
 }
