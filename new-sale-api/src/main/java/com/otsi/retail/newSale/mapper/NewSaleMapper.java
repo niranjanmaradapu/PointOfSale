@@ -1,11 +1,9 @@
 package com.otsi.retail.newSale.mapper;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
@@ -16,15 +14,15 @@ import com.otsi.retail.newSale.Entity.BarcodeEntity;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Entity.LineItemsEntity;
 import com.otsi.retail.newSale.Entity.LineItemsReEntity;
+import com.otsi.retail.newSale.Entity.LoyalityPointsEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.common.DomainData;
-import com.otsi.retail.newSale.service.NewSaleServiceImpl;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
-import com.otsi.retail.newSale.vo.HsnDetailsVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
+import com.otsi.retail.newSale.vo.LoyalityPointsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
@@ -330,5 +328,58 @@ public class NewSaleMapper {
 
 		return vo;
 	}
+	
+	// VoToEntity method
+
+		public LoyalityPointsEntity convertLoyaltyVoToEntity(LoyalityPointsVo loyalityVo) {
+
+			LocalDate date
+	        = LocalDate.now();
+
+			LoyalityPointsEntity entity = new LoyalityPointsEntity();
+			entity.setLoyaltyId(loyalityVo.getLoyaltyId());
+			entity.setUserId(loyalityVo.getUserId());
+			entity.setMobileNumber(loyalityVo.getMobileNumber());
+			entity.setDomainId(loyalityVo.getDomainId());
+			entity.setInvoiceNumber(loyalityVo.getInvoiceNumber());
+			entity.setInvoiceAmount(loyalityVo.getInvoiceAmount());
+			entity.setLoyaltyPoints((loyalityVo.getInvoiceAmount() / 10));
+			entity.setCreatedDate(LocalDate.now());
+			entity.setExpiredDate(date.plusMonths(loyalityVo.getNumberOfMonths()));
+
+			return entity;
+
+		}
+
+		// EntityToVo method
+
+		public LoyalityPointsVo convertLoyaltyEntityToVo(LoyalityPointsEntity loyalityEntity) {
+
+			LoyalityPointsVo vo = new LoyalityPointsVo();
+			vo.setLoyaltyId(loyalityEntity.getLoyaltyId());
+			vo.setUserId(loyalityEntity.getUserId());
+			vo.setDomainId(loyalityEntity.getDomainId());
+			vo.setMobileNumber(loyalityEntity.getMobileNumber());
+			vo.setLoyaltyPoints(loyalityEntity.getLoyaltyPoints());
+			vo.setInvoiceNumber(loyalityEntity.getInvoiceNumber());
+			vo.setInvoiceAmount(loyalityEntity.getInvoiceAmount());
+			vo.setCreatedDate(loyalityEntity.getCreatedDate());
+			vo.setExpiredDate(loyalityEntity.getExpiredDate());
+
+			return vo;
+		}
+
+		public List<LoyalityPointsEntity> convertloyaltyVoToEntity(List<LoyalityPointsVo> loyaltyList) {
+			return loyaltyList.stream().map(dto -> convertLoyaltyVoToEntity(dto)).collect(Collectors.toList());
+
+		}
+
+		public List<LoyalityPointsVo> convertLoyaltyEntityToVo(List<LoyalityPointsEntity> listOfLoyaltyPoints) {
+
+			return listOfLoyaltyPoints.stream().map(entity -> convertLoyaltyEntityToVo(entity))
+					.collect(Collectors.toList());
+
+		}
+
 
 }
