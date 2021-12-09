@@ -282,6 +282,8 @@ public class NewSaleMapper {
 		vo.setTaxAmount(dto.getTaxValue());
 		vo.setTotalManualDisc(dto.getManualDisc());
 		vo.setTotalPromoDisc(dto.getPromoDisc());
+		vo.setUserId(dto.getUserId());
+		vo.setApprovedBy(dto.getCreatedBy());
 //		if (dto.getCustomerDetails() != null) {
 //			vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
 //		}

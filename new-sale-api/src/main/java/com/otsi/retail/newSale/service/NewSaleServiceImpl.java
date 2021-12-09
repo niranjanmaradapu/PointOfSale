@@ -153,6 +153,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	// Method for saving order
 	@Override
 	public String saveNewSaleRequest(NewSaleVo vo) throws InvalidInputException {
+
 		NewSaleEntity entity = new NewSaleEntity();
 
 		entity.setUserId(vo.getUserId());
@@ -169,23 +170,23 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setLastModified(LocalDate.now());
 		entity.setStatus(OrderStatus.New);// Initial Order status should be new
 		entity.setStatus(vo.getStatus());
-		Random ran = new Random();
-		entity.setOrderNumber(
-				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
-		// Check for payment type
-		List<PaymentAmountTypeVo> checkList = new ArrayList<>();
-		if (vo.getPaymentAmountType() != null) {
-			if (vo.getPaymentAmountType().size() == 1 && checkList.size() == 1) {
-				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
-			}
-		}
 		entity.setNetValue(vo.getNetPayableAmount());
 		entity.setStoreId(vo.getStoreId());
 		entity.setOfflineNumber(vo.getOfflineNumber());
+		Random ran = new Random();
+		entity.setOrderNumber(
+				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
+
+		// Check for payment type
+		Long paymentValue = 0l;
+		if (vo.getPaymentAmountType() != null) {
+			paymentValue = vo.getPaymentAmountType().stream().mapToLong(x -> x.getPaymentAmount()).sum();
+		}
+		if (paymentValue.equals(vo.getNetPayableAmount())) {
+			entity.setStatus(OrderStatus.success);// Status should override once it is cash only
+		}
 
 		if (vo.getDomainId() == DomainData.TE.getId()) {
-
-			List<String> inventUpdate = new ArrayList<>();
 
 			List<DeliverySlipVo> dlSlips = vo.getDlSlip();
 
@@ -207,8 +208,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					a.getLineItems().stream().forEach(x -> {
 
-						inventUpdate.add(x.getBarCode());
-
 						x.setLastModified(LocalDate.now());
 						x.setDsEntity(a);
 						lineItemRepo.save(x);
@@ -216,22 +215,24 @@ public class NewSaleServiceImpl implements NewSaleService {
 					});
 
 				});
-				// Saving order details in order_transaction table only for cash
+				// Saving order details in order_transaction
 
-				if (vo.getPaymentAmountType() != null && vo.getPaymentAmountType().size() == 1
-				/* && checkList.size() == 1 */) {
+				if (vo.getPaymentAmountType() != null) {
+					vo.getPaymentAmountType().stream().forEach(x -> {
 
-					PaymentAmountType type = new PaymentAmountType();
-					type.setOrderId(saveEntity);
-					type.setPaymentAmount(saveEntity.getNetValue());
-					type.setPaymentType(PaymentType.Cash.getType());
+						PaymentAmountType type = new PaymentAmountType();
+						type.setOrderId(saveEntity);
+						type.setPaymentAmount(x.getPaymentAmount());
+						type.setPaymentType(x.getPaymentType().getType());
 
-					paymentAmountTypeRepository.save(type);
-					log.info("Cash payment is done for order : " + saveEntity.getOrderNumber());
-
+						paymentAmountTypeRepository.save(type);
+					});
+					log.info("payment is done for order : " + saveEntity.getOrderNumber());
 				}
-				// Request to update inventory for textile
-				// requestForUpdateInInventoryForTextile(inventUpdate);
+				// Condition to update inventory
+				if (paymentValue == vo.getNetPayableAmount()) {
+					updateOrderItemsInInventory(saveEntity);
+				}
 
 			} else {
 				log.error("Delivery slips are not valid" + vo);
@@ -262,22 +263,25 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				});
 
-				// Saving order details in order_transaction table only for cash
+				// Saving order details in order_transaction table
+				if (vo.getPaymentAmountType() != null) {
 
-				if (vo.getPaymentAmountType() != null && vo.getPaymentAmountType().size() == 1
-						&& checkList.size() == 1) {
+					vo.getPaymentAmountType().stream().forEach(x -> {
 
-					PaymentAmountType type = new PaymentAmountType();
-					type.setOrderId(saveEntity);
-					type.setPaymentAmount(saveEntity.getNetValue());
-					type.setPaymentType(PaymentType.Cash.getType());
+						PaymentAmountType type = new PaymentAmountType();
+						type.setOrderId(saveEntity);
+						type.setPaymentAmount(x.getPaymentAmount());
+						type.setPaymentType(x.getPaymentType().getType());
 
-					paymentAmountTypeRepository.save(type);
-					log.info("Cash payment is done for order : " + saveEntity.getOrderNumber());
+						paymentAmountTypeRepository.save(type);
+					});
+					log.info("payment is done for order : " + saveEntity.getOrderNumber());
 				}
 
-				// Request to update inventory for retail
-				// requestForUpdateInInventoryForRetail(map);
+				// Condition to update inventory
+				if (paymentValue == vo.getNetPayableAmount()) {
+					updateOrderItemsInInventory(saveEntity);
+				}
 
 			} else {
 				log.error("LineItems are not valid : " + vo);
@@ -292,7 +296,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@RabbitListener(queues = "newsale_queue")
 	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
 
-		System.out.println("Got payments for the order : " + paymentDetails.getNewsaleOrder());
 		List<NewSaleEntity> entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
 		NewSaleEntity orderRecord = entity.stream().findFirst().get();
 
@@ -327,12 +330,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 			Optional<NewSaleEntity> order = newSaleRepository.findById(payment.getOrderId().getOrderId());
 
 			// Call method to update order items into inventory
+			order.get().setStatus(OrderStatus.success);
+			// Update order status once payment is done
+			NewSaleEntity save = newSaleRepository.save(order.get());
+
 			updateOrderItemsInInventory(order.get());
-			log.info("Successfully updated payment deatails : " + order.get());
 			return "successfully updated payment deatils";
 
 		} else {
-			log.info("Payment failed for razoe pay id : " + razorPayId);
+			log.info("Payment failed for razoer pay id : " + razorPayId);
 			return "please do payment again";
 		}
 
@@ -354,22 +360,27 @@ public class NewSaleServiceImpl implements NewSaleService {
 				vo.setBarCode(x.getBarCode());
 				vo.setLineItemId(x.getLineItemId());
 				vo.setQuantity(x.getQuantity());
-				vo.setUserId(orderRecord.getCreatedBy());
+				vo.setStoreId(orderRecord.getStoreId());
 				updateVo.add(vo);
 			});
 			// rabbitTemplate.convertAndSend(exchange, routingKey, updateVo);
 		} else {
 
-			Map<String, Integer> map = new HashMap<>();
+			List<InventoryUpdateVo> updateVo = new ArrayList<>();
+
 			List<LineItemsReEntity> lineItemRes = orderRecord.getLineItemsRe();
 
 			lineItemRes.stream().forEach(x -> {
 
-				map.put(x.getBarCode(), x.getQuantity());
+				InventoryUpdateVo vo = new InventoryUpdateVo();
+				vo.setBarCode(x.getBarCode());
+				vo.setLineItemId(x.getLineItemReId());
+				vo.setQuantity(x.getQuantity());
+				vo.setStoreId(orderRecord.getStoreId());
+				updateVo.add(vo);
 			});
-			// rabbitTemplate.convertAndSend(exchange, routingKey, object);
+			// rabbitTemplate.convertAndSend(exchange, routingKey, updateVo);
 		}
-
 	}
 
 	@Override
@@ -1361,7 +1372,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineEntity.setNetValue(lineItem.getNetValue());
 					lineEntity.setItemPrice(lineItem.getItemPrice());
 					lineEntity.setSection(lineItem.getSection());
-					lineEntity.setHsnCode(lineEntity.getHsnCode());
+					lineEntity.setHsnCode(lineItem.getHsnCode());
 					lineEntity.setActualValue(lineItem.getActualValue());
 					lineEntity.setTaxValue(lineItem.getTaxValue());
 
@@ -1597,4 +1608,42 @@ public class NewSaleServiceImpl implements NewSaleService {
 		return " delivery Slip sucessfully deleted ";
 	}
 
+	// Method for fetching list of Gift vouchers
+	@Override
+	public List<GiftVoucherVo> getListOfGiftvouchers() throws RecordNotFoundException {
+
+		try {
+			List<GiftVoucherEntity> listOfGvs = gvRepo.findAll();
+			if (!listOfGvs.isEmpty()) {
+				List<GiftVoucherVo> listVo = new ArrayList<>();
+
+				listOfGvs.stream().forEach(x -> {
+					GiftVoucherVo vo = new GiftVoucherVo();
+
+					BeanUtils.copyProperties(x, vo);
+					listVo.add(vo);
+				});
+				return listVo;
+			} else {
+				throw new RecordNotFoundException("No records found");
+			}
+		} catch (InvalidInputException iie) {
+			throw new RecordNotFoundException("Exception while fetching records");
+		}
+	}
+
+	// Method for fetching invoice details by using order number
+	@Override
+	public NewSaleVo getInvoiceDetails(String orderNumber) throws RecordNotFoundException {
+
+		log.info("Request for fetching invoice details : " + orderNumber);
+		List<NewSaleEntity> orderRecord = newSaleRepository.findByOrderNumber(orderNumber);
+		if (!orderRecord.isEmpty()) {
+			NewSaleEntity order = orderRecord.stream().findFirst().get();
+			NewSaleVo result = newSaleMapper.convertNewSaleDtoToVo(order);
+			return result;
+		} else {
+			throw new RecordNotFoundException("Provide valid order number");
+		}
+	}
 }

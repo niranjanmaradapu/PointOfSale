@@ -42,7 +42,6 @@ import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
-import com.otsi.retail.newSale.vo.PaymentDetailsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
@@ -96,6 +95,11 @@ public class NewSaleController {
 		log.info("Received Request to saveNewSale :" + vo);
 
 		try {
+			if ((vo.getDlSlip() == null || vo.getDlSlip().isEmpty())
+					&& (vo.getLineItemsReVo() == null || vo.getLineItemsReVo().isEmpty())) {
+
+				return new GateWayResponse<>("Provide valid inputs", "Provide valid inputs");
+			}
 			String message = newSaleService.saveNewSaleRequest(vo);
 
 			return new GateWayResponse<>("Successfully created order.", message);
@@ -105,21 +109,32 @@ public class NewSaleController {
 		}
 	}
 
+	// Method for getting invoice details using Order number
+	@GetMapping("/getinvoicedata")
+	public GateWayResponse<?> getInvoicedetails(@RequestParam String orderNumber) throws RecordNotFoundException {
+		try {
+			NewSaleVo result = newSaleService.getInvoiceDetails(orderNumber);
+			return new GateWayResponse<>("Success..", result);
+		} catch (RecordNotFoundException re) {
+			return new GateWayResponse<>(re.getMsg(), "Exception occurs while fetching invoice details");
+		}
+	}
+
 	// Method to confirm payment status based on Razorpay Id
 	@PostMapping("payconfirmation")
 	public GateWayResponse<?> paymentConfirmationFromRazorpay(@RequestParam String razorPayId,
 			@RequestParam boolean payStatus) {
-		log.info("Received payment confirmation for razorpayId :" +razorPayId);
+		log.info("Received payment confirmation for razorpayId :" + razorPayId);
 		try {
 			String result = newSaleService.paymentConfirmationFromRazorpay(razorPayId, payStatus);
 			return new GateWayResponse<>(result, "Success..");
-			
+
 		} catch (Exception e) {
 			log.error("Exception occurs while confirming payment for Id : " + razorPayId);
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(), "Exception occurs");
 		}
 	}
-	
+
 	// Method for create new Barcode..
 	@PostMapping(CommonRequestMappigs.CREATE_BARCODE)
 	public GateWayResponse<?> saveBarcode(@RequestBody BarcodeVo vo) throws DuplicateRecordException {
@@ -177,7 +192,7 @@ public class NewSaleController {
 			String saveDs = newSaleService.saveDeliverySlip(vo);
 			return new GateWayResponse<>("successfully created deliveryslip", saveDs);
 		} catch (RecordNotFoundException e) {
-			log.error("Exception occurs while saving delivery slip : " + vo );
+			log.error("Exception occurs while saving delivery slip : " + vo);
 			return new GateWayResponse<>(e.getMsg(), "Exception occurs");
 		}
 	}
@@ -351,7 +366,7 @@ public class NewSaleController {
 			String result = newSaleService.saveGiftVoucher(vo);
 			return new GateWayResponse<>(result, "Successfully saved");
 		} catch (DuplicateRecordException dre) {
-			log.error("Getting error while saving giftvoucher : " + vo );
+			log.error("Getting error while saving giftvoucher : " + vo);
 			return new GateWayResponse<>(dre.getMsg(), "Duplicate Record");
 		}
 	}
@@ -368,6 +383,18 @@ public class NewSaleController {
 			return new GateWayResponse<>(iie.getMsg(), "Record not found");
 		}
 
+	}
+
+	// Method for getting list of Gift vouchers
+	@GetMapping("/getlistofgv")
+	public GateWayResponse<?> getListOfGvs() throws RecordNotFoundException {
+		log.info("Received request to fetch lift of gift vouchers");
+		try {
+			List<GiftVoucherVo> result = newSaleService.getListOfGiftvouchers();
+			return new GateWayResponse<>("Successfully fetch records", result);
+		} catch (RecordNotFoundException rfe) {
+			return new GateWayResponse<>(rfe.getMsg(), "Record not found");
+		}
 	}
 
 	// Method for saving Userdata
