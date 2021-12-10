@@ -85,6 +85,7 @@ import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.ReturnSummeryVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.SalesSummeryVo;
+import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 import com.otsi.retail.newSale.vo.TaggedItems;
 import com.otsi.retail.newSale.vo.TaxVo;
 import com.otsi.retail.newSale.vo.UserDetailsVo;
@@ -151,251 +152,251 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
-	
+
 	@Autowired
 	private LoyalityPointsRepo loyalityRepo;
 
 	// Method for saving order
-		@Override
-		public String saveNewSaleRequest(NewSaleVo vo) throws InvalidInputException {
+	@Override
+	public String saveNewSaleRequest(NewSaleVo vo) throws InvalidInputException {
 
-			NewSaleEntity entity = new NewSaleEntity();
+		NewSaleEntity entity = new NewSaleEntity();
 
-			entity.setUserId(vo.getUserId());
-			entity.setNatureOfSale(vo.getNatureOfSale());
-			entity.setDomainId(vo.getDomainId());
-			entity.setGrossValue(vo.getGrossAmount());
-			entity.setPromoDisc(vo.getTotalPromoDisc());
-			entity.setManualDisc(vo.getTotalManualDisc());
-			entity.setTaxValue(vo.getTaxAmount());
-			entity.setCreatedBy(vo.getApprovedBy());
-			entity.setDiscApprovedBy(vo.getDiscApprovedBy());
-			entity.setDiscType(vo.getDiscType());
-			entity.setCreationDate(LocalDate.now());
-			entity.setLastModified(LocalDate.now());
-			entity.setStatus(OrderStatus.New);// Initial Order status should be new
-			entity.setStatus(vo.getStatus());
-			entity.setNetValue(vo.getNetPayableAmount());
-			entity.setStoreId(vo.getStoreId());
-			entity.setOfflineNumber(vo.getOfflineNumber());
-			Random ran = new Random();
-			entity.setOrderNumber(
-					"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
+		entity.setUserId(vo.getUserId());
+		entity.setNatureOfSale(vo.getNatureOfSale());
+		entity.setDomainId(vo.getDomainId());
+		entity.setGrossValue(vo.getGrossAmount());
+		entity.setPromoDisc(vo.getTotalPromoDisc());
+		entity.setManualDisc(vo.getTotalManualDisc());
+		entity.setTaxValue(vo.getTaxAmount());
+		entity.setCreatedBy(vo.getApprovedBy());
+		entity.setDiscApprovedBy(vo.getDiscApprovedBy());
+		entity.setDiscType(vo.getDiscType());
+		entity.setCreationDate(LocalDate.now());
+		entity.setLastModified(LocalDate.now());
+		entity.setStatus(OrderStatus.New);// Initial Order status should be new
+		entity.setStatus(vo.getStatus());
+		entity.setNetValue(vo.getNetPayableAmount());
+		entity.setStoreId(vo.getStoreId());
+		entity.setOfflineNumber(vo.getOfflineNumber());
+		Random ran = new Random();
+		entity.setOrderNumber(
+				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
 
-			// Check for payment type
-			Long paymentValue = 0l;
-			if (vo.getPaymentAmountType() != null) {
-				paymentValue = vo.getPaymentAmountType().stream().mapToLong(x -> x.getPaymentAmount()).sum();
-			}
-			if (paymentValue.equals(vo.getNetPayableAmount())) {
-				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
-			}
+		// Check for payment type
+		Long paymentValue = 0l;
+		if (vo.getPaymentAmountType() != null) {
+			paymentValue = vo.getPaymentAmountType().stream().mapToLong(x -> x.getPaymentAmount()).sum();
+		}
+		if (paymentValue.equals(vo.getNetPayableAmount())) {
+			entity.setStatus(OrderStatus.success);// Status should override once it is cash only
+		}
 
-			if (vo.getDomainId() == DomainData.TE.getId()) {
+		if (vo.getDomainId() == DomainData.TE.getId()) {
 
-				List<DeliverySlipVo> dlSlips = vo.getDlSlip();
+			List<DeliverySlipVo> dlSlips = vo.getDlSlip();
 
-				List<String> dlsList = dlSlips.stream().map(x -> x.getDsNumber()).collect(Collectors.toList());
+			List<String> dlsList = dlSlips.stream().map(x -> x.getDsNumber()).collect(Collectors.toList());
 
-				List<DeliverySlipEntity> dsList = dsRepo.findByDsNumberInAndOrderIsNull(dlsList);
+			List<DeliverySlipEntity> dsList = dsRepo.findByDsNumberInAndOrderIsNull(dlsList);
 
-				if (dsList.size() == vo.getDlSlip().size()) {
+			if (dsList.size() == vo.getDlSlip().size()) {
 
-					NewSaleEntity saveEntity = newSaleRepository.save(entity);
+				NewSaleEntity saveEntity = newSaleRepository.save(entity);
 
-					List<DeliverySlipEntity> dsLists = new ArrayList<>();
-					log.info("Saved order :" + saveEntity);
+				List<DeliverySlipEntity> dsLists = new ArrayList<>();
+				log.info("Saved order :" + saveEntity);
 
-					dsList.stream().forEach(a -> {
+				dsList.stream().forEach(a -> {
 
-						a.setOrder(saveEntity);
-						a.setStatus(DSStatus.Completed);
-						a.setLastModified(LocalDate.now());
-						DeliverySlipEntity ds = dsRepo.save(a);
-						dsLists.add(ds);
+					a.setOrder(saveEntity);
+					a.setStatus(DSStatus.Completed);
+					a.setLastModified(LocalDate.now());
+					DeliverySlipEntity ds = dsRepo.save(a);
+					dsLists.add(ds);
 
-						a.getLineItems().stream().forEach(x -> {
-
-							x.setLastModified(LocalDate.now());
-							x.setDsEntity(a);
-							lineItemRepo.save(x);
-
-						});
-
-					});
-					saveEntity.setDlSlip(dsLists);
-					// Saving order details in order_transaction
-
-					if (vo.getPaymentAmountType() != null) {
-						vo.getPaymentAmountType().stream().forEach(x -> {
-
-							PaymentAmountType type = new PaymentAmountType();
-							type.setOrderId(saveEntity);
-							type.setPaymentAmount(x.getPaymentAmount());
-							type.setPaymentType(x.getPaymentType().getType());
-
-							paymentAmountTypeRepository.save(type);
-						});
-						log.info("payment is done for order : " + saveEntity.getOrderNumber());
-					}
-					// Condition to update inventory
-					if (paymentValue.equals(vo.getNetPayableAmount())) {
-						updateOrderItemsInInventory(saveEntity);
-					}
-
-				} else {
-					log.error("Delivery slips are not valid" + vo);
-					throw new InvalidInputException("Please provide Valid delivery slips..");
-				}
-			}
-			if (vo.getDomainId() != DomainData.TE.getId()) {
-
-				Map<String, Integer> map = new HashMap<>();
-
-				List<LineItemVo> lineItems = vo.getLineItemsReVo();
-
-				List<Long> lineItemIds = lineItems.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
-
-				List<LineItemsReEntity> lineItemsList = lineItemReRepo.findByLineItemReIdInAndOrderIdIsNull(lineItemIds);
-
-				if (lineItems.size() == lineItemsList.size()) {
-
-					NewSaleEntity saveEntity = newSaleRepository.save(entity);
-
-					lineItemsList.stream().forEach(x -> {
-
-						map.put(x.getBarCode(), x.getQuantity());
+					a.getLineItems().stream().forEach(x -> {
 
 						x.setLastModified(LocalDate.now());
-						x.setOrderId(saveEntity);
-						lineItemReRepo.save(x);
+						x.setDsEntity(a);
+						lineItemRepo.save(x);
 
 					});
 
-					// Saving order details in order_transaction table
-					if (vo.getPaymentAmountType() != null) {
+				});
+				saveEntity.setDlSlip(dsLists);
+				// Saving order details in order_transaction
 
-						vo.getPaymentAmountType().stream().forEach(x -> {
+				if (vo.getPaymentAmountType() != null) {
+					vo.getPaymentAmountType().stream().forEach(x -> {
 
-							PaymentAmountType type = new PaymentAmountType();
-							type.setOrderId(saveEntity);
-							type.setPaymentAmount(x.getPaymentAmount());
-							type.setPaymentType(x.getPaymentType().getType());
+						PaymentAmountType type = new PaymentAmountType();
+						type.setOrderId(saveEntity);
+						type.setPaymentAmount(x.getPaymentAmount());
+						type.setPaymentType(x.getPaymentType().getType());
 
-							paymentAmountTypeRepository.save(type);
-						});
-						log.info("payment is done for order : " + saveEntity.getOrderNumber());
-					}
-
-					// Condition to update inventory
-					if (paymentValue.equals(vo.getNetPayableAmount())) {
-						updateOrderItemsInInventory(saveEntity);
-					}
-
-				} else {
-					log.error("LineItems are not valid : " + vo);
-					throw new InvalidInputException("Please provide Valid delivery slips..");
-
+						paymentAmountTypeRepository.save(type);
+					});
+					log.info("payment is done for order : " + saveEntity.getOrderNumber());
 				}
-			}
-			log.info("Order generated with number : " + entity.getOrderNumber());
-			return entity.getOrderNumber();
-		}
-
-		@RabbitListener(queues = "newsale_queue")
-		public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
-
-			List<NewSaleEntity> entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
-			NewSaleEntity orderRecord = entity.stream().findFirst().get();
-
-			if (orderRecord != null) {
-
-				PaymentAmountType payDetails = new PaymentAmountType();
-				payDetails.setOrderId(orderRecord);
-				payDetails.setPaymentType(paymentDetails.getPayType());
-				payDetails.setPaymentAmount(paymentDetails.getAmount());
-				payDetails.setRazorPayId(paymentDetails.getRazorPayId());
-				payDetails.setRazorPayStatus(false);
-
-				paymentAmountTypeRepository.save(payDetails);
-
-				log.info("save payment details for order : " + orderRecord.getOrderNumber());
-			}
-		}
-
-		// Method for update the payment status in order_transaction table
-		@Override
-		public String paymentConfirmationFromRazorpay(String razorPayId, boolean payStatus) {
-
-			if (payStatus) {
-
-				PaymentAmountType payment = paymentAmountTypeRepository.findByRazorPayId(razorPayId);
-				payment.setRazorPayStatus(payStatus);
-
-				paymentAmountTypeRepository.save(payment);
-
-				log.info("update payment details for razorpay Id: " + razorPayId);
-
-				Optional<NewSaleEntity> order = newSaleRepository.findById(payment.getOrderId().getOrderId());
-
-				// Call method to update order items into inventory
-				order.get().setStatus(OrderStatus.success);
-				// Update order status once payment is done
-				NewSaleEntity save = newSaleRepository.save(order.get());
-
-				// updateOrderItemsInInventory(order.get());
-				return "successfully updated payment deatils";
+				// Condition to update inventory
+				if (paymentValue.equals(vo.getNetPayableAmount())) {
+					updateOrderItemsInInventory(saveEntity);
+				}
 
 			} else {
-				log.info("Payment failed for razoer pay id : " + razorPayId);
-				return "please do payment again";
+				log.error("Delivery slips are not valid" + vo);
+				throw new InvalidInputException("Please provide Valid delivery slips..");
 			}
-
 		}
+		if (vo.getDomainId() != DomainData.TE.getId()) {
 
-		// Method for update order item into inventory
-		private void updateOrderItemsInInventory(NewSaleEntity orderRecord) {
+			Map<String, Integer> map = new HashMap<>();
 
-			if (orderRecord.getDomainId() == DomainData.TE.getId()) {
+			List<LineItemVo> lineItems = vo.getLineItemsReVo();
 
-				List<LineItemsEntity> lineItems = orderRecord.getDlSlip().stream().flatMap(x -> x.getLineItems().stream())
-						.collect(Collectors.toList());
-				
-				//System.out.println("Line items : " +lineItems.toString());
+			List<Long> lineItemIds = lineItems.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
 
-				List<InventoryUpdateVo> updateVo = new ArrayList<>();
+			List<LineItemsReEntity> lineItemsList = lineItemReRepo.findByLineItemReIdInAndOrderIdIsNull(lineItemIds);
 
-				lineItems.stream().forEach(x -> {
+			if (lineItems.size() == lineItemsList.size()) {
 
-					InventoryUpdateVo vo = new InventoryUpdateVo();
-					vo.setBarCode(x.getBarCode());
-					vo.setLineItemId(x.getLineItemId());
-					vo.setQuantity(x.getQuantity());
-					vo.setStoreId(orderRecord.getStoreId());
-					updateVo.add(vo);
+				NewSaleEntity saveEntity = newSaleRepository.save(entity);
+
+				lineItemsList.stream().forEach(x -> {
+
+					map.put(x.getBarCode(), x.getQuantity());
+
+					x.setLastModified(LocalDate.now());
+					x.setOrderId(saveEntity);
+					lineItemReRepo.save(x);
+
 				});
-				System.out.println("Update request : " + updateVo);
-				rabbitTemplate.convertAndSend(config.getUpdateInventoryExchangeTextile(),
-						config.getUpdateInventoryTextileRK(), updateVo);
+
+				// Saving order details in order_transaction table
+				if (vo.getPaymentAmountType() != null) {
+
+					vo.getPaymentAmountType().stream().forEach(x -> {
+
+						PaymentAmountType type = new PaymentAmountType();
+						type.setOrderId(saveEntity);
+						type.setPaymentAmount(x.getPaymentAmount());
+						type.setPaymentType(x.getPaymentType().getType());
+
+						paymentAmountTypeRepository.save(type);
+					});
+					log.info("payment is done for order : " + saveEntity.getOrderNumber());
+				}
+
+				// Condition to update inventory
+				if (paymentValue.equals(vo.getNetPayableAmount())) {
+					updateOrderItemsInInventory(saveEntity);
+				}
+
 			} else {
+				log.error("LineItems are not valid : " + vo);
+				throw new InvalidInputException("Please provide Valid delivery slips..");
 
-				List<InventoryUpdateVo> updateVo = new ArrayList<>();
-
-				List<LineItemsReEntity> lineItemRes = orderRecord.getLineItemsRe();
-
-				lineItemRes.stream().forEach(x -> {
-
-					InventoryUpdateVo vo = new InventoryUpdateVo();
-					vo.setBarCode(x.getBarCode());
-					vo.setLineItemId(x.getLineItemReId());
-					vo.setQuantity(x.getQuantity());
-					vo.setStoreId(orderRecord.getStoreId());
-					updateVo.add(vo);
-				});
-				// rabbitTemplate.convertAndSend(config.getInventoryExchange(),
-				// config.getInventoryRK(), updateVo);
 			}
 		}
+		log.info("Order generated with number : " + entity.getOrderNumber());
+		return entity.getOrderNumber();
+	}
+
+	@RabbitListener(queues = "newsale_queue")
+	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
+
+		List<NewSaleEntity> entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
+		NewSaleEntity orderRecord = entity.stream().findFirst().get();
+
+		if (orderRecord != null) {
+
+			PaymentAmountType payDetails = new PaymentAmountType();
+			payDetails.setOrderId(orderRecord);
+			payDetails.setPaymentType(paymentDetails.getPayType());
+			payDetails.setPaymentAmount(paymentDetails.getAmount());
+			payDetails.setRazorPayId(paymentDetails.getRazorPayId());
+			payDetails.setRazorPayStatus(false);
+
+			paymentAmountTypeRepository.save(payDetails);
+
+			log.info("save payment details for order : " + orderRecord.getOrderNumber());
+		}
+	}
+
+	// Method for update the payment status in order_transaction table
+	@Override
+	public String paymentConfirmationFromRazorpay(String razorPayId, boolean payStatus) {
+
+		if (payStatus) {
+
+			PaymentAmountType payment = paymentAmountTypeRepository.findByRazorPayId(razorPayId);
+			payment.setRazorPayStatus(payStatus);
+
+			paymentAmountTypeRepository.save(payment);
+
+			log.info("update payment details for razorpay Id: " + razorPayId);
+
+			Optional<NewSaleEntity> order = newSaleRepository.findById(payment.getOrderId().getOrderId());
+
+			// Call method to update order items into inventory
+			order.get().setStatus(OrderStatus.success);
+			// Update order status once payment is done
+			NewSaleEntity save = newSaleRepository.save(order.get());
+
+			// updateOrderItemsInInventory(order.get());
+			return "successfully updated payment deatils";
+
+		} else {
+			log.info("Payment failed for razoer pay id : " + razorPayId);
+			return "please do payment again";
+		}
+
+	}
+
+	// Method for update order item into inventory
+	private void updateOrderItemsInInventory(NewSaleEntity orderRecord) {
+
+		if (orderRecord.getDomainId() == DomainData.TE.getId()) {
+
+			List<LineItemsEntity> lineItems = orderRecord.getDlSlip().stream().flatMap(x -> x.getLineItems().stream())
+					.collect(Collectors.toList());
+
+			// System.out.println("Line items : " +lineItems.toString());
+
+			List<InventoryUpdateVo> updateVo = new ArrayList<>();
+
+			lineItems.stream().forEach(x -> {
+
+				InventoryUpdateVo vo = new InventoryUpdateVo();
+				vo.setBarCode(x.getBarCode());
+				vo.setLineItemId(x.getLineItemId());
+				vo.setQuantity(x.getQuantity());
+				vo.setStoreId(orderRecord.getStoreId());
+				updateVo.add(vo);
+			});
+			System.out.println("Update request : " + updateVo);
+			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchangeTextile(),
+					config.getUpdateInventoryTextileRK(), updateVo);
+		} else {
+
+			List<InventoryUpdateVo> updateVo = new ArrayList<>();
+
+			List<LineItemsReEntity> lineItemRes = orderRecord.getLineItemsRe();
+
+			lineItemRes.stream().forEach(x -> {
+
+				InventoryUpdateVo vo = new InventoryUpdateVo();
+				vo.setBarCode(x.getBarCode());
+				vo.setLineItemId(x.getLineItemReId());
+				vo.setQuantity(x.getQuantity());
+				vo.setStoreId(orderRecord.getStoreId());
+				updateVo.add(vo);
+			});
+			// rabbitTemplate.convertAndSend(config.getInventoryExchange(),
+			// config.getInventoryRK(), updateVo);
+		}
+	}
 
 	@Override
 	public String saveBarcode(BarcodeVo vo) throws DuplicateRecordException {
@@ -1660,9 +1661,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 			throw new RecordNotFoundException("Provide valid order number");
 		}
 	}
-	
+
 	@Override
-	public String saveLoyaltyPoints(LoyalityPointsVo loyalityVo)  {
+	public String saveLoyaltyPoints(LoyalityPointsVo loyalityVo) {
 
 		LoyalityPointsEntity entity = newSaleMapper.convertLoyaltyVoToEntity(loyalityVo);
 		LoyalityPointsEntity save = loyalityRepo.save(entity);
@@ -1707,7 +1708,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Override
 	public LoyalityPointsVo getLoyaltyPointsByUserId(Long userId) throws RecordNotFoundException {
-		
+
 		LoyalityPointsEntity userIdValue = loyalityRepo.findByUserId(userId);
 
 		if (userIdValue == null) {
@@ -1721,6 +1722,32 @@ public class NewSaleServiceImpl implements NewSaleService {
 			return result;
 
 		}
-		
+
+	}
+
+	@Override
+	public List<LoyalityPointsVo> searchLoyaltyPoints(SearchLoyaltyPointsVo vo) throws RecordNotFoundException {
+
+		List<LoyalityPointsEntity> loyaltylist = new ArrayList<>();
+
+		if (vo.getInvoiceNumber() != null && vo.getMobileNumber() != null) {
+
+			loyaltylist = loyalityRepo.findByInvoiceNumberAndMobileNumber(vo.getInvoiceNumber(), vo.getMobileNumber());
+
+		} else if (vo.getInvoiceNumber() != null && vo.getMobileNumber() == null) {
+
+			loyaltylist = loyalityRepo.findByInvoiceNumber(vo.getInvoiceNumber());
+
+		} else if (vo.getInvoiceNumber() == null && vo.getMobileNumber() != null) {
+			loyaltylist = loyalityRepo.findByMobileNumber(vo.getMobileNumber());
+		}
+
+		if (loyaltylist.isEmpty()) {
+			throw new RecordNotFoundException("Records not found");
+		}
+
+		List<LoyalityPointsVo> dataList = newSaleMapper.convertLoyaltyEntityToVo(loyaltylist);
+
+		return dataList;
 	}
 }
