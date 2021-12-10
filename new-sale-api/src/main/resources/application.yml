@@ -6,9 +6,9 @@ spring:
     name: new-sale-service 
  datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/newSale
+    url: jdbc:postgresql://10.100.238.45:5432/newSale
     username: postgres
-    password: 1234
+    password: Otsi@123
  jpa:
    hibernate:
     ddl-auto: update
@@ -20,7 +20,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://service-registry:8761/eureka/
   instance:
     instance-id: ${spring.application.name}:${random.int}
     hostname: localhost
