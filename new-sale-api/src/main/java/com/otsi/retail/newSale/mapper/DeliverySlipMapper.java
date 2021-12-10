@@ -26,7 +26,7 @@ public class DeliverySlipMapper {
 		entity.setMrp(barVo.stream().mapToLong(i -> i.getMrp()).sum());
 		entity.setPromoDisc(barVo.stream().mapToLong(i -> i.getPromoDisc()).sum());
 		entity.setNetAmount(barVo.stream().mapToLong(i -> i.getNetAmount()).sum());
-		entity.setSalesMan(vo.getSalesMan());
+		entity.setUserId(vo.getSalesMan());
 		entity.setQty(vo.getQty());
 		entity.setType(vo.getType());
 		entity.setCreationDate(LocalDate.now());
@@ -46,7 +46,7 @@ public class DeliverySlipMapper {
 		vo.setPromoDisc(ent.getPromoDisc());
 		vo.setQty(ent.getQty());
 		vo.setType(ent.getType());
-		vo.setSalesMan(ent.getSalesMan());
+		vo.setSalesMan(ent.getUserId());
 
 		List<BarcodeEntity> barEnt = ent.getBarcodes();
 
@@ -79,7 +79,7 @@ public class DeliverySlipMapper {
 		DeliverySlipVo vo = new DeliverySlipVo();
 
 		vo.setDsNumber(dsEntity.getDsNumber());
-		vo.setSalesMan(dsEntity.getSalesMan());
+		vo.setSalesMan(dsEntity.getUserId());
 		vo.setCreatedDate(dsEntity.getCreationDate());
 		vo.setLastModified(dsEntity.getLastModified());
 

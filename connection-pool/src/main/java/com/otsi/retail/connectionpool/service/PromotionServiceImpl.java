@@ -36,6 +36,7 @@ import com.otsi.retail.connectionpool.repository.PromoBarcodeEntityRepository;
 import com.otsi.retail.connectionpool.repository.PromotionRepo;
 import com.otsi.retail.connectionpool.repository.PromotionToStoreRepo;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
+import com.otsi.retail.connectionpool.vo.ConnectionPromoVo;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
 import com.otsi.retail.connectionpool.vo.SearchPromotionsVo;
@@ -122,9 +123,10 @@ public class PromotionServiceImpl implements PromotionService {
 
 	// Method for getting list of Promotions by using flag(Status)
 	@Override
-	public List<PromotionsVo> getListOfPromotions(String flag) {
+	public ConnectionPromoVo getListOfPromotions(String flag, Long domainId) {
 		log.debug("debugging getListOfPromotions:" + flag);
 		List<PromotionsEntity> promoList = new ArrayList<>();
+		
 
 		Boolean status = null;
 		if (flag.equalsIgnoreCase("true")) {
@@ -133,16 +135,34 @@ public class PromotionServiceImpl implements PromotionService {
 		if (flag.equalsIgnoreCase("false")) {
 			status = Boolean.FALSE;
 		}
-		if (flag.equalsIgnoreCase("all")) {
+		if (flag.equalsIgnoreCase("all") && domainId == null) {
 			promoList = promoRepo.findAll();
-		} else {
+		}else if (!(flag.isEmpty()) && domainId == null) {
+
 			promoList = promoRepo.findByIsActive(status);
+		} else if (flag.isEmpty() && domainId!= null) {
+
+			promoList = promoRepo.findByDomainId(domainId);
+			
+//			promoList.stream().forEach( d->{
+//			  d.setDomainId(null);
+//			});
+		}
+		else {
+			promoList = promoRepo.findByIsActiveAndDomainId(status, domainId);
+			
+//			promoList.stream().forEach( d->{
+//				  d.setDomainId(null);
+//				});
 		}
 		if (!promoList.isEmpty()) {
+			ConnectionPromoVo promoVo = new ConnectionPromoVo();
 			List<PromotionsVo> listOfPromo = promoMapper.convertPromoEntityToVo(promoList);
 			log.warn("we are checking if list of promotions is fetching...");
 			log.info("list of promotions is fetching...");
-			return listOfPromo;
+			promoVo.setPromovo(listOfPromo);
+			promoVo.setDomainId(domainId);
+			return promoVo;
 		} else {
 			log.error("record not found");
 			throw new RecordNotFoundException("record not found");
@@ -239,7 +259,7 @@ public class PromotionServiceImpl implements PromotionService {
 	@Override
 	public String addPromotionToStore(PromotionsVo vo) {
 
-		PromotionsEntity promotionEntity = promoRepo.findByPromoNameIs(vo.getPromoName());
+		PromotionsEntity promotionEntity = promoRepo.findByPromoNameIs(vo.getPromotionName());
 
 		if (promotionEntity != null) {
 
@@ -272,18 +292,18 @@ public class PromotionServiceImpl implements PromotionService {
 			if (vo.getPromotionName() != null && vo.getStoreName() != null) {
 
 				promoDetails = promoRepo.findByStartDateAndEndDateAndPromoNameAndStoreNameAndIsActive(vo.getStartDate(),
-						vo.getEndDate(), vo.getPromotionName(), vo.getStoreName(), vo.isPromotionStatus());
+						vo.getEndDate(), vo.getPromotionName(), vo.getStoreName(), vo.getIsActive());
 			} else if (vo.getStoreName() != null && vo.getPromotionName() == null) {
 				promoDetails = promoRepo.findByStartDateAndEndDateAndStoreNameAndIsActive(vo.getStartDate(),
-						vo.getEndDate(), vo.getStoreName(), vo.isPromotionStatus());
+						vo.getEndDate(), vo.getStoreName(), vo.getIsActive());
 
 			} else if (vo.getPromotionName() != null && vo.getStoreName() == null) {
 				promoDetails = promoRepo.findByStartDateAndEndDateAndPromoNameAndIsActive(vo.getStartDate(),
-						vo.getEndDate(), vo.getPromotionName(), vo.isPromotionStatus());
+						vo.getEndDate(), vo.getPromotionName(), vo.getIsActive());
 
 			} else
 				promoDetails = promoRepo.findByStartDateAndEndDateAndIsActive(vo.getStartDate(), vo.getEndDate(),
-						vo.isPromotionStatus());
+						vo.getIsActive());
 
 		} else if (vo.getStartDate() == null && vo.getEndDate() == null) {
 			if (vo.getPromotionName() != null && vo.getStoreName() == null) {
@@ -298,7 +318,7 @@ public class PromotionServiceImpl implements PromotionService {
 			}
 
 			else
-				promoDetails = promoRepo.findByIsActive(vo.isPromotionStatus());
+				promoDetails = promoRepo.findByIsActive(vo.getIsActive());
 
 		}
 		if (promoDetails.isEmpty()) {
@@ -314,7 +334,7 @@ public class PromotionServiceImpl implements PromotionService {
 				searchVo.setStoreName(p.getStoreName());
 				searchVo.setStartDate(p.getStartDate());
 				searchVo.setEndDate(p.getEndDate());
-				searchVo.setPromotionStatus(p.getIsActive());
+				searchVo.setIsActive(p.getIsActive());
 				searchVo.setPromoId(p.getPromoId());
 				searchVo.setPriority(p.getPriority());
 				searchVo.setPromotionsCount(promoCount);
@@ -348,7 +368,7 @@ public class PromotionServiceImpl implements PromotionService {
 				searchVo.setStoreName(p.getStoreName());
 				searchVo.setStartDate(p.getStartDate());
 				searchVo.setEndDate(p.getEndDate());
-				searchVo.setPromotionStatus(p.getIsActive());
+				searchVo.setIsActive(p.getIsActive());
 				searchVo.setPromoId(p.getPromoId());
 				searchVo.setPriority(p.getPriority());
 				searchVo.setPromotionsCount(promoCount);
@@ -389,12 +409,12 @@ public class PromotionServiceImpl implements PromotionService {
 		PromotionsEntity dto = promoRepo.findById(vo.getPromoId()).get();
 
 		if (Objects.nonNull(vo.getStartDate()) && Objects.nonNull(vo.getEndDate())
-				&& Objects.nonNull(vo.isPromotionStatus())) {
+				&& Objects.nonNull(vo.getIsActive())) {
 			dto.setPromoId(vo.getPromoId());
 			dto.setStartDate(vo.getStartDate());
 			;
 			dto.setEndDate(vo.getEndDate());
-			dto.setIsActive(vo.isPromotionStatus());
+			dto.setIsActive(vo.getIsActive());
 		}
 
 		PromotionsEntity pEntity = promoRepo.save(dto);
@@ -517,51 +537,44 @@ public class PromotionServiceImpl implements PromotionService {
 		List<SearchPromotionsVo> searchPromotions = new ArrayList<>();
 		List<PromotionsEntity> promotionsList = new ArrayList<>();
 
-		if ((svo.getStartDate() != null) && (svo.getEndDate() != null)) 
-		{
+		if ((svo.getStartDate() != null) && (svo.getEndDate() != null)) {
 
 			if ((svo.getPromoId() != null) && (svo.getStoreName() != null)) {
 
 				promotionsList = promoRepo.findByStartDateAndEndDateAndPromoIdAndStoreName(svo.getStartDate(),
 						svo.getEndDate(), svo.getPromoId(), svo.getStoreName());
 
-			} else if((svo.getPromoId() ==null) && (svo.getStoreName()!=null))
-			{
-				promotionsList = promoRepo.findByStartDateAndEndDateAndStoreName(svo.getStartDate(), svo.getEndDate(), svo.getStoreName());
-			}else if((svo.getPromoId() !=null) && (svo.getStoreName()==null)){
-					
-				promotionsList = promoRepo.findByStartDateAndEndDateAndPromoId(svo.getStartDate(), svo.getEndDate(), svo.getPromoId());
-				
-			}
-			else {
-				
+			} else if ((svo.getPromoId() == null) && (svo.getStoreName() != null)) {
+				promotionsList = promoRepo.findByStartDateAndEndDateAndStoreName(svo.getStartDate(), svo.getEndDate(),
+						svo.getStoreName());
+			} else if ((svo.getPromoId() != null) && (svo.getStoreName() == null)) {
+
+				promotionsList = promoRepo.findByStartDateAndEndDateAndPromoId(svo.getStartDate(), svo.getEndDate(),
+						svo.getPromoId());
+
+			} else {
+
 				promotionsList = promoRepo.findByStartDateAndEndDate(svo.getStartDate(), svo.getEndDate());
 			}
 
-		}else if((svo.getStartDate() == null) && (svo.getEndDate() ==null))			  
-		{
-			 if((svo.getPromoId()!=null) && (svo.getStoreName() ==null))
-			 {
-				 promotionsList = promoRepo.findByPromoIdIs(svo.getPromoId());
-			 }
-			 else if((svo.getPromoId()!=null) && (svo.getStoreName()!=null))
-			 {
-				 promotionsList = promoRepo.findByPromoIdAndStoreName(svo.getPromoId(),svo.getStoreName());
-			 }else {
-				 
-				 promotionsList = promoRepo.findByStoreName(svo.getStoreName());
-			 }
-			
+		} else if ((svo.getStartDate() == null) && (svo.getEndDate() == null)) {
+			if ((svo.getPromoId() != null) && (svo.getStoreName() == null)) {
+				promotionsList = promoRepo.findByPromoIdIs(svo.getPromoId());
+			} else if ((svo.getPromoId() != null) && (svo.getStoreName() != null)) {
+				promotionsList = promoRepo.findByPromoIdAndStoreName(svo.getPromoId(), svo.getStoreName());
+			} else {
+
+				promotionsList = promoRepo.findByStoreName(svo.getStoreName());
+			}
+
 		}
-		
-		if(promotionsList.isEmpty())
-		{
+
+		if (promotionsList.isEmpty()) {
 			throw new RecordNotFoundException("Promotins are not exists");
-		}
-		else {
-			
-			promotionsList.stream().forEach( r ->{
-				
+		} else {
+
+			promotionsList.stream().forEach(r -> {
+
 				SearchPromotionsVo searchVo = new SearchPromotionsVo();
 				searchVo.setPromoId(r.getPromoId());
 				searchVo.setPromotionName(r.getPromoName());
@@ -571,8 +584,7 @@ public class PromotionServiceImpl implements PromotionService {
 				searchVo.setEndDate(r.getEndDate());
 				searchPromotions.add(searchVo);
 			});
-			
-			
+
 		}
 
 		return searchPromotions;

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
+import com.otsi.retail.connectionpool.vo.PoolVo;
 import com.otsi.retail.connectionpool.vo.SearchPoolVo;
 
 /**
@@ -19,13 +20,13 @@ public interface PoolService {
 
 	String savePool(ConnectionPoolVo vo);
 
-	List<ConnectionPoolVo> getListOfPools(String isActive);
+	PoolVo getListOfPools(String isActive, Long domainId);
 
 	String modifyPool(ConnectionPoolVo vo);
 
 	String deletePool(Long poolId);
 
-	List<SearchPoolVo> searchPool(SearchPoolVo pvo);
+	List<ConnectionPoolVo> searchPool(SearchPoolVo pvo);
 
 	
 

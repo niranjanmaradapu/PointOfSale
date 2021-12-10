@@ -47,19 +47,45 @@ public class Config {
 	@Value("${inventoryUpdateRetail_url}")
 	private String inventoryUpdateForRetail;
 
-	
 	@Value("${newsale_queue}")
 	private String newSaleQueue;
-	
+
 	@Value("${newsale_exchange}")
 	private String newSaleExchange;
-	
+
 	@Value("${payment_newsale_rk}")
 	private String paymentNewsaleRK;
-	
+
 	@Bean
 	public Queue queue() {
 		return new Queue(newSaleQueue);
+	}
+
+	@Value("${inventory_queue_textile}")
+	private String inventoryUpdateQueueTextile;
+
+	@Value("${inventory_exchange}")
+	private String updateInventoryExchangeTextile;
+
+	@Value("${payment_newsale_rk}")
+	private String updateInventoryTextileRK;
+
+	@Bean
+	public Queue inventoryUpdateQueueTextile() {
+		return new Queue(inventoryUpdateQueueTextile);
+	}
+
+	@Bean
+	public DirectExchange updateInventoryExchangeTextile() {
+		return new DirectExchange(updateInventoryExchangeTextile);
+	}
+
+	@Bean
+	public Binding bindingUpdateInventoryTextile(Queue inventoryUpdateQueueTextile,
+			DirectExchange updateInventoryExchangeTextile) {
+
+		return BindingBuilder.bind(inventoryUpdateQueueTextile).to(updateInventoryExchangeTextile)
+				.with(updateInventoryTextileRK);
 	}
 
 	@Bean

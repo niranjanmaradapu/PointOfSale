@@ -31,5 +31,9 @@ public interface PoolRepo extends JpaRepository<PoolEntity, Long> {
 
 	List<PoolEntity> findByCreatedByAndPoolType(String createdBy, PoolType poolType);
 
+	List<PoolEntity> findByIsActiveAndDomainId(Boolean flag, Long domainId);
+
+	List<PoolEntity> findByDomainId(Long domainId);
+
 
 }

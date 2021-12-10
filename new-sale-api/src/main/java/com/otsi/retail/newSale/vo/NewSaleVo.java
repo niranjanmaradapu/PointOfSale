@@ -12,11 +12,13 @@ import com.otsi.retail.newSale.common.SaleNature;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Component
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class NewSaleVo {
 
 	private Long newsaleId;
@@ -27,7 +29,7 @@ public class NewSaleVo {
 
 	private Long storeId;
 	
-	private Long UserId;
+	private Long userId;
 
 	private SaleNature natureOfSale;
 
@@ -51,7 +53,7 @@ public class NewSaleVo {
 
 	private String discApprovedBy;
 
-	private float roundOff;
+	// private float roundOff;
 
 	private Long netPayableAmount;
 
@@ -85,7 +87,7 @@ public class NewSaleVo {
 
 	private List<DeliverySlipVo> dlSlip;
 
-	private List<BarcodeVo> lineItems;
+	// private List<BarcodeVo> lineItems;
 
 	private List<LineItemVo> lineItemsReVo;
 	

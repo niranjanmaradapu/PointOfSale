@@ -32,6 +32,12 @@ public class LineItemVo {
 	private Long discount;
 
 	private Long netValue;
+	
+    private String hsnCode;
+	
+	private Long actualValue;
+	
+	private Long taxValue;
 
 	private Date creationDate;
 

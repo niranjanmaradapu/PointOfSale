@@ -11,11 +11,12 @@ import org.springframework.stereotype.Repository;
 
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
+import com.otsi.retail.newSale.common.OrderStatus;
 
 @Repository
 public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 
-	List<NewSaleEntity> findByCreationDateBetweenAndStatus(LocalDate dateFrom, LocalDate dateTo, String billStatus);
+	List<NewSaleEntity> findByCreationDateBetweenAndStatus(LocalDate dateFrom, LocalDate dateTo, OrderStatus orderStatus);
 
 	Optional<NewSaleEntity> findByOrderId(Long newsaleId);
 
@@ -46,7 +47,7 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 
 	List<NewSaleEntity> findByCreatedByAndCreationDateBetween(String empId, LocalDate dateFrom, LocalDate dateTo);
 
-	List<NewSaleEntity> findByStatus(String billStatus);
+	List<NewSaleEntity> findByStatus(OrderStatus orderStatus);
 
 
 }

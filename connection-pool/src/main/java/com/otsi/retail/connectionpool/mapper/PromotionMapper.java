@@ -27,12 +27,13 @@ public class PromotionMapper {
 		if (vo.getIsForEdit()) {
 			promo.setPromoId(vo.getPromoId());
 		}
-		promo.setPromoName(vo.getPromoName());
+		promo.setPromoName(vo.getPromotionName());
 		promo.setDomainId(vo.getDomainId());
 		promo.setDescription(vo.getDescription());
 		promo.setPrintNameOnBill(vo.getPrintNameOnBill());
 		promo.setIsTaxExtra(vo.getIsTaxExtra());
 		promo.setApplicability(vo.getApplicability());
+		promo.setCreatedBy(vo.getCreatedBy());
 		promo.setPromoApplyType(vo.getPromoApplyType());
 		promo.setBuyItemsFromPool(vo.getBuyItemsFromPool());
 		promo.setIsActive(Boolean.TRUE);
@@ -55,11 +56,12 @@ public class PromotionMapper {
 		promoList.stream().forEach(x -> {
 			PromotionsVo vo = new PromotionsVo();
 
-			vo.setPromoName(x.getPromoName());
+			vo.setPromotionName(x.getPromoName());
 			vo.setDomainId(x.getDomainId());
 			vo.setDescription(x.getDescription());
 			vo.setPrintNameOnBill(x.getPrintNameOnBill());
 			vo.setApplicability(x.getApplicability());
+			vo.setCreatedBy(x.getCreatedBy());
 			vo.setIsTaxExtra(x.getIsTaxExtra());
 			vo.setIsActive(x.getIsActive());
 			vo.setBuyItemsFromPool(x.getBuyItemsFromPool());

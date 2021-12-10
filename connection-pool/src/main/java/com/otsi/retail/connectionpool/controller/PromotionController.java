@@ -21,6 +21,7 @@ import com.otsi.retail.connectionpool.common.CommonRequestMappigs;
 import com.otsi.retail.connectionpool.gatewayresponse.GateWayResponse;
 import com.otsi.retail.connectionpool.service.PromotionService;
 import com.otsi.retail.connectionpool.service.PromotionServiceImpl;
+import com.otsi.retail.connectionpool.vo.ConnectionPromoVo;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
 import com.otsi.retail.connectionpool.vo.StoreVo;
@@ -55,10 +56,10 @@ public class PromotionController {
 
 	// Method for getting list of all promotions based on their status
 	@GetMapping(CommonRequestMappigs.GET_PROMO_LIST)
-	public GateWayResponse<?> listOfPromotions(@NotNull @RequestParam String flag) {
+	public GateWayResponse<?> listOfPromotions(@NotNull @RequestParam String flag, Long domainId) {
 		log.info("Recieved request to listOfPromotions():" + flag);
-		List<PromotionsVo> promoList = promoService.getListOfPromotions(flag);
-		return new GateWayResponse<>("fetching list of promotions successfully", promoList);
+		ConnectionPromoVo promoVo = promoService.getListOfPromotions(flag,domainId);
+		return new GateWayResponse<>("fetching list of promotions successfully", promoVo);
 
 	}
 

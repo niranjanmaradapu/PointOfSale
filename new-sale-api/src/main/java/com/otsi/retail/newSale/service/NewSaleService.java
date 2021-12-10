@@ -16,14 +16,13 @@ import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.GiftVoucherVo;
-import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
-import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
-import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
-import com.otsi.retail.newSale.vo.NewSaleList;
+import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
+import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
+import com.otsi.retail.newSale.vo.LoyalityPointsVo;
+import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
-import com.otsi.retail.newSale.vo.PaymentDetailsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 
@@ -89,5 +88,17 @@ public interface NewSaleService {
 	List<LineItemVo> getBarcodes(List<String> barCode, Long domainId) throws RecordNotFoundException;
 
 	String paymentConfirmationFromRazorpay(String razorPayId, boolean payStatus);
+
+	List<GiftVoucherVo> getListOfGiftvouchers() throws RecordNotFoundException;
+
+	NewSaleVo getInvoiceDetails(String orderNumber) throws RecordNotFoundException;
+	
+	String saveLoyaltyPoints(LoyalityPointsVo loyalityVo) ;
+
+	LoyalityPointsVo getLoyaltyPointsByLoyaltyId(Long loyaltyId) throws RecordNotFoundException;
+
+	List<LoyalityPointsVo> getAllLoyaltyPoints() throws RecordNotFoundException;
+	
+	LoyalityPointsVo getLoyaltyPointsByUserId(Long userId) throws RecordNotFoundException;
 
 }

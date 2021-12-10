@@ -32,11 +32,13 @@ public class PromotionsVo {
 	
 	private Long domainId;
 
-	private String promoName;
+	private String promotionName;
 
 	private String description;
 
 	private String printNameOnBill;
+	
+	private String createdBy;
 
 	private Applicability applicability;
 

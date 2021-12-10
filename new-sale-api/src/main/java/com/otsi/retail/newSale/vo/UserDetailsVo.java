@@ -15,12 +15,14 @@ public class UserDetailsVo {
 	private String gender;
 	private LocalDate createdDate;
 	private LocalDate lastModifyedDate;
-	private long createdBy;
+	private String createdBy;
+	private String modifiedBy;
 	private boolean isActive;
 	@JsonIgnore
 	private Role role;
 	@JsonIgnore
 	private List<ClientDomains> clientDomians;
+	@JsonIgnore
 	private List<UserAv> userAv;
 	private List<StoreVo> stores;
 	private StoreVo ownerOf;
