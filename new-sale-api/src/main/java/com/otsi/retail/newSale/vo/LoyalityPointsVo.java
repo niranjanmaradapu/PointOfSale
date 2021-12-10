@@ -21,6 +21,8 @@ public class LoyalityPointsVo {
 	
 	private String mobileNumber;
 	
+	private String customerName;
+	
 	private String invoiceNumber;
 	
 	private Long invoiceAmount;
@@ -28,6 +30,8 @@ public class LoyalityPointsVo {
 	private Long loyaltyPoints;
 	
 	private int numberOfMonths;
+	
+	private LocalDate invoiceCreatedDate;
 	
 	private LocalDate createdDate;
 	

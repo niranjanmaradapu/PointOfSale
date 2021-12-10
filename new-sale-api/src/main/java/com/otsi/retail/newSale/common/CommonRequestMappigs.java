@@ -45,5 +45,7 @@ public class CommonRequestMappigs {
 	public static final String GET_ALL_LOYALTY_POINTS = "getAllLoyaltyPoints";
 	
 	public static final String GET_LOYALTY_POINTS_BY_USER_ID = "getLoyaltyPointsByUserId";
+	
+	public static final String SEARCH_LOYALTY_POINTS= "searchLoyaltyPoints";
 
 }

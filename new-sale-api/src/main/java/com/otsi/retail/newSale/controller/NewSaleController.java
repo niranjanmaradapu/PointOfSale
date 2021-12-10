@@ -45,6 +45,7 @@ import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
+import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
 
 /**
@@ -519,6 +520,17 @@ public class NewSaleController {
 			log.error("Getting error while getting loyalty points by userId : " + userId);
 			return new GateWayResponse<>(dfe.getMsg(), "Please provide valid inputs");
 		}
+		
+	}
+	
+	@PostMapping(CommonRequestMappigs.SEARCH_LOYALTY_POINTS)
+	public GateWayResponse<?> searchLoyaltyPoints(@RequestBody SearchLoyaltyPointsVo vo) throws RecordNotFoundException{
+		log.info("Recieved request to searchLoyaltyPoints():" + vo);
+		List<LoyalityPointsVo> result = newSaleService.searchLoyaltyPoints(vo);
+
+		return new GateWayResponse<>(HttpStatus.OK, result, "");
 
 	}
+	
+	
 }
