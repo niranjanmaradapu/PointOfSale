@@ -1,5 +1,7 @@
 package com.otsi.retail.newSale.repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +13,7 @@ import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
 public interface GiftVoucherRepo extends JpaRepository<GiftVoucherEntity, Long> {
 
 	Optional<GiftVoucherEntity> findByGvNumber(String gvNumber);
+
+	List<GiftVoucherEntity> findByUserIdAndExpiryDateGreaterThanEqual(Long userId, LocalDate now);
 
 }
