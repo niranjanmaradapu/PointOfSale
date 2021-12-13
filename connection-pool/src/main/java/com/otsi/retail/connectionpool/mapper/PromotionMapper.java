@@ -27,6 +27,8 @@ public class PromotionMapper {
 		if (vo.getIsForEdit()) {
 			promo.setPromoId(vo.getPromoId());
 		}
+    
+		
 		promo.setPromoName(vo.getPromotionName());
 		promo.setDomainId(vo.getDomainId());
 		promo.setDescription(vo.getDescription());
@@ -40,6 +42,10 @@ public class PromotionMapper {
 		promo.setCreatedDate(LocalDate.now());
 		promo.setLastModified(LocalDate.now());
 		promo.setPriority(vo.getPriority());
+		promo.setPromoType(vo.getPromoType());
+		promo.setStartDate(vo.getStartDate());
+		promo.setEndDate(vo.getEndDate());
+		promo.setStoreName(vo.getStoreName());
 		promo.setPoolEntity(poolList);// Mapping all poolIds to Promotions
 		
 		/** Store Mapping **/
@@ -68,6 +74,10 @@ public class PromotionMapper {
 			vo.setCreatedDate(x.getCreatedDate());
 			vo.setLastModified(x.getLastModified());
 			vo.setPromoId(x.getPromoId());
+			vo.setPromoType(x.getPromoType());
+			vo.setStartDate(x.getStartDate());
+			vo.setEndDate(x.getEndDate());
+			vo.setStoreName(x.getStoreName());
 			vo.setPromoApplyType(x.getPromoApplyType());
 			vo.setPriority(x.getPriority());
 			listOfPromoVos.add(vo);
