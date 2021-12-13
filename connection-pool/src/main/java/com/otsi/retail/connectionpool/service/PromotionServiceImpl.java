@@ -449,6 +449,8 @@ public class PromotionServiceImpl implements PromotionService {
 			newDto.setPromoName(dto.get().getPromoName());
 			newDto.setIsActive(true);
 			newDto.setPriority(randomNum);
+			newDto.setDomainId(dto.get().getDomainId());
+			newDto.setCreatedBy(dto.get().getCreatedBy());
 			newDto.setStoreName(vo.getStoreName());
 			newDto.setCreatedDate(LocalDate.now());
 			newDto.setPromoType(dto.get().getPromoType());

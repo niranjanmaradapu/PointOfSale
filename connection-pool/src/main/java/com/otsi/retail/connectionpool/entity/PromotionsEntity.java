@@ -61,7 +61,8 @@ public class PromotionsEntity {
 	private LocalDate endDate;
 
 	private String storeName;
-
+    
+	@GeneratedValue
 	private int priority;
 
 	private LocalDate createdDate;
