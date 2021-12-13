@@ -26,6 +26,7 @@ import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
+import com.otsi.retail.newSale.vo.UserDataVo;
 
 @Component
 public interface NewSaleService {
@@ -103,7 +104,7 @@ public interface NewSaleService {
 	LoyalityPointsVo getLoyaltyPointsByUserId(Long userId) throws RecordNotFoundException;
 
 	List<LoyalityPointsVo> searchLoyaltyPoints(SearchLoyaltyPointsVo vo) throws RecordNotFoundException;
-	
-	
+
+	List<GiftVoucherVo> getGvByUserId(Long userId) throws RecordNotFoundException;
 
 }

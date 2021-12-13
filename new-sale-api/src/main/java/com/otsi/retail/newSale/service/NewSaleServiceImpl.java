@@ -88,6 +88,7 @@ import com.otsi.retail.newSale.vo.SalesSummeryVo;
 import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 import com.otsi.retail.newSale.vo.TaggedItems;
 import com.otsi.retail.newSale.vo.TaxVo;
+import com.otsi.retail.newSale.vo.UserDataVo;
 import com.otsi.retail.newSale.vo.UserDetailsVo;
 
 /**
@@ -1647,6 +1648,25 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 	}
 
+	// Method for fetching gift vouchers by using UserId
+	@Override
+	public List<GiftVoucherVo> getGvByUserId(Long userId) throws RecordNotFoundException {
+
+		List<GiftVoucherEntity> gvsList = gvRepo.findByUserIdAndExpiryDateGreaterThanEqual(userId, LocalDate.now());
+		List<GiftVoucherVo> gvVosList = new ArrayList<>();
+
+		if (!gvsList.isEmpty()) {
+			gvsList.stream().forEach(x -> {
+				GiftVoucherVo vo = new GiftVoucherVo();
+				BeanUtils.copyProperties(x, vo);
+				gvVosList.add(vo);
+			});
+		} else {
+			throw new RecordNotFoundException("No records found with user id : " + userId);
+		}
+		return gvVosList;
+	}
+
 	// Method for fetching invoice details by using order number
 	@Override
 	public NewSaleVo getInvoiceDetails(String orderNumber) throws RecordNotFoundException {
@@ -1750,4 +1770,5 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		return dataList;
 	}
+
 }
