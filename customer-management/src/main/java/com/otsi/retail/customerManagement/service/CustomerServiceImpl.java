@@ -260,7 +260,7 @@ public class CustomerServiceImpl implements CustomerService {
 		returnSlipDto.setCustomerName(request.getCustomerName());
 		returnSlipDto.setDomianId(request.getDomianId());
 		returnSlipRepo.save(returnSlipDto);
-
+		
 		log.warn("we are checking if return slip is saved...");
 		log.info("Successfully saved " + returnSlipDto.getRtNo());
 		return "Successfully saved " + returnSlipDto.getRtNo();
@@ -507,6 +507,33 @@ public class CustomerServiceImpl implements CustomerService {
 		}
 		
 		return "Record Deleted successfully";
+	}
+
+
+
+
+
+	@Override
+	public ReturnSlip getReturnSlipByrtNo(String rtNo) throws Exception {
+		
+		if(rtNo==null || rtNo.equals(null)) {
+			throw new Exception("Please give valid returnslip number ");
+		}
+		
+		ReturnSlip returnSlip=	returnSlipRepo.findByRtNo(rtNo);
+		if(returnSlip!=null) {
+			if(returnSlip.getRtStatus()==ReturnSlipStatus.PENDING.getId()) {
+				
+			ReturnSlipVo vo=	returnSlipMapper.convertDtoToVo(returnSlip);
+				return returnSlip;
+			}else {
+				throw new Exception("returnSlip already cliamed or canceled ");
+			}
+			
+		}else {
+			throw new Exception("returnSlip details no found with rtNumber : "+rtNo);
+		}
+		
 	}
 
 }

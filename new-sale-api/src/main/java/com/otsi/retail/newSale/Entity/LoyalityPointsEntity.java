@@ -38,6 +38,8 @@ public class LoyalityPointsEntity {
 
 	private String mobileNumber;
 	
+	private String customerName;
+	
 	private String invoiceNumber;
 	
 	private Long invoiceAmount;

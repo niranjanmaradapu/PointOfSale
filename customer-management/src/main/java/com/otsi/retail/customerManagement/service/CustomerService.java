@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.otsi.retail.customerManagement.model.ReturnSlip;
 import com.otsi.retail.customerManagement.vo.CustomerDetailsVo;
 import com.otsi.retail.customerManagement.vo.GenerateReturnSlipRequest;
 import com.otsi.retail.customerManagement.vo.HsnDetailsVo;
@@ -42,5 +43,7 @@ HsnDetailsVo getHsnDetails(double netAmt) throws JsonMappingException, JsonProce
 
 	String updateReturnSlip(String rtNumber, GenerateReturnSlipRequest request);
 
-	String deleteReturnSlips(int rsId);;
+	String deleteReturnSlips(int rsId);
+
+	ReturnSlip getReturnSlipByrtNo(String rtNo) throws Exception;;
 }

@@ -57,6 +57,8 @@ public class PromotionsVo {
 	private LocalDate startDate;
 
 	private LocalDate endDate;
+	
+	private String storeName;
 
 	private LocalDate createdDate;
 

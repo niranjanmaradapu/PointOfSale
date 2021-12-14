@@ -45,6 +45,7 @@ import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
+import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
 
 /**
@@ -386,6 +387,18 @@ public class NewSaleController {
 
 	}
 
+	// Method for fetching Gift voucher by userId
+	@GetMapping("/getgvbyuserid")
+	public GateWayResponse<?> getGvByUserId(@RequestParam Long userId) throws RecordNotFoundException {
+		log.info("Recieved request to fetching Giftvouchers by user Id : " + userId);
+		try {
+			List<GiftVoucherVo> result = newSaleService.getGvByUserId(userId);
+			return new GateWayResponse<>("Success", result);
+		} catch (RecordNotFoundException rfe) {
+			return new GateWayResponse<>(rfe.getMsg(), "No record found");
+		}
+	}
+
 	// Method for getting list of Gift vouchers
 	@GetMapping("/getlistofgv")
 	public GateWayResponse<?> getListOfGvs() throws RecordNotFoundException {
@@ -521,4 +534,15 @@ public class NewSaleController {
 		}
 
 	}
+
+	@PostMapping(CommonRequestMappigs.SEARCH_LOYALTY_POINTS)
+	public GateWayResponse<?> searchLoyaltyPoints(@RequestBody SearchLoyaltyPointsVo vo)
+			throws RecordNotFoundException {
+		log.info("Recieved request to searchLoyaltyPoints():" + vo);
+		List<LoyalityPointsVo> result = newSaleService.searchLoyaltyPoints(vo);
+
+		return new GateWayResponse<>(HttpStatus.OK, result, "");
+
+	}
+
 }
