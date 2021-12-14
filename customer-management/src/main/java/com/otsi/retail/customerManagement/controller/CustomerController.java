@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.otsi.retail.customerManagement.gatewayresponse.GateWayResponse;
+import com.otsi.retail.customerManagement.model.ReturnSlip;
 import com.otsi.retail.customerManagement.service.CustomerService;
 import com.otsi.retail.customerManagement.service.ReturnSlipVo;
 import com.otsi.retail.customerManagement.vo.CustomerDetailsVo;
@@ -58,10 +59,11 @@ public class CustomerController {
 		listVo = customerService.getListOfReturnSlips(vo);
 		return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
 	}
+
 	@DeleteMapping("/DeleteReturnSlip")
 	public GateWayResponse<?> deleteReturnSlip(@RequestParam int rsId) {
 		log.info("Received request to deleteReturnSlips:" + rsId);
-		//List<ListOfReturnSlipsVo> listVo = null;
+		// List<ListOfReturnSlipsVo> listVo = null;
 
 		String msg = customerService.deleteReturnSlips(rsId);
 		return new GateWayResponse<>(HttpStatus.OK, msg, "Success");
@@ -111,7 +113,8 @@ public class CustomerController {
 	}
 
 	@GetMapping("/getReturnSlipsDetails")
-	public GateWayResponse<?> ReturnSlipsDeatils(@RequestParam String rtNumber) throws JsonMappingException, JsonProcessingException, URISyntaxException {
+	public GateWayResponse<?> ReturnSlipsDeatils(@RequestParam String rtNumber)
+			throws JsonMappingException, JsonProcessingException, URISyntaxException {
 		log.info("Received request to ReturnSlipsDeatils():" + rtNumber);
 		RetrnSlipDetailsVo listVo = null;
 
@@ -128,6 +131,19 @@ public class CustomerController {
 		log.info("Recieved request to getNewSaleWithHsn()");
 		HsnDetailsVo netamt = customerService.getHsnDetails(netAmt);
 		return new GateWayResponse<>(HttpStatus.OK, netamt, "");
+
+	}
+
+	@GetMapping("/getReturnSlip/{rtNo}")
+	public GateWayResponse<?> getReturnSlip(@PathVariable String rtNo) {
+		try {
+			log.info("Recieved request to getReturnSlip() with rtNo : {}", rtNo);
+			ReturnSlip res = customerService.getReturnSlipByrtNo(rtNo);
+			return new GateWayResponse<>(HttpStatus.OK, res, "");
+		} catch (Exception e) {
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(), "");
+
+		}
 
 	}
 

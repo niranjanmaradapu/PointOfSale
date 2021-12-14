@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.otsi.retail.customerManagement.model.Barcode;
 import com.otsi.retail.customerManagement.model.ReturnSlip;
 import com.otsi.retail.customerManagement.model.TaggedItems;
+import com.otsi.retail.customerManagement.service.ReturnSlipVo;
 import com.otsi.retail.customerManagement.utils.ReturnSlipStatus;
 import com.otsi.retail.customerManagement.vo.BarcodeVo;
 import com.otsi.retail.customerManagement.vo.ListOfReturnSlipsVo;
@@ -58,6 +59,11 @@ public class ReturnSlipMapper {
 		lvo.stream().forEach(x -> x.setTotalAmount(totalAmount));
 
 		return lvo;
+	}
+
+	public ReturnSlipVo convertDtoToVo(ReturnSlip returnSlip) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
