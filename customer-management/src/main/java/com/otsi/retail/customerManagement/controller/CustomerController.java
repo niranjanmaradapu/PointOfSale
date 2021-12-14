@@ -134,7 +134,7 @@ public class CustomerController {
 
 	}
 
-	@GetMapping("/getReturnSlip/{rtNo}")
+	@GetMapping("/getReturnSlipbyRtNo/{rtNo}")
 	public GateWayResponse<?> getReturnSlip(@PathVariable String rtNo) {
 		try {
 			log.info("Recieved request to getReturnSlip() with rtNo : {}", rtNo);
