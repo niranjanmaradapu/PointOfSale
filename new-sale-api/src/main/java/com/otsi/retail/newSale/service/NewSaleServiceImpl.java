@@ -447,8 +447,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setLastModified(LocalDate.now());
 		entity.setUserId(vo.getSalesMan());
 
-		DeliverySlipEntity savedEntity = dsRepo.save(entity);
-
 		List<Long> lineItems = new ArrayList<>();
 
 		if (!vo.getLineItems().isEmpty()) {
@@ -462,6 +460,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 		List<LineItemsEntity> listLineItems = lineItemRepo.findByLineItemIdInAndDsEntityIsNull(lineItems);
 
 		if (lineItems.size() == listLineItems.size() && !listLineItems.isEmpty()) {
+
+			DeliverySlipEntity savedEntity = dsRepo.save(entity);
 
 			listLineItems.stream().forEach(x -> {
 
