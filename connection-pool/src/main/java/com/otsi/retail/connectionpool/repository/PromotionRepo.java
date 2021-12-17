@@ -19,19 +19,19 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	//PromotionsEntity findByPromoId(Long promoId);
 
-	List<PromotionsEntity> findByPromoName(String promoName);
-	PromotionsEntity findByPromoNameIs(String promoName);
+	List<PromotionsEntity> findByPromotionName(String promoName);
+	PromotionsEntity findByPromotionNameIs(String promoName);
 	
 
 	
 
-	List<PromotionsEntity> findByPromoNameAndIsActive(String promotionName, boolean promotionStatus);
+	List<PromotionsEntity> findByPromotionNameAndIsActive(String promotionName, boolean promotionStatus);
 
 	List<PromotionsEntity> findByStoreNameAndIsActive(String storeName, boolean promotionStatus);
 
 	List<PromotionsEntity> findByStoreName(String storeName);
 
-	List<PromotionsEntity> findByStoreNameAndPromoName(String storeName, String promotionName);
+	List<PromotionsEntity> findByStoreNameAndPromotionName(String storeName, String promotionName);
 
 	PromotionsEntity findByPromoId(Long promoId);
 
@@ -56,13 +56,13 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	List<PromotionsEntity> findByIsActiveAndDomainId(Boolean status, Long domainId);
 
-	List<PromotionsEntity> findByStartDateAndEndDateAndPromoNameAndStoreNameAndIsActive(LocalDate startDate,
+	List<PromotionsEntity> findByStartDateAndEndDateAndPromotionNameAndStoreNameAndIsActive(LocalDate startDate,
 			LocalDate endDate, String promotionName, String storeName, Boolean isActive);
 
 	List<PromotionsEntity> findByStartDateAndEndDateAndStoreNameAndIsActive(LocalDate startDate, LocalDate endDate,
 			String storeName, Boolean isActive);
 
-	List<PromotionsEntity> findByStartDateAndEndDateAndPromoNameAndIsActive(LocalDate startDate, LocalDate endDate,
+	List<PromotionsEntity> findByStartDateAndEndDateAndPromotionNameAndIsActive(LocalDate startDate, LocalDate endDate,
 			String promotionName, Boolean isActive);
 
 	List<PromotionsEntity> findByStartDateAndEndDateAndIsActive(LocalDate startDate, LocalDate endDate,

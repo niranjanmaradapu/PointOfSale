@@ -22,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.connectionpool.config.Config;
+import com.otsi.retail.connectionpool.entity.BenfitEntity;
 import com.otsi.retail.connectionpool.entity.PoolEntity;
 import com.otsi.retail.connectionpool.entity.PromoBarcodeEntity;
 import com.otsi.retail.connectionpool.entity.PromotionToStoreEntity;
@@ -31,10 +32,12 @@ import com.otsi.retail.connectionpool.exceptions.InvalidDataException;
 import com.otsi.retail.connectionpool.exceptions.RecordNotFoundException;
 import com.otsi.retail.connectionpool.gatewayresponse.GateWayResponse;
 import com.otsi.retail.connectionpool.mapper.PromotionMapper;
+import com.otsi.retail.connectionpool.repository.BenfitRepo;
 import com.otsi.retail.connectionpool.repository.PoolRepo;
 import com.otsi.retail.connectionpool.repository.PromoBarcodeEntityRepository;
 import com.otsi.retail.connectionpool.repository.PromotionRepo;
 import com.otsi.retail.connectionpool.repository.PromotionToStoreRepo;
+import com.otsi.retail.connectionpool.vo.BenfitVo;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 import com.otsi.retail.connectionpool.vo.ConnectionPromoVo;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
@@ -65,6 +68,9 @@ public class PromotionServiceImpl implements PromotionService {
 	private PoolRepo poolRepo;
 	@Autowired
 	private PromotionToStoreRepo promostoreRepo;
+	
+	@Autowired
+	private BenfitRepo benfitRepo;
 
 	@Autowired
 	private Config config;
@@ -75,14 +81,11 @@ public class PromotionServiceImpl implements PromotionService {
 	@Autowired
 	private PromoBarcodeEntityRepository promoBarcodeRepo;
 
-//	@Autowired
-//	private StoreRepo storeRepo;
-
 	// Method for adding promotion to pools
 	@Override
 	public String addPromotion(PromotionsVo vo) {
 		log.debug("debugging addPromotion:" + vo);
-		if (/* vo.getStoreVo() == null || */ vo.getPoolVo() == null) {
+		if (vo.getPoolVo() == null) {
 			throw new InvalidDataException("please give valid data");
 		}
 		List<ConnectionPoolVo> poolVo = vo.getPoolVo();
@@ -90,25 +93,13 @@ public class PromotionServiceImpl implements PromotionService {
 		List<Long> poolIds = poolVo.stream().map(x -> x.getPoolId()).collect(Collectors.toList());
 
 		List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
+		
+		BenfitVo bvo = vo.getBenfitVo();
 
-		// Code added by sudheer for store mappping
-		// List<StoreVo> storeVo = vo.getStoreVo();
+		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList,bvo);
+	
 
-		/** Promotion mapped to store by storeId **/
-
-		// List<Long> storeId = storeVo.stream().map(a ->
-		// a.getStoreId()).collect(Collectors.toList());
-		// List<StoresEntity> storeList = storeRepo.findByStoreIdIn(storeId);
-
-		/** Promotion mapped to store by storeName **/
-
-		// List<String> storeName = storeVo.stream().map(b ->
-		// b.getStoreName()).collect(Collectors.toList());
-		// List<StoresEntity> storeList = storeRepo.findByStoreNameIn(storeName);
-
-		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList/* , storeList */);
-
-		if (poolVo.size() == poolList.size() /* && storeVo.size() == storeList.size() */) {
+		if (poolVo.size() == poolList.size()) {
 
 			PromotionsEntity savedPromo = promoRepo.save(entity);
 
@@ -186,25 +177,12 @@ public class PromotionServiceImpl implements PromotionService {
 			List<Long> poolIds = poolVo.stream().map(x -> x.getPoolId()).collect(Collectors.toList());
 
 			List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
+            
+			BenfitVo bvo = vo.getBenfitVo();
 
-			// Code added by sudheer
-			// List<StoreVo> storeVo = vo.getStoreVo();
+			if ((poolVo.size() == poolList.size()) /*&& (bvo.getBenfitId().equals(vo.getBenfitVo().getBenfitId()))*/) {
 
-			/** Promotion mapped to store by storeId **/
-
-			// List<Long> storeId = storeVo.stream().map(a ->
-			// a.getStoreId()).collect(Collectors.toList());
-			// List<StoresEntity> storeList = storeRepo.findByStoreIdIn(storeId);
-
-			/** Promotion mapped to store by storeName **/
-
-			// List<String> storeName = storeVo.stream().map(b ->
-			// b.getStoreName()).collect(Collectors.toList());
-			// List<StoresEntity> storeList = storeRepo.findByStoreNameIn(storeName);
-
-			if (poolVo.size() == poolList.size()) {
-
-				PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList/* , storeList */);
+				PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList,bvo);
 				PromotionsEntity savedPromo = promoRepo.save(entity);
 
 			} else {
@@ -259,7 +237,7 @@ public class PromotionServiceImpl implements PromotionService {
 	@Override
 	public String addPromotionToStore(PromotionsVo vo) {
 
-		PromotionsEntity promotionEntity = promoRepo.findByPromoNameIs(vo.getPromotionName());
+		PromotionsEntity promotionEntity = promoRepo.findByPromotionNameIs(vo.getPromotionName());
 
 		if (promotionEntity != null) {
 
@@ -291,14 +269,14 @@ public class PromotionServiceImpl implements PromotionService {
 		if (vo.getStartDate() != null && vo.getEndDate() != null) {
 			if (vo.getPromotionName() != null && vo.getStoreName() != null) {
 
-				promoDetails = promoRepo.findByStartDateAndEndDateAndPromoNameAndStoreNameAndIsActive(vo.getStartDate(),
+				promoDetails = promoRepo.findByStartDateAndEndDateAndPromotionNameAndStoreNameAndIsActive(vo.getStartDate(),
 						vo.getEndDate(), vo.getPromotionName(), vo.getStoreName(), vo.getIsActive());
 			} else if (vo.getStoreName() != null && vo.getPromotionName() == null) {
 				promoDetails = promoRepo.findByStartDateAndEndDateAndStoreNameAndIsActive(vo.getStartDate(),
 						vo.getEndDate(), vo.getStoreName(), vo.getIsActive());
 
 			} else if (vo.getPromotionName() != null && vo.getStoreName() == null) {
-				promoDetails = promoRepo.findByStartDateAndEndDateAndPromoNameAndIsActive(vo.getStartDate(),
+				promoDetails = promoRepo.findByStartDateAndEndDateAndPromotionNameAndIsActive(vo.getStartDate(),
 						vo.getEndDate(), vo.getPromotionName(), vo.getIsActive());
 
 			} else
@@ -307,14 +285,14 @@ public class PromotionServiceImpl implements PromotionService {
 
 		} else if (vo.getStartDate() == null && vo.getEndDate() == null) {
 			if (vo.getPromotionName() != null && vo.getStoreName() == null) {
-				promoDetails = promoRepo.findByPromoName(vo.getPromotionName());
+				promoDetails = promoRepo.findByPromotionName(vo.getPromotionName());
 				// promoDetails.add(promoEntity);
 
 			} else if (vo.getStoreName() != null && vo.getPromotionName() == null) {
 				promoDetails = promoRepo.findByStoreName(vo.getStoreName());
 
 			} else if (vo.getPromotionName() != null && vo.getStoreName() != null) {
-				promoDetails = promoRepo.findByStoreNameAndPromoName(vo.getStoreName(), vo.getPromotionName());
+				promoDetails = promoRepo.findByStoreNameAndPromotionName(vo.getStoreName(), vo.getPromotionName());
 			}
 
 			else
@@ -330,7 +308,7 @@ public class PromotionServiceImpl implements PromotionService {
 			Long promoCount = promoDetails.stream().count();
 			promoDetails.stream().forEach(p -> {
 				SearchPromotionsVo searchVo = new SearchPromotionsVo();
-				searchVo.setPromotionName(p.getPromoName());
+				searchVo.setPromotionName(p.getPromotionName());
 				searchVo.setStoreName(p.getStoreName());
 				searchVo.setStartDate(p.getStartDate());
 				searchVo.setEndDate(p.getEndDate());
@@ -364,7 +342,7 @@ public class PromotionServiceImpl implements PromotionService {
 			Long promoCount = promoDetails.stream().count();
 			promoDetails.stream().forEach(p -> {
 				SearchPromotionsVo searchVo = new SearchPromotionsVo();
-				searchVo.setPromotionName(p.getPromoName());
+				searchVo.setPromotionName(p.getPromotionName());
 				searchVo.setStoreName(p.getStoreName());
 				searchVo.setStartDate(p.getStartDate());
 				searchVo.setEndDate(p.getEndDate());
@@ -446,7 +424,7 @@ public class PromotionServiceImpl implements PromotionService {
 			BeanUtils.copyProperties(dto, newDto);
 			newDto.setStartDate(dto.get().getStartDate());
 			newDto.setEndDate(dto.get().getEndDate());
-			newDto.setPromoName(dto.get().getPromoName());
+			newDto.setPromotionName(dto.get().getPromotionName());
 			newDto.setIsActive(true);
 			newDto.setPriority(randomNum);
 			newDto.setDomainId(dto.get().getDomainId());
@@ -579,7 +557,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 				SearchPromotionsVo searchVo = new SearchPromotionsVo();
 				searchVo.setPromoId(r.getPromoId());
-				searchVo.setPromotionName(r.getPromoName());
+				searchVo.setPromotionName(r.getPromotionName());
 				searchVo.setDescription(r.getDescription());
 				searchVo.setStoreName(r.getStoreName());
 				searchVo.setStartDate(r.getStartDate());
@@ -590,6 +568,21 @@ public class PromotionServiceImpl implements PromotionService {
 		}
 
 		return searchPromotions;
+	}
+
+	@Override
+	public String saveBenfit(BenfitVo vo) {
+	
+		BenfitEntity entity = new BenfitEntity();
+		BeanUtils.copyProperties(vo, entity);
+		BenfitEntity save = benfitRepo.save(entity);
+		
+		if(save.getBenfitId()!=null)
+		{
+			return "Benfit id:"+save.getBenfitId();
+		}
+		
+		return "Benfit Saving Failed";
 	}
 
 }
