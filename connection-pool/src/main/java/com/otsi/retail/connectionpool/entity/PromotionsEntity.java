@@ -11,11 +11,20 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.otsi.retail.connectionpool.common.Applicability;
+import com.otsi.retail.connectionpool.common.BenfitType;
+import com.otsi.retail.connectionpool.common.DiscountType;
+import com.otsi.retail.connectionpool.common.FixedAmountOn;
+import com.otsi.retail.connectionpool.common.PercentageDiscountOn;
 import com.otsi.retail.connectionpool.common.PromoApplyType;
 import com.otsi.retail.connectionpool.common.PromotionType;
+import com.otsi.retail.connectionpool.common.RupeesDiscountOn;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,7 +43,7 @@ public class PromotionsEntity {
 
 	private Long domainId;
 
-	private String promoName;
+	private String promotionName;
 
 	private String description;
 
@@ -46,13 +55,11 @@ public class PromotionsEntity {
 
 	private PromoApplyType promoApplyType;
 
-	private Boolean isTaxExtra;
-
 	private int buyItemsFromPool;
 
-	private Boolean isActive;
+	private Boolean isTaxExtra;
 
-	/** These below 3 fields are store related fields **/
+	private Boolean isActive;
 
 	private PromotionType promoType;
 
@@ -61,28 +68,23 @@ public class PromotionsEntity {
 	private LocalDate endDate;
 
 	private String storeName;
-    
+
 	@GeneratedValue
 	private int priority;
-
+    
+	@CreationTimestamp
 	private LocalDate createdDate;
-
+    
+	@UpdateTimestamp
 	private LocalDate lastModified;
 
 	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
 	@JoinTable(name = "pool_promo", joinColumns = @JoinColumn(name = "promoId"), inverseJoinColumns = @JoinColumn(name = "poolId"))
 	private List<PoolEntity> poolEntity;
-
-	/**
-	 * @Many_To_Many mapping For Stores
-	 */
-
-	/*
-	 * @ManyToMany(cascade = { CascadeType.ALL})
-	 * 
-	 * @JoinTable(name = "promo_store", joinColumns = @JoinColumn(name = "promoId"),
-	 * inverseJoinColumns = @JoinColumn(name = "storeId")) private
-	 * List<StoresEntity> storeEntity;
-	 */
+    
+	//one promotion have one benefit only
+	@OneToOne(cascade =CascadeType.MERGE)
+	@JoinColumn(name = "benfit_id")
+	private BenfitEntity benfitEntity;
 
 }

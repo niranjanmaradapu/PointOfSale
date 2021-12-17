@@ -4,10 +4,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import com.otsi.retail.connectionpool.entity.BenfitEntity;
 import com.otsi.retail.connectionpool.entity.PoolEntity;
 import com.otsi.retail.connectionpool.entity.PromotionsEntity;
+import com.otsi.retail.connectionpool.vo.BenfitVo;
 import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
 
@@ -20,16 +23,15 @@ import com.otsi.retail.connectionpool.vo.PromotionsVo;
 @Component
 public class PromotionMapper {
 
-	public PromotionsEntity convertPromoVoToEntity(PromotionsVo vo, List<PoolEntity> poolList/*,List<StoresEntity> stores */) {
+	public PromotionsEntity convertPromoVoToEntity(PromotionsVo vo, List<PoolEntity> poolList,BenfitVo bvo) {
 
 		PromotionsEntity promo = new PromotionsEntity();
 
 		if (vo.getIsForEdit()) {
 			promo.setPromoId(vo.getPromoId());
 		}
-    
-		
-		promo.setPromoName(vo.getPromotionName());
+
+		promo.setPromotionName(vo.getPromotionName());
 		promo.setDomainId(vo.getDomainId());
 		promo.setDescription(vo.getDescription());
 		promo.setPrintNameOnBill(vo.getPrintNameOnBill());
@@ -46,11 +48,18 @@ public class PromotionMapper {
 		promo.setStartDate(vo.getStartDate());
 		promo.setEndDate(vo.getEndDate());
 		promo.setStoreName(vo.getStoreName());
+		//BeanUtils.copyProperties(vo, promo);
 		promo.setPoolEntity(poolList);// Mapping all poolIds to Promotions
-		
-		/** Store Mapping **/
-		
-		//promo.setStoreEntity(stores);//Mapping all storeIds to Promotions
+
+		BenfitEntity benfitEntity = new BenfitEntity();
+		benfitEntity.setBenfitId(bvo.getBenfitId());
+		benfitEntity.setBenfitType(bvo.getBenfitType());
+		benfitEntity.setDiscountType(bvo.getDiscountType());
+		benfitEntity.setPercentageDiscountOn(bvo.getPercentageDiscountOn());
+		benfitEntity.setDiscount(bvo.getDiscount());
+
+//		//BeanUtils.copyProperties(bvo, benfitEntity);
+        promo.setBenfitEntity(benfitEntity);
 
 		return promo;
 	}
@@ -62,7 +71,7 @@ public class PromotionMapper {
 		promoList.stream().forEach(x -> {
 			PromotionsVo vo = new PromotionsVo();
 
-			vo.setPromotionName(x.getPromoName());
+			vo.setPromotionName(x.getPromotionName());
 			vo.setDomainId(x.getDomainId());
 			vo.setDescription(x.getDescription());
 			vo.setPrintNameOnBill(x.getPrintNameOnBill());
@@ -81,6 +90,15 @@ public class PromotionMapper {
 			vo.setPromoApplyType(x.getPromoApplyType());
 			vo.setPriority(x.getPriority());
 			listOfPromoVos.add(vo);
+
+			BenfitVo bvo = new BenfitVo();
+         
+			bvo.setBenfitId(x.getBenfitEntity().getBenfitId());
+			bvo.setBenfitType(x.getBenfitEntity().getBenfitType());
+			bvo.setDiscountType(x.getBenfitEntity().getDiscountType());
+			bvo.setPercentageDiscountOn(x.getBenfitEntity().getPercentageDiscountOn());
+			bvo.setDiscount(x.getBenfitEntity().getDiscount());
+			vo.setBenfitVo(bvo);
 
 			List<ConnectionPoolVo> poolList = new ArrayList<>();
 
@@ -101,5 +119,4 @@ public class PromotionMapper {
 		return listOfPromoVos;
 	}
 
-	
 }

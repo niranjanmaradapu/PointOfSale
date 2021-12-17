@@ -6,10 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,11 +19,12 @@ import com.otsi.retail.connectionpool.common.CommonRequestMappigs;
 import com.otsi.retail.connectionpool.gatewayresponse.GateWayResponse;
 import com.otsi.retail.connectionpool.service.PromotionService;
 import com.otsi.retail.connectionpool.service.PromotionServiceImpl;
+import com.otsi.retail.connectionpool.vo.BenfitVo;
 import com.otsi.retail.connectionpool.vo.ConnectionPromoVo;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
-import com.otsi.retail.connectionpool.vo.StoreVo;
 import com.otsi.retail.connectionpool.vo.SearchPromotionsVo;
+import com.otsi.retail.connectionpool.vo.StoreVo;
 import com.sun.istack.NotNull;
 
 /**
@@ -161,6 +160,14 @@ public class PromotionController {
 		
 		List<SearchPromotionsVo> result = promoService.listOfPromotionsBySearch(vo);
 		return new GateWayResponse<>("successfully getting promotions", result);
+
+	}
+	
+	@PostMapping(CommonRequestMappigs.ADD_BENFIT)
+	public GateWayResponse<?> saveBenfit(@RequestBody BenfitVo vo) {
+		log.info("Recieved request to addBenfit():" + vo);
+		String saveBenfit = promoService.saveBenfit(vo);
+		return new GateWayResponse<>("added benfit successfully", saveBenfit);
 
 	}
 
