@@ -47,6 +47,8 @@ public class CommonRequestMappigs {
 	
 	public static final String LIST_OF_PROMOTIONS_BY_SEARCH_CRITERIA = "listOfPromotionsBySearch";
 	
+	public static final String ADD_BENFIT = "addbenfit";
+	
 	
 
 }

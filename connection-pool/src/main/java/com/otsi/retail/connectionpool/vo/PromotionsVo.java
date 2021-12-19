@@ -6,8 +6,13 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.connectionpool.common.Applicability;
+import com.otsi.retail.connectionpool.common.BenfitType;
+import com.otsi.retail.connectionpool.common.DiscountType;
+import com.otsi.retail.connectionpool.common.FixedAmountOn;
+import com.otsi.retail.connectionpool.common.PercentageDiscountOn;
 import com.otsi.retail.connectionpool.common.PromoApplyType;
 import com.otsi.retail.connectionpool.common.PromotionType;
+import com.otsi.retail.connectionpool.common.RupeesDiscountOn;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,9 +32,9 @@ import lombok.NoArgsConstructor;
 public class PromotionsVo {
 
 	private Long promoId;
-	
+
 	private Long storeId;
-	
+
 	private Long domainId;
 
 	private String promotionName;
@@ -37,41 +42,41 @@ public class PromotionsVo {
 	private String description;
 
 	private String printNameOnBill;
-	
+
 	private String createdBy;
 
 	private Applicability applicability;
 
 	private PromoApplyType promoApplyType;
+	
+	private int buyItemsFromPool;
 
 	private Boolean isTaxExtra;
 
-	private int buyItemsFromPool;
-
 	private Boolean isActive;
-	
-	/** These below 3 fields are store related fields **/
 
-    private PromotionType promoType;
+	private PromotionType promoType;
 
 	private LocalDate startDate;
 
 	private LocalDate endDate;
-	
+
 	private String storeName;
 
 	private LocalDate createdDate;
 
 	private LocalDate lastModified;
-	
+
 	private int priority;
 
 	private Boolean isForEdit;
 
 	private List<ConnectionPoolVo> poolVo;
-	
+
 	/** These below fields are store related fields **/
-	
+
 	private StoreVo storeVo;
+	
+	private BenfitVo benfitVo;
 
 }

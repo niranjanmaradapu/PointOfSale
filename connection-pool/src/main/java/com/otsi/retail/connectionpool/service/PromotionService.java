@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.otsi.retail.connectionpool.vo.BenfitVo;
 import com.otsi.retail.connectionpool.vo.ConnectionPromoVo;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
@@ -41,6 +42,8 @@ public interface PromotionService {
 	List<LineItemVo> checkPromtion(List<LineItemVo> lineItmes);
 	
 	List<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo);
+	
+	String saveBenfit(BenfitVo vo);
 
 	
 }
