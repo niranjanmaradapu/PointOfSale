@@ -14,6 +14,9 @@ spring:
     password: guest
     port: 15672
     username: guest
+    exchange: newsale_exchange
+    queue: newsale_queue
+    routingkey: payment_newsale_rk
     
  jpa:
    hibernate:
