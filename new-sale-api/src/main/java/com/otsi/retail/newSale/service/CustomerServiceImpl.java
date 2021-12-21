@@ -3,11 +3,10 @@ package com.otsi.retail.newSale.service;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
@@ -21,14 +20,13 @@ import com.otsi.retail.newSale.mapper.CustomerMapper;
 import com.otsi.retail.newSale.repository.CustomerDetailsRepo;
 import com.otsi.retail.newSale.repository.UserDataAvRepo;
 import com.otsi.retail.newSale.repository.UserDataRepo;
-import com.otsi.retail.newSale.service.CustomerService;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-	private Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
+	private Logger log = LogManager.getLogger(CustomerServiceImpl.class);
 
 	@Autowired
 	private CustomerDetailsRepo customerRepo;
