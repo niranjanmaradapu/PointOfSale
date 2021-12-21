@@ -4,10 +4,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.otsi.retail.connectionpool.entity.PoolEntity;
 import com.otsi.retail.connectionpool.exceptions.DuplicateRecordException;
 import com.otsi.retail.connectionpool.exceptions.InvalidDataException;
@@ -28,7 +30,7 @@ import com.otsi.retail.connectionpool.vo.SearchPoolVo;
 @Service
 public class PoolServiceImpl implements PoolService {
 
-	private Logger log = LoggerFactory.getLogger(PoolServiceImpl.class);
+	private Logger log = LogManager.getLogger(PoolServiceImpl.class);
 
 	@Autowired
 	private PoolMapper poolMapper;

@@ -18,14 +18,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.otsi.retail.connectionpool.common.Applicability;
-import com.otsi.retail.connectionpool.common.BenfitType;
-import com.otsi.retail.connectionpool.common.DiscountType;
-import com.otsi.retail.connectionpool.common.FixedAmountOn;
-import com.otsi.retail.connectionpool.common.PercentageDiscountOn;
 import com.otsi.retail.connectionpool.common.PromoApplyType;
 import com.otsi.retail.connectionpool.common.PromotionType;
-import com.otsi.retail.connectionpool.common.RupeesDiscountOn;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

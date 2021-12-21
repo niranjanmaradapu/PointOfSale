@@ -10,8 +10,8 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -56,7 +56,7 @@ import com.otsi.retail.connectionpool.vo.StoreVo;
 @Service
 public class PromotionServiceImpl implements PromotionService {
 
-	private Logger log = LoggerFactory.getLogger(PromotionServiceImpl.class);
+	private Logger log = LogManager.getLogger(PromotionServiceImpl.class);
 
 	@Autowired
 	private PromotionMapper promoMapper;
