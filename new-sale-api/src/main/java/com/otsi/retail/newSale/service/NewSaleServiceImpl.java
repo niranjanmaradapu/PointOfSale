@@ -9,8 +9,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -88,7 +88,6 @@ import com.otsi.retail.newSale.vo.SalesSummeryVo;
 import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 import com.otsi.retail.newSale.vo.TaggedItems;
 import com.otsi.retail.newSale.vo.TaxVo;
-import com.otsi.retail.newSale.vo.UserDataVo;
 import com.otsi.retail.newSale.vo.UserDetailsVo;
 
 /**
@@ -102,7 +101,7 @@ import com.otsi.retail.newSale.vo.UserDetailsVo;
 @Configuration
 public class NewSaleServiceImpl implements NewSaleService {
 
-	private Logger log = LoggerFactory.getLogger(NewSaleServiceImpl.class);
+	private Logger log = LogManager.getLogger(NewSaleServiceImpl.class);
 
 	@Autowired
 	private RestTemplate template;

@@ -2,8 +2,8 @@ package com.otsi.retail.connectionpool.controller;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +30,7 @@ import com.otsi.retail.connectionpool.vo.SearchPoolVo;
 @RequestMapping(CommonRequestMappigs.POOL)
 public class PoolController {
 
-	private Logger log = LoggerFactory.getLogger(PoolController.class);
+	private Logger log = LogManager.getLogger(PoolController.class);
 
 	@Autowired
 	private PoolService poolService;
