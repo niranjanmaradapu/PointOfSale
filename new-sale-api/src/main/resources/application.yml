@@ -6,7 +6,7 @@ spring:
     name: new-sale-service 
   datasource:
     platform: postgres
-    url: jdbc:postgresql://10.100.238.45:5432/newSale
+    url: jdbc:postgresql://localhost:5432/newSale
     username: postgres
     password: Otsi@123
   rabbitmq:
