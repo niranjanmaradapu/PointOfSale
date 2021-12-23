@@ -373,12 +373,26 @@ public class NewSaleController {
 		}
 	}
 
+	// Method for activating GiftVoucher
+	@PutMapping("/changeflaggv")
+	public GateWayResponse<?> activateGiftVoucher(@RequestBody List<String> gvsList, @RequestParam Boolean flag)
+			throws RecordNotFoundException {
+		log.info("Recieved request to activate giftvouchers " + gvsList.toString());
+		try {
+			String result = newSaleService.activateGiftvoucher(gvsList, flag);
+			return new GateWayResponse<>(result, "Success");
+		} catch (RecordNotFoundException rfe) {
+			return new GateWayResponse<>(rfe.getMsg(), "Exception occurs");
+		}
+
+	}
+
 	// Method for getting Gift voucher by GV Number
-	@GetMapping("/getGv")
-	public GateWayResponse<?> getGiftVoucher(@RequestParam String gvNumber) throws InvalidInputException {
+	@GetMapping("/getGv/{clientId}")
+	public GateWayResponse<?> getGiftVoucher(@RequestParam String gvNumber ,@PathVariable Long clientId) throws InvalidInputException {
 		log.info("Recieved request to getting giftVoucher : " + gvNumber);
 		try {
-			GiftVoucherVo result = newSaleService.getGiftVoucher(gvNumber);
+			GiftVoucherVo result = newSaleService.getGiftVoucher(gvNumber,clientId);
 			return new GateWayResponse<>("Successfully fetch record", result);
 		} catch (InvalidInputException iie) {
 			log.error("Getting error while fetching giftvoucher : " + gvNumber);

@@ -63,13 +63,11 @@ public interface NewSaleService {
 
 	String saveGiftVoucher(GiftVoucherVo vo) throws DuplicateRecordException;
 
-	GiftVoucherVo getGiftVoucher(String gvNumber) throws InvalidInputException;
+	GiftVoucherVo getGiftVoucher(String gvNumber , Long clientId) throws InvalidInputException;
 
 	String tagCustomerToGv(Long userId, Long gvId) throws InvalidInputException, DataNotFoundException;
 
 	List<BarcodeVo> getAllBarcodes() throws DataNotFoundException;
-
-	
 
 	SaleReportVo getSaleReport(SaleReportVo srvo) throws RecordNotFoundException;
 
@@ -94,17 +92,19 @@ public interface NewSaleService {
 	List<GiftVoucherVo> getListOfGiftvouchers() throws RecordNotFoundException;
 
 	NewSaleVo getInvoiceDetails(String orderNumber) throws RecordNotFoundException;
-	
-	String saveLoyaltyPoints(LoyalityPointsVo loyalityVo) ;
+
+	String saveLoyaltyPoints(LoyalityPointsVo loyalityVo);
 
 	LoyalityPointsVo getLoyaltyPointsByLoyaltyId(Long loyaltyId) throws RecordNotFoundException;
 
 	List<LoyalityPointsVo> getAllLoyaltyPoints() throws RecordNotFoundException;
-	
+
 	LoyalityPointsVo getLoyaltyPointsByUserId(Long userId) throws RecordNotFoundException;
 
 	List<LoyalityPointsVo> searchLoyaltyPoints(SearchLoyaltyPointsVo vo) throws RecordNotFoundException;
 
 	List<GiftVoucherVo> getGvByUserId(Long userId) throws RecordNotFoundException;
+
+	String activateGiftvoucher(List<String> gvsList, Boolean flag) throws RecordNotFoundException;
 
 }

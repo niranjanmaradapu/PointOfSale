@@ -3,6 +3,7 @@ package com.otsi.retail.newSale.vo;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.otsi.retail.newSale.common.NoteType;
 import com.otsi.retail.newSale.common.OrderStatus;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,8 @@ public class NewSaleVo {
 	private Long userId;
 
 	private SaleNature natureOfSale;
+	
+	private NoteType note;
 
 	private OrderStatus status;
 
