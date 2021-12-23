@@ -2,8 +2,8 @@ package com.otsi.retail.customerManagement.controller;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +21,7 @@ import com.otsi.retail.customerManagement.service.ReasonService;
 @RequestMapping("/reason")
 public class ReasonController {
 
-	private Logger log = LoggerFactory.getLogger(ReasonController.class);
+	private Logger log = LogManager.getLogger(ReasonController.class);
 	@Autowired
 	private ReasonService reasonService;
 
