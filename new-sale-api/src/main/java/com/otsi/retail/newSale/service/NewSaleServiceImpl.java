@@ -164,6 +164,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		entity.setUserId(vo.getUserId());
 		entity.setNatureOfSale(vo.getNatureOfSale());
+		entity.setNote(vo.getNote());
 		entity.setDomainId(vo.getDomainId());
 		entity.setGrossValue(vo.getGrossAmount());
 		entity.setPromoDisc(vo.getTotalPromoDisc());
@@ -1179,8 +1180,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			GiftVoucherEntity entity = new GiftVoucherEntity();
 			BeanUtils.copyProperties(vo, entity);
-			entity.setCreatedDate(LocalDate.now());
-			entity.setIsTagged(Boolean.FALSE);
+			entity.setCreationDate(LocalDate.now());
+			entity.setIsActivated(Boolean.FALSE);
 			GiftVoucherEntity savedGf = gvRepo.save(entity);
 			log.info("Gift voucher saved successfully : " + savedGf);
 			return "Gift voucher saved succesfully..";
@@ -1193,11 +1194,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// Method for getting Gift voucher details by Gv Number
 	@Override
-	public GiftVoucherVo getGiftVoucher(String gvNumber) throws InvalidInputException {
+	public GiftVoucherVo getGiftVoucher(String gvNumber, Long clientId) throws InvalidInputException {
 
-		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumber(gvNumber);
+		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumberAndClientId(gvNumber, clientId);
 
-		if (gvEntity.isPresent()) {
+		if (gvEntity.isPresent() && gvEntity.get().getIsActivated()
+				&& gvEntity.get().getFromDate().isBefore(LocalDate.now())
+				&& gvEntity.get().getToDate().isAfter(LocalDate.now())) {
 			GiftVoucherVo vo = new GiftVoucherVo();
 			BeanUtils.copyProperties(gvEntity.get(), vo);
 			return vo;
@@ -1214,15 +1217,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 		Optional<GiftVoucherEntity> gv = gvRepo.findById(gvId);
 
 		// Gift voucher should not be tagged and expiry date should greater than today
-		if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
-			gv.get().setUserId(userId);
-			gv.get().setIsTagged(Boolean.TRUE);
-			gvRepo.save(gv.get());
-			log.info("Tagged giftvoucher " + gvId + "to user " + userId);
-		} else {
-			log.error("Entered Gift voucher is not valid : " + gvId);
-			throw new InvalidInputException("Gift voucher is not valid");
-		}
+//		if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
+//			gv.get().setUserId(userId);
+//			gv.get().setIsTagged(Boolean.TRUE);
+//			gvRepo.save(gv.get());
+//			log.info("Tagged giftvoucher " + gvId + "to user " + userId);
+//		} else {
+//			log.error("Entered Gift voucher is not valid : " + gvId);
+//			throw new InvalidInputException("Gift voucher is not valid");
+//		}
 		return "Gift vocher tagged successfully  " + gv.get().getGvNumber();
 	}
 
@@ -1651,19 +1654,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public List<GiftVoucherVo> getGvByUserId(Long userId) throws RecordNotFoundException {
 
-		List<GiftVoucherEntity> gvsList = gvRepo.findByUserIdAndExpiryDateGreaterThanEqual(userId, LocalDate.now());
-		List<GiftVoucherVo> gvVosList = new ArrayList<>();
+//		List<GiftVoucherEntity> gvsList = gvRepo.findByUserIdAndExpiryDateGreaterThanEqual(userId, LocalDate.now());
+//		List<GiftVoucherVo> gvVosList = new ArrayList<>();
 
-		if (!gvsList.isEmpty()) {
-			gvsList.stream().forEach(x -> {
-				GiftVoucherVo vo = new GiftVoucherVo();
-				BeanUtils.copyProperties(x, vo);
-				gvVosList.add(vo);
-			});
-		} else {
-			throw new RecordNotFoundException("No records found with user id : " + userId);
-		}
-		return gvVosList;
+//		if (!gvsList.isEmpty()) {
+//			gvsList.stream().forEach(x -> {
+//				GiftVoucherVo vo = new GiftVoucherVo();
+//				BeanUtils.copyProperties(x, vo);
+//				gvVosList.add(vo);
+//			});
+//		} else {
+//			throw new RecordNotFoundException("No records found with user id : " + userId);
+//		}
+		return null;
 	}
 
 	// Method for fetching invoice details by using order number
@@ -1770,4 +1773,23 @@ public class NewSaleServiceImpl implements NewSaleService {
 		return dataList;
 	}
 
+	// Method for change flag of Giftvoucher
+	@Override
+	public String activateGiftvoucher(List<String> gvsList, Boolean flag) throws RecordNotFoundException {
+
+		List<GiftVoucherEntity> gvEntities = gvRepo.findByGvNumberIn(gvsList);
+
+		if (!gvEntities.isEmpty()) {
+
+			gvEntities.stream().forEach(x -> {
+
+				x.setIsActivated(flag);
+
+				gvRepo.save(x);
+			});
+			return "success";
+		} else {
+			throw new RecordNotFoundException("Record not found");
+		}
+	}
 }
