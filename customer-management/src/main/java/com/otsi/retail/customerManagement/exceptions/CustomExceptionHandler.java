@@ -1,7 +1,8 @@
 package com.otsi.retail.customerManagement.exceptions;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,7 +14,7 @@ import com.otsi.retail.customerManagement.errors.ErrorResponse;
 @ControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 	
-	private Logger log = LoggerFactory.getLogger(CustomExceptionHandler.class);
+	private Logger log = LogManager.getLogger(CustomExceptionHandler.class);
 
 	@ExceptionHandler(value = RecordNotFoundException.class)
 	public ResponseEntity<Object> handleRecordNotFoundException(RecordNotFoundException recordNotException) {

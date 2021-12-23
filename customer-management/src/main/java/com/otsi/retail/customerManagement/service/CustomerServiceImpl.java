@@ -8,15 +8,12 @@ import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.otsi.retail.customerManagement.exceptions.ServiceDownException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,8 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -36,20 +31,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.otsi.retail.customerManagement.config.Config;
-import com.otsi.retail.customerManagement.controller.ReasonController;
 import com.otsi.retail.customerManagement.exceptions.DataNotFoundException;
-import com.otsi.retail.customerManagement.exceptions.InvalidDataException;
 import com.otsi.retail.customerManagement.exceptions.RecordNotFoundException;
+import com.otsi.retail.customerManagement.exceptions.ServiceDownException;
 import com.otsi.retail.customerManagement.gatewayresponse.GateWayResponse;
 import com.otsi.retail.customerManagement.mapper.ReturnSlipMapper;
-import com.otsi.retail.customerManagement.model.Barcode;
 import com.otsi.retail.customerManagement.model.ReturnSlip;
 import com.otsi.retail.customerManagement.model.TaggedItems;
 import com.otsi.retail.customerManagement.repo.BarcodeRepo;
 import com.otsi.retail.customerManagement.repo.ReturnSlipRepo;
-import com.otsi.retail.customerManagement.service.CustomerService;
 import com.otsi.retail.customerManagement.utils.ReturnSlipStatus;
-import com.otsi.retail.customerManagement.vo.BarcodeVo;
 import com.otsi.retail.customerManagement.vo.CustomerDetailsVo;
 import com.otsi.retail.customerManagement.vo.GenerateReturnSlipRequest;
 import com.otsi.retail.customerManagement.vo.HsnDetailsVo;
@@ -60,13 +51,15 @@ import com.otsi.retail.customerManagement.vo.NewSaleList;
 import com.otsi.retail.customerManagement.vo.RetrnSlipDetailsVo;
 import com.otsi.retail.customerManagement.vo.TaxVo;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 /**
  * @author vasavi
  */
 @Component
 public class CustomerServiceImpl implements CustomerService {
 
-	private Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
+	private Logger log = LogManager.getLogger(CustomerServiceImpl.class);
 
 	@Autowired
 	private BarcodeRepo barCodeRepo;
