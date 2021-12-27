@@ -24,8 +24,10 @@ public class UserDetailsVo {
 	private List<ClientDomains> clientDomians;
 	@JsonIgnore
 	private List<UserAv> userAv;
-	private List<StoreVo> stores;
-	private StoreVo ownerOf;
+	@JsonIgnore
+    private List<StoreVo> stores;
+	@JsonIgnore
+    private StoreVo ownerOf;
 	private boolean isSuperAdmin;
 	private boolean isCustomer;
 
