@@ -49,6 +49,8 @@ public class CommonRequestMappigs {
 	
 	public static final String ADD_BENFIT = "addbenfit";
 	
+	public static final String ACTIVEVSINACTIVEPROMOS= "activeVSinactivepromos";
+	
 	
 
 }

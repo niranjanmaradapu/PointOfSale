@@ -42,6 +42,7 @@ import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 import com.otsi.retail.connectionpool.vo.ConnectionPromoVo;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
+import com.otsi.retail.connectionpool.vo.ReportVo;
 import com.otsi.retail.connectionpool.vo.SearchPromotionsVo;
 import com.otsi.retail.connectionpool.vo.StoreVo;
 
@@ -583,6 +584,27 @@ public class PromotionServiceImpl implements PromotionService {
 		}
 		
 		return "Benfit Saving Failed";
+	}
+
+	@Override
+	public List<ReportVo> activeVSinactivePromos() {
+		
+		List<ReportVo> rvo = new ArrayList<ReportVo>();
+		
+		List<PromotionsEntity> promos = promoRepo.findByIsActive(Boolean.TRUE);
+		Long acount = promos.stream().mapToLong(i->i.getPromoId()).count();
+		ReportVo avo = new ReportVo();
+		avo.setName("Active Promos");
+		avo.setCount(acount);
+		rvo.add(avo);
+		List<PromotionsEntity> ipromos = promoRepo.findByIsActive(Boolean.FALSE);
+		Long icount = ipromos.stream().mapToLong(i->i.getPromoId()).count();
+		ReportVo ivo = new ReportVo();
+		ivo.setName("InActive Promos");
+		ivo.setCount(icount);
+		rvo.add(avo);
+		
+		return rvo;
 	}
 
 }
