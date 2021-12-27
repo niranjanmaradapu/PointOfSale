@@ -23,6 +23,7 @@ import com.otsi.retail.connectionpool.vo.BenfitVo;
 import com.otsi.retail.connectionpool.vo.ConnectionPromoVo;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
+import com.otsi.retail.connectionpool.vo.ReportVo;
 import com.otsi.retail.connectionpool.vo.SearchPromotionsVo;
 import com.otsi.retail.connectionpool.vo.StoreVo;
 import com.sun.istack.NotNull;
@@ -169,6 +170,15 @@ public class PromotionController {
 		String saveBenfit = promoService.saveBenfit(vo);
 		return new GateWayResponse<>("added benfit successfully", saveBenfit);
 
+	}
+	
+	@GetMapping(CommonRequestMappigs.ACTIVEVSINACTIVEPROMOS)
+	
+	public GateWayResponse<?>activeVSinactivePromos(){
+		log.info("Recieved request to activeVSinactivePromos()");
+		List<ReportVo> vo = promoService.activeVSinactivePromos();
+		return new GateWayResponse<>("", vo);
+		
 	}
 
 }
