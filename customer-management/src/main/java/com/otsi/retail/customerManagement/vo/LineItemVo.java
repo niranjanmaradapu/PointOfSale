@@ -20,6 +20,8 @@ public class LineItemVo {
 	private Long domainId;
 	
 	private String section;
+	
+	private Long userId;
 
 	private String barCode;
 
