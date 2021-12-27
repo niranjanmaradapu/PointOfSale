@@ -49,5 +49,9 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 
 	List<NewSaleEntity> findByStatus(OrderStatus orderStatus);
 
+	List<NewSaleEntity> findByStoreId(Long n);
+
+	
+
 
 }

@@ -1267,9 +1267,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		List<NewSaleEntity> saleDetails = new ArrayList<>();
 
-		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() != null) {
+		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore().getId() != 0L) {
 			saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreId(srvo.getDateFrom(), srvo.getDateTo(),
 					srvo.getStore().getId());
+		}else if(srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() == null) {
+			
+			saleDetails = newSaleRepository.findByCreationDateBetween(srvo.getDateFrom(), srvo.getDateTo());
+		}else if(srvo.getDateFrom() == null && srvo.getDateTo() == null && srvo.getStore().getId() != 0L) {
+			
+			saleDetails = newSaleRepository.findByStoreId(srvo.getStore().getId());
 		}
 
 		if (saleDetails.isEmpty()) {
