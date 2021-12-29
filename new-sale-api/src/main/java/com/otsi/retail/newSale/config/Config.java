@@ -37,6 +37,10 @@ public class Config {
 
 	@Value("${getreturnslip_url}")
 	private String getListOfReturnSlips;
+	
+
+	@Value("${getreturnslips_url}")
+	private String getAllListOfReturnSlips;
 
 	@Value("${getCustomerDetailsFromURM_url}")
 	private String getCustomerDetailsFromURM;

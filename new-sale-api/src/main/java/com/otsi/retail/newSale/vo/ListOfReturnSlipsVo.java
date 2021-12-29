@@ -40,7 +40,7 @@ public class ListOfReturnSlipsVo {
 
 	private Long recievedAmount;
 
-	private Date createdInfo;
+	private LocalDate createdInfo;
 
 	private String settelmentInfo;
 

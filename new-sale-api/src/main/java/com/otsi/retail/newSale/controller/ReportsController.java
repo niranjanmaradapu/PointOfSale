@@ -61,4 +61,17 @@ public class ReportsController {
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());		}
 
 	}
+	
+	@GetMapping(value = "/getsaleSummery")
+	public GateWayResponse<?> getsaleSummeryDetails() {
+		try {
+
+		List<ReportVo> rvo = reportService.getsaleSummeryDetails();
+
+		return new GateWayResponse<>(HttpStatus.OK, rvo, "");
+		}catch(Exception e)
+		{
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());		}
+
+	}
 }

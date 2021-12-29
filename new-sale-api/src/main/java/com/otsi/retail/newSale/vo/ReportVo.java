@@ -16,5 +16,7 @@ public class ReportVo {
 	private Long amount;
 	private Long storeId;
 	
+	private String name;
+	
 
 }
