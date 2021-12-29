@@ -602,7 +602,7 @@ public class PromotionServiceImpl implements PromotionService {
 		ReportVo ivo = new ReportVo();
 		ivo.setName("InActive Promos");
 		ivo.setCount(icount);
-		rvo.add(avo);
+		rvo.add(ivo);
 		
 		return rvo;
 	}
