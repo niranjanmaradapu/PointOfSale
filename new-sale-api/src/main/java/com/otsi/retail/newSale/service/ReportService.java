@@ -14,6 +14,8 @@ public interface ReportService {
 	List<ReportVo> getSaleMonthyTrendDetails();
 
 	List<ReportVo> getTopfiveSalesByStore();
+
+	List<ReportVo> getsaleSummeryDetails();
 	
 
 }
