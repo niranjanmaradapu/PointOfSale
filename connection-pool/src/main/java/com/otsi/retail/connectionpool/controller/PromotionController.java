@@ -64,7 +64,7 @@ public class PromotionController {
 	}
 
 	// Method for modifying/editing Promotion
-	@PostMapping(CommonRequestMappigs.EDIT_PROMO)
+	@PutMapping(CommonRequestMappigs.EDIT_PROMO)
 	public GateWayResponse<?> editPromotion(@RequestBody PromotionsVo vo) {
 		log.info("Recieved request to editPromotion():" + vo);
 		String result = promoService.editPromotion(vo);
