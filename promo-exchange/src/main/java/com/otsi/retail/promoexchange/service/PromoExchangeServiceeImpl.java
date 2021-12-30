@@ -2,20 +2,16 @@ package com.otsi.retail.promoexchange.service;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -26,10 +22,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.otsi.retail.promoexchange.Entity.CustomerDetailsEntity;
 import com.otsi.retail.promoexchange.Entity.PromoExchangeEntity;
 import com.otsi.retail.promoexchange.config.Config;
-import com.otsi.retail.promoexchange.exceptions.DataNotFoundException;
 import com.otsi.retail.promoexchange.exceptions.InvalidDataException;
 import com.otsi.retail.promoexchange.exceptions.RecordNotFoundException;
 import com.otsi.retail.promoexchange.gateway.GateWayResponse;
@@ -38,13 +32,14 @@ import com.otsi.retail.promoexchange.repository.CustomerDetailsRepo;
 import com.otsi.retail.promoexchange.repository.PromoExchangeRepository;
 import com.otsi.retail.promoexchange.vo.DeliverySlipVo;
 import com.otsi.retail.promoexchange.vo.ListOfReturnSlipsVo;
-import com.otsi.retail.promoexchange.vo.ListOfSaleBillsVo;
 import com.otsi.retail.promoexchange.vo.PromoExchangeVo;
 
 @Component
 public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
-	private Logger log = LoggerFactory.getLogger(PromoExchangeServiceeImpl.class);
+	//private Logger log = LoggerFactory.getLogger(PromoExchangeServiceeImpl.class);
+	
+	  private Logger log= LogManager.getLogger(PromoExchangeServiceeImpl.class);
 
 	@Autowired
 	private RestTemplate template;
