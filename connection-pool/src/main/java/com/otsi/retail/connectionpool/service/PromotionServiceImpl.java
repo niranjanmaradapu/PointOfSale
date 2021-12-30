@@ -95,9 +95,9 @@ public class PromotionServiceImpl implements PromotionService {
 
 		List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
 		
-		BenfitVo bvo = vo.getBenfitVo();
+		// BenfitVo bvo = vo.getBenfitVo();
 
-		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList,bvo);
+		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList);
 	
 
 		if (poolVo.size() == poolList.size()) {
@@ -179,11 +179,11 @@ public class PromotionServiceImpl implements PromotionService {
 
 			List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
             
-			BenfitVo bvo = vo.getBenfitVo();
+			//BenfitVo bvo = vo.getBenfitVo();
 
 			if ((poolVo.size() == poolList.size()) /*&& (bvo.getBenfitId().equals(vo.getBenfitVo().getBenfitId()))*/) {
 
-				PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList,bvo);
+				PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList);
 				PromotionsEntity savedPromo = promoRepo.save(entity);
 
 			} else {
