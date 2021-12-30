@@ -440,6 +440,24 @@ public class PromotionServiceImpl implements PromotionService {
 			newDto.setPrintNameOnBill(dto.get().getPrintNameOnBill());
 			newDto.setApplicability(dto.get().getApplicability());
 			newDto.setBuyItemsFromPool(dto.get().getBuyItemsFromPool());
+			
+            List<BenfitEntity> benfits = new ArrayList<>();
+			
+			newDto.getBenfitEntity().stream().forEach(b -> {
+			    BenfitEntity benfit = new BenfitEntity();
+			    benfit.setBenfitType(b.getBenfitType());
+			    benfit.setBenfitId(b.getBenfitId());
+			    benfit.setDiscountType(b.getDiscountType());
+			    benfit.setDiscount(b.getDiscount());
+			    benfit.setNumOfItemsFromBuyPool(b.getNumOfItemsFromBuyPool());
+			    benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
+			    benfit.setItemValue(b.getItemValue());
+			    benfit.setPercentageDiscountOn(b.getPercentageDiscountOn());
+			    benfit.setPoolId(b.getPoolId());
+			    benfit.setPoolName(b.getPoolName());
+			    benfits.add(benfit);
+			});
+			newDto.setBenfitEntity(benfits);
 			promoRepo.save(newDto);
 		} else {
 
