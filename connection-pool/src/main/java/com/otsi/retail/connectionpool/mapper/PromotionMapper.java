@@ -64,6 +64,8 @@ public class PromotionMapper {
 			benfit.setPoolId(b.getPoolId());
 			benfit.setPercentageDiscountOn(b.getPercentageDiscountOn());
 			benfit.setPoolName(b.getPoolName());
+			benfit.setToSlab(b.getToSlab());
+			benfit.setFromSlab(b.getFromSlab());
 			benfitEntity.add(benfit);
 		});
 		promo.setBenfitEntity(benfitEntity);
@@ -111,6 +113,8 @@ public class PromotionMapper {
 			    bvo.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
 			    bvo.setPoolId(b.getPoolId());
 			    bvo.setPoolName(b.getPoolName());
+			    bvo.setToSlab(b.getToSlab());
+			    bvo.setFromSlab(b.getFromSlab());
 			    benfitVos.add(bvo);		
 			    });
 
