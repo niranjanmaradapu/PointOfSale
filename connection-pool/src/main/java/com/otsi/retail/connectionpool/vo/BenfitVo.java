@@ -40,5 +40,9 @@ public class BenfitVo {
     private Long poolId;
 	
 	private String poolName;
+	
+    private float toSlab;
+	
+	private float fromSlab;
 
 }

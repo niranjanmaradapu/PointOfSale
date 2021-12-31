@@ -52,6 +52,10 @@ public class BenfitEntity {
 	private Long poolId;
 	
 	private String poolName;
+	
+	private float toSlab;
+	
+	private float fromSlab;
 
 	// one benefit have one promotion only
     // @OneToOne(mappedBy = "benfitEntity")

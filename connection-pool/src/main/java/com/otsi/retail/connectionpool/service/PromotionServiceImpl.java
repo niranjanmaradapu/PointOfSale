@@ -455,6 +455,8 @@ public class PromotionServiceImpl implements PromotionService {
 			    benfit.setPercentageDiscountOn(b.getPercentageDiscountOn());
 			    benfit.setPoolId(b.getPoolId());
 			    benfit.setPoolName(b.getPoolName());
+			    benfit.setToSlab(b.getToSlab());
+			    benfit.setFromSlab(b.getFromSlab());
 			    benfits.add(benfit);
 			});
 			newDto.setBenfitEntity(benfits);
