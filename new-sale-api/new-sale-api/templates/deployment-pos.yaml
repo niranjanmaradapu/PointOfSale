@@ -72,7 +72,7 @@ spec:
         - name: new-sale-api-data
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "new-sale-api.fullname" . }}-pos
+            claimName: {{ include "new-sale-api.fullname" . }}
         {{- else }}
           emptyDir: {}
         {{- end -}}
