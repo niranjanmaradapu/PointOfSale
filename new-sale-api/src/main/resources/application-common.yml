@@ -1,19 +1,19 @@
 server:
- port: 8081
+  port: 8081
 
 spring:
- application:
+  application:
     name: new-sale-service 
- datasource:
+  datasource:
     platform: postgres
     url: jdbc:postgresql://localhost:5432/newSale1
     username: postgres
     password: Otsi@123
- jpa:
-   hibernate:
-    ddl-auto: update
-   database-platform: org.hibernate.dialect.PostgreSQL9Dialect
-   show-sql: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+      database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+      show-sql: true
    
 eureka:
   client:
