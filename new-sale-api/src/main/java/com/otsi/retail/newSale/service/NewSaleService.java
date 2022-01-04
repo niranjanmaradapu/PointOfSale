@@ -77,7 +77,7 @@ public interface NewSaleService {
 
 	String editLineItem(LineItemVo lineItem) throws RecordNotFoundException;
 
-	LineItemVo getLineItemByBarcode(String barCode, Long domainId) throws RecordNotFoundException;
+	List<LineItemVo> getLineItemByBarcode(String barCode, Long domainId) throws RecordNotFoundException;
 
 	String deleteLineItem(String barCode, Long domainId) throws RecordNotFoundException;
 

@@ -16,7 +16,7 @@ public interface DeliverySlipRepository extends JpaRepository<DeliverySlipEntity
 
 	DeliverySlipEntity findByDsNumber(String dsNumber);
 
-	List<DeliverySlipEntity> findByDsId(Long dsId);
+	DeliverySlipEntity findByDsId(Long dsId);
 
 	List<DeliverySlipEntity> findByCreationDateBetweenAndDsId(LocalDate dateFrom, LocalDate dateTo, Long dsId);
 
@@ -31,7 +31,7 @@ public interface DeliverySlipRepository extends JpaRepository<DeliverySlipEntity
 
 	List<DeliverySlipEntity> findByStatusAndCreationDate(DSStatus completed, LocalDate now);
 
-	List<DeliverySlipEntity> findByCreationDateBetweenAndDsIdOrderByCreationDateAsc(LocalDate dateFrom,
+	DeliverySlipEntity findByCreationDateBetweenAndDsIdOrderByCreationDateAsc(LocalDate dateFrom,
 			LocalDate dateTo, Long dsId);
 
 	List<DeliverySlipEntity> findByCreationDateBetweenAndStatusOrderByCreationDateAsc(LocalDate dateFrom,
@@ -43,7 +43,7 @@ public interface DeliverySlipRepository extends JpaRepository<DeliverySlipEntity
 
 	List<DeliverySlipEntity> findByCreationDateBetweenOrderByCreationDateAsc(LocalDate dateFrom, LocalDate dateTo);
 
-	List<DeliverySlipEntity> findByCreationDateBetweenAndDsIdAndDsNumberAndStatusOrderByCreationDateAsc(
+	DeliverySlipEntity findByCreationDateBetweenAndDsIdAndDsNumberAndStatusOrderByCreationDateAsc(
 			LocalDate dateFrom, LocalDate dateTo, Long dsId, String dsNumber, DSStatus status);
 
 	List<DeliverySlipEntity> findByCreationDateBetweenAndDsNumberOrderByCreationDateAsc(LocalDate dateFrom,
