@@ -308,8 +308,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
 
 		List<NewSaleEntity> entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
-		NewSaleEntity orderRecord = entity.stream().findFirst().get();
-
+		
+		NewSaleEntity orderRecord = null;
+		
+		if (entity.size() != 0) {
+			orderRecord = entity.stream().findFirst().get();
+		}
 		if (orderRecord != null) {
 
 			PaymentAmountType payDetails = new PaymentAmountType();
@@ -345,7 +349,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			// Update order status once payment is done
 			NewSaleEntity save = newSaleRepository.save(order.get());
 
-			// updateOrderItemsInInventory(order.get());
+			updateOrderItemsInInventory(order.get());
 			return "successfully updated payment deatils";
 
 		} else {
