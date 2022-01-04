@@ -205,7 +205,7 @@ public class NewSaleController {
 			throws RecordNotFoundException {
 
 		log.info("Recieved request for getting line item : " + barCode);
-		LineItemVo result = newSaleService.getLineItemByBarcode(barCode, domainId);
+		List<LineItemVo> result = newSaleService.getLineItemByBarcode(barCode, domainId);
 
 		return new GateWayResponse<>("Success", result);
 
