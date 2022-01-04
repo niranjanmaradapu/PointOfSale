@@ -443,10 +443,10 @@ public class PromotionServiceImpl implements PromotionService {
 			
             List<BenfitEntity> benfits = new ArrayList<>();
 			
-			newDto.getBenfitEntity().stream().forEach(b -> {
+            dto.get().getBenfitEntity().stream().forEach(b -> {
 			    BenfitEntity benfit = new BenfitEntity();
 			    benfit.setBenfitType(b.getBenfitType());
-			    benfit.setBenfitId(b.getBenfitId());
+			    // benfit.setBenfitId(b.getBenfitId());
 			    benfit.setDiscountType(b.getDiscountType());
 			    benfit.setDiscount(b.getDiscount());
 			    benfit.setNumOfItemsFromBuyPool(b.getNumOfItemsFromBuyPool());
