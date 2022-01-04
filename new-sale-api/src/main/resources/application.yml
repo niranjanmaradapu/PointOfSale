@@ -20,8 +20,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-      database-platform: org.hibernate.dialect.PostgreSQL9Dialect
-      show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    show-sql: true
    
 eureka:
   client:
