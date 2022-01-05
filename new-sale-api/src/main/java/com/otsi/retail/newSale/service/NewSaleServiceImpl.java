@@ -1397,6 +1397,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineEntity.setHsnCode(lineItem.getHsnCode());
 					lineEntity.setActualValue(lineItem.getActualValue());
 					lineEntity.setTaxValue(lineItem.getTaxValue());
+					lineEntity.setCgst(lineItem.getCgst());
+					lineEntity.setSgst(lineItem.getSgst());
 
 					// GrossValue is multiple of net value of product and quantity
 					lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -1425,6 +1427,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineReEntity.setItemPrice(lineItem.getItemPrice());
 					lineReEntity.setSection(lineItem.getSection());
 					lineReEntity.setUserId(lineItem.getUserId());
+					lineReEntity.setTaxValue(lineItem.getTaxValue());
+					lineReEntity.setCgst(lineItem.getCgst());
+					lineReEntity.setSgst(lineItem.getSgst());
 
 					// GrossValue is multiple of net value of product and quantity
 					lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -1491,6 +1496,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 				line.setDiscount(lineItem.getDiscount());
 				line.setNetValue(lineItem.getNetValue());
 				line.setItemPrice(lineItem.getItemPrice());
+				line.setTaxValue(lineItem.getTaxValue());
+				line.setCgst(lineItem.getCgst());
+				line.setSgst(lineItem.getSgst());
 
 				// GrossValue is multiple of net value of product and quantity
 				line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -1516,6 +1524,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 				line.setNetValue(lineItem.getNetValue());
 				line.setItemPrice(lineItem.getItemPrice());
 				line.setUserId(lineItem.getUserId());
+				line.setTaxValue(lineItem.getTaxValue());
+				line.setCgst(lineItem.getCgst());
+				line.setSgst(lineItem.getSgst());
 
 				// GrossValue is multiple of net value of product and quantity
 				line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());

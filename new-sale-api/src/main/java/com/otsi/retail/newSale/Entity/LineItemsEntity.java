@@ -22,7 +22,7 @@ public class LineItemsEntity {
 	@Id
 	@GeneratedValue
 	private Long lineItemId;
-	
+
 	private String section;
 
 	private String barCode;
@@ -32,12 +32,16 @@ public class LineItemsEntity {
 	private int quantity;
 
 	private Long grossValue;
-	
+
 	private String hsnCode;
-	
+
 	private Long actualValue;
-	
+
 	private Long taxValue;
+
+	private Long cgst;
+
+	private Long sgst;
 
 	private Long discount;
 

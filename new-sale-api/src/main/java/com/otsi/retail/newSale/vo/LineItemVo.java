@@ -38,6 +38,10 @@ public class LineItemVo {
 	private Long actualValue;
 	
 	private Long taxValue;
+	
+	private Long cgst;
+	
+	private Long sgst;
 
 	private Long discount;
 
