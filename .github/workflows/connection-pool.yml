@@ -3,9 +3,13 @@ on:
   push:
     branches:
       - DevOps
+    paths:
+      - "connection-pool"
   pull_request:
     branches: 
       - DevOps
+    paths:
+      - "connection-pool"
 jobs:
   build:
     runs-on: ubuntu-latest
