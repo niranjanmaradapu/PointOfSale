@@ -8,15 +8,7 @@ spring:
     platform: postgres
     url: jdbc:postgresql://localhost:5432/newSale
     username: postgres
-    password: Otsi@123
-  rabbitmq:
-    host: http://aeb8cc91b2f7948a8bc858c8d8f7fb4d-768590259.ap-south-1.elb.amazonaws.com
-    password: guest
-    port: 15672
-    username: guest
-    exchange: inventory_exchange
-    queue: inventory_queue_textile
-    routingkey: inventory_rk    
+    password: Otsi@123 
   jpa:
     hibernate:
       ddl-auto: update
