@@ -3,9 +3,15 @@ on:
   push:
     branches:
       - DevOps
+    paths:
+      - "user-store-mapping"
+      - ".github/workflows/user-store-mapping.yml"
   pull_request:
     branches: 
       - DevOps
+    paths:
+      - "user-store-mapping"
+      - ".github/workflows/user-store-mapping.yml"
 jobs:
   build:
     runs-on: ubuntu-latest

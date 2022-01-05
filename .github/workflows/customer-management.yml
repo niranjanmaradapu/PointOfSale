@@ -3,9 +3,15 @@ on:
   push:
     branches:
       - DevOps
+    paths:
+      - "customer-management"
+      - ".github/workflows/customer-management.yml"
   pull_request:
     branches: 
       - DevOps
+    paths:
+      - "customer-management"
+      - ".github/workflows/customer-management.yml"
 jobs:
   build:
     runs-on: ubuntu-latest
