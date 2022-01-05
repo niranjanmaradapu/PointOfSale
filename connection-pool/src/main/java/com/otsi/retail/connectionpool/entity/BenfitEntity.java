@@ -7,12 +7,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.otsi.retail.connectionpool.common.BenfitType;
 import com.otsi.retail.connectionpool.common.DiscountType;
+import com.otsi.retail.connectionpool.common.ItemValue;
 import com.otsi.retail.connectionpool.common.PercentageDiscountOn;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,9 +42,27 @@ public class BenfitEntity {
 	private String discount;
 
 	private PercentageDiscountOn percentageDiscountOn;
+	
+    private Long numOfItemsFromGetPool;
+	
+	private Long numOfItemsFromBuyPool;
+	
+	private ItemValue itemValue;
+	
+	private Long poolId;
+	
+	private String poolName;
+	
+	private float toSlab;
+	
+	private float fromSlab;
 
 	// one benefit have one promotion only
-	@OneToOne(mappedBy = "benfitEntity")
+    // @OneToOne(mappedBy = "benfitEntity")
+    // private PromotionsEntity promotionEntity;
+	
+	@ManyToOne
+	@JoinColumn(name = "promoId")
 	private PromotionsEntity promotionEntity;
 
 }

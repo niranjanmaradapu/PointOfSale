@@ -9,6 +9,7 @@ import com.otsi.retail.connectionpool.vo.BenfitVo;
 import com.otsi.retail.connectionpool.vo.ConnectionPromoVo;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
+import com.otsi.retail.connectionpool.vo.ReportVo;
 import com.otsi.retail.connectionpool.vo.StoreVo;
 import com.otsi.retail.connectionpool.vo.SearchPromotionsVo;
 
@@ -44,6 +45,8 @@ public interface PromotionService {
 	List<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo);
 	
 	String saveBenfit(BenfitVo vo);
+
+	List<ReportVo> activeVSinactivePromos();
 
 	
 }

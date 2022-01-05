@@ -23,7 +23,7 @@ import com.otsi.retail.connectionpool.vo.PromotionsVo;
 @Component
 public class PromotionMapper {
 
-	public PromotionsEntity convertPromoVoToEntity(PromotionsVo vo, List<PoolEntity> poolList,BenfitVo bvo) {
+	public PromotionsEntity convertPromoVoToEntity(PromotionsVo vo, List<PoolEntity> poolList) {
 
 		PromotionsEntity promo = new PromotionsEntity();
 
@@ -50,16 +50,25 @@ public class PromotionMapper {
 		promo.setStoreName(vo.getStoreName());
 		//BeanUtils.copyProperties(vo, promo);
 		promo.setPoolEntity(poolList);// Mapping all poolIds to Promotions
-
-		BenfitEntity benfitEntity = new BenfitEntity();
-		benfitEntity.setBenfitId(bvo.getBenfitId());
-		benfitEntity.setBenfitType(bvo.getBenfitType());
-		benfitEntity.setDiscountType(bvo.getDiscountType());
-		benfitEntity.setPercentageDiscountOn(bvo.getPercentageDiscountOn());
-		benfitEntity.setDiscount(bvo.getDiscount());
-
-//		//BeanUtils.copyProperties(bvo, benfitEntity);
-        promo.setBenfitEntity(benfitEntity);
+		
+		List<BenfitEntity> benfitEntity = new ArrayList<>();
+		vo.getBenfitVo().stream().forEach(b -> {
+			BenfitEntity benfit = new BenfitEntity();
+			benfit.setBenfitId(b.getBenfitId());
+			benfit.setBenfitType(b.getBenfitType());
+			benfit.setDiscountType(b.getDiscountType());
+			benfit.setDiscount(b.getDiscount());
+			benfit.setItemValue(b.getItemValue());
+			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromBuyPool());
+			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
+			benfit.setPoolId(b.getPoolId());
+			benfit.setPercentageDiscountOn(b.getPercentageDiscountOn());
+			benfit.setPoolName(b.getPoolName());
+			benfit.setToSlab(b.getToSlab());
+			benfit.setFromSlab(b.getFromSlab());
+			benfitEntity.add(benfit);
+		});
+		promo.setBenfitEntity(benfitEntity);
 
 		return promo;
 	}
@@ -90,15 +99,24 @@ public class PromotionMapper {
 			vo.setPromoApplyType(x.getPromoApplyType());
 			vo.setPriority(x.getPriority());
 			listOfPromoVos.add(vo);
-
-			BenfitVo bvo = new BenfitVo();
-         
-			bvo.setBenfitId(x.getBenfitEntity().getBenfitId());
-			bvo.setBenfitType(x.getBenfitEntity().getBenfitType());
-			bvo.setDiscountType(x.getBenfitEntity().getDiscountType());
-			bvo.setPercentageDiscountOn(x.getBenfitEntity().getPercentageDiscountOn());
-			bvo.setDiscount(x.getBenfitEntity().getDiscount());
-			vo.setBenfitVo(bvo);
+			
+			List<BenfitVo> benfitVos = new ArrayList<>();
+			x.getBenfitEntity().stream().forEach(b -> {
+				BenfitVo bvo = new BenfitVo();
+				bvo.setBenfitId(b.getBenfitId());
+				bvo.setBenfitType(b.getBenfitType());
+				bvo.setDiscount(b.getDiscount());
+			    bvo.setDiscountType(b.getDiscountType());
+			    bvo.setItemValue(b.getItemValue());
+			    bvo.setPercentageDiscountOn(b.getPercentageDiscountOn());
+			    bvo.setNumOfItemsFromBuyPool(b.getNumOfItemsFromBuyPool());
+			    bvo.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
+			    bvo.setPoolId(b.getPoolId());
+			    bvo.setPoolName(b.getPoolName());
+			    bvo.setToSlab(b.getToSlab());
+			    bvo.setFromSlab(b.getFromSlab());
+			    benfitVos.add(bvo);		
+			    });
 
 			List<ConnectionPoolVo> poolList = new ArrayList<>();
 
@@ -114,6 +132,7 @@ public class PromotionMapper {
 				poolList.add(pool);
 			});
 			vo.setPoolVo(poolList);
+			vo.setBenfitVo(benfitVos);
 		});
 
 		return listOfPromoVos;

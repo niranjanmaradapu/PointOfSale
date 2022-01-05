@@ -189,12 +189,15 @@ public class NewSaleMapper {
 			});
 
 			DeliverySlipVo dsvo = new DeliverySlipVo();
+		Long amount=	x.getLineItems().stream().mapToLong(a->a.getNetValue()).sum();
+		Long grossAmount = x.getLineItems().stream().mapToLong(a->a.getGrossValue()).sum();
 
 			BeanUtils.copyProperties(x, dsvo);
 			dsvo.setLineItems(listBarVo);
+             dsvo.setNetAmount(amount);
+             dsvo.setMrp(grossAmount);
 
-			dsVoList.add(dsvo);
-
+dsVoList.add(dsvo);
 		});
 
 		// vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i ->

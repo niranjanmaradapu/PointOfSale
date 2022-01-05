@@ -6,11 +6,10 @@ package com.otsi.retail.customerManagement.controller;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +30,6 @@ import com.otsi.retail.customerManagement.vo.GenerateReturnSlipRequest;
 import com.otsi.retail.customerManagement.vo.HsnDetailsVo;
 import com.otsi.retail.customerManagement.vo.InvoiceRequestVo;
 import com.otsi.retail.customerManagement.vo.ListOfReturnSlipsVo;
-import com.otsi.retail.customerManagement.vo.NewSaleList;
 import com.otsi.retail.customerManagement.vo.RetrnSlipDetailsVo;
 
 @RestController
@@ -39,7 +37,7 @@ import com.otsi.retail.customerManagement.vo.RetrnSlipDetailsVo;
 @RequestMapping("/customer")
 public class CustomerController {
 
-	private Logger log = LoggerFactory.getLogger(CustomerController.class);
+	private Logger log = LogManager.getLogger(CustomerController.class);
 
 	@Autowired
 	private CustomerService customerService;

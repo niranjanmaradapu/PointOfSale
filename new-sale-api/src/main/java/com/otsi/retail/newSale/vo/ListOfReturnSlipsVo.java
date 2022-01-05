@@ -15,6 +15,8 @@ import lombok.Data;
 @Component
 @Data
 public class ListOfReturnSlipsVo {
+	
+	private int rsId;
 
 	private LocalDate dateFrom;
 
@@ -38,7 +40,7 @@ public class ListOfReturnSlipsVo {
 
 	private Long recievedAmount;
 
-	private Date createdInfo;
+	private LocalDate createdInfo;
 
 	private String settelmentInfo;
 

@@ -22,20 +22,20 @@ public class GiftVoucherEntity {
 	@GeneratedValue
 	private Long gvId;
 
-	private Long userId;
+	private Long clientId;
 
 	private String gvNumber;
 
 	private String description;
 
-	private Boolean isTagged;
+	private Boolean isActivated;
 
-	private LocalDate expiryDate;
+	private LocalDate fromDate;
 
-	private Long totalAmount;
+	private LocalDate toDate;
 
-	private Long leftOverAmount;
+	private Long value;
 
-	private LocalDate createdDate;
+	private LocalDate creationDate;
 
 }

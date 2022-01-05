@@ -5,7 +5,9 @@ package com.otsi.retail.connectionpool.vo;
 
 import com.otsi.retail.connectionpool.common.BenfitType;
 import com.otsi.retail.connectionpool.common.DiscountType;
+import com.otsi.retail.connectionpool.common.ItemValue;
 import com.otsi.retail.connectionpool.common.PercentageDiscountOn;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,5 +30,19 @@ public class BenfitVo {
 	private String discount;
 
 	private PercentageDiscountOn percentageDiscountOn;
+	
+    private Long numOfItemsFromBuyPool;
+	
+	private ItemValue itemValue;
+	
+	private Long numOfItemsFromGetPool;
+	
+    private Long poolId;
+	
+	private String poolName;
+	
+    private float toSlab;
+	
+	private float fromSlab;
 
 }

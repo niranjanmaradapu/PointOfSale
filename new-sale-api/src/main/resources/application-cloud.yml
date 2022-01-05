@@ -1,0 +1,50 @@
+server:
+ port: 8081
+
+spring:
+ application:
+    name: new-sale-service 
+ datasource:
+    platform: postgres
+    url: jdbc:postgresql://10.100.238.45:5432/new-sale-api
+    username: postgres
+    password: Otsi@123
+ jpa:
+   hibernate:
+    ddl-auto: update
+   database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+   show-sql: true
+   
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://10.100.143.45:8762/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${random.int}
+    hostname: localhost
+logging:
+    file:
+      name: C:/Users/ADMIN/Desktop/logs/newsale.log    
+    level:
+      com.otsi.retail.newSale.serviceimpl: DEBUG   
+springdoc:
+  packagesToScan: com.otsi.retail.newSale
+  
+######################### REST CALLS ###########################
+  
+  
+inventoryUpdateTextile_url: http://10.100.15.219:9092/inventoryTextile/fromNewsaleForTextile
+
+getreturnslip_url: http://10.100.67.139:8082/customer/getListOfReturnSlips
+
+getCustomerDetailsFromURM_url: http://10.100.160.240:8084/user/getUser
+
+inventoryUpdateRetail_url: http://10.100.15.219:9092/inventoryRetail/fromNewsaleForRetail
+
+getNewSaleWithHsn_url: http://10.100.177.121:8083/hsnDetails/getHsnDetails
+
+savecustomer_url: http://10.100.161.5:8081/customer/savecustomerdetails
+  
+  

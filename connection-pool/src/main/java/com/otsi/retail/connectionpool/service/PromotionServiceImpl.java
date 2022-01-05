@@ -42,6 +42,7 @@ import com.otsi.retail.connectionpool.vo.ConnectionPoolVo;
 import com.otsi.retail.connectionpool.vo.ConnectionPromoVo;
 import com.otsi.retail.connectionpool.vo.LineItemVo;
 import com.otsi.retail.connectionpool.vo.PromotionsVo;
+import com.otsi.retail.connectionpool.vo.ReportVo;
 import com.otsi.retail.connectionpool.vo.SearchPromotionsVo;
 import com.otsi.retail.connectionpool.vo.StoreVo;
 
@@ -94,9 +95,9 @@ public class PromotionServiceImpl implements PromotionService {
 
 		List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
 		
-		BenfitVo bvo = vo.getBenfitVo();
+		// BenfitVo bvo = vo.getBenfitVo();
 
-		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList,bvo);
+		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList);
 	
 
 		if (poolVo.size() == poolList.size()) {
@@ -178,11 +179,11 @@ public class PromotionServiceImpl implements PromotionService {
 
 			List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
             
-			BenfitVo bvo = vo.getBenfitVo();
+			//BenfitVo bvo = vo.getBenfitVo();
 
 			if ((poolVo.size() == poolList.size()) /*&& (bvo.getBenfitId().equals(vo.getBenfitVo().getBenfitId()))*/) {
 
-				PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList,bvo);
+				PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList);
 				PromotionsEntity savedPromo = promoRepo.save(entity);
 
 			} else {
@@ -439,6 +440,26 @@ public class PromotionServiceImpl implements PromotionService {
 			newDto.setPrintNameOnBill(dto.get().getPrintNameOnBill());
 			newDto.setApplicability(dto.get().getApplicability());
 			newDto.setBuyItemsFromPool(dto.get().getBuyItemsFromPool());
+			
+            List<BenfitEntity> benfits = new ArrayList<>();
+			
+            dto.get().getBenfitEntity().stream().forEach(b -> {
+			    BenfitEntity benfit = new BenfitEntity();
+			    benfit.setBenfitType(b.getBenfitType());
+			    // benfit.setBenfitId(b.getBenfitId());
+			    benfit.setDiscountType(b.getDiscountType());
+			    benfit.setDiscount(b.getDiscount());
+			    benfit.setNumOfItemsFromBuyPool(b.getNumOfItemsFromBuyPool());
+			    benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
+			    benfit.setItemValue(b.getItemValue());
+			    benfit.setPercentageDiscountOn(b.getPercentageDiscountOn());
+			    benfit.setPoolId(b.getPoolId());
+			    benfit.setPoolName(b.getPoolName());
+			    benfit.setToSlab(b.getToSlab());
+			    benfit.setFromSlab(b.getFromSlab());
+			    benfits.add(benfit);
+			});
+			newDto.setBenfitEntity(benfits);
 			promoRepo.save(newDto);
 		} else {
 
@@ -583,6 +604,27 @@ public class PromotionServiceImpl implements PromotionService {
 		}
 		
 		return "Benfit Saving Failed";
+	}
+
+	@Override
+	public List<ReportVo> activeVSinactivePromos() {
+		
+		List<ReportVo> rvo = new ArrayList<ReportVo>();
+		
+		List<PromotionsEntity> promos = promoRepo.findByIsActive(Boolean.TRUE);
+		Long acount = promos.stream().mapToLong(i->i.getPromoId()).count();
+		ReportVo avo = new ReportVo();
+		avo.setName("Active Promos");
+		avo.setCount(acount);
+		rvo.add(avo);
+		List<PromotionsEntity> ipromos = promoRepo.findByIsActive(Boolean.FALSE);
+		Long icount = ipromos.stream().mapToLong(i->i.getPromoId()).count();
+		ReportVo ivo = new ReportVo();
+		ivo.setName("InActive Promos");
+		ivo.setCount(icount);
+		rvo.add(ivo);
+		
+		return rvo;
 	}
 
 }
