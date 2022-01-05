@@ -71,6 +71,6 @@ public class PromotionsVo {
 
 	private StoreVo storeVo;
 	
-	private BenfitVo benfitVo;
+	private List<BenfitVo> benfitVo;
 
 }

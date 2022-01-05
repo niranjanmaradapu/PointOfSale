@@ -14,6 +14,10 @@ public interface GiftVoucherRepo extends JpaRepository<GiftVoucherEntity, Long> 
 
 	Optional<GiftVoucherEntity> findByGvNumber(String gvNumber);
 
-	List<GiftVoucherEntity> findByUserIdAndExpiryDateGreaterThanEqual(Long userId, LocalDate now);
+	//List<GiftVoucherEntity> findByUserIdAndExpiryDateGreaterThanEqual(Long userId, LocalDate now);
+
+	List<GiftVoucherEntity> findByGvNumberIn(List<String> gvsList);
+
+	Optional<GiftVoucherEntity> findByGvNumberAndClientId(String gvNumber, Long clientId);
 
 }

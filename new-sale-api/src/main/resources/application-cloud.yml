@@ -37,7 +37,7 @@ springdoc:
   
 inventoryUpdateTextile_url: http://10.100.15.219:9092/inventoryTextile/fromNewsaleForTextile
 
-getreturnslip_url: http://localhost:8082/customer/getListOfReturnSlips
+getreturnslip_url: http://10.100.67.139:8082/customer/getListOfReturnSlips
 
 getCustomerDetailsFromURM_url: http://10.100.160.240:8084/user/getUser
 

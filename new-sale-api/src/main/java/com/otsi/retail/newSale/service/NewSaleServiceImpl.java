@@ -155,6 +155,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private LoyalityPointsRepo loyalityRepo;
+	
+	List<DeliverySlipEntity> dsDetails = new ArrayList<>();
+
 
 	// Method for saving order
 	@Override
@@ -164,6 +167,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		entity.setUserId(vo.getUserId());
 		entity.setNatureOfSale(vo.getNatureOfSale());
+		entity.setNote(vo.getNote());
 		entity.setDomainId(vo.getDomainId());
 		entity.setGrossValue(vo.getGrossAmount());
 		entity.setPromoDisc(vo.getTotalPromoDisc());
@@ -307,8 +311,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
 
 		List<NewSaleEntity> entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
-		NewSaleEntity orderRecord = entity.stream().findFirst().get();
-
+		
+		NewSaleEntity orderRecord = null;
+		
+		if (entity.size() != 0) {
+			orderRecord = entity.stream().findFirst().get();
+		}
 		if (orderRecord != null) {
 
 			PaymentAmountType payDetails = new PaymentAmountType();
@@ -344,7 +352,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			// Update order status once payment is done
 			NewSaleEntity save = newSaleRepository.save(order.get());
 
-			// updateOrderItemsInInventory(order.get());
+			updateOrderItemsInInventory(order.get());
 			return "successfully updated payment deatils";
 
 		} else {
@@ -743,161 +751,152 @@ public class NewSaleServiceImpl implements NewSaleService {
 	public ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo)
 			throws RecordNotFoundException {
 		log.debug("deugging getlistofDeliverySlips:" + listOfDeliverySlipVo);
-		List<DeliverySlipEntity> dsDetails = new ArrayList<DeliverySlipEntity>();
 
-		if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
-				&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() != null
-				&& listOfDeliverySlipVo.getBarcode() != null) {
+		try {
 
-			Optional<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
+			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
+					&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() != null
+					&& listOfDeliverySlipVo.getBarcode() != null) {
 
-			if (bar != null) {
-				dsDetails = dsRepo.findByCreationDateBetweenAndDsIdAndDsNumberAndStatusOrderByCreationDateAsc(
+				List<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
+
+				if (bar != null) {
+					bar.stream().forEach(b -> {
+						DeliverySlipEntity dsEntity = new DeliverySlipEntity();
+						dsEntity = dsRepo.findByCreationDateBetweenAndDsIdAndDsNumberAndStatusOrderByCreationDateAsc(
+								listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
+								b.getDsEntity().getDsId(), listOfDeliverySlipVo.getDsNumber(),
+								listOfDeliverySlipVo.getStatus());
+						dsDetails.add(dsEntity);
+					});
+
+				}
+
+			}
+			/*
+			 * getting the record using barcode
+			 */
+
+			if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
+					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
+					&& listOfDeliverySlipVo.getBarcode() != null) {
+
+				List<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
+
+				if (bar != null) {
+
+					bar.stream().forEach(b -> {
+						DeliverySlipEntity dentity = new DeliverySlipEntity();
+						dentity = dsRepo.findByDsId(b.getDsEntity().getDsId());
+						dsDetails.add(dentity);
+					});
+
+				}
+
+			}
+			/*
+			 * getting the record using barcode and dates
+			 */
+
+			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
+					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
+					&& listOfDeliverySlipVo.getBarcode() != null) {
+
+				List<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
+
+				if (bar != null) {
+
+					bar.stream().forEach(b -> {
+						DeliverySlipEntity dentity = new DeliverySlipEntity();
+
+						dentity = dsRepo.findByCreationDateBetweenAndDsIdOrderByCreationDateAsc(
+								listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
+								b.getDsEntity().getDsId());
+						dsDetails.add(dentity);
+					});
+
+				}
+			}
+			/*
+			 * getting the record using dsNumber and dates
+			 */
+			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
+					&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() == null
+					&& listOfDeliverySlipVo.getBarcode() == null) {
+
+				dsDetails = dsRepo.findByCreationDateBetweenAndDsNumberOrderByCreationDateAsc(
 						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-						bar.get().getDsEntity().getDsId(), listOfDeliverySlipVo.getDsNumber(),
+						listOfDeliverySlipVo.getDsNumber());
+
+			}
+			/*
+			 * getting the record using status and dates
+			 */
+			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
+					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
+					&& listOfDeliverySlipVo.getBarcode() == null) {
+
+				dsDetails = dsRepo.findByCreationDateBetweenAndStatusOrderByCreationDateAsc(
+						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
 						listOfDeliverySlipVo.getStatus());
 
-			} else {
-				log.error("No record found with given barcode");
-				throw new RecordNotFoundException("No record found with given barcode");
-			}
-		}
-		/*
-		 * getting the record using barcode
-		 */
-
-		if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
-				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
-				&& listOfDeliverySlipVo.getBarcode() != null) {
-
-			Optional<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
-
-			if (bar != null) {
-				dsDetails = dsRepo.findByDsId(bar.get().getDsEntity().getDsId());
-
-			} else {
-				log.error("No record found with given barcode");
-				throw new RecordNotFoundException("No record found with given barcode");
-			}
-		}
-		/*
-		 * getting the record using barcode and dates
-		 */
-
-		if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
-				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
-				&& listOfDeliverySlipVo.getBarcode() != null) {
-
-			Optional<LineItemsEntity> bar = lineItemRepo.findByBarCode(listOfDeliverySlipVo.getBarcode());
-
-			if (bar != null) {
-				dsDetails = dsRepo.findByCreationDateBetweenAndDsIdOrderByCreationDateAsc(
-						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-						bar.get().getDsEntity().getDsId());
-
-			} else {
-				log.error("No record found with given barcode");
-				throw new RecordNotFoundException("No record found with given barcode");
-			}
-		}
-		/*
-		 * getting the record using dsNumber and dates
-		 */
-		if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
-				&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() == null
-				&& listOfDeliverySlipVo.getBarcode() == null) {
-
-			dsDetails = dsRepo.findByCreationDateBetweenAndDsNumberOrderByCreationDateAsc(
-					listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-					listOfDeliverySlipVo.getDsNumber());
-
-			if (dsDetails == null) {
-				log.error("No record found with given information");
-				throw new RecordNotFoundException("No record found with given information");
 			}
 
-		}
-		/*
-		 * getting the record using status and dates
-		 */
-		if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
-				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
-				&& listOfDeliverySlipVo.getBarcode() == null) {
+			/*
+			 * getting the record using dsNumber
+			 */
 
-			dsDetails = dsRepo.findByCreationDateBetweenAndStatusOrderByCreationDateAsc(
-					listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-					listOfDeliverySlipVo.getStatus());
+			if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
+					&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() == null
+					&& listOfDeliverySlipVo.getBarcode() == null) {
 
-			if (dsDetails == null) {
-				log.error("No record found with given information");
-				throw new RecordNotFoundException("No record found with given information");
+				// List<String> dlsList = listOfDeliverySlipVo.stream().map(x ->
+				// x.getDsNumber()).collect(Collectors.toList());
+				List<String> dsList = new ArrayList<>();
+				dsList.add(listOfDeliverySlipVo.getDsNumber());
+				dsDetails = dsRepo.findByDsNumberInOrderByCreationDateAsc(dsList);
+
 			}
 
-		}
+			/*
+			 * getting the record using status
+			 */
 
-		/*
-		 * getting the record using dsNumber
-		 */
+			if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
+					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
+					&& listOfDeliverySlipVo.getBarcode() == null) {
 
-		if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
-				&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() == null
-				&& listOfDeliverySlipVo.getBarcode() == null) {
+				dsDetails = dsRepo.findByStatusOrderByCreationDateAsc(listOfDeliverySlipVo.getStatus());
 
-			// List<String> dlsList = listOfDeliverySlipVo.stream().map(x ->
-			// x.getDsNumber()).collect(Collectors.toList());
-			List<String> dsList = new ArrayList<>();
-			dsList.add(listOfDeliverySlipVo.getDsNumber());
-			dsDetails = dsRepo.findByDsNumberInOrderByCreationDateAsc(dsList);
-
-			if (dsDetails.isEmpty()) {
-
-				/*
-				 * throw new RuntimeException( "No record found with giver DS Number :" +
-				 * listOfDeliverySlipVo.getDsNumber());
-				 */
-				log.error("No record found with given DS Number");
-				throw new RecordNotFoundException("No record found with given DS Numbe");
 			}
+			/*
+			 * getting the record using dates
+			 */
+			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
+					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
+					&& listOfDeliverySlipVo.getBarcode() == null) {
 
-		}
+				dsDetails = dsRepo.findByCreationDateBetweenOrderByCreationDateAsc(listOfDeliverySlipVo.getDateFrom(),
+						listOfDeliverySlipVo.getDateTo());
 
-		/*
-		 * getting the record using status
-		 */
-
-		if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
-				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
-				&& listOfDeliverySlipVo.getBarcode() == null) {
-
-			dsDetails = dsRepo.findByStatusOrderByCreationDateAsc(listOfDeliverySlipVo.getStatus());
-
-			if (dsDetails == null) {
-				log.error("No record found with given DS Number");
-				throw new RecordNotFoundException("No record found with given DS Numbe");
 			}
+			ListOfDeliverySlipVo lvo=null;
+			if (!dsDetails.isEmpty()) {
+				 lvo = newSaleMapper.convertListDSToVo(dsDetails);
+				log.warn("we are testing is fetching list of deivery slips");
+				log.info("after getting list of delivery slips :" + lvo);
+				return lvo;
 
-		}
-		/*
-		 * getting the record using dates
-		 */
-		if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
-				&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
-				&& listOfDeliverySlipVo.getBarcode() == null) {
+			}else {
+				throw new RecordNotFoundException("record not found");
+			}
+			
+			
+		} catch (Exception ex) {
 
-			dsDetails = dsRepo.findByCreationDateBetweenOrderByCreationDateAsc(listOfDeliverySlipVo.getDateFrom(),
-					listOfDeliverySlipVo.getDateTo());
-
-		}
-		if (dsDetails.isEmpty()) {
-			log.error("No record found with given information");
-			throw new RecordNotFoundException("No record found with given information");
-		}
-
-		else {
-			ListOfDeliverySlipVo mapper = newSaleMapper.convertListDSToVo(dsDetails);
-			log.warn("we are testing is fetching list of deivery slips");
-			log.info("after getting list of delivery slips :" + mapper);
-			return mapper;
+			throw new RecordNotFoundException("record not found");
+		} finally {
+		  dsDetails.clear();
 		}
 
 	}
@@ -1179,8 +1178,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			GiftVoucherEntity entity = new GiftVoucherEntity();
 			BeanUtils.copyProperties(vo, entity);
-			entity.setCreatedDate(LocalDate.now());
-			entity.setIsTagged(Boolean.FALSE);
+			entity.setCreationDate(LocalDate.now());
+			entity.setIsActivated(Boolean.FALSE);
 			GiftVoucherEntity savedGf = gvRepo.save(entity);
 			log.info("Gift voucher saved successfully : " + savedGf);
 			return "Gift voucher saved succesfully..";
@@ -1193,11 +1192,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// Method for getting Gift voucher details by Gv Number
 	@Override
-	public GiftVoucherVo getGiftVoucher(String gvNumber) throws InvalidInputException {
+	public GiftVoucherVo getGiftVoucher(String gvNumber, Long clientId) throws InvalidInputException {
 
-		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumber(gvNumber);
+		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumberAndClientId(gvNumber, clientId);
 
-		if (gvEntity.isPresent()) {
+		if (gvEntity.isPresent() && gvEntity.get().getIsActivated()
+				&& gvEntity.get().getFromDate().isBefore(LocalDate.now())
+				&& gvEntity.get().getToDate().isAfter(LocalDate.now())) {
 			GiftVoucherVo vo = new GiftVoucherVo();
 			BeanUtils.copyProperties(gvEntity.get(), vo);
 			return vo;
@@ -1214,15 +1215,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 		Optional<GiftVoucherEntity> gv = gvRepo.findById(gvId);
 
 		// Gift voucher should not be tagged and expiry date should greater than today
-		if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
-			gv.get().setUserId(userId);
-			gv.get().setIsTagged(Boolean.TRUE);
-			gvRepo.save(gv.get());
-			log.info("Tagged giftvoucher " + gvId + "to user " + userId);
-		} else {
-			log.error("Entered Gift voucher is not valid : " + gvId);
-			throw new InvalidInputException("Gift voucher is not valid");
-		}
+//		if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
+//			gv.get().setUserId(userId);
+//			gv.get().setIsTagged(Boolean.TRUE);
+//			gvRepo.save(gv.get());
+//			log.info("Tagged giftvoucher " + gvId + "to user " + userId);
+//		} else {
+//			log.error("Entered Gift voucher is not valid : " + gvId);
+//			throw new InvalidInputException("Gift voucher is not valid");
+//		}
 		return "Gift vocher tagged successfully  " + gv.get().getGvNumber();
 	}
 
@@ -1267,6 +1268,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() != null) {
 			saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreId(srvo.getDateFrom(), srvo.getDateTo(),
 					srvo.getStore().getId());
+		}else if(srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() == null) {
+			
+			saleDetails = newSaleRepository.findByCreationDateBetween(srvo.getDateFrom(), srvo.getDateTo());
+		}else if(srvo.getDateFrom() == null && srvo.getDateTo() == null && srvo.getStore().getId() != 0L) {
+			
+			saleDetails = newSaleRepository.findByStoreId(srvo.getStore().getId());
 		}
 
 		if (saleDetails.isEmpty()) {
@@ -1526,16 +1533,20 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	// Method for getting line item by using Bar code
-	@Override
-	public LineItemVo getLineItemByBarcode(String barCode, Long domainId) throws RecordNotFoundException {
+	public List<LineItemVo> getLineItemByBarcode(String barCode, Long domainId) throws RecordNotFoundException {
 
 		if (domainId == DomainData.TE.getId()) {
-			Optional<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
-			if (lineItem.isPresent()) {
+			List<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
+			List<LineItemVo> lvo = new ArrayList<>();
+			if (lineItem != null) {
+				lineItem.stream().forEach(b -> {
 
-				LineItemVo vo = new LineItemVo();
-				BeanUtils.copyProperties(lineItem.get(), vo);
-				return vo;
+					LineItemVo vo = new LineItemVo();
+					BeanUtils.copyProperties(b, vo);
+					lvo.add(vo);
+
+				});
+				return lvo;
 
 			} else {
 				log.info("Provide valid barcode for getting line item : " + barCode);
@@ -1543,12 +1554,17 @@ public class NewSaleServiceImpl implements NewSaleService {
 			}
 
 		} else {
-			Optional<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode);
-			if (lineItem.isPresent()) {
-				LineItemVo vo = new LineItemVo();
-				BeanUtils.copyProperties(lineItem.get(), vo);
-				return vo;
+			List<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode);
+			if (lineItem != null) {
+				List<LineItemVo> lvo = new ArrayList<>();
+				lineItem.stream().forEach(b -> {
 
+					LineItemVo vo = new LineItemVo();
+					BeanUtils.copyProperties(b, vo);
+					lvo.add(vo);
+
+				});
+				return lvo;
 			} else {
 				log.info("Provide valid barcode for getting line item : " + barCode);
 				throw new RecordNotFoundException("provide valide barcode");
@@ -1563,10 +1579,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 	public String deleteLineItem(String barCode, Long domainId) throws RecordNotFoundException {
 
 		if (domainId == DomainData.TE.getId()) {
-			Optional<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
-			if (lineItem.isPresent()) {
+			List<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
+			if (lineItem != null) {
 
-				lineItemRepo.delete(lineItem.get());
+				lineItem.stream().forEach(a->{
+					lineItemRepo.delete(a);
+					
+				});
 				return "Successfully deleted";
 
 			} else {
@@ -1574,10 +1593,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 			}
 		} else {
 
-			Optional<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode);
-			if (lineItem.isPresent()) {
+			List<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode);
+			if (lineItem != null) {
+				lineItem.stream().forEach(a->{
+					lineItemReRepo.delete(a);
+					
+				});
 
-				lineItemReRepo.delete(lineItem.get());
+				
 				log.info("Successfully deleted line item : " + lineItem);
 				return "Successfully deleted";
 
@@ -1588,7 +1611,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 
 	}
-
 	@Override
 	public String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo) {
 
@@ -1651,19 +1673,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public List<GiftVoucherVo> getGvByUserId(Long userId) throws RecordNotFoundException {
 
-		List<GiftVoucherEntity> gvsList = gvRepo.findByUserIdAndExpiryDateGreaterThanEqual(userId, LocalDate.now());
-		List<GiftVoucherVo> gvVosList = new ArrayList<>();
+//		List<GiftVoucherEntity> gvsList = gvRepo.findByUserIdAndExpiryDateGreaterThanEqual(userId, LocalDate.now());
+//		List<GiftVoucherVo> gvVosList = new ArrayList<>();
 
-		if (!gvsList.isEmpty()) {
-			gvsList.stream().forEach(x -> {
-				GiftVoucherVo vo = new GiftVoucherVo();
-				BeanUtils.copyProperties(x, vo);
-				gvVosList.add(vo);
-			});
-		} else {
-			throw new RecordNotFoundException("No records found with user id : " + userId);
-		}
-		return gvVosList;
+//		if (!gvsList.isEmpty()) {
+//			gvsList.stream().forEach(x -> {
+//				GiftVoucherVo vo = new GiftVoucherVo();
+//				BeanUtils.copyProperties(x, vo);
+//				gvVosList.add(vo);
+//			});
+//		} else {
+//			throw new RecordNotFoundException("No records found with user id : " + userId);
+//		}
+		return null;
 	}
 
 	// Method for fetching invoice details by using order number
@@ -1770,4 +1792,23 @@ public class NewSaleServiceImpl implements NewSaleService {
 		return dataList;
 	}
 
+	// Method for change flag of Giftvoucher
+	@Override
+	public String activateGiftvoucher(List<String> gvsList, Boolean flag) throws RecordNotFoundException {
+
+		List<GiftVoucherEntity> gvEntities = gvRepo.findByGvNumberIn(gvsList);
+
+		if (!gvEntities.isEmpty()) {
+
+			gvEntities.stream().forEach(x -> {
+
+				x.setIsActivated(flag);
+
+				gvRepo.save(x);
+			});
+			return "success";
+		} else {
+			throw new RecordNotFoundException("Record not found");
+		}
+	}
 }

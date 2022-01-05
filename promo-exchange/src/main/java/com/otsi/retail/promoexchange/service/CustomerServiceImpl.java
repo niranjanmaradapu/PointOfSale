@@ -2,15 +2,12 @@ package com.otsi.retail.promoexchange.service;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.otsi.retail.promoexchange.Entity.CustomerDetailsEntity;
-import com.otsi.retail.promoexchange.controller.PromoExchangeController;
 import com.otsi.retail.promoexchange.exceptions.DuplicateRecordFoundException;
 import com.otsi.retail.promoexchange.exceptions.RecordNotFoundException;
 import com.otsi.retail.promoexchange.mapper.CustomerMapper;
@@ -20,7 +17,9 @@ import com.otsi.retail.promoexchange.vo.CustomerVo;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-	private Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
+	//private Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
+	
+	  private Logger log=LogManager.getLogger(CustomerServiceImpl.class);
 
 	@Autowired
 	private CustomerDetailsRepo customerRepo;

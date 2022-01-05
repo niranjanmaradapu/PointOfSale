@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.otsi.retail.newSale.common.NoteType;
 import com.otsi.retail.newSale.common.OrderStatus;
 import com.otsi.retail.newSale.common.SaleNature;
 
@@ -39,6 +40,8 @@ public class NewSaleEntity {
 	private Long userId;// Customer Id from user data table
 
 	private Long storeId;
+	
+	private NoteType note;
 
 	private Long domainId;// Which type of store (Textail,Retail etc., )
 
