@@ -74,4 +74,50 @@ public class ReportsController {
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());		}
 
 	}
+	@GetMapping(value = "/gettodaysSale")
+	public GateWayResponse<?> getTodayssale() {
+		try {
+
+		ReportVo rvo = reportService.getTodaysSale();
+
+		return new GateWayResponse<>(HttpStatus.OK, rvo, "");
+		}catch(Exception e)
+		{
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());		}
+
+	}
+	
+	@GetMapping(value = "/getMonthlySale")
+	public GateWayResponse<?> getMonthlysale() {
+		try {
+
+		ReportVo rvo = reportService.getMonthlySale();
+
+		return new GateWayResponse<>(HttpStatus.OK, rvo, "");
+		}catch(Exception e)
+		{
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());		}
+
+	}
+	@GetMapping(value = "/getcurrentMonthSalevsLastMonth")
+	public GateWayResponse<?> getcurrentMonthSalevsLastmonth() {
+		try {
+
+		ReportVo rvo = reportService.getcurrentMonthSalevsLastMonth();
+
+		return new GateWayResponse<>(HttpStatus.OK, rvo, "");
+		}catch(Exception e)
+		{
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());		}
+
+	}
+	
+	
+	
 }
+	
+	
+
+
+
+
