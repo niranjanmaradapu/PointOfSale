@@ -16,6 +16,12 @@ public interface ReportService {
 	List<ReportVo> getTopfiveSalesByStore();
 
 	List<ReportVo> getsaleSummeryDetails();
+
+	ReportVo getTodaysSale();
+
+	ReportVo getMonthlySale();
+
+	ReportVo getcurrentMonthSalevsLastMonth();
 	
 
 }

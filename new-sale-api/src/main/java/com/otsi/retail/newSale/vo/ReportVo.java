@@ -18,5 +18,7 @@ public class ReportVo {
 	
 	private String name;
 	
+	private float percentValue;
+	
 
 }

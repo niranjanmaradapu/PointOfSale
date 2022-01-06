@@ -155,7 +155,7 @@ public class ReportsServiceImp implements ReportService {
 		
 		Long ramount = mvo.stream().mapToLong(a-> a.getAmount()).sum();
 		ReportVo revo = new ReportVo();
-		revo.setName("RetuenInvoice");
+		revo.setName("ReturnInvoice");
 		revo.setAmount(ramount);
 		rvo.add(revo);
 		
@@ -167,13 +167,95 @@ public class ReportsServiceImp implements ReportService {
 				.collect(Collectors.toList());
 		Long amount = nen.stream().mapToLong(a-> a.getNetValue()).sum();
 		ReportVo rsvo = new ReportVo();
-		rsvo.setName("saleInvoice");
+		rsvo.setName("SaleInvoice");
 		rsvo.setAmount(amount);
 		rvo.add(rsvo);
 		
 		
 		return rvo;
 	}
+
+	@Override
+	public ReportVo getTodaysSale() {
+		
+		LocalDate Date= LocalDate.now();
+
+		
+		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
+		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear()==(Date.getYear()))
+				.collect(Collectors.toList());
+		
+		List<NewSaleEntity> nen = nsen.stream().filter(a -> a.getCreationDate().getMonthValue()==(Date.getMonthValue()))
+				.collect(Collectors.toList());
+		
+		List<NewSaleEntity> ne = nen.stream().filter(a -> a.getCreationDate().getDayOfMonth()==(Date.getDayOfMonth()))
+				.collect(Collectors.toList());
+		
+		Long amount = ne.stream().mapToLong(a-> a.getNetValue()).sum();
+		ReportVo rsvo = new ReportVo();
+		rsvo.setName("today's sale");
+		rsvo.setAmount(amount);
+		
+		return rsvo;
+	}
+
+	@Override
+	public ReportVo getMonthlySale() {
+		
+		
+LocalDate Date= LocalDate.now();
+
+		
+		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
+		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear()==(Date.getYear()))
+				.collect(Collectors.toList());
+		
+		List<NewSaleEntity> nen = nsen.stream().filter(a -> a.getCreationDate().getMonthValue()==(Date.getMonthValue()))
+				.collect(Collectors.toList());
+		
+		
+		
+		Long amount = nen.stream().mapToLong(a-> a.getNetValue()).sum();
+		ReportVo rsvo = new ReportVo();
+		rsvo.setName("currntmonth sale");
+		rsvo.setAmount(amount);
+		
+		return rsvo;	
+		}
+
+	@Override
+	public ReportVo getcurrentMonthSalevsLastMonth() {
+		
+		ReportVo currentMonth = getMonthlySale();
+		LocalDate Date = LocalDate.now().minusMonths(1);
+		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
+		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear()==(Date.getYear()))
+				.collect(Collectors.toList());
+		
+		List<NewSaleEntity> nen = nsen.stream().filter(a -> a.getCreationDate().getMonthValue()==(Date.getMonthValue()))
+				.collect(Collectors.toList());
+		
+		
+		
+		Long amount = nen.stream().mapToLong(a-> a.getNetValue()).sum();
+		ReportVo rsvo = new ReportVo();
+
+		
+		if(amount!=0L) {
+			
+			float value = ( (currentMonth.getAmount()-amount)*100)/amount;
+			rsvo.setName("currentMonthSaleVsLastMonth");
+			rsvo.setPercentValue(value);
+			return rsvo;
+			
+	    }else {
+		
+		rsvo.setName("There is No Sale for last Month");
+		rsvo.setPercentValue(currentMonth.getAmount());
+		return rsvo;
+	    }
+	}
+	
 	
 
 }
