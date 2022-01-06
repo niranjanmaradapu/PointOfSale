@@ -14,7 +14,11 @@ spring:
     ddl-auto: update
    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
    show-sql: true
-   
+ rabbitmq:
+      host: localhost
+      port: 5672
+      username: guest
+      password: guest
 eureka:
   client:
     register-with-eureka: true
