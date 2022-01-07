@@ -51,4 +51,8 @@ public interface DeliverySlipRepository extends JpaRepository<DeliverySlipEntity
 
 	List<DeliverySlipEntity> findByDsNumberInAndOrderIsNull(List<String> dlsList);
 
+	List<DeliverySlipEntity> findByStoreId(Long storeId);
+
+	List<DeliverySlipEntity> findByUserId(Long u);
+
 }

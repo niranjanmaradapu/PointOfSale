@@ -22,6 +22,8 @@ public interface ReportService {
 	ReportVo getMonthlySale();
 
 	ReportVo getcurrentMonthSalevsLastMonth();
+
+	List<ReportVo> getTopFiveSalesByRepresentative(Long storeId, Long domainId);
 	
 
 }
