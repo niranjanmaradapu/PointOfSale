@@ -112,7 +112,18 @@ public class ReportsController {
 
 	}
 	
-	
+	@GetMapping(value = "/getTopFiveSalesByRepresentative")
+	public GateWayResponse<?> getTopFiveSaleByRepresentative(Long StoreId,Long DomainId) {
+		try {
+
+		List<ReportVo> rvo = reportService.getTopFiveSalesByRepresentative(StoreId,DomainId);
+
+		return new GateWayResponse<>(HttpStatus.OK, rvo, "");
+		}catch(Exception e)
+		{
+			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());		}
+
+	}
 	
 }
 	

@@ -16,6 +16,8 @@ public class ReportVo {
 	private Long amount;
 	private Long storeId;
 	
+	private Long userId;
+	
 	private String name;
 	
 	private float percentValue;
