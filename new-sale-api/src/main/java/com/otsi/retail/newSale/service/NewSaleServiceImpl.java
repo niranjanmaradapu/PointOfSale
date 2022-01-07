@@ -455,7 +455,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setCreationDate(LocalDate.now());
 		entity.setLastModified(LocalDate.now());
 		entity.setUserId(vo.getSalesMan());
-
+		entity.setStoreId(vo.getStoreId());
+		
 		List<Long> lineItems = new ArrayList<>();
 
 		if (!vo.getLineItems().isEmpty()) {
@@ -1400,6 +1401,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineEntity.setTaxValue(lineItem.getTaxValue());
 					lineEntity.setCgst(lineItem.getCgst());
 					lineEntity.setSgst(lineItem.getSgst());
+					lineEntity.setStoreId(lineItem.getStoreId());
 
 					// GrossValue is multiple of net value of product and quantity
 					lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -1431,6 +1433,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineReEntity.setTaxValue(lineItem.getTaxValue());
 					lineReEntity.setCgst(lineItem.getCgst());
 					lineReEntity.setSgst(lineItem.getSgst());
+					lineReEntity.setStoreId(lineItem.getStoreId());
 
 					// GrossValue is multiple of net value of product and quantity
 					lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -1500,6 +1503,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				line.setTaxValue(lineItem.getTaxValue());
 				line.setCgst(lineItem.getCgst());
 				line.setSgst(lineItem.getSgst());
+				line.setStoreId(lineItem.getStoreId());
 
 				// GrossValue is multiple of net value of product and quantity
 				line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -1528,6 +1532,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				line.setTaxValue(lineItem.getTaxValue());
 				line.setCgst(lineItem.getCgst());
 				line.setSgst(lineItem.getSgst());
+				line.setStoreId(lineItem.getStoreId());
 
 				// GrossValue is multiple of net value of product and quantity
 				line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());

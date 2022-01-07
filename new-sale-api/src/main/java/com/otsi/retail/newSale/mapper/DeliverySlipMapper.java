@@ -1,11 +1,11 @@
 package com.otsi.retail.newSale.mapper;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
@@ -82,24 +82,24 @@ public class DeliverySlipMapper {
 		vo.setSalesMan(dsEntity.getUserId());
 		vo.setCreatedDate(dsEntity.getCreationDate());
 		vo.setLastModified(dsEntity.getLastModified());
+		vo.setStoreId(dsEntity.getStoreId());
 
 		List<LineItemVo> lineItems = new ArrayList<>();
 
 		dsEntity.getLineItems().stream().forEach(x -> {
 
 			LineItemVo lineVo = new LineItemVo();
-			// BeanUtils.copyProperties(x, lineVo);
+			BeanUtils.copyProperties(x, lineVo);
 
-			lineVo.setBarCode(x.getBarCode());
-			lineVo.setQuantity(x.getQuantity());
-			lineVo.setNetValue(x.getNetValue());
-			lineVo.setLineItemId(x.getLineItemId());
-			lineVo.setItemPrice(x.getItemPrice());
-			lineVo.setGrossValue(x.getGrossValue());
-			lineVo.setDiscount(x.getDiscount());
-			lineVo.setCreationDate(x.getCreationDate());
-			lineVo.setLastModified(x.getLastModified());
-
+			/*
+			 * lineVo.setBarCode(x.getBarCode()); lineVo.setQuantity(x.getQuantity());
+			 * lineVo.setNetValue(x.getNetValue()); lineVo.setLineItemId(x.getLineItemId());
+			 * lineVo.setItemPrice(x.getItemPrice());
+			 * lineVo.setGrossValue(x.getGrossValue()); lineVo.setDiscount(x.getDiscount());
+			 * lineVo.setCreationDate(x.getCreationDate());
+			 * lineVo.setLastModified(x.getLastModified());
+			 */
+		
 			lineItems.add(lineVo);
 		});
 		vo.setLineItems(lineItems);

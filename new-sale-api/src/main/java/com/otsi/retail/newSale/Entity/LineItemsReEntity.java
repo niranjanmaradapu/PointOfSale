@@ -24,6 +24,8 @@ public class LineItemsReEntity {
 	@Id
 	@GeneratedValue
 	private Long lineItemReId;
+	
+	private Long storeId;
 
 	private String barCode;
 

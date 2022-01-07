@@ -22,6 +22,8 @@ public class LineItemsEntity {
 	@Id
 	@GeneratedValue
 	private Long lineItemId;
+	
+	private Long storeId;
 
 	private String section;
 
