@@ -11,6 +11,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +38,6 @@ public class Config {
 
 	@Value("${getreturnslip_url}")
 	private String getListOfReturnSlips;
-	
 
 	@Value("${getreturnslips_url}")
 	private String getAllListOfReturnSlips;
@@ -60,10 +60,14 @@ public class Config {
 	@Value("${payment_newsale_rk}")
 	private String paymentNewsaleRK;
 
-	@Bean
-	public Queue queue() {
-		return new Queue(newSaleQueue);
-	}
+	@Value("${inventory_queue_retail}")
+	private String inventoryRetailQueue;
+
+	@Value("${inventory_retail_exchange}")
+	private String inventoryRetailExchange;
+
+	@Value("${inventory_retail_rk}")
+	private String inventoryRetailRK;
 
 	@Value("${inventory_queue_textile}")
 	private String inventoryUpdateQueueTextile;
@@ -73,13 +77,14 @@ public class Config {
 
 	@Value("${payment_newsale_rk}")
 	private String updateInventoryTextileRK;
+	
 
-	@Bean
+	@Qualifier("inventoryUpdateQueueTextile")
 	public Queue inventoryUpdateQueueTextile() {
 		return new Queue(inventoryUpdateQueueTextile);
 	}
 
-	@Bean
+	@Qualifier("updateInventoryExchangeTextile")
 	public DirectExchange updateInventoryExchangeTextile() {
 		return new DirectExchange(updateInventoryExchangeTextile);
 	}
@@ -91,6 +96,11 @@ public class Config {
 		return BindingBuilder.bind(inventoryUpdateQueueTextile).to(updateInventoryExchangeTextile)
 				.with(updateInventoryTextileRK);
 	}
+	
+	@Bean
+	public Queue queue() {
+		return new Queue(newSaleQueue);
+	}
 
 	@Bean
 	public DirectExchange directExchange() {
@@ -101,6 +111,22 @@ public class Config {
 	public Binding binding(Queue queue, DirectExchange directExchange) {
 
 		return BindingBuilder.bind(queue).to(directExchange).with(paymentNewsaleRK);
+	}
+
+	@Qualifier("inventoryRetailQueue")
+	public Queue inventoryUpdateQueueRetail() {
+		return new Queue(inventoryRetailQueue);
+	}
+
+	@Qualifier("inventoryRetailExchange")
+	public DirectExchange directExchangeForRetail() {
+		return new DirectExchange(inventoryRetailExchange);
+	}
+
+	@Bean
+	public Binding bindingForRetail(Queue inventoryRetailQueue, DirectExchange inventoryRetailExchange) {
+
+		return BindingBuilder.bind(inventoryRetailQueue).to(inventoryRetailExchange).with(inventoryRetailRK);
 	}
 
 	@Bean
