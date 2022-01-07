@@ -155,9 +155,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private LoyalityPointsRepo loyalityRepo;
-	
-	List<DeliverySlipEntity> dsDetails = new ArrayList<>();
 
+	List<DeliverySlipEntity> dsDetails = new ArrayList<>();
 
 	// Method for saving order
 	@Override
@@ -266,6 +265,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			if (lineItems.size() == lineItemsList.size()) {
 
 				NewSaleEntity saveEntity = newSaleRepository.save(entity);
+				List<LineItemsReEntity> lineItemsForUpdate = new ArrayList<>();
 
 				lineItemsList.stream().forEach(x -> {
 
@@ -274,9 +274,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 					x.setLastModified(LocalDate.now());
 					x.setOrderId(saveEntity);
 					lineItemReRepo.save(x);
+					lineItemsForUpdate.add(x);
 
 				});
-
+				saveEntity.setLineItemsRe(lineItemsForUpdate);
 				// Saving order details in order_transaction table
 				if (vo.getPaymentAmountType() != null) {
 
@@ -311,9 +312,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
 
 		List<NewSaleEntity> entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
-		
+
 		NewSaleEntity orderRecord = null;
-		
+
 		if (entity.size() != 0) {
 			orderRecord = entity.stream().findFirst().get();
 		}
@@ -401,8 +402,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 				vo.setStoreId(orderRecord.getStoreId());
 				updateVo.add(vo);
 			});
-			// rabbitTemplate.convertAndSend(config.getInventoryExchange(),
-			// config.getInventoryRK(), updateVo);
+
+			log.info("Update request to Retail : " + updateVo);
+			rabbitTemplate.convertAndSend(config.getInventoryRetailExchange(), config.getInventoryRetailRK(), updateVo);
 		}
 	}
 
@@ -880,23 +882,22 @@ public class NewSaleServiceImpl implements NewSaleService {
 						listOfDeliverySlipVo.getDateTo());
 
 			}
-			ListOfDeliverySlipVo lvo=null;
+			ListOfDeliverySlipVo lvo = null;
 			if (!dsDetails.isEmpty()) {
-				 lvo = newSaleMapper.convertListDSToVo(dsDetails);
+				lvo = newSaleMapper.convertListDSToVo(dsDetails);
 				log.warn("we are testing is fetching list of deivery slips");
 				log.info("after getting list of delivery slips :" + lvo);
 				return lvo;
 
-			}else {
+			} else {
 				throw new RecordNotFoundException("record not found");
 			}
-			
-			
+
 		} catch (Exception ex) {
 
 			throw new RecordNotFoundException("record not found");
 		} finally {
-		  dsDetails.clear();
+			dsDetails.clear();
 		}
 
 	}
@@ -1268,11 +1269,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() != null) {
 			saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreId(srvo.getDateFrom(), srvo.getDateTo(),
 					srvo.getStore().getId());
-		}else if(srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() == null) {
-			
+		} else if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() == null) {
+
 			saleDetails = newSaleRepository.findByCreationDateBetween(srvo.getDateFrom(), srvo.getDateTo());
-		}else if(srvo.getDateFrom() == null && srvo.getDateTo() == null && srvo.getStore().getId() != 0L) {
-			
+		} else if (srvo.getDateFrom() == null && srvo.getDateTo() == null && srvo.getStore().getId() != 0L) {
+
 			saleDetails = newSaleRepository.findByStoreId(srvo.getStore().getId());
 		}
 
@@ -1593,9 +1594,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 			List<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
 			if (lineItem != null) {
 
-				lineItem.stream().forEach(a->{
+				lineItem.stream().forEach(a -> {
 					lineItemRepo.delete(a);
-					
+
 				});
 				return "Successfully deleted";
 
@@ -1606,12 +1607,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			List<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode);
 			if (lineItem != null) {
-				lineItem.stream().forEach(a->{
+				lineItem.stream().forEach(a -> {
 					lineItemReRepo.delete(a);
-					
+
 				});
 
-				
 				log.info("Successfully deleted line item : " + lineItem);
 				return "Successfully deleted";
 
@@ -1622,6 +1622,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 
 	}
+
 	@Override
 	public String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo) {
 
