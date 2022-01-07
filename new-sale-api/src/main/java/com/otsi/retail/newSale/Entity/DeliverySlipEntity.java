@@ -34,6 +34,8 @@ public class DeliverySlipEntity  {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long dsId;
+	
+	private Long storeId;
 
 	private String dsNumber;
 	
