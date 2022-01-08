@@ -14,6 +14,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -52,13 +53,13 @@ public class ReportsServiceImp implements ReportService {
 	private Config config;
 
 	@Override
-	public List<ReportVo> getInvoicesGeneratedDetails() {
+	public List<ReportVo> getInvoicesGeneratedDetails(Long storeId) {
 
 		List<ReportVo> lrvo = new ArrayList<ReportVo>();
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreId(storeId);
 
 		List<NewSaleEntity> nen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
@@ -179,11 +180,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getTodaysSale() {
+	public ReportVo getTodaysSale(Long storeId,Long domainId) {
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -203,11 +204,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getMonthlySale() {
+	public ReportVo getMonthlySale(Long storeId,Long domainId) {
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -224,11 +225,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getcurrentMonthSalevsLastMonth() {
+	public ReportVo getcurrentMonthSalevsLastMonth(Long storeId,Long domainId) {
 
-		ReportVo currentMonth = getMonthlySale();
+		ReportVo currentMonth = getMonthlySale(storeId,domainId);
 		LocalDate Date = LocalDate.now().minusMonths(1);
-		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -256,15 +257,15 @@ public class ReportsServiceImp implements ReportService {
 
 	
 	@Override
-	public List<ReportVo> getTopFiveSalesByRepresentative(Long StoreId, Long DomainId) {
+	public List<ReportVo> getTopFiveSalesByRepresentative(Long storeId, Long domainId) {
 
 		List<ReportVo> vo = new ArrayList<>();
 		LocalDate Date =LocalDate.now();
 		
-		if (DomainId == DomainData.TE.getId()) {
+		if (domainId == DomainData.TE.getId()) {
 			
 
-			List<DeliverySlipEntity> dsEntity = dsRepo.findByStoreId(StoreId);
+			List<DeliverySlipEntity> dsEntity = dsRepo.findByStoreId(storeId);
 			
 			List<DeliverySlipEntity> desen = dsEntity.stream().filter(a -> a.getCreationDate().getDayOfMonth() == (Date.getDayOfMonth()))
 					.collect(Collectors.toList());
@@ -296,9 +297,9 @@ public class ReportsServiceImp implements ReportService {
 
 			return first5ElementsList;
 
-		}else if (DomainId != DomainData.TE.getId()) {
+		}else if (domainId != DomainData.TE.getId()) {
 			
-			List<LineItemsReEntity> reent = lineItemReRepo.findByStoreId(StoreId);
+			List<LineItemsReEntity> reent = lineItemReRepo.findByStoreId(storeId);
 			
 			List<LineItemsReEntity> desen = reent.stream().filter(a -> a.getCreationDate().getDayOfMonth() == (Date.getDayOfMonth()))
 					.collect(Collectors.toList());
