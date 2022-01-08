@@ -48,7 +48,7 @@ public class PaymentAmountType {
 //    @ManyToOne
 //    @JoinColumn(name = "order_id")
 //    private Long newSale;
-	private String razorPayId;
+	private String paymentId;
 
 	private Boolean razorPayStatus;
 }

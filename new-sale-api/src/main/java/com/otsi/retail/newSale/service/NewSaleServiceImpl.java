@@ -324,7 +324,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			payDetails.setOrderId(orderRecord);
 			payDetails.setPaymentType(paymentDetails.getPayType());
 			payDetails.setPaymentAmount(paymentDetails.getAmount());
-			payDetails.setRazorPayId(paymentDetails.getRazorPayId());
+			payDetails.setPaymentId(paymentDetails.getRazorPayId());
 			payDetails.setRazorPayStatus(false);
 
 			paymentAmountTypeRepository.save(payDetails);
@@ -339,7 +339,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		if (payStatus) {
 
-			PaymentAmountType payment = paymentAmountTypeRepository.findByRazorPayId(razorPayId);
+			PaymentAmountType payment = paymentAmountTypeRepository.findByPaymentId(razorPayId);
 			payment.setRazorPayStatus(payStatus);
 
 			paymentAmountTypeRepository.save(payment);
@@ -382,11 +382,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				vo.setLineItemId(x.getLineItemId());
 				vo.setQuantity(x.getQuantity());
 				vo.setStoreId(orderRecord.getStoreId());
+				vo.setDomainId(orderRecord.getDomainId());
 				updateVo.add(vo);
 			});
-			System.out.println("Update request : " + updateVo);
-			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchangeTextile(),
-					config.getUpdateInventoryTextileRK(), updateVo);
+			log.info("Update request to Textile: " + updateVo);
+			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(),
+					config.getUpdateInventoryRK(), updateVo);
 		} else {
 
 			List<InventoryUpdateVo> updateVo = new ArrayList<>();
@@ -400,11 +401,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 				vo.setLineItemId(x.getLineItemReId());
 				vo.setQuantity(x.getQuantity());
 				vo.setStoreId(orderRecord.getStoreId());
+				vo.setDomainId(orderRecord.getDomainId());
 				updateVo.add(vo);
 			});
 
 			log.info("Update request to Retail : " + updateVo);
-			rabbitTemplate.convertAndSend(config.getInventoryRetailExchange(), config.getInventoryRetailRK(), updateVo);
+			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(),
+					config.getUpdateInventoryRK(), updateVo);
 		}
 	}
 
