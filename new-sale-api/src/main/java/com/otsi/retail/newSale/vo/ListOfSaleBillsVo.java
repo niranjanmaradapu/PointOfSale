@@ -16,6 +16,10 @@ public class ListOfSaleBillsVo {
 	private LocalDate dateFrom;
 
 	private LocalDate dateTo;
+	
+	private Long storeId;
+	
+	private Long domainId;
 
 	private LocalDate createdDate;
 

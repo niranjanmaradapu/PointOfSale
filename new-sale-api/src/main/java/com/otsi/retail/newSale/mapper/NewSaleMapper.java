@@ -150,8 +150,10 @@ public class NewSaleMapper {
 		});
 
 		lsvo.setTotalAmount(saleDetails.stream().mapToLong(i -> i.getNetValue()).sum());
+	
 		
-		lsvo.setTotalDiscount(saleDetails.stream().mapToLong(d -> d.getManualDisc()).sum());
+		//lsvo.setTotalDiscount(saleDetails.stream().mapToLong(d -> d.getManualDisc()).sum());
+	
 
 		return lsvo;
 
