@@ -87,14 +87,14 @@ public class CustomerServiceImpl implements CustomerService {
 		 * getting the record using dates combination
 		 *
 		 */
-		if (vo.getDateFrom() != null && vo.getDateTo() != null) {
+		if (vo.getDateFrom() != null && vo.getDateTo() != null && vo.getStoreId()!=0L) {
 			/**
 			 * getting the record using dates and RtNumber
 			 *
 			 */
 			if (vo.getRtNumber() != null && vo.getBarcode() == null && vo.getCreatedBy() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtNoOrderByCreatedDateAsc(vo.getDateFrom(),
-						vo.getDateTo(), vo.getRtNumber());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(vo.getDateFrom(),
+						vo.getDateTo(), vo.getRtNumber(),vo.getStoreId());
 			}
 
 			/**
@@ -103,13 +103,13 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null && vo.getBarcode() != null) {
 
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCodeOrderByCreatedDateAsc(
-						vo.getDateFrom(), vo.getDateTo(), vo.getBarcode());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(
+						vo.getDateFrom(), vo.getDateTo(), vo.getBarcode(),vo.getStoreId());
 
 			} else if (vo.getRtNumber() == null && vo.getCreatedBy() != null && vo.getBarcode() == null) {
 
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndCreatedByOrderByCreatedDateAsc(
-						vo.getDateFrom(), vo.getDateTo(), vo.getCreatedBy());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndCreatedByAndStoreIdOrderByCreatedDateAsc(
+						vo.getDateFrom(), vo.getDateTo(), vo.getCreatedBy(),vo.getStoreId());
 
 			}
 			/**
@@ -117,19 +117,19 @@ public class CustomerServiceImpl implements CustomerService {
 			 *
 			 */
 			else
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenOrderByCreatedDateAsc(vo.getDateFrom(),
-						vo.getDateTo());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(vo.getDateFrom(),
+						vo.getDateTo(),vo.getStoreId());
 			/**
 			 * getting the records without dates
 			 *
 			 */
-		} else if (vo.getDateFrom() == null && vo.getDateTo() == null) {
+		} else if (vo.getDateFrom() == null && vo.getDateTo() == null && vo.getStoreId()!=0L) {
 			/**
 			 * getting the record using RtNumber
 			 *
 			 */
 			if (vo.getRtNumber() != null && vo.getCreatedBy() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByRtNoOrderByCreatedDateAsc(vo.getRtNumber());
+				retunSlipdetails = returnSlipRepo.findByRtNoAndStoreIdOrderByCreatedDateAsc(vo.getRtNumber(),vo.getStoreId());
 			}
 
 			/**
@@ -139,7 +139,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null && vo.getBarcode() != null) {
 
-				retunSlipdetails = returnSlipRepo.findByTaggedItems_barCodeOrderByCreatedDateAsc(vo.getBarcode());
+				retunSlipdetails = returnSlipRepo.findByTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(vo.getBarcode(),vo.getStoreId());
 
 			}
 
@@ -148,7 +148,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 *
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreatedBy() != null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedByOrderByCreatedDateAsc(vo.getCreatedBy());
+				retunSlipdetails = returnSlipRepo.findByCreatedByAndStoreIdOrderByCreatedDateAsc(vo.getCreatedBy(),vo.getStoreId());
 			}
 
 		}
@@ -251,6 +251,7 @@ public class CustomerServiceImpl implements CustomerService {
 		returnSlipDto.setAmount(request.getTotalAmount());
 		returnSlipDto.setMobileNumber(request.getMobileNumber());
 		returnSlipDto.setCustomerName(request.getCustomerName());
+		returnSlipDto.setStoreId(request.getStoreId());
 		returnSlipDto.setDomianId(request.getDomianId());
 		returnSlipRepo.save(returnSlipDto);
 		

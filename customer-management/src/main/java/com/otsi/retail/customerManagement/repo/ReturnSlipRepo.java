@@ -97,4 +97,22 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 
 	ReturnSlip findByRtNoAndRtStatus(String rtNo, int id);
 
+	List<ReturnSlip> findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, String rtNumber, Long storeId);
+
+	List<ReturnSlip> findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, String barcode, Long storeId);
+
+	List<ReturnSlip> findByCreatedDateBetweenAndCreatedByAndStoreIdOrderByCreatedDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, String createdBy, Long storeId);
+
+	List<ReturnSlip> findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(LocalDate dateFrom, LocalDate dateTo,
+			Long storeId);
+
+	List<ReturnSlip> findByRtNoAndStoreIdOrderByCreatedDateAsc(String rtNumber, Long storeId);
+
+	List<ReturnSlip> findByTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(String barcode, Long storeId);
+
+	List<ReturnSlip> findByCreatedByAndStoreIdOrderByCreatedDateAsc(String createdBy, Long storeId);
+
 }

@@ -24,6 +24,8 @@ public class ListOfReturnSlipsVo {
 	private int rsId;
 
 	private LocalDate dateTo;
+	
+	private Long storeId;
 
 	private String barcode;
 	
