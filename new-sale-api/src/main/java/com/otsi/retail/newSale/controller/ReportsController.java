@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
@@ -24,10 +25,10 @@ public class ReportsController {
 	private ReportService reportService;
 
 	@GetMapping(value = "/InvoicesGenerated")
-	public GateWayResponse<?> getInvoicesGeneratedDetails() {
+	public GateWayResponse<?> getInvoicesGeneratedDetails(@RequestParam Long storeId) {
 		try {
 
-		List<ReportVo> rvo = reportService.getInvoicesGeneratedDetails();
+		List<ReportVo> rvo = reportService.getInvoicesGeneratedDetails(storeId);
 
 		return new GateWayResponse<>(HttpStatus.OK, rvo, "");
 		}catch(Exception e)
@@ -75,10 +76,10 @@ public class ReportsController {
 
 	}
 	@GetMapping(value = "/gettodaysSale")
-	public GateWayResponse<?> getTodayssale() {
+	public GateWayResponse<?> getTodayssale(@RequestParam Long storeId,@RequestParam Long domainId) {
 		try {
 
-		ReportVo rvo = reportService.getTodaysSale();
+		ReportVo rvo = reportService.getTodaysSale(storeId,domainId);
 
 		return new GateWayResponse<>(HttpStatus.OK, rvo, "");
 		}catch(Exception e)
@@ -88,10 +89,10 @@ public class ReportsController {
 	}
 	
 	@GetMapping(value = "/getMonthlySale")
-	public GateWayResponse<?> getMonthlysale() {
+	public GateWayResponse<?> getMonthlysale(@RequestParam Long storeId,@RequestParam Long domainId) {
 		try {
 
-		ReportVo rvo = reportService.getMonthlySale();
+		ReportVo rvo = reportService.getMonthlySale(storeId,domainId);
 
 		return new GateWayResponse<>(HttpStatus.OK, rvo, "");
 		}catch(Exception e)
@@ -100,10 +101,10 @@ public class ReportsController {
 
 	}
 	@GetMapping(value = "/getcurrentMonthSalevsLastMonth")
-	public GateWayResponse<?> getcurrentMonthSalevsLastmonth() {
+	public GateWayResponse<?> getcurrentMonthSalevsLastmonth(@RequestParam Long storeId,@RequestParam Long domainId) {
 		try {
 
-		ReportVo rvo = reportService.getcurrentMonthSalevsLastMonth();
+		ReportVo rvo = reportService.getcurrentMonthSalevsLastMonth(storeId,domainId);
 
 		return new GateWayResponse<>(HttpStatus.OK, rvo, "");
 		}catch(Exception e)
@@ -113,10 +114,10 @@ public class ReportsController {
 	}
 	
 	@GetMapping(value = "/getTopFiveSalesByRepresentative")
-	public GateWayResponse<?> getTopFiveSaleByRepresentative(Long StoreId,Long DomainId) {
+	public GateWayResponse<?> getTopFiveSaleByRepresentative(@RequestParam Long storeId,Long domainId) {
 		try {
 
-		List<ReportVo> rvo = reportService.getTopFiveSalesByRepresentative(StoreId,DomainId);
+		List<ReportVo> rvo = reportService.getTopFiveSalesByRepresentative(storeId,domainId);
 
 		return new GateWayResponse<>(HttpStatus.OK, rvo, "");
 		}catch(Exception e)

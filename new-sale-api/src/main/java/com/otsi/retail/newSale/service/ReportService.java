@@ -9,7 +9,7 @@ import com.otsi.retail.newSale.vo.ReportVo;
 @Component
 public interface ReportService {
 
-	List<ReportVo> getInvoicesGeneratedDetails();
+	List<ReportVo> getInvoicesGeneratedDetails(Long storeId);
 
 	List<ReportVo> getSaleMonthyTrendDetails();
 
@@ -17,11 +17,11 @@ public interface ReportService {
 
 	List<ReportVo> getsaleSummeryDetails();
 
-	ReportVo getTodaysSale();
+	ReportVo getTodaysSale(Long storeId, Long domainId);
 
-	ReportVo getMonthlySale();
+	ReportVo getMonthlySale(Long storeId, Long domainId);
 
-	ReportVo getcurrentMonthSalevsLastMonth();
+	ReportVo getcurrentMonthSalevsLastMonth(Long storeId, Long domainId);
 
 	List<ReportVo> getTopFiveSalesByRepresentative(Long storeId, Long domainId);
 	
