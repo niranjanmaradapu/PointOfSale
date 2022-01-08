@@ -25,6 +25,8 @@ public class PaymentAmountTypeVo {
 	private PaymentType paymentType;
 
 	private Long paymentAmount;
+	
+	private String payId;
 
 	private NewSaleVo newsale;
 
