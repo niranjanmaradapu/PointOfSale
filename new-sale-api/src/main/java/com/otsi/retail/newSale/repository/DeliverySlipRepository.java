@@ -55,4 +55,25 @@ public interface DeliverySlipRepository extends JpaRepository<DeliverySlipEntity
 
 	List<DeliverySlipEntity> findByUserId(Long u);
 
+	DeliverySlipEntity findByCreationDateBetweenAndDsIdAndDsNumberAndStatusAndStoreIdOrderByCreationDateAsc(
+			LocalDate dateFrom, LocalDate dateTo, Long dsId, String dsNumber, Long storeId, DSStatus status);
+
+	DeliverySlipEntity findByDsIdAndStoreId(Long dsId, Long storeId);
+
+	DeliverySlipEntity findByCreationDateBetweenAndDsIdAndStoreIdOrderByCreationDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, Long storeId, Long dsId);
+
+	List<DeliverySlipEntity> findByCreationDateBetweenAndDsNumberAndStoreIdOrderByCreationDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, Long storeId, String dsNumber);
+
+	List<DeliverySlipEntity> findByCreationDateBetweenAndStatusAndStoreIdOrderByCreationDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, Long storeId, DSStatus status);
+
+	List<DeliverySlipEntity> findByDsNumberInAndStoreIdOrderByCreationDateAsc(List<String> dsList, Long storeId);
+
+	List<DeliverySlipEntity> findByStatusAndStoreIdOrderByCreationDateAsc(DSStatus status, Long storeId);
+
+	List<DeliverySlipEntity> findByCreationDateBetweenAndStoreIdOrderByCreationDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, Long storeId);
+
 }
