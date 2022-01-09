@@ -1346,8 +1346,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 			System.out.println(vo);
 
 			HsnDetailsVo hsnDetails1 = getHsnDetails(rAmount);
-
-			retunVo.setTotalDiscount(barVoList.stream().mapToLong(d -> d.getDiscount()).sum());
+			List<Long> result = barVoList.stream()
+					.map(num -> num.getDiscount()) 
+					.filter(n -> n!=null)
+					.collect(Collectors.toList());
+			retunVo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());
 			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getGrossValue()).sum());
 			// retunVo.setTaxDescription(hsnDetails1.getTaxVo().getTaxLabel());
 			retunVo.setBillValue(rAmount);
