@@ -165,7 +165,12 @@ public class NewSaleMapper {
 
 		srvo.setBillValue(saleDetails.stream().mapToLong(b -> b.getNetValue()).sum());
 		srvo.setTotalMrp(saleDetails.stream().mapToLong(m -> m.getGrossValue()).sum());
-		srvo.setTotalDiscount(saleDetails.stream().mapToLong(d -> d.getPromoDisc()).sum());
+		List<Long> result = saleDetails.stream()
+				.map(num -> num.getPromoDisc()) 
+				.filter(n -> n!=null)
+				.collect(Collectors.toList());
+		
+		srvo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());		
 		return srvo;
 
 	}
