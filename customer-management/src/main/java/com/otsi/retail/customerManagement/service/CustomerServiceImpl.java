@@ -87,14 +87,14 @@ public class CustomerServiceImpl implements CustomerService {
 		 * getting the record using dates combination
 		 *
 		 */
-		if (vo.getDateFrom() != null && vo.getDateTo() != null && vo.getStoreId()!=0L) {
+		if (vo.getDateFrom() != null && vo.getDateTo() != null && vo.getStoreId()!=0L && vo.getDomainId()!=0L) {
 			/**
 			 * getting the record using dates and RtNumber
 			 *
 			 */
 			if (vo.getRtNumber() != null && vo.getBarcode() == null && vo.getCreatedBy() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(vo.getDateFrom(),
-						vo.getDateTo(), vo.getRtNumber(),vo.getStoreId());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndRtNoAndStoreIdAndDomianIdOrderByCreatedDateAsc(vo.getDateFrom(),
+						vo.getDateTo(), vo.getRtNumber(),vo.getStoreId(),vo.getDomainId());
 			}
 
 			/**
@@ -103,13 +103,13 @@ public class CustomerServiceImpl implements CustomerService {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null && vo.getBarcode() != null) {
 
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(
-						vo.getDateFrom(), vo.getDateTo(), vo.getBarcode(),vo.getStoreId());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdAndDomianIdOrderByCreatedDateAsc(
+						vo.getDateFrom(), vo.getDateTo(), vo.getBarcode(),vo.getStoreId(),vo.getDomainId());
 
 			} else if (vo.getRtNumber() == null && vo.getCreatedBy() != null && vo.getBarcode() == null) {
 
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndCreatedByAndStoreIdOrderByCreatedDateAsc(
-						vo.getDateFrom(), vo.getDateTo(), vo.getCreatedBy(),vo.getStoreId());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndCreatedByAndStoreIdAndDomianIdOrderByCreatedDateAsc(
+						vo.getDateFrom(), vo.getDateTo(), vo.getCreatedBy(),vo.getStoreId(),vo.getDomainId());
 
 			}
 			/**
@@ -117,19 +117,19 @@ public class CustomerServiceImpl implements CustomerService {
 			 *
 			 */
 			else
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(vo.getDateFrom(),
-						vo.getDateTo(),vo.getStoreId());
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndStoreIdAndDomianIdOrderByCreatedDateAsc(vo.getDateFrom(),
+						vo.getDateTo(),vo.getStoreId(),vo.getDomainId());
 			/**
 			 * getting the records without dates
 			 *
 			 */
-		} else if (vo.getDateFrom() == null && vo.getDateTo() == null && vo.getStoreId()!=0L) {
+		} else if (vo.getDateFrom() == null && vo.getDateTo() == null && vo.getStoreId()!=0L &&vo.getDomainId()!=0L) {
 			/**
 			 * getting the record using RtNumber
 			 *
 			 */
 			if (vo.getRtNumber() != null && vo.getCreatedBy() == null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByRtNoAndStoreIdOrderByCreatedDateAsc(vo.getRtNumber(),vo.getStoreId());
+				retunSlipdetails = returnSlipRepo.findByRtNoAndStoreIdAndDomianIdOrderByCreatedDateAsc(vo.getRtNumber(),vo.getStoreId(),vo.getDomainId());
 			}
 
 			/**
@@ -139,7 +139,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null && vo.getBarcode() != null) {
 
-				retunSlipdetails = returnSlipRepo.findByTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(vo.getBarcode(),vo.getStoreId());
+				retunSlipdetails = returnSlipRepo.findByTaggedItems_barCodeAndStoreIdAndDomianIdOrderByCreatedDateAsc(vo.getBarcode(),vo.getStoreId(),vo.getDomainId());
 
 			}
 
@@ -148,7 +148,7 @@ public class CustomerServiceImpl implements CustomerService {
 			 *
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreatedBy() != null && vo.getBarcode() == null) {
-				retunSlipdetails = returnSlipRepo.findByCreatedByAndStoreIdOrderByCreatedDateAsc(vo.getCreatedBy(),vo.getStoreId());
+				retunSlipdetails = returnSlipRepo.findByCreatedByAndStoreIdAndDomianIdOrderByCreatedDateAsc(vo.getCreatedBy(),vo.getStoreId(),vo.getDomainId());
 			}
 
 		}

@@ -114,5 +114,25 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 	List<ReturnSlip> findByTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(String barcode, Long storeId);
 
 	List<ReturnSlip> findByCreatedByAndStoreIdOrderByCreatedDateAsc(String createdBy, Long storeId);
+//-----------------------
+	List<ReturnSlip> findByCreatedDateBetweenAndRtNoAndStoreIdAndDomianIdOrderByCreatedDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, String rtNumber, Long storeId, Long domainId);
+
+	List<ReturnSlip> findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdAndDomianIdOrderByCreatedDateAsc(
+			LocalDate dateFrom, LocalDate dateTo, String barcode, Long storeId, Long domainId);
+
+	List<ReturnSlip> findByCreatedDateBetweenAndCreatedByAndStoreIdAndDomianIdOrderByCreatedDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, String createdBy, Long storeId, Long domainId);
+
+	List<ReturnSlip> findByCreatedDateBetweenAndStoreIdAndDomianIdOrderByCreatedDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, Long storeId, Long domainId);
+
+	List<ReturnSlip> findByRtNoAndStoreIdAndDomianIdOrderByCreatedDateAsc(String rtNumber, Long storeId, Long domainId);
+
+	List<ReturnSlip> findByTaggedItems_barCodeAndStoreIdAndDomianIdOrderByCreatedDateAsc(String barcode, Long storeId,
+			Long domainId);
+
+	List<ReturnSlip> findByCreatedByAndStoreIdAndDomianIdOrderByCreatedDateAsc(String createdBy, Long storeId,
+			Long domainId);
 
 }
