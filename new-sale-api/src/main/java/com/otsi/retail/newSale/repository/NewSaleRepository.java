@@ -76,6 +76,11 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 
 	List<NewSaleEntity> findByCreatedByAndStoreIdAndDomainId(String empId, Long storeId, Long domainId);
 
+	List<NewSaleEntity> findByCreationDateBetweenAndDomainId(LocalDate dateFrom, LocalDate dateTo, Long domainId);
+
+	List<NewSaleEntity> findByCreationDateBetweenAndDomainIdAndStoreId(LocalDate dateFrom, LocalDate dateTo,
+			Long domainId, Long storeId);
+
 	
 
 

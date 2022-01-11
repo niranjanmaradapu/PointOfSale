@@ -22,6 +22,8 @@ private LocalDate dateFrom;
 	
 	private LocalDate dateTo;
 	
+	private Long domainId;
+	
 	//private BillType billType;
 	
 	private Long TotalMrp;
@@ -29,6 +31,8 @@ private LocalDate dateFrom;
 	private Long billValue;
 	
 	private Long totalDiscount;
+	
+	private Long storeId;
 	
 	/*
 	 * private float totalTaxableAmount;

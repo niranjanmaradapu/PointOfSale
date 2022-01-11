@@ -1270,12 +1270,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		List<NewSaleEntity> saleDetails = new ArrayList<>();
 
-		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() != null) {
-			saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreId(srvo.getDateFrom(), srvo.getDateTo(),
-					srvo.getStore().getId());
-		} else if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() == null) {
+		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() != null && srvo.getDomainId()!=0L) {
+			saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreIdAndDomainId(srvo.getDateFrom(), srvo.getDateTo(),
+					srvo.getStore().getId(),srvo.getDomainId());
+		} else if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() == null && srvo.getDomainId()!=0L) {
 
-			saleDetails = newSaleRepository.findByCreationDateBetween(srvo.getDateFrom(), srvo.getDateTo());
+			saleDetails = newSaleRepository.findByCreationDateBetweenAndDomainIdAndStoreId(srvo.getDateFrom(), srvo.getDateTo(),srvo.getDomainId(),srvo.getStoreId());
 		} else if (srvo.getDateFrom() == null && srvo.getDateTo() == null && srvo.getStore().getId() != 0L) {
 
 			saleDetails = newSaleRepository.findByStoreId(srvo.getStore().getId());
@@ -1304,6 +1304,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			ListOfReturnSlipsVo rvo = new ListOfReturnSlipsVo();
 			rvo.setDateFrom(srvo.getDateFrom());
 			rvo.setDateTo(srvo.getDateTo());
+			rvo.setDomainId(srvo.getDomainId());
+			rvo.setStoreId(srvo.getStoreId());
 			;
 			HttpEntity<ListOfReturnSlipsVo> entity = new HttpEntity<>(rvo, headers);
 
