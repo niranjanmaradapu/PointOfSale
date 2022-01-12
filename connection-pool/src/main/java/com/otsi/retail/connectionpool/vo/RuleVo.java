@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RuleVo {
 
-	private ColumnName columnName;
+	private String columnName;
 
 	private Operator operatorSymbol;
 

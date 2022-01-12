@@ -110,7 +110,7 @@ public class PromotionServiceImpl implements PromotionService {
 		}
 		log.warn("we are checking if pool is added...");
 		log.info("Promotion mapped succesfully...");
-		return "Promotion mapped succesfully...";
+		return "Promotion mapped succesfully with id: "+entity.getPromoId();
 	}
 
 	// Method for getting list of Promotions by using flag(Status)
