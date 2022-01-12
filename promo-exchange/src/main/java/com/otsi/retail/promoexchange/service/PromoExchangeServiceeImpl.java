@@ -43,10 +43,7 @@ public class PromoExchangeServiceeImpl implements PromoExchangeService {
 
 	@Autowired
 	private RestTemplate template;
-
-	// Rest call
 	
-
 	@Autowired
 	private CustomerService customerService;
 	@Autowired

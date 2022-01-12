@@ -27,6 +27,8 @@ import com.otsi.retail.promoexchange.vo.DeliverySlipVo;
 import com.otsi.retail.promoexchange.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.promoexchange.vo.PromoExchangeVo;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 @RestController
 @RequestMapping(CommonRequestMappings.PROMO_ITEM_EXCHANGE)
 public class PromoExchangeController {
@@ -66,21 +68,34 @@ public class PromoExchangeController {
 		return new GateWayResponse<>("Item Exchanged Successfully", message);
 	}
 
-	// Method for getting Delivery slip Data using DsNumber
+	// CircuitBreaker implemented
 	@GetMapping(CommonRequestMappings.GET_DS)
+	@CircuitBreaker(name = "GetDeliverySlipCB", fallbackMethod = "getDeliverySlipsFallback")
 	public GateWayResponse<?> getDeliverySlipDetails(@RequestParam String dsNumber) throws Exception {
 		log.info("Recieved request to getDeliverySlipDetails():" + dsNumber);
 		DeliverySlipVo dsDetails = promoExchangeService.getDeliverySlipDetails(dsNumber);
 		return new GateWayResponse<>(HttpStatus.OK, dsDetails, "");
 
 	}
-
+	
+	public GateWayResponse<?> getDeliverySlipsFallback(Exception ex) {
+		log.error("Third Party Service Down");
+		return new GateWayResponse<>("Third Party Service  is Down", null);
+	}
+	
+	// CircuitBreaker implemented
 	@GetMapping(CommonRequestMappings.GET_LIST_OF_RETURN_SLIPS)
+	@CircuitBreaker(name = "GetReturnSlipsCB", fallbackMethod = "getReturnSlipsFallback")
 	public GateWayResponse<?> getlistofReturnSlips() throws JsonMappingException, JsonProcessingException {
 		log.info("Recieved request to getlistofReturnSlips()");
 		List<ListOfReturnSlipsVo> returnSlips = promoExchangeService.getListOfRetunSlips();
 		return new GateWayResponse<>(HttpStatus.OK, returnSlips, "Success");
 
+	}
+	
+	public GateWayResponse<?> getReturnSlipsFallback(Exception ex) {
+		log.error("Third Party Service Down");
+		return new GateWayResponse<>("Third Party Service  is Down", null);
 	}
 
 	// Method for getting Delivery slip Data using DsNumber
