@@ -24,7 +24,7 @@ public class RuleEntity {
 	@GeneratedValue
 	private Long ruleId;
 
-	private ColumnName columnName;
+	private String columnName;
 
 	private Operator operatorSymbol;
 

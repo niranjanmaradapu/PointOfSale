@@ -60,7 +60,7 @@ public class PoolServiceImpl implements PoolService {
 		});
 		log.warn("we are checking if pool is saved...");
 		log.info("pool saved Successfully");
-		return "Pool saved Successfully";
+		return "Pool saved Successfully with id: "+poolEntity.getPoolId();
 
 		/*
 		 * catch (Exception e) { log.error("please give valid data"); throw new
