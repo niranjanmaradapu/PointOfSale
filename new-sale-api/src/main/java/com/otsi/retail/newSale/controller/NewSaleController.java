@@ -139,13 +139,13 @@ public class NewSaleController {
 			return new GateWayResponse<>(result, "Success..");
 
 		} catch (Exception e) {
-			if(e instanceof AmqpConnectException) {
-				return new GateWayResponse<>("rabbitMq server is stopped",null);
+			if (e instanceof AmqpConnectException) {
+				return new GateWayResponse<>("rabbitMq server is stopped", null);
 
-			}else {
-			
-			log.error("Exception occurs while confirming payment for Id : " + razorPayId);
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(), "Exception occurs");
+			} else {
+
+				log.error("Exception occurs while confirming payment for Id : " + razorPayId);
+				return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(), "Exception occurs");
 			}
 		}
 	}
@@ -505,9 +505,7 @@ public class NewSaleController {
 
 	// Method for getting list of sale report
 	@PostMapping(CommonRequestMappigs.GET_SALE_REPORT)
-
 	@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleReportFallBackMethod")
-
 	public GateWayResponse<?> getSaleReport(@RequestBody SaleReportVo srvo) throws RecordNotFoundException {
 
 		SaleReportVo saleReport = newSaleService.getSaleReport(srvo);
@@ -603,5 +601,8 @@ public class NewSaleController {
 		return new GateWayResponse<>(HttpStatus.OK, result, "");
 
 	}
+	
+	
+	
 
 }
