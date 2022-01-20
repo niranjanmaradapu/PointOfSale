@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.service;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,12 +20,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -89,6 +92,7 @@ import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 import com.otsi.retail.newSale.vo.TaggedItems;
 import com.otsi.retail.newSale.vo.TaxVo;
 import com.otsi.retail.newSale.vo.UserDetailsVo;
+import com.otsi.retail.newSale.vo.UpdateCreditRequest;
 
 /**
  * Service class contains all bussiness logics related to new sale , create
@@ -232,6 +236,18 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				if (vo.getPaymentAmountType() != null) {
 					vo.getPaymentAmountType().stream().forEach(x -> {
+						
+						// if check the payment type condition
+						if (x.getPaymentType().equals(PaymentType.PKTADVANCE)) {
+							try {
+                                
+								// Calling credit notes method
+								updateCreditNotes(vo.getNetPayableAmount(), vo.getMobileNumber(), vo.getStoreId());
+
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
 
 						PaymentAmountType type = new PaymentAmountType();
 						type.setOrderId(saveEntity);
@@ -386,8 +402,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				updateVo.add(vo);
 			});
 			log.info("Update request to Textile: " + updateVo);
-			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(),
-					config.getUpdateInventoryRK(), updateVo);
+			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(), config.getUpdateInventoryRK(), updateVo);
 		} else {
 
 			List<InventoryUpdateVo> updateVo = new ArrayList<>();
@@ -406,8 +421,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			});
 
 			log.info("Update request to Retail : " + updateVo);
-			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(),
-					config.getUpdateInventoryRK(), updateVo);
+			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(), config.getUpdateInventoryRK(), updateVo);
 		}
 	}
 
@@ -459,7 +473,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setLastModified(LocalDate.now());
 		entity.setUserId(vo.getSalesMan());
 		entity.setStoreId(vo.getStoreId());
-		
+
 		List<Long> lineItems = new ArrayList<>();
 
 		if (!vo.getLineItems().isEmpty()) {
@@ -519,12 +533,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 		 * getting the data using between dates and bill status or custMobileNumber or
 		 * barCode or invoiceNumber
 		 */
-		if (svo.getDateFrom() != null && svo.getDateTo() != null && svo.getStoreId()!=0L && svo.getDomainId()!=0L) {
+		if (svo.getDateFrom() != null && svo.getDateTo() != null && svo.getStoreId() != 0L && svo.getDomainId() != 0L) {
 			if (svo.getBillStatus() != null && svo.getCustMobileNumber() == null && svo.getEmpId() == null
 					&& svo.getInvoiceNumber() == null) {
 
-				saleDetails = newSaleRepository.findByCreationDateBetweenAndStatusAndStoreIdAndDomainId(svo.getDateFrom(), svo.getDateTo(),
-						svo.getBillStatus(),svo.getDomainId(),svo.getStoreId());
+				saleDetails = newSaleRepository.findByCreationDateBetweenAndStatusAndStoreIdAndDomainId(
+						svo.getDateFrom(), svo.getDateTo(), svo.getBillStatus(), svo.getDomainId(), svo.getStoreId());
 			}
 			/*
 			 * getting the record using custmobilenumber
@@ -550,8 +564,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					List<Long> userIds = uvo.stream().map(x -> x.getUserId()).collect(Collectors.toList());
 
-					saleDetails = newSaleRepository.findByUserIdInAndStoreIdAndDomainIdAndCreationDateBetween(userIds, svo.getDateFrom(),
-							svo.getDateTo(),svo.getStoreId(),svo.getDomainId());
+					saleDetails = newSaleRepository.findByUserIdInAndStoreIdAndDomainIdAndCreationDateBetween(userIds,
+							svo.getDateFrom(), svo.getDateTo(), svo.getStoreId(), svo.getDomainId());
 
 				}
 
@@ -567,27 +581,30 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getEmpId() == null
 					&& svo.getInvoiceNumber() != null) {
-				saleDetails = newSaleRepository.findByOrderNumberAndStoreIdAndDomainIdAndCreationDateBetween(svo.getInvoiceNumber(),
-						svo.getDateFrom(), svo.getDateTo(),svo.getDomainId(),svo.getStoreId());
+				saleDetails = newSaleRepository.findByOrderNumberAndStoreIdAndDomainIdAndCreationDateBetween(
+						svo.getInvoiceNumber(), svo.getDateFrom(), svo.getDateTo(), svo.getDomainId(),
+						svo.getStoreId());
 			}
 			/*
 			 * getting the record using empId
 			 */
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getInvoiceNumber() == null
 					&& svo.getEmpId() != null) {
-				saleDetails = newSaleRepository.findByCreatedByAndStoreIdAndDomainIdAndCreationDateBetween(svo.getEmpId(), svo.getDateFrom(),
-						svo.getDateTo(),svo.getStoreId(),svo.getDomainId());
+				saleDetails = newSaleRepository.findByCreatedByAndStoreIdAndDomainIdAndCreationDateBetween(
+						svo.getEmpId(), svo.getDateFrom(), svo.getDateTo(), svo.getStoreId(), svo.getDomainId());
 
 			} else
-				saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreIdAndDomainId(svo.getDateFrom(), svo.getDateTo(),svo.getStoreId(),svo.getDomainId());
+				saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreIdAndDomainId(svo.getDateFrom(),
+						svo.getDateTo(), svo.getStoreId(), svo.getDomainId());
 
 		}
 
-		if (svo.getDateFrom() == null && svo.getDateTo() == null && svo.getStoreId()!=0L&& svo.getDomainId()!=0L) {
+		if (svo.getDateFrom() == null && svo.getDateTo() == null && svo.getStoreId() != 0L && svo.getDomainId() != 0L) {
 			if (svo.getBillStatus() != null && svo.getCustMobileNumber() == null && svo.getEmpId() == null
 					&& svo.getInvoiceNumber() == null) {
 
-				saleDetails = newSaleRepository.findByStatusAndStoreIdAndDomainId(svo.getBillStatus(),svo.getStoreId(),svo.getDomainId());
+				saleDetails = newSaleRepository.findByStatusAndStoreIdAndDomainId(svo.getBillStatus(), svo.getStoreId(),
+						svo.getDomainId());
 			}
 			/*
 			 * getting the record using custmobilenumber
@@ -613,7 +630,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					List<Long> userIds = uvo.stream().map(x -> x.getUserId()).collect(Collectors.toList());
 
-					saleDetails = newSaleRepository.findByUserIdInAndStoreIdAndDomainId(userIds,svo.getStoreId(),svo.getDomainId());
+					saleDetails = newSaleRepository.findByUserIdInAndStoreIdAndDomainId(userIds, svo.getStoreId(),
+							svo.getDomainId());
 
 				}
 
@@ -629,14 +647,16 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getEmpId() == null
 					&& svo.getInvoiceNumber() != null) {
-				saleDetails = newSaleRepository.findByOrderNumberAndStoreIdAndDomainId(svo.getInvoiceNumber(),svo.getStoreId(),svo.getDomainId());
+				saleDetails = newSaleRepository.findByOrderNumberAndStoreIdAndDomainId(svo.getInvoiceNumber(),
+						svo.getStoreId(), svo.getDomainId());
 			}
 			/*
 			 * getting the record using empId
 			 */
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getInvoiceNumber() == null
 					&& svo.getEmpId() != null) {
-				saleDetails = newSaleRepository.findByCreatedByAndStoreIdAndDomainId(svo.getEmpId(),svo.getStoreId(),svo.getDomainId());
+				saleDetails = newSaleRepository.findByCreatedByAndStoreIdAndDomainId(svo.getEmpId(), svo.getStoreId(),
+						svo.getDomainId());
 
 			}
 		}
@@ -762,17 +782,19 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
 					&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() != null
-					&& listOfDeliverySlipVo.getBarcode() != null && listOfDeliverySlipVo.getStoreId()!=0L) {
+					&& listOfDeliverySlipVo.getBarcode() != null && listOfDeliverySlipVo.getStoreId() != 0L) {
 
-				List<LineItemsEntity> bar = lineItemRepo.findByBarCodeAndStoreId(listOfDeliverySlipVo.getBarcode(),listOfDeliverySlipVo.getStoreId());
+				List<LineItemsEntity> bar = lineItemRepo.findByBarCodeAndStoreId(listOfDeliverySlipVo.getBarcode(),
+						listOfDeliverySlipVo.getStoreId());
 
 				if (bar != null) {
 					bar.stream().forEach(b -> {
 						DeliverySlipEntity dsEntity = new DeliverySlipEntity();
-						dsEntity = dsRepo.findByCreationDateBetweenAndDsIdAndDsNumberAndStatusAndStoreIdOrderByCreationDateAsc(
-								listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-								b.getDsEntity().getDsId(), listOfDeliverySlipVo.getDsNumber(),listOfDeliverySlipVo.getStoreId(),
-								listOfDeliverySlipVo.getStatus());
+						dsEntity = dsRepo
+								.findByCreationDateBetweenAndDsIdAndDsNumberAndStatusAndStoreIdOrderByCreationDateAsc(
+										listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
+										b.getDsEntity().getDsId(), listOfDeliverySlipVo.getDsNumber(),
+										listOfDeliverySlipVo.getStoreId(), listOfDeliverySlipVo.getStatus());
 						dsDetails.add(dsEntity);
 					});
 
@@ -785,15 +807,17 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
 					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
-					&& listOfDeliverySlipVo.getBarcode() != null&&listOfDeliverySlipVo.getStoreId()!=0L) {
+					&& listOfDeliverySlipVo.getBarcode() != null && listOfDeliverySlipVo.getStoreId() != 0L) {
 
-				List<LineItemsEntity> bar = lineItemRepo.findByBarCodeAndStoreId(listOfDeliverySlipVo.getBarcode(),listOfDeliverySlipVo.getStoreId());
+				List<LineItemsEntity> bar = lineItemRepo.findByBarCodeAndStoreId(listOfDeliverySlipVo.getBarcode(),
+						listOfDeliverySlipVo.getStoreId());
 
 				if (bar != null) {
 
 					bar.stream().forEach(b -> {
 						DeliverySlipEntity dentity = new DeliverySlipEntity();
-						dentity = dsRepo.findByDsIdAndStoreId(b.getDsEntity().getDsId(),listOfDeliverySlipVo.getStoreId());
+						dentity = dsRepo.findByDsIdAndStoreId(b.getDsEntity().getDsId(),
+								listOfDeliverySlipVo.getStoreId());
 						dsDetails.add(dentity);
 					});
 
@@ -806,9 +830,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
 					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
-					&& listOfDeliverySlipVo.getBarcode() != null&& listOfDeliverySlipVo.getStoreId()!=0L) {
+					&& listOfDeliverySlipVo.getBarcode() != null && listOfDeliverySlipVo.getStoreId() != 0L) {
 
-				List<LineItemsEntity> bar = lineItemRepo.findByBarCodeAndStoreId(listOfDeliverySlipVo.getBarcode(),listOfDeliverySlipVo.getStoreId());
+				List<LineItemsEntity> bar = lineItemRepo.findByBarCodeAndStoreId(listOfDeliverySlipVo.getBarcode(),
+						listOfDeliverySlipVo.getStoreId());
 
 				if (bar != null) {
 
@@ -816,8 +841,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 						DeliverySlipEntity dentity = new DeliverySlipEntity();
 
 						dentity = dsRepo.findByCreationDateBetweenAndDsIdAndStoreIdOrderByCreationDateAsc(
-								listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),listOfDeliverySlipVo.getStoreId(),
-								b.getDsEntity().getDsId());
+								listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
+								listOfDeliverySlipVo.getStoreId(), b.getDsEntity().getDsId());
 						dsDetails.add(dentity);
 					});
 
@@ -828,11 +853,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
 					&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() == null
-					&& listOfDeliverySlipVo.getBarcode() == null&&listOfDeliverySlipVo.getStoreId()!=0L) {
+					&& listOfDeliverySlipVo.getBarcode() == null && listOfDeliverySlipVo.getStoreId() != 0L) {
 
 				dsDetails = dsRepo.findByCreationDateBetweenAndDsNumberAndStoreIdOrderByCreationDateAsc(
-						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),listOfDeliverySlipVo.getStoreId(),
-						listOfDeliverySlipVo.getDsNumber());
+						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
+						listOfDeliverySlipVo.getStoreId(), listOfDeliverySlipVo.getDsNumber());
 
 			}
 			/*
@@ -840,11 +865,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
 					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
-					&& listOfDeliverySlipVo.getBarcode() == null&&listOfDeliverySlipVo.getStoreId()!=0L) {
+					&& listOfDeliverySlipVo.getBarcode() == null && listOfDeliverySlipVo.getStoreId() != 0L) {
 
 				dsDetails = dsRepo.findByCreationDateBetweenAndStatusAndStoreIdOrderByCreationDateAsc(
-						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),listOfDeliverySlipVo.getStoreId(),
-						listOfDeliverySlipVo.getStatus());
+						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
+						listOfDeliverySlipVo.getStoreId(), listOfDeliverySlipVo.getStatus());
 
 			}
 
@@ -854,13 +879,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
 					&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() == null
-					&& listOfDeliverySlipVo.getBarcode() == null&&listOfDeliverySlipVo.getStoreId()!=0L) {
+					&& listOfDeliverySlipVo.getBarcode() == null && listOfDeliverySlipVo.getStoreId() != 0L) {
 
 				// List<String> dlsList = listOfDeliverySlipVo.stream().map(x ->
 				// x.getDsNumber()).collect(Collectors.toList());
 				List<String> dsList = new ArrayList<>();
 				dsList.add(listOfDeliverySlipVo.getDsNumber());
-				dsDetails = dsRepo.findByDsNumberInAndStoreIdOrderByCreationDateAsc(dsList,listOfDeliverySlipVo.getStoreId());
+				dsDetails = dsRepo.findByDsNumberInAndStoreIdOrderByCreationDateAsc(dsList,
+						listOfDeliverySlipVo.getStoreId());
 
 			}
 
@@ -870,9 +896,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
 					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
-					&& listOfDeliverySlipVo.getBarcode() == null&&listOfDeliverySlipVo.getStoreId()!=0L) {
+					&& listOfDeliverySlipVo.getBarcode() == null && listOfDeliverySlipVo.getStoreId() != 0L) {
 
-				dsDetails = dsRepo.findByStatusAndStoreIdOrderByCreationDateAsc(listOfDeliverySlipVo.getStatus(),listOfDeliverySlipVo.getStoreId());
+				dsDetails = dsRepo.findByStatusAndStoreIdOrderByCreationDateAsc(listOfDeliverySlipVo.getStatus(),
+						listOfDeliverySlipVo.getStoreId());
 
 			}
 			/*
@@ -880,10 +907,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
 					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
-					&& listOfDeliverySlipVo.getBarcode() == null&&listOfDeliverySlipVo.getStoreId()!=0L) {
+					&& listOfDeliverySlipVo.getBarcode() == null && listOfDeliverySlipVo.getStoreId() != 0L) {
 
-				dsDetails = dsRepo.findByCreationDateBetweenAndStoreIdOrderByCreationDateAsc(listOfDeliverySlipVo.getDateFrom(),
-						listOfDeliverySlipVo.getDateTo(),listOfDeliverySlipVo.getStoreId());
+				dsDetails = dsRepo.findByCreationDateBetweenAndStoreIdOrderByCreationDateAsc(
+						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
+						listOfDeliverySlipVo.getStoreId());
 
 			}
 			ListOfDeliverySlipVo lvo = null;
@@ -1270,12 +1298,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		List<NewSaleEntity> saleDetails = new ArrayList<>();
 
-		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() != null && srvo.getDomainId()!=0L) {
-			saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreIdAndDomainId(srvo.getDateFrom(), srvo.getDateTo(),
-					srvo.getStore().getId(),srvo.getDomainId());
-		} else if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() == null && srvo.getDomainId()!=0L) {
+		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() != null
+				&& srvo.getDomainId() != 0L) {
+			saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreIdAndDomainId(srvo.getDateFrom(),
+					srvo.getDateTo(), srvo.getStore().getId(), srvo.getDomainId());
+		} else if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() == null
+				&& srvo.getDomainId() != 0L) {
 
-			saleDetails = newSaleRepository.findByCreationDateBetweenAndDomainIdAndStoreId(srvo.getDateFrom(), srvo.getDateTo(),srvo.getDomainId(),srvo.getStoreId());
+			saleDetails = newSaleRepository.findByCreationDateBetweenAndDomainIdAndStoreId(srvo.getDateFrom(),
+					srvo.getDateTo(), srvo.getDomainId(), srvo.getStoreId());
 		} else if (srvo.getDateFrom() == null && srvo.getDateTo() == null && srvo.getStore().getId() != 0L) {
 
 			saleDetails = newSaleRepository.findByStoreId(srvo.getStore().getId());
@@ -1348,9 +1379,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			System.out.println(vo);
 
 			HsnDetailsVo hsnDetails1 = getHsnDetails(rAmount);
-			List<Long> result = barVoList.stream()
-					.map(num -> num.getDiscount()) 
-					.filter(n -> n!=null)
+			List<Long> result = barVoList.stream().map(num -> num.getDiscount()).filter(n -> n != null)
 					.collect(Collectors.toList());
 			retunVo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());
 			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getGrossValue()).sum());
@@ -1836,4 +1865,31 @@ public class NewSaleServiceImpl implements NewSaleService {
 			throw new RecordNotFoundException("Record not found");
 		}
 	}
+
+	// UPDATE CREDIT NOTES METHOD
+	private String updateCreditNotes(Long amount, String mobileNumber, Long storeId) {
+
+		UpdateCreditRequest req = new UpdateCreditRequest();
+
+		req.setAmount(amount);
+		req.setMobileNumber(mobileNumber);
+		req.setStoreId(storeId);
+		req.setCreditDebit("C");
+
+		System.out.println("Update Credit Notes Request:: " + req);
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<UpdateCreditRequest> entity = new HttpEntity<>(req, headers);
+
+		
+		  ResponseEntity<?> creditNotesResponse = template.exchange(
+		         config.getUpdateCreditNotesDetails(), HttpMethod.POST, entity, GateWayResponse.class);
+		  
+		  System.out.println("Credit Rest Call Response:: "+creditNotesResponse.toString());
+		  	 
+		return "Credit Notes Updated Successfully";
+
+	}
+
 }

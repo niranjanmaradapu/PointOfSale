@@ -26,7 +26,6 @@ import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
-import com.otsi.retail.newSale.vo.UserDataVo;
 
 @Component
 public interface NewSaleService {
@@ -63,7 +62,7 @@ public interface NewSaleService {
 
 	String saveGiftVoucher(GiftVoucherVo vo) throws DuplicateRecordException;
 
-	GiftVoucherVo getGiftVoucher(String gvNumber , Long clientId) throws InvalidInputException;
+	GiftVoucherVo getGiftVoucher(String gvNumber, Long clientId) throws InvalidInputException;
 
 	String tagCustomerToGv(Long userId, Long gvId) throws InvalidInputException, DataNotFoundException;
 
@@ -106,5 +105,10 @@ public interface NewSaleService {
 	List<GiftVoucherVo> getGvByUserId(Long userId) throws RecordNotFoundException;
 
 	String activateGiftvoucher(List<String> gvsList, Boolean flag) throws RecordNotFoundException;
+
+	
+
+	 
+	
 
 }
