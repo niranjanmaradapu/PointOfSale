@@ -25,7 +25,11 @@ public class LineItemsEntity {
 	
 	private Long storeId;
 
-	private String section;
+	private Long section;
+	
+	private Long subSection;
+	
+	private Long division;
 
 	private String barCode;
 
