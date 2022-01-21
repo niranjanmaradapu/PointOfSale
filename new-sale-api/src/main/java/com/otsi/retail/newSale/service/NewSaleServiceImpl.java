@@ -237,12 +237,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 				if (vo.getPaymentAmountType() != null) {
 					vo.getPaymentAmountType().stream().forEach(x -> {
 						
-						// if check the payment type condition
-						if (x.getPaymentType().equals(PaymentType.PKTADVANCE)) {
+						// Checking the payment type condition
+						if ((x.getPaymentType().equals(PaymentType.PKTADVANCE)) || 
+								(x.getPaymentType().equals(PaymentType.PKTPENDING))) {
 							try {
                                 
-								// Calling credit notes method
-								updateCreditNotes(vo.getNetPayableAmount(), vo.getMobileNumber(), vo.getStoreId());
+								// Calling the credit notes method
+								updateCreditNotes(vo.getNetPayableAmount(), vo.getMobileNumber(), vo.getStoreId(), x.getPaymentType().getType());
 
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -1433,6 +1434,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineEntity.setNetValue(lineItem.getNetValue());
 					lineEntity.setItemPrice(lineItem.getItemPrice());
 					lineEntity.setSection(lineItem.getSection());
+					lineEntity.setSubSection(lineItem.getSubSection());
+					lineEntity.setDivision(lineItem.getDivision());
 					lineEntity.setHsnCode(lineItem.getHsnCode());
 					lineEntity.setActualValue(lineItem.getActualValue());
 					lineEntity.setTaxValue(lineItem.getTaxValue());
@@ -1466,6 +1469,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineReEntity.setNetValue(lineItem.getNetValue());
 					lineReEntity.setItemPrice(lineItem.getItemPrice());
 					lineReEntity.setSection(lineItem.getSection());
+					lineReEntity.setSubSection(lineItem.getSubSection());
+					lineReEntity.setDivision(lineItem.getDivision());
 					lineReEntity.setUserId(lineItem.getUserId());
 					lineReEntity.setTaxValue(lineItem.getTaxValue());
 					lineReEntity.setCgst(lineItem.getCgst());
@@ -1867,14 +1872,21 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	// UPDATE CREDIT NOTES METHOD
-	private String updateCreditNotes(Long amount, String mobileNumber, Long storeId) {
+	private String updateCreditNotes(Long amount, String mobileNumber, Long storeId, String type) {
 
 		UpdateCreditRequest req = new UpdateCreditRequest();
-
+       
 		req.setAmount(amount);
 		req.setMobileNumber(mobileNumber);
 		req.setStoreId(storeId);
-		req.setCreditDebit("C");
+		if(type.equals("PKTADVANCE"))
+		{
+			req.setCreditDebit("C");
+			
+		}else if(type.equals("PKTPENDING"))
+		{
+			req.setCreditDebit("D");
+		}
 
 		System.out.println("Update Credit Notes Request:: " + req);
 		

@@ -24,12 +24,16 @@ public class LineItemsReEntity {
 	@Id
 	@GeneratedValue
 	private Long lineItemReId;
-	
+
 	private Long storeId;
 
 	private String barCode;
 
-	private String section;
+	private Long section;
+
+	private Long subSection;
+
+	private Long division;
 
 	private Long userId;
 
