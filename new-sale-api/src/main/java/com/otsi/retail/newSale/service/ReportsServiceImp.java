@@ -2,7 +2,6 @@ package com.otsi.retail.newSale.service;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -10,11 +9,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -22,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
+import com.otsi.retail.newSale.Entity.LineItemsEntity;
 import com.otsi.retail.newSale.Entity.LineItemsReEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.common.DomainData;
@@ -42,15 +40,20 @@ public class ReportsServiceImp implements ReportService {
 
 	@Autowired
 	private DeliverySlipRepository dsRepo;
-	
+
 	@Autowired
 	private LineItemReRepo lineItemReRepo;
+	
+	@Autowired
+	private LineItemRepo lineItemRepo;
 
 	@Autowired
 	private RestTemplate template;
 
 	@Autowired
 	private Config config;
+	
+	
 
 	@Override
 	public List<ReportVo> getInvoicesGeneratedDetails(Long storeId) {
@@ -180,11 +183,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getTodaysSale(Long storeId,Long domainId) {
+	public ReportVo getTodaysSale(Long storeId, Long domainId) {
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId, domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -204,11 +207,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getMonthlySale(Long storeId,Long domainId) {
+	public ReportVo getMonthlySale(Long storeId, Long domainId) {
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId, domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -225,11 +228,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getcurrentMonthSalevsLastMonth(Long storeId,Long domainId) {
+	public ReportVo getcurrentMonthSalevsLastMonth(Long storeId, Long domainId) {
 
-		ReportVo currentMonth = getMonthlySale(storeId,domainId);
+		ReportVo currentMonth = getMonthlySale(storeId, domainId);
 		LocalDate Date = LocalDate.now().minusMonths(1);
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId, domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -255,19 +258,18 @@ public class ReportsServiceImp implements ReportService {
 		}
 	}
 
-	
 	@Override
 	public List<ReportVo> getTopFiveSalesByRepresentative(Long storeId, Long domainId) {
 
 		List<ReportVo> vo = new ArrayList<>();
-		LocalDate Date =LocalDate.now();
-		
+		LocalDate Date = LocalDate.now();
+
 		if (domainId == DomainData.TE.getId()) {
-			
 
 			List<DeliverySlipEntity> dsEntity = dsRepo.findByStoreId(storeId);
-			
-			List<DeliverySlipEntity> desen = dsEntity.stream().filter(a -> a.getCreationDate().getDayOfMonth() == (Date.getDayOfMonth()))
+
+			List<DeliverySlipEntity> desen = dsEntity.stream()
+					.filter(a -> a.getCreationDate().getDayOfMonth() == (Date.getDayOfMonth()))
 					.collect(Collectors.toList());
 
 			List<Long> userids = desen.stream().map(a -> a.getUserId()).distinct().collect(Collectors.toList());
@@ -297,14 +299,15 @@ public class ReportsServiceImp implements ReportService {
 
 			return first5ElementsList;
 
-		}else if (domainId != DomainData.TE.getId()) {
-			
+		} else if (domainId != DomainData.TE.getId()) {
+
 			List<LineItemsReEntity> reent = lineItemReRepo.findByStoreId(storeId);
-			
-			List<LineItemsReEntity> desen = reent.stream().filter(a -> a.getCreationDate().getDayOfMonth() == (Date.getDayOfMonth()))
+
+			List<LineItemsReEntity> desen = reent.stream()
+					.filter(a -> a.getCreationDate().getDayOfMonth() == (Date.getDayOfMonth()))
 					.collect(Collectors.toList());
 			List<Long> userids = desen.stream().map(a -> a.getUserId()).distinct().collect(Collectors.toList());
-			
+
 			userids.stream().forEach(u -> {
 
 				List<LineItemsReEntity> len = lineItemReRepo.findByUserId(u);
@@ -322,7 +325,6 @@ public class ReportsServiceImp implements ReportService {
 					vo.add(v);
 
 				});
-				
 
 			});
 			List<ReportVo> sorted = vo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
@@ -330,27 +332,49 @@ public class ReportsServiceImp implements ReportService {
 			List<ReportVo> top5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
 
 			return top5ElementsList;
-			
-			
-			
-			
-			
-			
-		}else {
+
+		} else {
 			ReportVo v = new ReportVo();
-			
+
 			v.setName("There is no sale for today");
 			vo.add(v);
-			
+
 			return vo;
 		}
-			
-		
+
 	}
-	
+
+	@Override
+	public List<ReportVo> getSalesByCategory(Long storeId, Long domainId) {
+		List<ReportVo> vo = new ArrayList<>();
+		List<NewSaleEntity> nsentity = new ArrayList<NewSaleEntity>();
+		LocalDate Date = LocalDate.now();
+		// System.out.println("id"+lineItemId);
+		if (domainId == DomainData.TE.getId()) {
+			List<LineItemsEntity> lineEntity = lineItemRepo.findByStoreId(storeId);
+			List<LineItemsEntity> lien = lineEntity.stream()
+					.filter(a -> a.getCreationDate().getMonth() == Date.getMonth())
+					.collect(Collectors.toList());
+			List<Long> sections = lien.stream().map(a -> a.getSection()).distinct().collect(Collectors.toList());
+			
+			sections.stream().forEach(b -> {
+				
+				Long amount = 0l;
+				
+				List<LineItemsEntity> data = lineItemRepo.findBySection(b);
+				data.stream().forEach(a -> {
+					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(a.getDsEntity().getOrder().getOrderId());
+					nsentity.add(nen.get());
+				});
+				
+				amount = nsentity.stream().mapToLong(x -> x.getNetValue()).sum();
+				ReportVo rvo = new ReportVo();
+				rvo.setAmount(amount);
+				rvo.setCategeoryType(b);
+				vo.add(rvo);
+			});
+		}
+		return vo;
+	}
+
 }
-
-		
-	
-
-

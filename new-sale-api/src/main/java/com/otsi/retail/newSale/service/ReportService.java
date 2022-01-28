@@ -25,5 +25,7 @@ public interface ReportService {
 
 	List<ReportVo> getTopFiveSalesByRepresentative(Long storeId, Long domainId);
 	
+	List<ReportVo> getSalesByCategory(Long storeId, Long domainId);
+	
 
 }
