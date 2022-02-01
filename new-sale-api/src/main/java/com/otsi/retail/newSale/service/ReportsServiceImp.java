@@ -264,6 +264,7 @@ public class ReportsServiceImp implements ReportService {
 	public List<ReportVo> getTopFiveSalesByRepresentative(Long storeId, Long domainId) {
 
 		List<ReportVo> vo = new ArrayList<>();
+		List<NewSaleEntity> lnesen = new ArrayList<>();
 		LocalDate Date =LocalDate.now();
 		
 		if (domainId == DomainData.TE.getId()) {
@@ -271,28 +272,34 @@ public class ReportsServiceImp implements ReportService {
 
 			List<DeliverySlipEntity> dsEntity = dsRepo.findByStoreId(storeId);
 			
-			List<DeliverySlipEntity> desen = dsEntity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
+			List<DeliverySlipEntity> desen = dsEntity.stream().filter(a -> a.getCreationDate().getMonthValue() == (Date.getMonthValue()))
 					.collect(Collectors.toList());
 
-			List<Long> userids = desen.stream().map(a -> a.getUserId()).distinct().collect(Collectors.toList());
+			List<Long> userids = desen.stream().map(a -> a.getUserId()).filter(n -> n != null).distinct().collect(Collectors.toList());
 
 			userids.stream().forEach(u -> {
 
 				List<DeliverySlipEntity> dsen = dsRepo.findByUserId(u);
+			List<NewSaleEntity> nsen =	dsen.stream().map(a -> a.getOrder()).filter(n -> n != null)
+				.collect(Collectors.toList());
 
-				List<Long> orderIds = dsen.stream().map(a -> a.getOrder().getOrderId()).distinct().filter(n -> n != null)
+				List<Long> orderIds = nsen.stream().map(a -> a.getOrderId()).filter(n -> n != null).distinct()
 						.collect(Collectors.toList());
 				orderIds.stream().forEach(d -> {
 					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(d);
-
-					Long amount = nen.get().getNetValue();
-					ReportVo v = new ReportVo();
-					v.setAmount(amount);
-					v.setUserId(u);
-
-					vo.add(v);
+					
+					lnesen.add(nen.get());
+					
 
 				});
+				if(!lnesen.isEmpty()) {
+				Long amount = lnesen.stream().mapToLong(x -> x.getNetValue()).sum();
+				ReportVo v = new ReportVo();
+				v.setAmount(amount);
+				v.setUserId(u);
+
+				vo.add(v);
+				}
 
 			});
 			List<ReportVo> sorted = vo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
@@ -305,7 +312,7 @@ public class ReportsServiceImp implements ReportService {
 			
 			List<LineItemsReEntity> reent = lineItemReRepo.findByStoreId(storeId);
 			
-			List<LineItemsReEntity> desen = reent.stream().filter(a -> a.getCreationDate().getDayOfMonth() == (Date.getDayOfMonth()))
+			List<LineItemsReEntity> desen = reent.stream().filter(a -> a.getCreationDate().getMonthValue() == (Date.getMonthValue()))
 					.collect(Collectors.toList());
 			List<Long> userids = desen.stream().map(a -> a.getUserId()).distinct().collect(Collectors.toList());
 			
@@ -317,16 +324,17 @@ public class ReportsServiceImp implements ReportService {
 						.collect(Collectors.toList());
 				orderIds.stream().forEach(d -> {
 					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(d);
+					lnesen.add(nen.get());
 
-					Long amount = nen.get().getNetValue();
-					ReportVo v = new ReportVo();
-					v.setAmount(amount);
-					v.setUserId(u);
-
-					vo.add(v);
+					
 
 				});
-				
+				Long amount = lnesen.stream().mapToLong(x -> x.getNetValue()).sum();
+				ReportVo v = new ReportVo();
+				v.setAmount(amount);
+				v.setUserId(u);
+
+				vo.add(v);
 
 			});
 			List<ReportVo> sorted = vo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
