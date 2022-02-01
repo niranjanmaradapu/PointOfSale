@@ -7,7 +7,7 @@ metadata:
     {{- include "user-store-mapping.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicaCountPos }}
   {{- end }}
   selector:
     matchLabels:
@@ -72,7 +72,7 @@ spec:
         - name: user-store-mapping-data
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "user-store-mapping.fullname" . }}-pos
+            claimName: {{ include "user-store-mapping.fullname" . }}
         {{- else }}
           emptyDir: {}
         {{- end -}}

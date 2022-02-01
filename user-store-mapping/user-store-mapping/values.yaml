@@ -10,6 +10,7 @@ env:
   postgres_db: newStore
 
 replicaCount: 1
+replicaCountPos: 1
 namespace: 
   name: default
 image:

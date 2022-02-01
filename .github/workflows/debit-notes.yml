@@ -3,15 +3,12 @@ on:
   push:
     branches:
       - DevOps
-    paths:
-      - "debit-notes"
-      - ".github/workflows/debit-notes.yml"
+
   pull_request:
     branches: 
       - DevOps
     paths:
-      - "debit-notes"
-      - ".github/workflows/debit-notes.yml"
+
 jobs:
   build:
     runs-on: ubuntu-latest

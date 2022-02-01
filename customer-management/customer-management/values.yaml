@@ -10,6 +10,7 @@ env:
   postgres_db: customerManagement
 
 replicaCount: 1
+replicaCountPos: 1
 namespace: 
   name: default
 image:

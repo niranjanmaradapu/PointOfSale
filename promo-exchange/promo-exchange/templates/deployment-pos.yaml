@@ -7,7 +7,7 @@ metadata:
     {{- include "promo-exchange.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicaCountPos }}
   {{- end }}
   selector:
     matchLabels:
@@ -72,7 +72,7 @@ spec:
         - name: promo-exchange-data
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "promo-exchange.fullname" . }}-pos
+            claimName: {{ include "promo-exchange.fullname" . }}
         {{- else }}
           emptyDir: {}
         {{- end -}}

@@ -10,6 +10,8 @@ env:
   postgres_db: connectionpool
 
 replicaCount: 1
+replicaCountPos: 1
+
 namespace: 
   name: default
 image:

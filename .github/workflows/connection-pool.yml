@@ -3,15 +3,11 @@ on:
   push:
     branches:
       - DevOps
-    paths:
-      - "connection-pool"
-      - ".github/workflows/connection-pool.yml"
+
   pull_request:
     branches: 
       - DevOps
-    paths:
-      - "connection-pool"
-      - ".github/workflows/connection-pool.yml"
+
 jobs:
   build:
     runs-on: ubuntu-latest

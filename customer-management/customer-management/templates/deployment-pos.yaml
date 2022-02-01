@@ -7,7 +7,7 @@ metadata:
     {{- include "customer-management.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicaCountPos }}
   {{- end }}
   selector:
     matchLabels:
@@ -72,7 +72,7 @@ spec:
         - name: customer-management-data
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "customer-management.fullname" . }}-pos
+            claimName: {{ include "customer-management.fullname" . }}
         {{- else }}
           emptyDir: {}
         {{- end -}}

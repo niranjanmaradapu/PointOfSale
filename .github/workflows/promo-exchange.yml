@@ -3,15 +3,11 @@ on:
   push:
     branches:
       - DevOps
-    paths:
-      - "promo-exchange"
-      - ".github/workflows/promo-exchange.yml"
+
   pull_request:
     branches: 
       - DevOps
-    paths:
-      - "promo-exchange"
-      - ".github/workflows/promo-exchange.yml"
+
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -10,6 +10,7 @@ env:
   postgres_db: debit-notes
 
 replicaCount: 1
+replicaCountPos: 1
 namespace: 
   name: default
 image:

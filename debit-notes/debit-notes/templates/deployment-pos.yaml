@@ -7,7 +7,7 @@ metadata:
     {{- include "debit-notes.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicaCountPos }}
   {{- end }}
   selector:
     matchLabels:
@@ -72,7 +72,7 @@ spec:
         - name: debit-notes-data
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "debit-notes.fullname" . }}-pos
+            claimName: {{ include "debit-notes.fullname" . }}
         {{- else }}
           emptyDir: {}
         {{- end -}}

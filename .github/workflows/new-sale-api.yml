@@ -3,15 +3,11 @@ on:
   push:
     branches:
       - DevOps
-    paths:
-      - "new-sale-api"
-      - ".github/workflows/new-sale-api.yml"
+
   pull_request:
     branches: 
       - DevOps
-    paths:
-      - "new-sale-api"
-      - ".github/workflows/new-sale-api.yml"
+      
 jobs:
   build:
     runs-on: ubuntu-latest
