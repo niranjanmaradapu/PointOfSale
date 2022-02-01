@@ -278,7 +278,7 @@ public class ReportsServiceImp implements ReportService {
 
 				List<DeliverySlipEntity> dsen = dsRepo.findByUserId(u);
 
-				List<Long> orderIds = dsen.stream().map(a -> a.getOrder().getOrderId()).distinct()
+				List<Long> orderIds = dsen.stream().map(a -> a.getOrder().getOrderId()).distinct().filter(n -> n != null)
 						.collect(Collectors.toList());
 				orderIds.stream().forEach(d -> {
 					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(d);
@@ -312,7 +312,7 @@ public class ReportsServiceImp implements ReportService {
 
 				List<LineItemsReEntity> len = lineItemReRepo.findByUserId(u);
 
-				List<Long> orderIds = len.stream().map(a -> a.getOrderId().getOrderId()).distinct()
+				List<Long> orderIds = len.stream().map(a -> a.getOrderId().getOrderId()).distinct().filter(n -> n != null)
 						.collect(Collectors.toList());
 				orderIds.stream().forEach(d -> {
 					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(d);

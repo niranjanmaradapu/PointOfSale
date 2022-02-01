@@ -189,8 +189,10 @@ public class NewSaleMapper {
 			x.getLineItems().stream().forEach(b -> {
 
 				LineItemVo barvo = new LineItemVo();
+				
 
 				BeanUtils.copyProperties(b, barvo);
+				barvo.setUserId(x.getUserId());
 
 				listBarVo.add(barvo);
 			});
@@ -200,11 +202,12 @@ public class NewSaleMapper {
 		Long grossAmount = x.getLineItems().stream().mapToLong(a->a.getGrossValue()).sum();
 
 			BeanUtils.copyProperties(x, dsvo);
+			dsvo.setCreatedDate(x.getCreationDate());
 			dsvo.setLineItems(listBarVo);
              dsvo.setNetAmount(amount);
              dsvo.setMrp(grossAmount);
 
-dsVoList.add(dsvo);
+            dsVoList.add(dsvo);
 		});
 
 		// vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i ->
