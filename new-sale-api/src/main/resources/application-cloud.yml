@@ -14,6 +14,11 @@ spring:
     ddl-auto: update
    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
    show-sql: true
+ rabbitmq:
+      host: aeb8cc91b2f7948a8bc858c8d8f7fb4d-768590259.ap-south-1.elb.amazonaws.com
+      port: 5672
+      username: user
+      password: piV7lSjh6q
    
 eureka:
   client:

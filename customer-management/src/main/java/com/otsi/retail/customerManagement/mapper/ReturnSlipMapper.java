@@ -50,7 +50,7 @@ public class ReturnSlipMapper {
 			vo.setDomainId(dto.getDomianId());
 			vo.setBarcodes(dto.getTaggedItems());
 			vo.setRsId(dto.getRsId());
-
+            vo.setStoreId(dto.getStoreId());
 			vo.setCreatedInfo(dto.getCreatedDate());
 			vo.setCreatedBy(dto.getCreatedBy());
 			lvo.add(vo);

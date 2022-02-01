@@ -22,4 +22,10 @@ public interface LineItemReRepo extends JpaRepository<LineItemsReEntity, Long>{
 	//List<LineItemsReEntity> findByBarcodeIn(List<String> barCode);
 
 	List<LineItemsReEntity> findByBarCodeIn(List<String> barCode);
+
+	List<LineItemsReEntity> findByUserId(Long u);
+
+	List<LineItemsReEntity> findByStoreId(Long storeId);
+
+	List<LineItemsReEntity> findBySection(Long b);
 }

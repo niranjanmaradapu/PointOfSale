@@ -51,6 +51,36 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 
 	List<NewSaleEntity> findByStoreId(Long n);
 
+	List<NewSaleEntity> findByStoreIdAndDomainId(Long storeId, Long domainId);
+
+	List<NewSaleEntity> findByCreationDateBetweenAndStatusAndStoreIdAndDomainId(LocalDate dateFrom, LocalDate dateTo,
+			OrderStatus billStatus, Long domainId, Long storeId);
+
+	List<NewSaleEntity> findByUserIdInAndStoreIdAndDomainIdAndCreationDateBetween(List<Long> userIds,
+			LocalDate dateFrom, LocalDate dateTo, Long storeId, Long domainId);
+
+	List<NewSaleEntity> findByOrderNumberAndStoreIdAndDomainIdAndCreationDateBetween(String invoiceNumber,
+			LocalDate dateFrom, LocalDate dateTo, Long domainId, Long storeId);
+
+	List<NewSaleEntity> findByCreatedByAndStoreIdAndDomainIdAndCreationDateBetween(String empId, LocalDate dateFrom,
+			LocalDate dateTo, Long storeId, Long domainId);
+
+	List<NewSaleEntity> findByCreationDateBetweenAndStoreIdAndDomainId(LocalDate dateFrom, LocalDate dateTo,
+			Long storeId, Long domainId);
+
+	List<NewSaleEntity> findByStatusAndStoreIdAndDomainId(OrderStatus billStatus, Long storeId, Long domainId);
+
+	List<NewSaleEntity> findByUserIdInAndStoreIdAndDomainId(List<Long> userIds, Long storeId, Long domainId);
+
+	List<NewSaleEntity> findByOrderNumberAndStoreIdAndDomainId(String invoiceNumber, Long storeId, Long domainId);
+
+	List<NewSaleEntity> findByCreatedByAndStoreIdAndDomainId(String empId, Long storeId, Long domainId);
+
+	List<NewSaleEntity> findByCreationDateBetweenAndDomainId(LocalDate dateFrom, LocalDate dateTo, Long domainId);
+
+	List<NewSaleEntity> findByCreationDateBetweenAndDomainIdAndStoreId(LocalDate dateFrom, LocalDate dateTo,
+			Long domainId, Long storeId);
+
 	
 
 

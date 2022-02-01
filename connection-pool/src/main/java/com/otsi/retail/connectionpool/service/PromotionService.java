@@ -45,8 +45,7 @@ public interface PromotionService {
 	List<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo);
 	
 	String saveBenfit(BenfitVo vo);
-
+	
 	List<ReportVo> activeVSinactivePromos();
-
 	
 }

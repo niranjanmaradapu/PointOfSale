@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.controller;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import javax.validation.Valid;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.amqp.AmqpConnectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.ResourceAccessException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -47,6 +50,8 @@ import com.otsi.retail.newSale.vo.ReturnSlipVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 /**
  * Controller class for accepting all the requests which are related to
@@ -124,6 +129,8 @@ public class NewSaleController {
 
 	// Method to confirm payment status based on Razorpay Id
 	@PostMapping("payconfirmation")
+	@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getPaymentConfirmationFallBackMethod")
+
 	public GateWayResponse<?> paymentConfirmationFromRazorpay(@RequestParam String razorPayId,
 			@RequestParam boolean payStatus) {
 		log.info("Received payment confirmation for razorpayId :" + razorPayId);
@@ -132,9 +139,21 @@ public class NewSaleController {
 			return new GateWayResponse<>(result, "Success..");
 
 		} catch (Exception e) {
-			log.error("Exception occurs while confirming payment for Id : " + razorPayId);
-			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(), "Exception occurs");
+			if (e instanceof AmqpConnectException) {
+				return new GateWayResponse<>("rabbitMq server is stopped", null);
+
+			} else {
+
+				log.error("Exception occurs while confirming payment for Id : " + razorPayId);
+				return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage(), "Exception occurs");
+			}
 		}
+	}
+
+	public GateWayResponse<?> getPaymentConfirmationFallBackMethod(Exception ex) {
+
+		return new GateWayResponse<>("Third Party Service  is Down", null);
+
 	}
 
 	// Method for create new Barcode..
@@ -243,12 +262,20 @@ public class NewSaleController {
 
 	// Method for getting list of sale bills
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
+	@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleBillsFallBackMethod")
+
 	public GateWayResponse<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo)
 			throws RecordNotFoundException, JsonMappingException, JsonProcessingException {
 		log.info("Received Request to getListOfSaleBills :" + svo.toString());
 
 		ListOfSaleBillsVo listOfSaleBills = newSaleService.getListOfSaleBills(svo);
 		return new GateWayResponse<>(HttpStatus.OK, listOfSaleBills, "");
+
+	}
+
+	public GateWayResponse<?> getSaleBillsFallBackMethod(Exception ex) {
+
+		return new GateWayResponse<>("Third Party Service  is Down", null);
 
 	}
 
@@ -326,12 +353,20 @@ public class NewSaleController {
 	}
 
 	@GetMapping("/getHsnDetails/{netAmt}")
+	@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getHsnDetailsFallBackMethod")
+
 	public GateWayResponse<?> getHsnDetails(@PathVariable double netAmt)
 			throws JsonMappingException, JsonProcessingException, DataNotFoundException {
 
 		log.info("Recieved request to getNewSaleWithHsn()");
 		double netamt = newSaleService.getNewSaleWithHsn(netAmt);
 		return new GateWayResponse<>(HttpStatus.OK, netamt, "");
+
+	}
+
+	public GateWayResponse<?> getHsnDetailsFallBackMethod(Exception ex) {
+
+		return new GateWayResponse<>("Third Party Service  is Down", null);
 
 	}
 
@@ -389,10 +424,11 @@ public class NewSaleController {
 
 	// Method for getting Gift voucher by GV Number
 	@GetMapping("/getGv/{clientId}")
-	public GateWayResponse<?> getGiftVoucher(@RequestParam String gvNumber ,@PathVariable Long clientId) throws InvalidInputException {
+	public GateWayResponse<?> getGiftVoucher(@RequestParam String gvNumber, @PathVariable Long clientId)
+			throws InvalidInputException {
 		log.info("Recieved request to getting giftVoucher : " + gvNumber);
 		try {
-			GiftVoucherVo result = newSaleService.getGiftVoucher(gvNumber,clientId);
+			GiftVoucherVo result = newSaleService.getGiftVoucher(gvNumber, clientId);
 			return new GateWayResponse<>("Successfully fetch record", result);
 		} catch (InvalidInputException iie) {
 			log.error("Getting error while fetching giftvoucher : " + gvNumber);
@@ -469,10 +505,17 @@ public class NewSaleController {
 
 	// Method for getting list of sale report
 	@PostMapping(CommonRequestMappigs.GET_SALE_REPORT)
+	@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleReportFallBackMethod")
 	public GateWayResponse<?> getSaleReport(@RequestBody SaleReportVo srvo) throws RecordNotFoundException {
 
 		SaleReportVo saleReport = newSaleService.getSaleReport(srvo);
 		return new GateWayResponse<>(HttpStatus.OK, saleReport, "");
+
+	}
+
+	public GateWayResponse<?> getSaleReportFallBackMethod(Exception ex) {
+
+		return new GateWayResponse<>("Third Party Service  is Down", null);
 
 	}
 
@@ -558,5 +601,8 @@ public class NewSaleController {
 		return new GateWayResponse<>(HttpStatus.OK, result, "");
 
 	}
+	
+	
+	
 
 }

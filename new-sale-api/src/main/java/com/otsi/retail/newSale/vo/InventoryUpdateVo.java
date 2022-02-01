@@ -21,5 +21,7 @@ public class InventoryUpdateVo {
 	private String barCode;
 	
 	private Long storeId;
+	
+	private Long domainId;
 
 }
