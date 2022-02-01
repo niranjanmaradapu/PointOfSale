@@ -33,6 +33,7 @@ public class ReturnSlip {
 	private int rsId;
 	private String rtNo;
 	private String crNo;
+	private Long storeId;
 	private String settelmentInfo;
 	private Long amount;
 	private String mobileNumber;

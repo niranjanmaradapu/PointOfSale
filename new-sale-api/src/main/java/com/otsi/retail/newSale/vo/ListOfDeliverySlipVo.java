@@ -19,6 +19,8 @@ public class ListOfDeliverySlipVo {
 	private DSStatus status;
 	
 	private String barcode;
+	
+	private Long storeId;
 
 	private LocalDate dateFrom;
 

@@ -32,6 +32,8 @@ import com.otsi.retail.customerManagement.vo.InvoiceRequestVo;
 import com.otsi.retail.customerManagement.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.customerManagement.vo.RetrnSlipDetailsVo;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 @RestController
 
 @RequestMapping("/customer")
@@ -68,11 +70,17 @@ public class CustomerController {
 	}
 
 	@PostMapping("/getInvoiceDetails")
+	@CircuitBreaker(name = "newSale", fallbackMethod = "getInvoiceFallback")
 	public GateWayResponse<?> getInvoiceDetails(@RequestBody InvoiceRequestVo searchVo) throws Exception {
 		log.info("Received request to getInvoiceDetails:" + searchVo);
 		List<ReturnSlipVo> newSale = customerService.getInvoiceDetailsFromNewSale(searchVo);
 		return new GateWayResponse<>(HttpStatus.OK, newSale, "");
 
+	}
+
+	public GateWayResponse<?> getInvoiceFallback(Exception e) {
+		log.error("Third Party Service Down");
+		return new GateWayResponse<>("Third Party Service  is Down", null);
 	}
 
 	@PostMapping("/createReturnSlip")
@@ -92,11 +100,17 @@ public class CustomerController {
 	}
 
 	@GetMapping("/getCustomerDetails/{mobileNo}")
+	@CircuitBreaker(name = "GetCustomerDetailsCB", fallbackMethod = "getCustomerFallback")
 	public GateWayResponse<?> getCustomerDetails(@PathVariable String mobileNo) throws Exception {
 		log.info("Received request to getCustomerDetails:" + mobileNo);
 		CustomerDetailsVo customerVo = customerService.getCustomerFDetailsFromInvoice(mobileNo);
 		return new GateWayResponse<>(HttpStatus.OK, customerVo, "");
 
+	}
+
+	public GateWayResponse<?> getCustomerFallback(Exception ex) {
+		log.error("Third Party Service Down");
+		return new GateWayResponse<>("Third Party Service  is Down", null);
 	}
 
 	@GetMapping("/getAllListOfReturnSlips")
@@ -111,6 +125,7 @@ public class CustomerController {
 	}
 
 	@GetMapping("/getReturnSlipsDetails")
+	@CircuitBreaker(name = "GetReturnSlipDetailsCB", fallbackMethod = "returnSlipDetailsFallback")
 	public GateWayResponse<?> ReturnSlipsDeatils(@RequestParam String rtNumber)
 			throws JsonMappingException, JsonProcessingException, URISyntaxException {
 		log.info("Received request to ReturnSlipsDeatils():" + rtNumber);
@@ -122,7 +137,13 @@ public class CustomerController {
 
 	}
 
+	public GateWayResponse<?> returnSlipDetailsFallback(Exception ex) {
+		log.error("Third Party Service Down");
+		return new GateWayResponse<>("Third Party Service  is Down", null);
+	}
+
 	@GetMapping("/getHsnDetails/{netAmt}")
+	@CircuitBreaker(name = "GetHsnDetailsCB", fallbackMethod = "hsnDetailsFallback")
 	public GateWayResponse<?> getHsnDetails(@PathVariable double netAmt)
 			throws JsonMappingException, JsonProcessingException {
 
@@ -130,6 +151,11 @@ public class CustomerController {
 		HsnDetailsVo netamt = customerService.getHsnDetails(netAmt);
 		return new GateWayResponse<>(HttpStatus.OK, netamt, "");
 
+	}
+	
+	public GateWayResponse<?> hsnDetailsFallback(Exception ex) {
+		log.error("Third Party Service Down");
+		return new GateWayResponse<>("Third Party Service  is Down", null);
 	}
 
 	@GetMapping("/getReturnSlipbyRtNo/{rtNo}")

@@ -17,6 +17,7 @@ public class GenerateReturnSlipRequest {
 	private List<TaggedItems> barcodes;
 	private String rtNumber;
 	private String crNumber;
+	private Long storeId;
 	private String invoiceNo;
 	private String reason;
 	private String createdBy;

@@ -23,6 +23,8 @@ public class ListOfReturnSlipsVo {
 	private LocalDate dateTo;
 
 	private Long domainId;
+	
+	private Long storeId;
 
 	private String barcode;
 

@@ -150,8 +150,10 @@ public class NewSaleMapper {
 		});
 
 		lsvo.setTotalAmount(saleDetails.stream().mapToLong(i -> i.getNetValue()).sum());
+	
 		
-		lsvo.setTotalDiscount(saleDetails.stream().mapToLong(d -> d.getManualDisc()).sum());
+		//lsvo.setTotalDiscount(saleDetails.stream().mapToLong(d -> d.getManualDisc()).sum());
+	
 
 		return lsvo;
 
@@ -163,7 +165,12 @@ public class NewSaleMapper {
 
 		srvo.setBillValue(saleDetails.stream().mapToLong(b -> b.getNetValue()).sum());
 		srvo.setTotalMrp(saleDetails.stream().mapToLong(m -> m.getGrossValue()).sum());
-		srvo.setTotalDiscount(saleDetails.stream().mapToLong(d -> d.getPromoDisc()).sum());
+		List<Long> result = saleDetails.stream()
+				.map(num -> num.getPromoDisc()) 
+				.filter(n -> n!=null)
+				.collect(Collectors.toList());
+		
+		srvo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());		
 		return srvo;
 
 	}
@@ -182,8 +189,10 @@ public class NewSaleMapper {
 			x.getLineItems().stream().forEach(b -> {
 
 				LineItemVo barvo = new LineItemVo();
+				
 
 				BeanUtils.copyProperties(b, barvo);
+				barvo.setUserId(x.getUserId());
 
 				listBarVo.add(barvo);
 			});
@@ -193,11 +202,12 @@ public class NewSaleMapper {
 		Long grossAmount = x.getLineItems().stream().mapToLong(a->a.getGrossValue()).sum();
 
 			BeanUtils.copyProperties(x, dsvo);
+			dsvo.setCreatedDate(x.getCreationDate());
 			dsvo.setLineItems(listBarVo);
              dsvo.setNetAmount(amount);
              dsvo.setMrp(grossAmount);
 
-dsVoList.add(dsvo);
+            dsVoList.add(dsvo);
 		});
 
 		// vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i ->

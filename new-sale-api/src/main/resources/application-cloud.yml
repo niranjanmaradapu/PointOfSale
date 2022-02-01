@@ -2,18 +2,23 @@ server:
  port: 8081
 
 spring:
-  application:
+ application:
     name: new-sale-service 
-  datasource:
+ datasource:
     platform: postgres
     url: jdbc:postgresql://10.100.238.45:5432/new-sale-api
     username: postgres
     password: Otsi@123
-  jpa:
-    hibernate:
-      ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
-    show-sql: true
+ jpa:
+   hibernate:
+    ddl-auto: update
+   database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+   show-sql: true
+ rabbitmq:
+      host: aeb8cc91b2f7948a8bc858c8d8f7fb4d-768590259.ap-south-1.elb.amazonaws.com
+      port: 5672
+      username: user
+      password: piV7lSjh6q
    
 eureka:
   client:

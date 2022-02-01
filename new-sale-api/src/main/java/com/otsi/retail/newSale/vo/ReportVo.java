@@ -11,12 +11,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReportVo {
-	
+
 	private Month Month;
 	private Long amount;
 	private Long storeId;
-	
+
+	private Long userId;
+
 	private String name;
-	
+
+	private float percentValue;
+
+	private Long categeoryType;
 
 }

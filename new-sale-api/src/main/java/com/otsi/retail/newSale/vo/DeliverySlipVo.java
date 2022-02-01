@@ -23,6 +23,8 @@ public class DeliverySlipVo {
 	private List<BarcodeVo> barcode;
 	
 	private Long dsId;
+	
+	private Long storeId;
 
 	private int qty;
 	

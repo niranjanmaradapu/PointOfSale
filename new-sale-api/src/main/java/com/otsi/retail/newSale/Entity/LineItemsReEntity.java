@@ -25,15 +25,27 @@ public class LineItemsReEntity {
 	@GeneratedValue
 	private Long lineItemReId;
 
+	private Long storeId;
+
 	private String barCode;
-	
-	private String section;
-	
+
+	private Long section;
+
+	private Long subSection;
+
+	private Long division;
+
 	private Long userId;
 
 	private Long itemPrice;
 
 	private int quantity;
+
+	private Long taxValue;
+
+	private Long cgst;
+
+	private Long sgst;
 
 	private Long grossValue;
 
