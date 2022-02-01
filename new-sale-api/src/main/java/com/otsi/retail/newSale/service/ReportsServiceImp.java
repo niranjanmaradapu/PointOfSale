@@ -43,10 +43,10 @@ public class ReportsServiceImp implements ReportService {
 
 	@Autowired
 	private DeliverySlipRepository dsRepo;
-	
+
 	@Autowired
 	private LineItemRepo lineItemRepo;
-	
+
 	@Autowired
 	private LineItemReRepo lineItemReRepo;
 
@@ -184,11 +184,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getTodaysSale(Long storeId,Long domainId) {
+	public ReportVo getTodaysSale(Long storeId, Long domainId) {
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId, domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -208,11 +208,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getMonthlySale(Long storeId,Long domainId) {
+	public ReportVo getMonthlySale(Long storeId, Long domainId) {
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId, domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -229,11 +229,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getcurrentMonthSalevsLastMonth(Long storeId,Long domainId) {
+	public ReportVo getcurrentMonthSalevsLastMonth(Long storeId, Long domainId) {
 
-		ReportVo currentMonth = getMonthlySale(storeId,domainId);
+		ReportVo currentMonth = getMonthlySale(storeId, domainId);
 		LocalDate Date = LocalDate.now().minusMonths(1);
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId, domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -259,46 +259,45 @@ public class ReportsServiceImp implements ReportService {
 		}
 	}
 
-	
 	@Override
 	public List<ReportVo> getTopFiveSalesByRepresentative(Long storeId, Long domainId) {
 
 		List<ReportVo> vo = new ArrayList<>();
 		List<NewSaleEntity> lnesen = new ArrayList<>();
-		LocalDate Date =LocalDate.now();
-		
+		LocalDate Date = LocalDate.now();
+
 		if (domainId == DomainData.TE.getId()) {
-			
 
 			List<DeliverySlipEntity> dsEntity = dsRepo.findByStoreId(storeId);
-			
-			List<DeliverySlipEntity> desen = dsEntity.stream().filter(a -> a.getCreationDate().getMonthValue() == (Date.getMonthValue()))
+
+			List<DeliverySlipEntity> desen = dsEntity.stream()
+					.filter(a -> a.getCreationDate().getMonthValue() == (Date.getMonthValue()))
 					.collect(Collectors.toList());
 
-			List<Long> userids = desen.stream().map(a -> a.getUserId()).filter(n -> n != null).distinct().collect(Collectors.toList());
+			List<Long> userids = desen.stream().map(a -> a.getUserId()).filter(n -> n != null).distinct()
+					.collect(Collectors.toList());
 
 			userids.stream().forEach(u -> {
 
 				List<DeliverySlipEntity> dsen = dsRepo.findByUserId(u);
-			List<NewSaleEntity> nsen =	dsen.stream().map(a -> a.getOrder()).filter(n -> n != null)
-				.collect(Collectors.toList());
+				List<NewSaleEntity> nsen = dsen.stream().map(a -> a.getOrder()).filter(n -> n != null)
+						.collect(Collectors.toList());
 
 				List<Long> orderIds = nsen.stream().map(a -> a.getOrderId()).filter(n -> n != null).distinct()
 						.collect(Collectors.toList());
 				orderIds.stream().forEach(d -> {
 					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(d);
-					
+
 					lnesen.add(nen.get());
-					
 
 				});
-				if(!lnesen.isEmpty()) {
-				Long amount = lnesen.stream().mapToLong(x -> x.getNetValue()).sum();
-				ReportVo v = new ReportVo();
-				v.setAmount(amount);
-				v.setUserId(u);
+				if (!lnesen.isEmpty()) {
+					Long amount = lnesen.stream().mapToLong(x -> x.getNetValue()).sum();
+					ReportVo v = new ReportVo();
+					v.setAmount(amount);
+					v.setUserId(u);
 
-				vo.add(v);
+					vo.add(v);
 				}
 
 			});
@@ -308,25 +307,25 @@ public class ReportsServiceImp implements ReportService {
 
 			return first5ElementsList;
 
-		}else if (domainId != DomainData.TE.getId()) {
-			
+		} else if (domainId != DomainData.TE.getId()) {
+
 			List<LineItemsReEntity> reent = lineItemReRepo.findByStoreId(storeId);
-			
-			List<LineItemsReEntity> desen = reent.stream().filter(a -> a.getCreationDate().getMonthValue() == (Date.getMonthValue()))
+
+			List<LineItemsReEntity> desen = reent.stream()
+					.filter(a -> a.getCreationDate().getMonthValue() == (Date.getMonthValue()))
 					.collect(Collectors.toList());
 			List<Long> userids = desen.stream().map(a -> a.getUserId()).distinct().collect(Collectors.toList());
-			
+
 			userids.stream().forEach(u -> {
 
 				List<LineItemsReEntity> len = lineItemReRepo.findByUserId(u);
-
-				List<Long> orderIds = len.stream().map(a -> a.getOrderId().getOrderId()).distinct()
+				List<NewSaleEntity> news = len.stream().map(a -> a.getOrderId()).filter(n -> n != null).distinct()
 						.collect(Collectors.toList());
+
+				List<Long> orderIds = news.stream().map(a -> a.getOrderId()).distinct().collect(Collectors.toList());
 				orderIds.stream().forEach(d -> {
 					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(d);
 					lnesen.add(nen.get());
-
-					
 
 				});
 				Long amount = lnesen.stream().mapToLong(x -> x.getNetValue()).sum();
@@ -342,100 +341,96 @@ public class ReportsServiceImp implements ReportService {
 			List<ReportVo> top5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
 
 			return top5ElementsList;
-			
-			
-			
-			
-			
-			
-		}else {
+
+		} else {
 			ReportVo v = new ReportVo();
-			
+
 			v.setName("There is no sale for today");
 			vo.add(v);
-			
+
 			return vo;
 		}
-			
-		
+
 	}
 
 	@Override
 	public List<ReportVo> getSalesByCategory(Long storeId, Long domainId) {
-		
-		
-			List<ReportVo> vo = new ArrayList<>();
-			List<NewSaleEntity> nsentity = new ArrayList<NewSaleEntity>();
-			LocalDate Date = LocalDate.now();
-			// System.out.println("id"+lineItemId);
-			if (domainId == DomainData.TE.getId()) {
-				List<LineItemsEntity> lineEntity = lineItemRepo.findByStoreId(storeId);
-				List<LineItemsEntity> lien = lineEntity.stream()
-						.filter(a -> a.getCreationDate().getMonth() == Date.getMonth()).collect(Collectors.toList());
-				List<Long> sections = lien.stream().map(a -> a.getSection()).distinct().collect(Collectors.toList());
 
-				sections.stream().forEach(b -> {
-
-					Long amount = 0l;
-
-					List<LineItemsEntity> data = lineItemRepo.findBySection(b);
-
-					List<Long> result = data.stream().map(num -> num.getDsEntity().getOrder().getOrderId())
-							.filter(n -> n != null).collect(Collectors.toList());
-
-					List<Long> orderIds = result.stream().map(q -> q).distinct().collect(Collectors.toList());
-					orderIds.stream().forEach(a -> {
-						Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(a);
-						nsentity.add(nen.get());
-					});
-
-					amount = nsentity.stream().mapToLong(x -> x.getNetValue()).sum();
-					ReportVo rvo = new ReportVo();
-					rvo.setAmount(amount);
-					rvo.setCategeoryType(b);
-					vo.add(rvo);
-				});
-				return vo;
-
-			}else if (domainId != DomainData.TE.getId()) {
-				List<LineItemsReEntity> lineReEntity = lineItemReRepo.findByStoreId(storeId);
-				List<LineItemsReEntity> lien = lineReEntity.stream()
-						.filter(a -> a.getCreationDate().getMonth() == Date.getMonth()).collect(Collectors.toList());
-				List<Long> sections = lien.stream().map(a -> a.getSection()).distinct().collect(Collectors.toList());
-
-				sections.stream().forEach(b -> {
-
-					Long amount = 0l;
-
-					List<LineItemsReEntity> data = lineItemReRepo.findBySection(b);
-
-					List<Long> result = data.stream().map(num -> num.getOrderId().getOrderId())
-							.filter(n -> n != null).collect(Collectors.toList());
-
-					List<Long> orderIds = result.stream().map(q -> q).distinct().collect(Collectors.toList());
-					orderIds.stream().forEach(a -> {
-						Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(a);
-						nsentity.add(nen.get());
-					});
-
-					amount = nsentity.stream().mapToLong(x -> x.getNetValue()).sum();
-					ReportVo rvo = new ReportVo();
-					rvo.setAmount(amount);
-					rvo.setCategeoryType(b);
-					vo.add(rvo);
-				});
-				return vo;
-				
-				
-			}
-			return vo;
+		List<ReportVo> vo = new ArrayList<>();
+		List<NewSaleEntity> nsentity = new ArrayList<NewSaleEntity>();
+		LocalDate Date = LocalDate.now();
+		// System.out.println("id"+lineItemId);
+		if (domainId == DomainData.TE.getId()) {
+			List<LineItemsEntity> lineEntity = lineItemRepo.findByStoreId(storeId);
 			
+			List<Long> sections = lineEntity.stream().map(a -> a.getSection()).filter(n -> n != null).distinct()
+					.collect(Collectors.toList());
+
+			sections.stream().forEach(b -> {
+
+				Long amount = 0l;
+
+				nsentity.clear();
+				List<LineItemsEntity> data = lineItemRepo.findBySectionAndStoreId(b, storeId);
+				List<LineItemsEntity> lien = data.stream()
+						.filter(a -> a.getCreationDate().getMonth() == Date.getMonth()).collect(Collectors.toList());
+				List<NewSaleEntity> nsen = lien.stream().map(num -> num.getDsEntity().getOrder()).filter(n -> n != null)
+						.collect(Collectors.toList());
+
+				List<Long> result = nsen.stream().map(num -> num.getOrderId()).filter(n -> n != null)
+						.collect(Collectors.toList());
+
+				List<Long> orderIds = result.stream().map(q -> q).distinct().collect(Collectors.toList());
+				orderIds.stream().forEach(a -> {
+					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(a);
+					nsentity.add(nen.get());
+				});
+
+				amount = nsentity.stream().mapToLong(x -> x.getNetValue()).sum();
+				ReportVo rvo = new ReportVo();
+				rvo.setAmount(amount);
+				rvo.setCategeoryType(b);
+				vo.add(rvo);
+			});
+			return vo;
+
+		} else if (domainId != DomainData.TE.getId()) {
+			List<LineItemsReEntity> lineReEntity = lineItemReRepo.findByStoreId(storeId);
+			
+			List<Long> sections = lineReEntity.stream().map(a -> a.getSection()).filter(n -> n != null).distinct().collect(Collectors.toList());
+
+			sections.stream().forEach(b -> {
+
+				Long amount = 0l;
+				nsentity.clear();
+
+				List<LineItemsReEntity> data = lineItemReRepo.findBySectionAndStoreId(b,storeId);
+				
+				List<LineItemsReEntity> lien = data.stream()
+						.filter(a -> a.getCreationDate().getMonth() == Date.getMonth()).collect(Collectors.toList());
+				List<NewSaleEntity> newen = lien.stream().map(num -> num.getOrderId()).filter(n -> n != null)
+						.collect(Collectors.toList());
+
+				List<Long> result = newen.stream().map(num -> num.getOrderId()).filter(n -> n != null)
+						.collect(Collectors.toList());
+
+				List<Long> orderIds = result.stream().map(q -> q).distinct().collect(Collectors.toList());
+				orderIds.stream().forEach(a -> {
+					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(a);
+					nsentity.add(nen.get());
+				});
+
+				amount = nsentity.stream().mapToLong(x -> x.getNetValue()).sum();
+				ReportVo rvo = new ReportVo();
+				rvo.setAmount(amount);
+				rvo.setCategeoryType(b);
+				vo.add(rvo);
+			});
+			return vo;
+
 		}
+		return vo;
 
-	
+	}
+
 }
-
-		
-	
-
-
