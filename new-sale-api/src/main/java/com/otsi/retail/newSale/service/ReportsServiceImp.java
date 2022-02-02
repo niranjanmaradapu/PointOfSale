@@ -1,5 +1,7 @@
 package com.otsi.retail.newSale.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
@@ -11,16 +13,19 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Entity.LineItemsEntity;
 import com.otsi.retail.newSale.Entity.LineItemsReEntity;
@@ -34,6 +39,7 @@ import com.otsi.retail.newSale.repository.LineItemRepo;
 import com.otsi.retail.newSale.repository.NewSaleRepository;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReportVo;
+import com.otsi.retail.newSale.vo.StoreVo;
 
 @Service
 public class ReportsServiceImp implements ReportService {
@@ -55,6 +61,26 @@ public class ReportsServiceImp implements ReportService {
 
 	@Autowired
 	private Config config;
+	public List<StoreVo> getStoresForGivenId(List<Long> storeIds) throws URISyntaxException{
+		HttpHeaders headers = new HttpHeaders();
+		URI uri = UriComponentsBuilder.fromUri(new URI(config.getStoreDetails())).build()
+				.encode().toUri();
+		
+		HttpEntity<List<Long>> request = new HttpEntity<List<Long>>(storeIds, headers);
+
+		ResponseEntity<?> newsaleResponse = template.exchange(uri, HttpMethod.POST, request,
+				GateWayResponse.class);
+
+		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
+		ObjectMapper mapper = new ObjectMapper();
+
+		GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
+
+		List<StoreVo> bvo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<List<StoreVo>>() {
+		});
+		return bvo;
+		
+	}
 
 	@Override
 	public List<ReportVo> getInvoicesGeneratedDetails(Long storeId) {
@@ -128,10 +154,47 @@ public class ReportsServiceImp implements ReportService {
 
 			rvo.add(vo);
 		});
-
+		
+         
 		List<ReportVo> sorted = rvo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
 				.collect(Collectors.toList());
 		List<ReportVo> first5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
+		List<Long> sIds =rvo.stream().map(s-> s.getStoreId()).collect(Collectors.toList());
+		List<StoreVo> svos=new ArrayList<>();
+		try {
+			 svos = getStoresForGivenId(sIds);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		/*if (first5ElementsList.size() == svos.size()) {
+            for (StoreVo storeListdata : svos) {
+                for (ReportVo prevListdata : first5ElementsList) {
+                    if (prevListdata.get.equals(storeListdata.getName()))
+                             {
+                        return  true;
+
+                    }
+                }
+
+            }
+        }*/
+		if (first5ElementsList.size() == svos.size()) {
+			
+			svos.stream().forEach( s-> {
+				
+				first5ElementsList.stream().forEach(r->{
+					
+					if(s.getId() == r.getStoreId()) {
+					
+						r.setName(s.getName());
+					}
+					
+				});
+				
+			});
+			
+		}
 
 		return first5ElementsList;
 	}

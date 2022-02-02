@@ -77,6 +77,9 @@ public class Config {
 	@Value("${inventory_rk}")
 	private String updateInventoryRK;
 	
+	@Value("${getStoreDetails_url}")
+	private String storeDetails;
+	
 	@Bean
 	public Queue inventoryUpdateQueue() {
 		return new Queue(inventoryUpdateQueue);
