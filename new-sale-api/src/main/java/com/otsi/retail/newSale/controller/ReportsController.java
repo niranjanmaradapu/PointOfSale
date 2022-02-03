@@ -135,5 +135,7 @@ public class ReportsController {
 		List<ReportVo> byCategory = reportService.getSalesByCategory(storeId, domainId);
 		return new GateWayResponse<>(HttpStatus.OK, byCategory, "");
 	}
+	
+	
 
 }

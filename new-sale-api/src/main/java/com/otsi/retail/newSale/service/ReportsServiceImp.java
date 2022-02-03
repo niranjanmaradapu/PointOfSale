@@ -40,6 +40,7 @@ import com.otsi.retail.newSale.repository.NewSaleRepository;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReportVo;
 import com.otsi.retail.newSale.vo.StoreVo;
+import com.otsi.retail.newSale.vo.UserDetailsVo;
 
 @Service
 public class ReportsServiceImp implements ReportService {
@@ -79,6 +80,28 @@ public class ReportsServiceImp implements ReportService {
 		List<StoreVo> bvo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<List<StoreVo>>() {
 		});
 		return bvo;
+		
+	}
+	public List<UserDetailsVo> getUsersForGivenIds(List<Long> userIds) throws URISyntaxException{
+		
+		HttpHeaders headers = new HttpHeaders();
+		URI uri = UriComponentsBuilder.fromUri(new URI(config.getUserDetails())).build()
+				.encode().toUri();
+		
+		HttpEntity<List<Long>> request = new HttpEntity<List<Long>>(userIds, headers);
+
+		ResponseEntity<?> newsaleResponse = template.exchange(uri, HttpMethod.POST, request,
+				GateWayResponse.class);
+
+		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
+		ObjectMapper mapper = new ObjectMapper();
+
+		GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
+
+		List<UserDetailsVo> uvo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<List<UserDetailsVo>>() {
+		});
+		return uvo;
+		
 		
 	}
 
@@ -159,7 +182,7 @@ public class ReportsServiceImp implements ReportService {
 		List<ReportVo> sorted = rvo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
 				.collect(Collectors.toList());
 		List<ReportVo> first5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
-		List<Long> sIds =rvo.stream().map(s-> s.getStoreId()).collect(Collectors.toList());
+		List<Long> sIds =first5ElementsList.stream().map(s-> s.getStoreId()).collect(Collectors.toList());
 		List<StoreVo> svos=new ArrayList<>();
 		try {
 			 svos = getStoresForGivenId(sIds);
@@ -167,18 +190,7 @@ public class ReportsServiceImp implements ReportService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		/*if (first5ElementsList.size() == svos.size()) {
-            for (StoreVo storeListdata : svos) {
-                for (ReportVo prevListdata : first5ElementsList) {
-                    if (prevListdata.get.equals(storeListdata.getName()))
-                             {
-                        return  true;
-
-                    }
-                }
-
-            }
-        }*/
+		
 		if (first5ElementsList.size() == svos.size()) {
 			
 			svos.stream().forEach( s-> {
@@ -367,6 +379,31 @@ public class ReportsServiceImp implements ReportService {
 			List<ReportVo> sorted = vo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
 					.collect(Collectors.toList());
 			List<ReportVo> first5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
+			List<Long> uids = first5ElementsList.stream().map(u -> u.getUserId()).collect(Collectors.toList());
+			List<UserDetailsVo> uvos = new ArrayList<>();
+			try {
+				uvos = getUsersForGivenIds(uids);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if (first5ElementsList.size() == uvos.size()) {
+				
+				uvos.stream().forEach( s-> {
+					
+					first5ElementsList.stream().forEach(r->{
+						
+						if(s.getUserId() == r.getUserId()) {
+						
+							r.setName(s.getUserName());
+						}
+						
+					});
+					
+				});
+				
+			}
 
 			return first5ElementsList;
 
@@ -402,6 +439,32 @@ public class ReportsServiceImp implements ReportService {
 			List<ReportVo> sorted = vo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
 					.collect(Collectors.toList());
 			List<ReportVo> top5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
+			List<Long> uids = top5ElementsList.stream().map(u -> u.getUserId()).collect(Collectors.toList());
+			List<UserDetailsVo> uvos = new ArrayList<>();
+			try {
+				uvos = getUsersForGivenIds(uids);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if (top5ElementsList.size() == uvos.size()) {
+				
+				uvos.stream().forEach( s-> {
+					
+					top5ElementsList.stream().forEach(r->{
+						
+						if(s.getUserId() == r.getUserId()) {
+						
+							r.setName(s.getUserName());
+						}
+						
+					});
+					
+				});
+				
+			}
+
 
 			return top5ElementsList;
 
