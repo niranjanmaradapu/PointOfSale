@@ -338,10 +338,13 @@ public class ReportsServiceImp implements ReportService {
 	public List<ReportVo> getTopFiveSalesByRepresentative(Long storeId, Long domainId) {
 
 		List<ReportVo> vo = new ArrayList<>();
+
 		List<NewSaleEntity> lnesen = new ArrayList<>();
 		LocalDate Date = LocalDate.now();
 
 		if (domainId == DomainData.TE.getId()) {
+			List<ReportVo> lRvos = new ArrayList<ReportVo>();
+
 
 			List<DeliverySlipEntity> dsEntity = dsRepo.findByStoreId(storeId);
 
@@ -376,10 +379,7 @@ public class ReportsServiceImp implements ReportService {
 				}
 
 			});
-			List<ReportVo> sorted = vo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
-					.collect(Collectors.toList());
-			List<ReportVo> first5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
-			List<Long> uids = first5ElementsList.stream().map(u -> u.getUserId()).collect(Collectors.toList());
+			List<Long> uids = vo.stream().map(u -> u.getUserId()).collect(Collectors.toList());
 			List<UserDetailsVo> uvos = new ArrayList<>();
 			try {
 				uvos = getUsersForGivenIds(uids);
@@ -387,27 +387,39 @@ public class ReportsServiceImp implements ReportService {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			if(uvos!=null) {
 			
-			if (first5ElementsList.size() == uvos.size()) {
 				
 				uvos.stream().forEach( s-> {
 					
-					first5ElementsList.stream().forEach(r->{
+					vo.stream().forEach(r->{
 						
-						if(s.getUserId() == r.getUserId()) {
-						
-							r.setName(s.getUserName());
+						if(s.getUserId().equals(r.getUserId())) {
+							
+					       r.setName(s.getUserName());
+							
+							lRvos.add(r);
+							
+		
+							
 						}
 						
 					});
 					
 				});
-				
-			}
+			
+			List<ReportVo> sorted = lRvos.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
+					.collect(Collectors.toList());
+			List<ReportVo> first5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
+			
+				return first5ElementsList;
 
-			return first5ElementsList;
+			}
+			
+			
 
 		} else if (domainId != DomainData.TE.getId()) {
+			List<ReportVo> lRvos = new ArrayList<ReportVo>();
 
 			List<LineItemsReEntity> reent = lineItemReRepo.findByStoreId(storeId);
 
@@ -436,10 +448,7 @@ public class ReportsServiceImp implements ReportService {
 				vo.add(v);
 
 			});
-			List<ReportVo> sorted = vo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
-					.collect(Collectors.toList());
-			List<ReportVo> top5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
-			List<Long> uids = top5ElementsList.stream().map(u -> u.getUserId()).collect(Collectors.toList());
+			List<Long> uids = vo.stream().map(u -> u.getUserId()).collect(Collectors.toList());
 			List<UserDetailsVo> uvos = new ArrayList<>();
 			try {
 				uvos = getUsersForGivenIds(uids);
@@ -447,35 +456,39 @@ public class ReportsServiceImp implements ReportService {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			if(uvos!=null) {
 			
-			if (top5ElementsList.size() == uvos.size()) {
 				
 				uvos.stream().forEach( s-> {
 					
-					top5ElementsList.stream().forEach(r->{
+					vo.stream().forEach(r->{
 						
-						if(s.getUserId() == r.getUserId()) {
-						
-							r.setName(s.getUserName());
+						if(s.getUserId().equals(r.getUserId())) {
+							
+					       r.setName(s.getUserName());
+							
+							lRvos.add(r);
+							
+		
+							
 						}
 						
 					});
 					
 				});
-				
+			
+			List<ReportVo> sorted = lRvos.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
+					.collect(Collectors.toList());
+			List<ReportVo> first5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
+			
+				return first5ElementsList;
+
 			}
 
-
-			return top5ElementsList;
-
-		} else {
-			ReportVo v = new ReportVo();
-
-			v.setName("There is no sale for today");
-			vo.add(v);
-
-			return vo;
 		}
+		
+		return vo;
+		
 
 	}
 
