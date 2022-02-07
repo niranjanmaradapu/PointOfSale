@@ -795,7 +795,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 								.findByCreationDateBetweenAndDsIdAndDsNumberAndStatusAndStoreIdOrderByCreationDateAsc(
 										listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
 										b.getDsEntity().getDsId(), listOfDeliverySlipVo.getDsNumber(),
-										listOfDeliverySlipVo.getStoreId(), listOfDeliverySlipVo.getStatus());
+										listOfDeliverySlipVo.getStatus(),listOfDeliverySlipVo.getStoreId());
 						dsDetails.add(dsEntity);
 					});
 
@@ -837,14 +837,16 @@ public class NewSaleServiceImpl implements NewSaleService {
 						listOfDeliverySlipVo.getStoreId());
 
 				if (bar != null) {
-
-					bar.stream().forEach(b -> {
+                List<DeliverySlipEntity> den=  bar.stream().map(d->d.getDsEntity()).filter(n->n!=null).collect(Collectors.toList());
+                den.stream().forEach(b -> {
 						DeliverySlipEntity dentity = new DeliverySlipEntity();
 
 						dentity = dsRepo.findByCreationDateBetweenAndDsIdAndStoreIdOrderByCreationDateAsc(
 								listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-								listOfDeliverySlipVo.getStoreId(), b.getDsEntity().getDsId());
+								 b.getDsId(),listOfDeliverySlipVo.getStoreId());
+						if(dentity!=null) {
 						dsDetails.add(dentity);
+						}
 					});
 
 				}
@@ -858,7 +860,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				dsDetails = dsRepo.findByCreationDateBetweenAndDsNumberAndStoreIdOrderByCreationDateAsc(
 						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-						listOfDeliverySlipVo.getStoreId(), listOfDeliverySlipVo.getDsNumber());
+						listOfDeliverySlipVo.getDsNumber(), listOfDeliverySlipVo.getStoreId());
 
 			}
 			/*
@@ -870,7 +872,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				dsDetails = dsRepo.findByCreationDateBetweenAndStatusAndStoreIdOrderByCreationDateAsc(
 						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-						listOfDeliverySlipVo.getStoreId(), listOfDeliverySlipVo.getStatus());
+						listOfDeliverySlipVo.getStatus(),listOfDeliverySlipVo.getStoreId());
 
 			}
 
