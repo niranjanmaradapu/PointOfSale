@@ -539,7 +539,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					&& svo.getInvoiceNumber() == null) {
 
 				saleDetails = newSaleRepository.findByCreationDateBetweenAndStatusAndStoreIdAndDomainId(
-						svo.getDateFrom(), svo.getDateTo(), svo.getBillStatus(), svo.getDomainId(), svo.getStoreId());
+						svo.getDateFrom(), svo.getDateTo(), svo.getBillStatus(), svo.getStoreId(),svo.getDomainId());
 			}
 			/*
 			 * getting the record using custmobilenumber
@@ -566,7 +566,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					List<Long> userIds = uvo.stream().map(x -> x.getUserId()).collect(Collectors.toList());
 
 					saleDetails = newSaleRepository.findByUserIdInAndStoreIdAndDomainIdAndCreationDateBetween(userIds,
-							svo.getDateFrom(), svo.getDateTo(), svo.getStoreId(), svo.getDomainId());
+							 svo.getStoreId(), svo.getDomainId(),svo.getDateFrom(), svo.getDateTo());
 
 				}
 
@@ -583,8 +583,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getEmpId() == null
 					&& svo.getInvoiceNumber() != null) {
 				saleDetails = newSaleRepository.findByOrderNumberAndStoreIdAndDomainIdAndCreationDateBetween(
-						svo.getInvoiceNumber(), svo.getDateFrom(), svo.getDateTo(), svo.getDomainId(),
-						svo.getStoreId());
+						svo.getInvoiceNumber(),
+						svo.getStoreId(),svo.getDomainId(),svo.getDateFrom(), svo.getDateTo());
 			}
 			/*
 			 * getting the record using empId
@@ -592,7 +592,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getInvoiceNumber() == null
 					&& svo.getEmpId() != null) {
 				saleDetails = newSaleRepository.findByCreatedByAndStoreIdAndDomainIdAndCreationDateBetween(
-						svo.getEmpId(), svo.getDateFrom(), svo.getDateTo(), svo.getStoreId(), svo.getDomainId());
+						svo.getEmpId(), svo.getStoreId(), svo.getDomainId(),svo.getDateFrom(), svo.getDateTo());
 
 			} else
 				saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreIdAndDomainId(svo.getDateFrom(),
