@@ -9,12 +9,12 @@
 		<version>2.5.3</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.connectionpool</groupId>
-	<artifactId>connection-pool</artifactId>
+	<groupId>com.promotions</groupId>
+	<artifactId>Promotions</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>connection-pool</name>
-	<description>Connection project for Spring Boot</description>
+	<name>Promotions</name>
+	<description>Promotions project for Spring Boot</description>
 	<properties>
 		<java.version>8</java.version>
 		<spring-cloud.version>2020.0.3</spring-cloud.version>
@@ -32,7 +32,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
 		<!-- Log4J -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -46,8 +45,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId><!--$NO-MVN-MAN-VER$ -->
-			<version>${log4j2.version}</version><!--$NO-MVN-MAN-VER$ -->
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j2.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -63,9 +62,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<!-- <dependency> <groupId>org.springframework.cloud</groupId> <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId> 
-			</dependency> -->
-
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
