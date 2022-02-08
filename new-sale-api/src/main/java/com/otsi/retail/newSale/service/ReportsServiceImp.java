@@ -106,13 +106,13 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public List<ReportVo> getInvoicesGeneratedDetails(Long storeId) {
+	public List<ReportVo> getInvoicesGeneratedDetails(Long storeId,Long domainId) {
 
 		List<ReportVo> lrvo = new ArrayList<ReportVo>();
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreId(storeId);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
 
 		List<NewSaleEntity> nen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
@@ -152,12 +152,12 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public List<ReportVo> getTopfiveSalesByStore() {
+	public List<ReportVo> getTopfiveSalesByStore(Long domainId) {
 		List<ReportVo> rvo = new ArrayList<ReportVo>();
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
+		List<NewSaleEntity> nsentity = newsaleRepo.findByDomainId(domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -212,13 +212,13 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public List<ReportVo> getsaleSummeryDetails() {
+	public List<ReportVo> getsaleSummeryDetails(Long storeId,Long domainId) {
 
 		List<ReportVo> rvo = new ArrayList<ReportVo>();
 
 		LocalDate Date = LocalDate.now();
 
-		ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetAllListOfReturnSlips(),
+		ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetAllListOfReturnSlips() + "?storeId=" + storeId + "?domainId=" + domainId,
 				HttpMethod.GET, null, GateWayResponse.class);
 
 		ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
@@ -242,7 +242,7 @@ public class ReportsServiceImp implements ReportService {
 		revo.setAmount(ramount);
 		rvo.add(revo);
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
