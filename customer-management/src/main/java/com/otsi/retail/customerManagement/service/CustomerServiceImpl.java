@@ -322,9 +322,9 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public List<ListOfReturnSlipsVo> getAllListOfReturnSlips() {
+	public List<ListOfReturnSlipsVo> getAllListOfReturnSlips(Long storeId,Long domainId) {
 		log.debug("debugging getAllListOfReturnSlips()");
-		List<ReturnSlip> rmodel = returnSlipRepo.findAll();
+		List<ReturnSlip> rmodel = returnSlipRepo.findByStoreIdAndDomianId(storeId,domainId);
 		if (rmodel.isEmpty()) {
 			log.error("No return slips are found");
 			throw new DataNotFoundException("No return slips are found");
