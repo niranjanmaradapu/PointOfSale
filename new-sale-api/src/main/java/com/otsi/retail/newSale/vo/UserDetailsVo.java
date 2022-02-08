@@ -12,11 +12,17 @@ public class UserDetailsVo {
 	private Long userId;
 	private String userName;
 	private String phoneNumber;
+	@JsonIgnore
 	private String gender;
+	@JsonIgnore
 	private LocalDate createdDate;
+	@JsonIgnore
 	private LocalDate lastModifyedDate;
+	@JsonIgnore
 	private String createdBy;
+	@JsonIgnore
 	private String modifiedBy;
+	@JsonIgnore
 	private boolean isActive;
 	@JsonIgnore
 	private Role role;
@@ -28,7 +34,9 @@ public class UserDetailsVo {
     private List<StoreVo> stores;
 	@JsonIgnore
     private StoreVo ownerOf;
+	@JsonIgnore
 	private boolean isSuperAdmin;
+	@JsonIgnore
 	private boolean isCustomer;
 
 }
