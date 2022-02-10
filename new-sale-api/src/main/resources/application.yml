@@ -1,5 +1,4 @@
 server:
-
  port: 8081
 
 spring:
@@ -9,19 +8,23 @@ spring:
     platform: postgres
     url: jdbc:postgresql://localhost:5432/newSale
     username: postgres
-    password: Otsi@123
+    password: 1234
  jpa:
    hibernate:
     ddl-auto: update
    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
    show-sql: true
-   
+ rabbitmq:
+      host: localhost
+      port: 5672
+      username: guest
+      password: guest
 eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8762/eureka/
+      defaultZone: http://localhost:8761/eureka/
   instance:
     instance-id: ${spring.application.name}:${random.int}
     hostname: localhost
@@ -33,8 +36,3 @@ logging:
 springdoc:
   packagesToScan: com.otsi.retail.newSale
   
-savecustomer:
-  url: http://localhost:8081/customer/savecustomerdetails
-  
-getNewSaleWithHsn: 
-  url: http://localhost:8083/hsnDetails/getHsnDetails

@@ -7,5 +7,7 @@ import com.otsi.retail.newSale.Entity.PaymentAmountType;
 @Repository
 public interface PaymentAmountTypeRepository extends JpaRepository<PaymentAmountType, Long> {
 
+	PaymentAmountType findByPaymentId(String paymentId);
+
 }
 

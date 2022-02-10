@@ -1,5 +1,5 @@
 server:
- port: 8087
+ port: 8088
  
  
 spring:
@@ -10,7 +10,7 @@ spring:
     platform: postgres
     url: jdbc:postgresql://localhost:5432/promo-exchange
     username: postgres
-    password: Otsi@123
+    password: root
     
   
  jpa:
@@ -34,9 +34,4 @@ eureka:
 springdoc:
   packagesToScan: com.promoexchangeapi
   
-savecustomer:
-  url: http://localhost:8081/customer/savecustomerdetails
-getdeliveryslip:
-  url: http://localhost:8081/newsale/getdeliveryslip
-getreturnslip:
-  url: http://localhost:8082/customer/getAllListOfReturnSlips
+

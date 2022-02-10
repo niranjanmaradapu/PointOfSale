@@ -15,6 +15,7 @@ public class InvoiceRequestVo {
 
 	private String invoiceNo;
 	private String barCode;
+	private int domianId;
 	private String mobileNo;
 	private LocalDate fromDate;
 	private LocalDate toDate;

@@ -22,37 +22,16 @@ import com.otsi.retail.promoexchange.vo.PromoExchangeVo;
 public interface PromoExchangeService {
 
 	
-	ResponseEntity<?> savePromoItemExchangeRequest(PromoExchangeVo vo);
-
-	ResponseEntity<?> getBarcodeDetails(String barCode);
-
-	ResponseEntity<?> getListOfSaleBills(ListOfSaleBillsVo svo);
+	String savePromoItemExchangeRequest(PromoExchangeVo vo);
 	
 	DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws Exception;
-
-	ResponseEntity<?> getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo);
-
-	ResponseEntity<?> posDayClose();
-
-	//List<ReturnSlipsVo> getListOfReturnSlips(ReturnSlipsVo vo);
-
-	ResponseEntity<?> saveBarcode(BarcodeVo vo);
-
-	ResponseEntity<?> saveDeliverySlip(DeliverySlipVo vo);
-
+	
 	List<ListOfReturnSlipsVo> getListOfRetunSlips()
 			throws JsonMappingException, JsonProcessingException;
 
+	List<PromoExchangeVo> getListOfSaleBills();
+
+	List<PromoExchangeVo> getSaleBillByBillNumber(String billNumber);
+    
 	
-
-	/* DeliverySlipVo getNewsaleWithDeliveryslip(String dsNumber); */
-
-	
-
-	
-
-	/* Optional<PromoExchangeEntity> getPromoItems(Long promoExchangeId); */
-
-	
-
 }

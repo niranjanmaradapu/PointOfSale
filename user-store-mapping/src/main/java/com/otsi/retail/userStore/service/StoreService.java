@@ -5,17 +5,18 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.otsi.retail.userStore.exceptions.DuplicateRecordException;
 import com.otsi.retail.userStore.model.StoreModel;
 import com.otsi.retail.userStore.vo.StoreVO;
 //this is the interface here we are writing  all the unimplemented methods
 @Service
 public interface StoreService {
 
-	ResponseEntity<?> save(StoreModel storeModel);
+	String save(StoreModel storeModel);
 
-	ResponseEntity<?> findByName(String storeName);
+	StoreVO findByName(String storeName);
 
-	ResponseEntity<Object> deleteById(Long id);
+	String deleteById(Long id) throws DuplicateRecordException;
 
 	List<StoreVO> getAllStores();
 

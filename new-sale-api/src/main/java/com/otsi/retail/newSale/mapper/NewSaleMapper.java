@@ -1,11 +1,9 @@
 package com.otsi.retail.newSale.mapper;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
@@ -14,14 +12,21 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
+import com.otsi.retail.newSale.Entity.LineItemsEntity;
+import com.otsi.retail.newSale.Entity.LineItemsReEntity;
+import com.otsi.retail.newSale.Entity.LoyalityPointsEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
+import com.otsi.retail.newSale.common.DomainData;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
+import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
+import com.otsi.retail.newSale.vo.LoyalityPointsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
+import com.otsi.retail.newSale.vo.SaleReportVo;
 
 @Component
 public class NewSaleMapper {
@@ -34,6 +39,7 @@ public class NewSaleMapper {
 
 	@Autowired
 	private DeliverySlipMapper deliverySlipMapper;
+	private NewSaleVo nsvo;
 
 	public BarcodeEntity convertBarcodeVoToEntity(BarcodeVo vo) {
 
@@ -81,24 +87,104 @@ public class NewSaleMapper {
 		saleDetails.stream().forEach(x -> {
 
 			NewSaleVo nsvo = new NewSaleVo();
+			List<LineItemVo> listBarVo = new ArrayList<>();
+			if (x.getDomainId() == DomainData.RE.getId()) {
+				if (x.getLineItemsRe() != null) {
+					x.getLineItemsRe().stream().forEach(a -> {
 
-			// BeanUtils.copyProperties(x, nsvo);
+						LineItemVo barvo = new LineItemVo();
 
-			nsvo.setInvoiceNumber(x.getBillNumber());
-			nsvo.setBiller(x.getBiller());
-			nsvo.setCreatedDate(x.getCreatedDate());
-			nsvo.setTotalManualDisc(x.getTotalManualDisc());
-			nsvo.setApprovedBy(x.getApprovedBy());
-			nsvo.setReason(x.getReason());
+						barvo.setCreationDate(a.getCreationDate());
+						barvo.setBarCode(a.getBarCode());
+						barvo.setSection(a.getSection());
+						barvo.setItemPrice(a.getItemPrice());
+						barvo.setGrossValue(a.getGrossValue());
+						barvo.setNetValue(a.getNetValue());
+						barvo.setQuantity(a.getQuantity());
+						barvo.setDiscount(a.getDiscount());
+						barvo.setSection(a.getSection());
+						barvo.setHsnCode(a.getHsnCode());
+						barvo.setSgst(a.getSgst());
+						barvo.setCgst(a.getCgst());
+						barvo.setTaxValue(a.getTaxValue());
+						barvo.setUserId(a.getUserId());
+						listBarVo.add(barvo);
+						nsvo.setLineItemsReVo(listBarVo);
+					});
+				}
+			} else if (x.getDomainId() != DomainData.RE.getId()) {
+
+				if (x.getDlSlip() != null) {
+					x.getDlSlip().stream().forEach(a -> {
+						a.getLineItems().stream().forEach(b -> {
+
+							LineItemVo linevo = new LineItemVo();
+
+							linevo.setCreationDate(b.getCreationDate());
+							linevo.setBarCode(b.getBarCode());
+							linevo.setItemPrice(b.getItemPrice());
+							linevo.setGrossValue(b.getGrossValue());
+							linevo.setNetValue(b.getNetValue());
+							linevo.setQuantity(b.getQuantity());
+							linevo.setDiscount(b.getDiscount());
+							linevo.setSection(b.getSection());
+							linevo.setSection(b.getSection());
+							linevo.setHsnCode(b.getHsnCode());
+							linevo.setSgst(b.getSgst());
+							linevo.setCgst(b.getCgst());
+							linevo.setUserId(a.getUserId());
+							linevo.setTaxValue(b.getTaxValue());
+
+							listBarVo.add(linevo);
+							nsvo.setLineItemsReVo(listBarVo);
+						});
+					});
+				}
+
+			}
+			nsvo.setInvoiceNumber(x.getOrderNumber());
+			nsvo.setBiller(x.getCreatedBy());
+			nsvo.setCreatedDate(x.getCreationDate());
+			nsvo.setTotalManualDisc(x.getManualDisc());
+			nsvo.setApprovedBy(x.getCreatedBy());
+			nsvo.setReason(x.getDiscType());
 			nsvo.setOfflineNumber(x.getOfflineNumber());
+			nsvo.setNetPayableAmount(x.getNetValue());
+			nsvo.setUserId(x.getUserId());
+			nsvo.setEmpId(x.getCreatedBy());
+			nsvo.setStatus(x.getStatus());
+			nsvo.setNewsaleId(x.getOrderId());
 
 			sVoList.add(nsvo);
 
-		});
-		lsvo.setAmount(saleDetails.stream().mapToLong(i -> i.getNetPayableAmount()).sum());
+			lsvo.setNewSaleVo(sVoList);
 
-		lsvo.setNewSaleVo(sVoList);
+		});
+
+		lsvo.setTotalAmount(saleDetails.stream().mapToLong(i -> i.getNetValue()).sum());
+	
+		
+		//lsvo.setTotalDiscount(saleDetails.stream().mapToLong(d -> d.getManualDisc()).sum());
+	
+
 		return lsvo;
+
+	}
+
+	public SaleReportVo convertlistSaleReportEntityToVo(List<NewSaleEntity> saleDetails) {
+
+		SaleReportVo srvo = new SaleReportVo();
+
+		srvo.setBillValue(saleDetails.stream().mapToLong(b -> b.getNetValue()).sum());
+		srvo.setTotalMrp(saleDetails.stream().mapToLong(m -> m.getGrossValue()).sum());
+		List<Long> result = saleDetails.stream()
+				.map(num -> num.getPromoDisc()) 
+				.filter(n -> n!=null)
+				.collect(Collectors.toList());
+		
+		srvo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());		
+		return srvo;
+
 	}
 
 	public ListOfDeliverySlipVo convertListDSToVo(List<DeliverySlipEntity> dsDetails) {
@@ -106,32 +192,63 @@ public class NewSaleMapper {
 		ListOfDeliverySlipVo vo = new ListOfDeliverySlipVo();
 
 		List<DeliverySlipVo> dsVoList = new ArrayList<>();
+		List<LineItemsEntity> barEnt = new ArrayList<>();
 
 		dsDetails.stream().forEach(x -> {
 
+			List<LineItemVo> listBarVo = new ArrayList<>();
+
+			x.getLineItems().stream().forEach(b -> {
+
+				LineItemVo barvo = new LineItemVo();
+				
+
+				BeanUtils.copyProperties(b, barvo);
+				barvo.setUserId(x.getUserId());
+
+				listBarVo.add(barvo);
+			});
+
 			DeliverySlipVo dsvo = new DeliverySlipVo();
+		Long amount=	x.getLineItems().stream().mapToLong(a->a.getNetValue()).sum();
+		Long grossAmount = x.getLineItems().stream().mapToLong(a->a.getGrossValue()).sum();
 
 			BeanUtils.copyProperties(x, dsvo);
+			dsvo.setCreatedDate(x.getCreationDate());
+			dsvo.setLineItems(listBarVo);
+             dsvo.setNetAmount(amount);
+             dsvo.setMrp(grossAmount);
 
-			dsVoList.add(dsvo);
-
+            dsVoList.add(dsvo);
 		});
 
-		vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i -> i.getPromoDisc()).sum());
-		vo.setTotalNetAmount(dsDetails.stream().mapToLong(i -> i.getNetAmount()).sum());
-		vo.setTotalGrossAmount(dsDetails.stream().mapToLong(i -> i.getMrp()).sum());
+		// vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i ->
+		// i.getPromoDisc()).sum());
+		// vo.setTotalNetAmount(dsDetails.stream().mapToLong(i ->
+		// i.getNetAmount()).sum());
+		// vo.setTotalGrossAmount(dsDetails.stream().mapToLong(i -> i.getMrp()).sum());
 		vo.setDeliverySlipVo(dsVoList);
+
+		dsDetails.stream().forEach(a -> {
+			
+
+			//vo.setBartoatalPromoDisc(a.getLineItems().stream().mapToLong(i -> i.getDiscount()).sum());
+			vo.setBartotalNetAmount(a.getLineItems().stream().mapToLong(i -> i.getNetValue()).sum());
+			vo.setBartotalGrossAmount(a.getLineItems().stream().mapToLong(i -> i.getGrossValue()).sum());
+			vo.setBarTotalQty(a.getLineItems().stream().mapToInt(q -> q.getQuantity()).sum());
+
+		});
 
 		return vo;
 	}
 
 	public NewSaleVo entityToVo(NewSaleEntity dto) {
 		NewSaleVo vo = new NewSaleVo();
-		vo.setNewsaleId(dto.getNewsaleId());
-		vo.setInvoiceNumber(dto.getBillNumber());
-		vo.setNetPayableAmount(dto.getNetPayableAmount());
-		vo.setRecievedAmount(dto.getRecievedAmount());
-		vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
+		vo.setNewsaleId(dto.getOrderId());
+		vo.setInvoiceNumber(dto.getOrderNumber());
+		vo.setNetPayableAmount(dto.getGrossValue());
+		vo.setRecievedAmount(dto.getNetValue());
+		// vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
 		return vo;
 	}
 
@@ -152,51 +269,142 @@ public class NewSaleMapper {
 	public NewSaleResponseVo entityToResVo(NewSaleEntity dto) {
 		NewSaleResponseVo vo = new NewSaleResponseVo();
 		List<PaymentAmountTypeVo> payVos = new ArrayList<>();
-		vo.setCustomerId(dto.getCustomerDetails().getCustomerId());
-		vo.setCustomerName(dto.getCustomerDetails().getName());
-		vo.setMobileNumber(dto.getCustomerDetails().getMobileNumber());
-		vo.setNewsaleId(dto.getNewsaleId());
-		dto.getPaymentType().forEach(p -> {
-			PaymentAmountTypeVo payVo = new PaymentAmountTypeVo();
-			payVo.setId(p.getId());
-			payVo.setPaymentAmount(p.getPaymentAmount());
-			payVo.setPaymentType(p.getPaymentType());
-			payVos.add(payVo);
-		});
+		vo.setCustomerId(dto.getUserId());
+		// vo.setCustomerName(dto.getCustomerDetails().getName());
+		// vo.setMobileNumber(dto.getCustomerDetails().getMobileNumber());
+		vo.setNewsaleId(dto.getOrderId());
+//		dto.getPaymentType().forEach(p -> {
+//			PaymentAmountTypeVo payVo = new PaymentAmountTypeVo();
+//			payVo.setId(p.getId());
+//			payVo.setPaymentAmount(p.getPaymentAmount());
+//			payVo.setPaymentType(p.getPaymentType());
+//			payVos.add(payVo);
+//		});
 		vo.setPaymentAmountTypeId(payVos);
-		vo.setAmount(dto.getNetPayableAmount() - dto.getRecievedAmount());
-		vo.setInvoiceNumber(dto.getInvoiceNumber());
+		vo.setAmount(dto.getNetValue() - dto.getNetValue());
+		vo.setInvoiceNumber(dto.getOrderNumber());
 		return vo;
 	}
 
 	public NewSaleVo convertNewSaleDtoToVo(NewSaleEntity dto) {
 		NewSaleVo vo = new NewSaleVo();
-		vo.setApprovedBy(dto.getApprovedBy());
-		vo.setBiller(dto.getBiller());
-		vo.setCreatedDate(dto.getCreatedDate());
-		if (dto.getDlSlip() != null) {
-			vo.setDlSlip(deliverySlipMapper.convertDsEntityListToVoList(dto.getDlSlip()));
-		}
-		vo.setGrossAmount(dto.getGrossAmount());
-		vo.setInvoiceNumber(dto.getBillNumber());
+		vo.setApprovedBy(dto.getCreatedBy());
+		// vo.setBiller(dto.getBiller());
+		vo.setCreatedDate(dto.getCreationDate());
+//		if (dto.getDlSlip() != null) {
+//			vo.setDlSlip(deliverySlipMapper.convertDsEntityListToVoList(dto.getDlSlip()));
+//		}
+		vo.setGrossAmount(dto.getGrossValue());
+		vo.setInvoiceNumber(dto.getOrderNumber());
 		vo.setNatureOfSale(dto.getNatureOfSale());
-		vo.setNetPayableAmount(dto.getNetPayableAmount());
+		vo.setNetPayableAmount(dto.getNetValue());
 		vo.setOfflineNumber(dto.getOfflineNumber());
-		if (dto.getPaymentType() != null) {
-			vo.setPaymentAmountType(paymentAmountTypeMapper.EntityToVo(dto.getPaymentType()));
-
-		}
-		vo.setRoundOff(dto.getRoundOff());
-		vo.setTaxAmount(dto.getTaxAmount());
-		vo.setTotalManualDisc(dto.getTotalManualDisc());
-		vo.setTotalPromoDisc(dto.getTotalPromoDisc());
-		if (dto.getCustomerDetails() != null) {
-			vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
-
-		}
+//		if (dto.getPaymentType() != null) {
+//			vo.setPaymentAmountType(paymentAmountTypeMapper.EntityToVo(dto.getPaymentType()));
+//
+//		}
+		// vo.setRoundOff(dto.getRoundOff());
+		vo.setTaxAmount(dto.getTaxValue());
+		vo.setTotalManualDisc(dto.getManualDisc());
+		vo.setTotalPromoDisc(dto.getPromoDisc());
+		vo.setUserId(dto.getUserId());
+		vo.setApprovedBy(dto.getCreatedBy());
+//		if (dto.getCustomerDetails() != null) {
+//			vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
+//		}
 
 		return vo;
 		// TODO Auto-generated method stub
+
+	}
+
+	// Method for convert List of Bar code entities to List of bar code Vo's
+	public List<BarcodeVo> convertBarcodeListFromEntityToVo(List<BarcodeEntity> listOfBarcodes) {
+
+		List<BarcodeVo> barcodeList = new ArrayList<>();
+
+		listOfBarcodes.parallelStream().forEach(x -> {
+
+			BarcodeVo barcodeVo = convertBarcodeEntityToVo(x);
+			barcodeList.add(barcodeVo);
+
+		});
+		return barcodeList;
+	}
+
+	public List<LineItemVo> convertBarcodesEntityToVo(List<LineItemsEntity> barcodeDetails) {
+		return barcodeDetails.stream().map(dto -> barentityToVo(dto)).collect(Collectors.toList());
+
+	}
+
+	public List<LineItemVo> convertBarcodesReEntityToVo(List<LineItemsReEntity> barcodeDetails) {
+		return barcodeDetails.stream().map(dto -> barentityToVo(dto)).collect(Collectors.toList());
+
+	}
+
+	private LineItemVo barentityToVo(LineItemsReEntity dto) {
+
+		LineItemVo vo = new LineItemVo();
+		BeanUtils.copyProperties(dto, vo);
+
+		return vo;
+	}
+
+	private LineItemVo barentityToVo(LineItemsEntity dto) {
+
+		LineItemVo vo = new LineItemVo();
+		BeanUtils.copyProperties(dto, vo);
+
+		return vo;
+	}
+
+	// VoToEntity method
+
+	public LoyalityPointsEntity convertLoyaltyVoToEntity(LoyalityPointsVo loyalityVo) {
+
+		LoyalityPointsEntity entity = new LoyalityPointsEntity();
+		entity.setLoyaltyId(loyalityVo.getLoyaltyId());
+		entity.setUserId(loyalityVo.getUserId());
+		entity.setMobileNumber(loyalityVo.getMobileNumber());
+		entity.setCustomerName(loyalityVo.getCustomerName());
+		entity.setDomainId(loyalityVo.getDomainId());
+		entity.setInvoiceNumber(loyalityVo.getInvoiceNumber());
+		entity.setInvoiceAmount(loyalityVo.getInvoiceAmount());
+		entity.setLoyaltyPoints((loyalityVo.getInvoiceAmount() / 10));
+		entity.setExpiredDate((loyalityVo.getInvoiceCreatedDate()).plusMonths(loyalityVo.getNumberOfMonths()));
+
+		return entity;
+
+	}
+
+	// EntityToVo method
+
+	public LoyalityPointsVo convertLoyaltyEntityToVo(LoyalityPointsEntity loyalityEntity) {
+
+		LoyalityPointsVo vo = new LoyalityPointsVo();
+		vo.setLoyaltyId(loyalityEntity.getLoyaltyId());
+		vo.setUserId(loyalityEntity.getUserId());
+		vo.setDomainId(loyalityEntity.getDomainId());
+		vo.setMobileNumber(loyalityEntity.getMobileNumber());
+		vo.setCustomerName(loyalityEntity.getCustomerName());
+		vo.setLoyaltyPoints(loyalityEntity.getLoyaltyPoints());
+		vo.setInvoiceNumber(loyalityEntity.getInvoiceNumber());
+		vo.setInvoiceAmount(loyalityEntity.getInvoiceAmount());
+		vo.setCreatedDate(loyalityEntity.getCreatedDate());
+		vo.setExpiredDate(loyalityEntity.getExpiredDate());
+
+		return vo;
+	}
+
+	public List<LoyalityPointsEntity> convertloyaltyVoToEntity(List<LoyalityPointsVo> loyaltyList) {
+		return loyaltyList.stream().map(dto -> convertLoyaltyVoToEntity(dto)).collect(Collectors.toList());
+
+	}
+
+	public List<LoyalityPointsVo> convertLoyaltyEntityToVo(List<LoyalityPointsEntity> listOfLoyaltyPoints) {
+
+		return listOfLoyaltyPoints.stream().map(entity -> convertLoyaltyEntityToVo(entity))
+				.collect(Collectors.toList());
 
 	}
 

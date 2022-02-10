@@ -3,7 +3,6 @@
  */
 package com.otsi.retail.promoexchange.gateway;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -16,39 +15,19 @@ import org.springframework.validation.FieldError;
  */
 public class GateWayResponse<T> {
 
-	private Boolean status;
-	private HttpStatus httpStatus;
+	private String isSuccess;
+	private int status;
 	private String message;
 	private T result;
-	private List<String> errors;
-	private List<FieldError> fieldErrors;
-
-	/**
-	 *
+	/*
+	 * private List<String> errors; private List<FieldError> fieldErrors;
 	 */
-	public GateWayResponse() {
-	}
-
-	/**
-	 * @param errors
-	 * @param fieldErrors
-	 */
-	public GateWayResponse(List<String> errors, List<FieldError> fieldErrors) {
-		super();
-		this.errors = errors;
-		this.fieldErrors = fieldErrors;
-	}
-
-	/**
-	 * @param result
-	 * @param status
-	 * @param httpStatus
-	 */
-	public GateWayResponse(boolean status, final HttpStatus httpStatus, final T result) {
-		super();
-		this.result = result;
-		this.status = status;
-		this.httpStatus = httpStatus;
+	// public final int HttpStatus_OK = 200;
+	
+	//Default constructor
+	
+	public GateWayResponse(){
+		
 	}
 
 	/**
@@ -58,8 +37,9 @@ public class GateWayResponse<T> {
 	 */
 	public GateWayResponse(final T result) {
 		this.result = result;
-		this.status = Boolean.TRUE;
-		this.httpStatus = HttpStatus.OK;
+		this.status = 200;
+		this.isSuccess = "true";
+		// this.httpStatus = status;
 	}
 
 	/**
@@ -68,13 +48,13 @@ public class GateWayResponse<T> {
 	 * @param message
 	 * @param errors
 	 */
-	public GateWayResponse(boolean status, final HttpStatus httpStatus, final String message,
-			final List<String> errors) {
+
+	public GateWayResponse(int status, final String message, final List<String> errors) {
 		super();
 		this.status = status;
-		this.httpStatus = httpStatus;
+		this.isSuccess = "false";
 		this.message = message;
-		this.errors = errors;
+
 	}
 
 	/**
@@ -83,12 +63,14 @@ public class GateWayResponse<T> {
 	 * @param message
 	 * @param fieldErrors
 	 */
+
 	public GateWayResponse(String message, final List<FieldError> fieldErrors) {
 		super();
-		this.status = Boolean.FALSE;
-		this.httpStatus = HttpStatus.BAD_REQUEST;
+		// this.status = status;
+		this.status = 404;
 		this.message = message;
-		this.fieldErrors = fieldErrors;
+
+		this.isSuccess = "false";
 	}
 
 	/**
@@ -98,40 +80,15 @@ public class GateWayResponse<T> {
 	 * @param error
 	 */
 
-	public GateWayResponse(boolean status, final HttpStatus httpStatus, final String message, final String error) {
+	public GateWayResponse(final HttpStatus httpStatus, final String message, final String error) {
 		super();
+		// this.status = status;
 		this.status = status;
-		this.httpStatus = httpStatus;
 		this.message = message;
+		this.isSuccess = "true";
 		if (!StringUtils.isEmpty(error)) {
-			errors = Arrays.asList(error);
+			// errors = Arrays.asList(error);
 		}
-	}
-
-	/**
-	 * @param status
-	 * @param httpStatus
-	 * @param message
-	 * @param errors
-	 */
-	public GateWayResponse(Boolean status, HttpStatus httpStatus, String message, List<String> errors) {
-		super();
-		this.status = status;
-		this.httpStatus = httpStatus;
-		this.message = message;
-		this.errors = errors;
-	}
-
-	/**
-	 * @param status
-	 * @param httpStatus
-	 * @param message
-	 */
-	public GateWayResponse(HttpStatus httpStatus, final String message) {
-		super();
-		this.status = Boolean.FALSE;
-		this.httpStatus = httpStatus;
-		this.message = message;
 	}
 
 	/**
@@ -141,98 +98,62 @@ public class GateWayResponse<T> {
 	 * @param message
 	 */
 
-	public GateWayResponse(final HttpStatus httpStatus, final T result, String message) {
+	public GateWayResponse(final HttpStatus status, final T result, String message) {
 		super();
-		this.status = true;
-		this.result = result;
-		this.httpStatus = httpStatus;
+		 this.status = 200;
+		 this.result = result;
+		 this.isSuccess = "true";
+		// this.httpStatus = httpStatus;
 		this.message = message;
 	}
 
 	/**
-	 * @return the status
+	 * @param isSuccess
+	 * @param status
+	 * @param message
+	 * @param result
 	 */
-	public Boolean getStatus() {
+
+	// our response for controller
+	public GateWayResponse(String message, T result) {
+		super();
+		this.isSuccess = "true";
+		this.status = 200;
+		this.message = message;
+		this.result = result;
+	}
+
+	public int getStatus() {
 		return status;
 	}
 
-	/**
-	 * @param status the status to set
-	 */
-	public void setStatus(Boolean status) {
+	public String getIsSuccess() {
+		return isSuccess;
+	}
+
+	public void setIsSuccess(String isSuccess) {
+		this.isSuccess = isSuccess;
+	}
+
+	public void setStatus(int status) {
 		this.status = status;
 	}
 
-	/**
-	 * @return the httpStatus
-	 */
-	public HttpStatus getHttpStatus() {
-		return httpStatus;
-	}
-
-	/**
-	 * @param httpStatus the httpStatus to set
-	 */
-	public void setHttpStatus(HttpStatus httpStatus) {
-		this.httpStatus = httpStatus;
-	}
-
-	/**
-	 * @return the message
-	 */
 	public String getMessage() {
 		return message;
 	}
 
-	/**
-	 * @param message the message to set
-	 */
 	public void setMessage(String message) {
 		this.message = message;
 	}
 
-	/**
-	 * @return the result
-	 */
 	public T getResult() {
 		return result;
 	}
 
-	/**
-	 * @param result the result to set
-	 */
 	public void setResult(T result) {
 		this.result = result;
 	}
 
-	/**
-	 * @return the errors
-	 */
-	public List<String> getErrors() {
-		return errors;
-	}
-
-	/**
-	 * @param errors the errors to set
-	 */
-	public void setErrors(List<String> errors) {
-		this.errors = errors;
-	}
-
-	/**
-	 * @return the fieldErrors
-	 */
-	public List<FieldError> getFieldErrors() {
-		return fieldErrors;
-	}
-
-	/**
-	 * @param fieldErrors the fieldErrors to set
-	 */
-	public void setFieldErrors(List<FieldError> fieldErrors) {
-		this.fieldErrors = fieldErrors;
-	}
-
 }
-
 

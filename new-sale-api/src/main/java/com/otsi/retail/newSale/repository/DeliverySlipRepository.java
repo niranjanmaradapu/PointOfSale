@@ -1,7 +1,6 @@
 package com.otsi.retail.newSale.repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,35 +16,65 @@ public interface DeliverySlipRepository extends JpaRepository<DeliverySlipEntity
 
 	DeliverySlipEntity findByDsNumber(String dsNumber);
 
-	List<DeliverySlipEntity> findByDsId(Long dsId);
+	DeliverySlipEntity findByDsId(Long dsId);
 
-	List<DeliverySlipEntity> findByCreatedDateBetweenAndDsId(LocalDate dateFrom, LocalDate dateTo, Long dsId);
+	List<DeliverySlipEntity> findByCreationDateBetweenAndDsId(LocalDate dateFrom, LocalDate dateTo, Long dsId);
 
-	List<DeliverySlipEntity> findByCreatedDateBetweenAndDsNumber(LocalDate dateFrom, LocalDate dateTo, String dsNumber);
+	List<DeliverySlipEntity> findByCreationDateBetweenAndDsNumber(LocalDate dateFrom, LocalDate dateTo,
+			String dsNumber);
 
-	List<DeliverySlipEntity> findByCreatedDateBetweenAndStatus(LocalDate dateFrom, LocalDate dateTo, DSStatus status);
+	List<DeliverySlipEntity> findByCreationDateBetweenAndStatus(LocalDate dateFrom, LocalDate dateTo, DSStatus status);
 
 	List<DeliverySlipEntity> findByStatus(DSStatus status);
 
-	List<DeliverySlipEntity> findByCreatedDateBetween(LocalDate dateFrom, LocalDate dateTo);
+	List<DeliverySlipEntity> findByCreationDateBetween(LocalDate dateFrom, LocalDate dateTo);
 
-	List<DeliverySlipEntity> findByStatusAndCreatedDate(DSStatus completed, LocalDate now);
+	List<DeliverySlipEntity> findByStatusAndCreationDate(DSStatus completed, LocalDate now);
 
-	List<DeliverySlipEntity> findByCreatedDateBetweenAndDsNumberOrderByCreatedDateAsc(LocalDate dateFrom,
-			LocalDate dateTo, String dsNumber);
+	DeliverySlipEntity findByCreationDateBetweenAndDsIdOrderByCreationDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, Long dsId);
 
-	List<DeliverySlipEntity> findByCreatedDateBetweenAndDsIdOrderByCreatedDateAsc(LocalDate dateFrom, LocalDate dateTo,
-			Long dsId);
-
-	List<DeliverySlipEntity> findByCreatedDateBetweenAndStatusOrderByCreatedDateAsc(LocalDate dateFrom,
+	List<DeliverySlipEntity> findByCreationDateBetweenAndStatusOrderByCreationDateAsc(LocalDate dateFrom,
 			LocalDate dateTo, DSStatus status);
 
-	List<DeliverySlipEntity> findByDsNumberInOrderByCreatedDateAsc(List<String> dsList);
+	List<DeliverySlipEntity> findByDsNumberInOrderByCreationDateAsc(List<String> dsList);
 
-	List<DeliverySlipEntity> findByStatusOrderByCreatedDateAsc(DSStatus status);
+	List<DeliverySlipEntity> findByStatusOrderByCreationDateAsc(DSStatus status);
 
-	List<DeliverySlipEntity> findByCreatedDateBetweenOrderByCreatedDateAsc(LocalDate dateFrom, LocalDate dateTo);
+	List<DeliverySlipEntity> findByCreationDateBetweenOrderByCreationDateAsc(LocalDate dateFrom, LocalDate dateTo);
 
-	// List<DeliverySlipEntity> findByDsNumberIn(List<DeliverySlipVo> dlSlips);
+	DeliverySlipEntity findByCreationDateBetweenAndDsIdAndDsNumberAndStatusOrderByCreationDateAsc(
+			LocalDate dateFrom, LocalDate dateTo, Long dsId, String dsNumber, DSStatus status);
+
+	List<DeliverySlipEntity> findByCreationDateBetweenAndDsNumberOrderByCreationDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, String dsNumber);
+
+	List<DeliverySlipEntity> findByDsNumberInAndOrderIsNull(List<String> dlsList);
+
+	List<DeliverySlipEntity> findByStoreId(Long storeId);
+
+	List<DeliverySlipEntity> findByUserId(Long u);
+
+	DeliverySlipEntity findByCreationDateBetweenAndDsIdAndDsNumberAndStatusAndStoreIdOrderByCreationDateAsc(
+			LocalDate dateFrom, LocalDate dateTo, Long dsId, String dsNumber, DSStatus status, Long storeId);
+
+	DeliverySlipEntity findByDsIdAndStoreId(Long dsId, Long storeId);
+
+	DeliverySlipEntity findByCreationDateBetweenAndDsIdAndStoreIdOrderByCreationDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, Long dsId,Long storeId);
+
+	List<DeliverySlipEntity> findByCreationDateBetweenAndDsNumberAndStoreIdOrderByCreationDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, String dsNumber,Long storeId);
+
+	List<DeliverySlipEntity> findByCreationDateBetweenAndStatusAndStoreIdOrderByCreationDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, DSStatus status,Long storeId);
+
+	List<DeliverySlipEntity> findByDsNumberInAndStoreIdOrderByCreationDateAsc(List<String> dsList, Long storeId);
+
+	List<DeliverySlipEntity> findByStatusAndStoreIdOrderByCreationDateAsc(DSStatus status, Long storeId);
+
+	List<DeliverySlipEntity> findByCreationDateBetweenAndStoreIdOrderByCreationDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, Long storeId);
+
 
 }

@@ -6,20 +6,25 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.otsi.retail.newSale.common.DSStatus;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "delivery_slip")
 @ToString
@@ -27,35 +32,46 @@ public class DeliverySlipEntity  {
 
 	
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long dsId;
+	
+	private Long storeId;
 
 	private String dsNumber;
 	
+	private Long userId;
+	
+	@Transient
 	private int qty;
-
+	
+	@Transient
 	private String type;
 
+	@Transient
 	private Long mrp;
 
+	@Transient
 	private Long promoDisc;
 
+	@Transient
 	private Long netAmount;
 
 	private DSStatus status;
 	
-	private Long salesMan;
+	//private Long salesMan;
 
-	private LocalDate createdDate;
+	private LocalDate creationDate;
 
-	private LocalDateTime lastModified;
+	private LocalDate lastModified;
 
+	@Transient
 	@OneToMany( mappedBy  = "deliverySlip", cascade = CascadeType.ALL)
 	private List<BarcodeEntity> barcodes;
+	
+	@OneToMany( mappedBy  = "dsEntity", cascade = CascadeType.ALL)
+	private List<LineItemsEntity> lineItems;
 
 	@ManyToOne
-	@JoinColumn(name = "newsale_id")
-	private NewSaleEntity newsale;
-	
-
+	@JoinColumn(name = "order_id")
+	private NewSaleEntity order;
 }

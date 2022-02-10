@@ -1,6 +1,7 @@
 package com.otsi.retail.newSale.vo;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.stereotype.Component;
@@ -26,8 +27,11 @@ public class BarcodeVo {
 
 	private Long salesMan;
 
+
 	private LocalDateTime createdDate;
 
 	private LocalDateTime lastModified;
+	
+	private HsnDetailsVo HsnDetailsVo;
 
 }

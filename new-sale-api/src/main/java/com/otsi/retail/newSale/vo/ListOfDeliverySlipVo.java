@@ -19,6 +19,8 @@ public class ListOfDeliverySlipVo {
 	private DSStatus status;
 	
 	private String barcode;
+	
+	private Long storeId;
 
 	private LocalDate dateFrom;
 
@@ -30,6 +32,15 @@ public class ListOfDeliverySlipVo {
 
 	private Long totalGrossAmount;
 	
+	private Long bartoatalPromoDisc;
+
+	private Long bartotalNetAmount;
+
+	private Long bartotalGrossAmount;
+	
+	private int barTotalQty;
+	
 	private List<DeliverySlipVo> deliverySlipVo;
 
+	//private List<BarcodeVo> barcodevo;
 }

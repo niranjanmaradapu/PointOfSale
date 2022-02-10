@@ -13,7 +13,7 @@ public class NewSaleResponseVo {
 	
 	private String customerName;
 	
-	private Long invoiceNumber;
+	private String invoiceNumber;
 	
 	private Long amount;
 	

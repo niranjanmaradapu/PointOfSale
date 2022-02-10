@@ -8,13 +8,23 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.common.DSStatus;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Component
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class DeliverySlipVo {
 
 	private List<BarcodeVo> barcode;
+	
+	private Long dsId;
+	
+	private Long storeId;
 
 	private int qty;
 	
@@ -34,7 +44,9 @@ public class DeliverySlipVo {
 
 	private LocalDate createdDate;
 
-	private LocalDateTime lastModified;
+	private LocalDate lastModified;
+	
+	private List<LineItemVo> lineItems;
 
 	// private Long salesMan;
 

@@ -7,29 +7,31 @@ import org.springframework.stereotype.Component;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Component
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GiftVoucherVo {
+@ToString
+public class GiftVoucherVo {// Don't change these field names because these are mapped with entity object
 
 	private Long gvId;
 
-	private Long userId;
+	private Long clientId;
 
 	private String gvNumber;
 
 	private String description;
 
-	private Boolean isTagged;
+	private Boolean isActivated;
 
-	private LocalDate expiryDate;
+	private LocalDate fromDate;
 
-	private Long totalAmount;
+	private LocalDate toDate;
 
-	private Long leftOverAmount;
+	private Long value;
 
-	private LocalDate createdDate;
+	private LocalDate creationDate;
 
 }

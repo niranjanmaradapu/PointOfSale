@@ -6,9 +6,9 @@ spring:
     name: customer-management
  datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/newSale
+    url: jdbc:postgresql://localhost:5432/customer-management
     username: postgres
-    password: Otsi@123 
+    password: root
  jpa:
    hibernate:
     ddl-auto: update
@@ -28,3 +28,12 @@ eureka:
 springdoc:
   packagesToScan: com.otsi.retail.customerManagement
   
+getbarcodes:
+  url: http://localhost:8081/newsale/getbarcodes
+getNewSaleWithHsn: 
+  url: http://localhost:8083/hsnDetails/getHsnDetails
+logging:
+    file:
+      name: C:/Users/ADMIN/Desktop/logs/customer-management.log
+    level:
+      com.otsi.retail.customerManagement.service: DEBUG   

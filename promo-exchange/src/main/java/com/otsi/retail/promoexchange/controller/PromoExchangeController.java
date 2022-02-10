@@ -1,44 +1,41 @@
 package com.otsi.retail.promoexchange.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.otsi.retail.promoexchange.Entity.PromoExchangeEntity;
 import com.otsi.retail.promoexchange.common.CommonRequestMappings;
+import com.otsi.retail.promoexchange.gateway.GateWayResponse;
 import com.otsi.retail.promoexchange.service.CustomerService;
 import com.otsi.retail.promoexchange.service.PromoExchangeService;
-import com.otsi.retail.promoexchange.vo.BarcodeVo;
 import com.otsi.retail.promoexchange.vo.CustomerVo;
 import com.otsi.retail.promoexchange.vo.DeliverySlipVo;
-import com.otsi.retail.promoexchange.vo.ListOfDeliverySlipVo;
-import com.otsi.retail.promoexchange.vo.ListOfSaleBillsVo;
+import com.otsi.retail.promoexchange.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.promoexchange.vo.PromoExchangeVo;
 
-/**
- * Controller class for accepting all the requests which are related to
- * CustomerSaving API, NewSale API, Create delivery slip API
- * 
- * @author Manikanta Guptha
- *
- */
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @RestController
 @RequestMapping(CommonRequestMappings.PROMO_ITEM_EXCHANGE)
 public class PromoExchangeController {
+
+	//private Logger log = LoggerFactory.getLogger(PromoExchangeController.class);
+	
+	  private Logger log=LogManager.getLogger(PromoExchangeController.class);
 
 	@Autowired
 	private PromoExchangeService promoExchangeService;
@@ -48,148 +45,75 @@ public class PromoExchangeController {
 
 	// Save customer details API
 	@PostMapping(path = CommonRequestMappings.SAVE_CUSTOMERDETAILS, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> saveCustomerDetails(@Valid @RequestBody CustomerVo details) {
-		try {
-			ResponseEntity<?> result = service.saveCustomerDetails(details);
-			return new ResponseEntity<>(result, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
+	public GateWayResponse<?> saveCustomerDetails(@Valid @RequestBody CustomerVo details) throws Exception {
+		log.info("Recieved request to saveCustomerDetails():" + details);
+		String result = service.saveCustomerDetails(details);
+		return new GateWayResponse<>(result);
+
 	}
 
 	// Get customer details from Mobile number
 	@GetMapping(path = CommonRequestMappings.GET_CUSTOMERDETAILS_BY_MOBILENUMBER)
-	public ResponseEntity<?> getCustomerByMobileNumber(@RequestParam String mobileNumber) {
-
-		ResponseEntity<?> customer = service.getCustomerByMobileNumber(mobileNumber);
-		return new ResponseEntity<>(customer, HttpStatus.OK);
+	public GateWayResponse<?> getCustomerByMobileNumber(@RequestParam String mobileNumber) throws Exception {
+		log.info("Recieved request to getCustomerByMobileNumber():" + mobileNumber);
+		CustomerVo customer = service.getCustomerByMobileNumber(mobileNumber);
+		return new GateWayResponse<>(customer);
 	}
 
 	// @ Method for saving promo exchange items...
 	@PostMapping(CommonRequestMappings.ITEM_EXCHANGE)
-	public ResponseEntity<?> saveItemExchange(@RequestBody PromoExchangeVo vo) {
-
-		ResponseEntity<?> message = promoExchangeService.savePromoItemExchangeRequest(vo);
-
-		return new ResponseEntity<>(message, HttpStatus.OK);
+	public GateWayResponse<?> saveItemExchange(@RequestBody PromoExchangeVo vo) {
+		log.info("Recieved request to saveItemExchange():" + vo);
+		String message = promoExchangeService.savePromoItemExchangeRequest(vo);
+		return new GateWayResponse<>("Item Exchanged Successfully", message);
 	}
 
-	// Method for create new Barcode..
-	@PostMapping(CommonRequestMappings.CREATE_BARCODE)
-	public ResponseEntity<?> saveBarcode(@RequestBody BarcodeVo vo) {
-
-		ResponseEntity<?> result = promoExchangeService.saveBarcode(vo);
-
-		return new ResponseEntity<>(result, HttpStatus.OK);
-	}
-
-	// Method for getting Barcode details from Barcode table using Barcode number
-	@GetMapping(CommonRequestMappings.GET_BARCODE_DETAILS)
-	public ResponseEntity<?> getBarcodeDetails(@RequestParam String barCode) {
-
-		ResponseEntity<?> barCodeDetails = promoExchangeService.getBarcodeDetails(barCode);
-
-		return new ResponseEntity<>(barCodeDetails, HttpStatus.OK);
+	// CircuitBreaker implemented
+	@GetMapping(CommonRequestMappings.GET_DS)
+	@CircuitBreaker(name = "GetDeliverySlipCB", fallbackMethod = "getDeliverySlipsFallback")
+	public GateWayResponse<?> getDeliverySlipDetails(@RequestParam String dsNumber) throws Exception {
+		log.info("Recieved request to getDeliverySlipDetails():" + dsNumber);
+		DeliverySlipVo dsDetails = promoExchangeService.getDeliverySlipDetails(dsNumber);
+		return new GateWayResponse<>(HttpStatus.OK, dsDetails, "");
 
 	}
+	
+	public GateWayResponse<?> getDeliverySlipsFallback(Exception ex) {
+		log.error("Third Party Service Down");
+		return new GateWayResponse<>("Third Party Service  is Down", null);
+	}
+	
+	// CircuitBreaker implemented
+	@GetMapping(CommonRequestMappings.GET_LIST_OF_RETURN_SLIPS)
+	@CircuitBreaker(name = "GetReturnSlipsCB", fallbackMethod = "getReturnSlipsFallback")
+	public GateWayResponse<?> getlistofReturnSlips() throws JsonMappingException, JsonProcessingException {
+		log.info("Recieved request to getlistofReturnSlips()");
+		List<ListOfReturnSlipsVo> returnSlips = promoExchangeService.getListOfRetunSlips();
+		return new GateWayResponse<>(HttpStatus.OK, returnSlips, "Success");
 
-	// Method for creating Delivery slip using List of Barcodes
-	@PostMapping(CommonRequestMappings.CREATE_DS)
-	public ResponseEntity<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo) {
-
-		try {
-			ResponseEntity<?> saveDs = promoExchangeService.saveDeliverySlip(vo);
-			return new ResponseEntity<>(saveDs, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
+	}
+	
+	public GateWayResponse<?> getReturnSlipsFallback(Exception ex) {
+		log.error("Third Party Service Down");
+		return new GateWayResponse<>("Third Party Service  is Down", null);
 	}
 
 	// Method for getting Delivery slip Data using DsNumber
-	@GetMapping(CommonRequestMappings.GET_DS)
-	public ResponseEntity<?> getDeliverySlipDetails(@RequestParam String dsNumber) {
-
-		try {
-			DeliverySlipVo dsDetails = promoExchangeService.getDeliverySlipDetails(dsNumber);
-			return new ResponseEntity<>(dsDetails, HttpStatus.OK);
-
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
+	@GetMapping(CommonRequestMappings.GET_PROMO_EXCHANGE_BILLS_BY_BILL_NUMBER)
+	public GateWayResponse<?> getSaleBillsBillNumber(@RequestParam String billNumber) {
+		log.info("Recieved request to getSaleBillsBillNumber():" + billNumber);
+		List<PromoExchangeVo> billDetails = promoExchangeService.getSaleBillByBillNumber(billNumber);
+		return new GateWayResponse<>(HttpStatus.OK, billDetails, "Success");
 
 	}
-
-// @
-	/*
-	 * @GetMapping(CommonRequestMappings.GET_NEWSALE_WITH_DELIVERYSLIPS) public
-	 * ResponseEntity<?> getNewsaleWithDeliveryslip(@RequestParam String dsNumber) {
-	 * 
-	 * 
-	 * DeliverySlipVo dsDetails =
-	 * promoExchangeService.getNewsaleWithDeliveryslip(dsNumber); return new
-	 * ResponseEntity<>(dsDetails, HttpStatus.OK);
-	 * 
-	 * 
-	 * 
-	 * }
-	 */
-	@GetMapping(CommonRequestMappings.GET_LIST_OF_RETURN_SLIPS)
-	public ResponseEntity<?> getlistofReturnSlips() {
-
-		try {
-
-			return new ResponseEntity<>(promoExchangeService.getListOfRetunSlips(), HttpStatus.OK);
-		} catch (JsonMappingException e) {
-
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-
-			e.printStackTrace();
-		}
-		throw new RuntimeException("return slip details not found");
-
-	}
-
-	// Method for getting list of sale bills
 
 	@GetMapping(CommonRequestMappings.GET_LIST_OF_PROMO_EXCHANGE_BILLS)
-	public ResponseEntity<?> getListOfPromoItemExchangeBills(@RequestBody ListOfSaleBillsVo svo) {
-		try {
+	public GateWayResponse<?> getlistofPromoExchageBills() {
+		log.info("Recieved request to getlistofPromoExchageBills()");
+		List<PromoExchangeVo> vo = promoExchangeService.getListOfSaleBills();
 
-			ResponseEntity<?> listOfSaleBills = promoExchangeService.getListOfSaleBills(svo);
-			return new ResponseEntity<>(listOfSaleBills, HttpStatus.OK);
+		return new GateWayResponse<>(HttpStatus.OK, vo, "Success");
 
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-
-		}
 	}
 
-	// Method for getting list of delivery slips
-
-	/*
-	 * @GetMapping(CommonRequestMappigs.GET_LISTOF_DS) public ResponseEntity<?>
-	 * getlistofDeliverySlips1(@RequestBody ListOfDeliverySlipVo
-	 * listOfDeliverySlipVo) {
-	 * 
-	 * // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	 * try {
-	 * 
-	 * ResponseEntity<?> getDs =
-	 * promoExchangeService.getDeliverySlipDetails(listOfDeliverySlipVo);
-	 * 
-	 * return new ResponseEntity<>(getDs, HttpStatus.OK); } catch (Exception e) {
-	 * return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-	 * 
-	 * }}
-	 */
-
-	// Method for day closer
-
-	/*
-	 * @GetMapping(path = CommonRequestMappings.GET_PROMO_ITEMS) public
-	 * Optional<PromoExchangeEntity> getPromoItems(@RequestParam Long
-	 * promoExchangeId) { return
-	 * promoExchangeService.getPromoItems(promoExchangeId); }
-	 */
 }
