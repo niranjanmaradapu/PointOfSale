@@ -52,13 +52,9 @@ public class PromotionsVo {
 
 	private Boolean isActive;
 
-	private PromotionType promoType;
+	private LocalDate promotionStartDate;
 
-	private LocalDate startDate;
-
-	private LocalDate endDate;
-
-	private String storeName;
+	private LocalDate promotionEndDate;
 
 	private LocalDate createdDate;
 

@@ -6,4 +6,7 @@ import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
 
 public interface PromotionToStoreRepo  extends JpaRepository<PromotionToStoreEntity, Long>{
 
+
+	PromotionToStoreEntity findByPromoId(Long promoId);
+
 }

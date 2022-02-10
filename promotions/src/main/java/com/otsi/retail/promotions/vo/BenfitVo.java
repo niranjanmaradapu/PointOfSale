@@ -41,8 +41,6 @@ public class BenfitVo {
 	
 	private String poolName;
 	
-    private float toSlab;
-	
-	private float fromSlab;
+    private PromotionSlabsVo promoSlabVo;
 
 }

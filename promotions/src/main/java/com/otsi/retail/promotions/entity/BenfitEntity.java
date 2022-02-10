@@ -3,13 +3,20 @@
  */
 package com.otsi.retail.promotions.entity;
 
+import java.time.LocalDate;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.otsi.retail.promotions.common.BenfitType;
 import com.otsi.retail.promotions.common.DiscountType;
@@ -28,7 +35,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "benfit_entity")
+@Table(name = "promotion_benfits")
 public class BenfitEntity {
 
 	@Id
@@ -53,12 +60,18 @@ public class BenfitEntity {
 	
 	private String poolName;
 	
-	private float toSlab;
+	@CreationTimestamp
+	private LocalDate createdat;
 	
-	private float fromSlab;
+	@UpdateTimestamp
+	private LocalDate updatedat;
 	
 	@ManyToOne
 	@JoinColumn(name = "promoId")
 	private PromotionsEntity promotionEntity;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "promotionSlabId")
+	private PromotionSlabsEntity promotionSlabEntity;
 
 }

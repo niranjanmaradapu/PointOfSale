@@ -25,7 +25,6 @@ import com.otsi.retail.promotions.common.PromotionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -57,16 +56,9 @@ public class PromotionsEntity {
 
 	private Boolean isActive;
 
-	private PromotionType promoType;
+	private LocalDate promotionStartDate;
 
-	private LocalDate startDate;
-
-	private LocalDate endDate;
-
-	private String storeName;
-
-	@GeneratedValue
-	private int priority;
+	private LocalDate promotionEndDate;
     
 	@CreationTimestamp
 	private LocalDate createdDate;

@@ -54,7 +54,7 @@ public class PoolMapper {
 		poolRule.setRuleType(poolRuleVo.getRuleType());
 		poolRule.setGivenValue(poolRuleVo.getGivenValue());
 		poolRule.setOperatorSymbol(poolRuleVo.getOperatorSymbol());
-		poolRule.setRuleNumber(poolRuleVo.getRuleNumber());
+		//poolRule.setRuleNumber(poolRuleVo.getRuleNumber());
 
 		return poolRule;
 

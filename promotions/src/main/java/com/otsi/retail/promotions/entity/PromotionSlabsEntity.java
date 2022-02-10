@@ -1,7 +1,6 @@
 package com.otsi.retail.promotions.entity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,35 +10,32 @@ import javax.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@Table(name = "promotion_store_mappings")
-public class PromotionToStoreEntity {
+@Table(name = "promotion_slabs")
+public class PromotionSlabsEntity {
 	
 	@Id
 	@GeneratedValue
 	private Long id;
 	
+    private float toSlab;
+	
+	private float fromSlab;
+	
 	private Long promoId;
-
-	private Long storeId;
-
-	private int priority;
 	
-	private LocalDate promotionStartDate;
-	  
-	private LocalDate promotionEndDate;
-	
-	private Boolean promotionStatus;
-	 	 	
-	private Long createdBy;
-
 	@CreationTimestamp
 	private LocalDate createdat;
-
+	
 	@UpdateTimestamp
 	private LocalDate updatedat;
-
+	
+	
 }

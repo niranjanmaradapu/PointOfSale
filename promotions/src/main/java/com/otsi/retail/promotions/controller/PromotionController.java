@@ -107,21 +107,6 @@ public class PromotionController {
 
 	}
 
-	@PostMapping(CommonRequestMappigs.SEARCH_BY_STORE)
-	public GateWayResponse<?> searchByStore(@RequestBody SearchPromotionsVo vo) {
-		log.info("Recieved request to searchByStore():" + vo);
-		List<SearchPromotionsVo> result = promoService.searchByStore(vo);
-		return new GateWayResponse<>("  successfully getting store mapped promotions", result);
-
-	}
-
-	@PutMapping(CommonRequestMappigs.UPDATE_PRIORITY)
-	public GateWayResponse<?> updatePrioriy(@RequestBody SearchPromotionsVo vo) {
-		log.info("Recieved request to updatePriority():" + vo);
-		String result = promoService.updatePriority(vo);
-		return new GateWayResponse<>(" priority updated successfully", result);
-
-	}
 
 	@PutMapping(CommonRequestMappigs.UPDATE_PROMO_DATES)
 	public GateWayResponse<?> updatePromoDates(@RequestBody SearchPromotionsVo vo) {
@@ -139,7 +124,7 @@ public class PromotionController {
 
 	}
 
-	@PostMapping("addpromotoproduct")
+	@PostMapping("/addpromotoproduct")
 	public GateWayResponse<?> addPromtionToBarcode(@RequestParam Long promoId, @RequestParam String barcode) {
 
 		String result = promoService.addPromtionToBarcode(promoId, barcode);
@@ -148,15 +133,6 @@ public class PromotionController {
 
 	}
 
-	@PostMapping("/checkPromtion")
-	public GateWayResponse<?> checkPromtion(@RequestBody List<LineItemVo> lineItmes) {
-
-		PromotionServiceImpl.i=0;
-		
-		List<LineItemVo> result = promoService.checkPromtion(lineItmes);
-
-		return new GateWayResponse<>("", result);
-	}
 	
 	@PostMapping(CommonRequestMappigs.LIST_OF_PROMOTIONS_BY_SEARCH_CRITERIA)
 	public GateWayResponse<?> listOfPromotions(@RequestBody SearchPromotionsVo vo) {

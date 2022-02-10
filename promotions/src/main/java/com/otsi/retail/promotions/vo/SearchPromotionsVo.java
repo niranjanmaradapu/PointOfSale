@@ -26,11 +26,9 @@ public class SearchPromotionsVo {
 	
 	private Long promotionsCount;
 	
-	private String storeName;
+	private LocalDate promotionStartDate;
 	
-	private LocalDate startDate;
-	
-	private LocalDate endDate;
+	private LocalDate promotionEndDate;
 	
 	private Boolean isActive;
 	

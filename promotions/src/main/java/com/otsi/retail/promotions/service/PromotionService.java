@@ -2,12 +2,10 @@ package com.otsi.retail.promotions.service;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.promotions.vo.BenfitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
-import com.otsi.retail.promotions.vo.LineItemVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
 import com.otsi.retail.promotions.vo.SearchPromotionsVo;
@@ -30,17 +28,11 @@ public interface PromotionService {
 
 	List<SearchPromotionsVo> searchPromotion(SearchPromotionsVo vo);
 
-	List<SearchPromotionsVo> searchByStore(SearchPromotionsVo vo);
-	
-	String updatePriority(SearchPromotionsVo vo);
-	
 	String updatePromotionDates(SearchPromotionsVo vo);
 	
 	String clonePromotionByStore(SearchPromotionsVo vo);
 
 	String addPromtionToBarcode(Long promoId, String barcode);
-
-	List<LineItemVo> checkPromtion(List<LineItemVo> lineItmes);
 	
 	List<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo);
 	
