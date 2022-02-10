@@ -673,7 +673,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			////////////////////
 
 			// List<HsnDetailsVo> list = new ArrayList<>();
-			NewSaleVo nsvo = new NewSaleVo();
+			/*NewSaleVo nsvo = new NewSaleVo();
 			List<NewSaleVo> sVoList = new ArrayList<>();
 
 			lsvo.getNewSaleVo().stream().forEach(x -> {
@@ -692,8 +692,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 					});
 				}
-
+*/
 				/////////
+			lsvo.getNewSaleVo().stream().forEach(x -> {
 				List<UserDetailsVo> uvo = getUserDetailsFromURM(null, x.getUserId());
 
 				/////////
@@ -703,8 +704,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 						x.setMobileNumber(u.getPhoneNumber());
 					});
 				}
+			});
 
-				x.setLineItemsReVo(listBar);
+				/*x.setLineItemsReVo(listBar);
 				x.setTotalqQty(x.getLineItemsReVo().stream().mapToInt(q -> q.getQuantity()).sum());
 				x.setTotalMrp(x.getLineItemsReVo().stream().mapToLong(m -> m.getGrossValue()).sum());
 				x.setTotalNetAmount(x.getLineItemsReVo().stream().mapToLong(m -> m.getNetValue()).sum());
@@ -717,8 +719,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 						(float) listBar.stream().mapToDouble(t -> t.getHsnDetailsVo().getTaxVo().getSgst()).sum());
 				x.setTotalIgst(
 						(float) listBar.stream().mapToDouble(t -> t.getHsnDetailsVo().getTaxVo().getIgst()).sum());
-
-			});
+*/
+			
 
 			//////////////////
 
