@@ -218,7 +218,7 @@ public class ReportsServiceImp implements ReportService {
 
 		LocalDate Date = LocalDate.now();
 
-		ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetAllListOfReturnSlips() + "?storeId=" + storeId + "?domainId=" + domainId,
+		ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetAllListOfReturnSlips() + "?storeId="+storeId+ "&" +"domainId=" + domainId,
 				HttpMethod.GET, null, GateWayResponse.class);
 
 		ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
