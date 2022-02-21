@@ -294,11 +294,11 @@ public class NewSaleController {
 	}
 	// Method for day closer
 
-	@GetMapping(CommonRequestMappigs.DAY_CLOSER)
-	public GateWayResponse<?> dayclose() {
+	@GetMapping(CommonRequestMappigs.GET_PENDINGDELIVERYSLIPS)
+	public GateWayResponse<?> dayclose(@RequestParam Long storeId) {
 		log.info("Recieved request to dayclose()");
 		try {
-			List<DeliverySlipEntity> dayclose = newSaleService.posDayClose();
+			List<DeliverySlipVo> dayclose = newSaleService.posDayClose(storeId);
 			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());
@@ -308,10 +308,10 @@ public class NewSaleController {
 
 	}
 
-	@GetMapping(CommonRequestMappigs.POS_CLOSEDAY)
-	public GateWayResponse<?> posclose(@RequestParam Boolean posclose) {
+	@PostMapping(CommonRequestMappigs.CLOSE_PENDINGDELIVERYSLIP)
+	public GateWayResponse<?> posclose(@RequestBody List<DeliverySlipVo> dsVo) {
 		try {
-			String dayclose = newSaleService.posClose(posclose);
+			String dayclose = newSaleService.posClose(dsVo);
 			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
