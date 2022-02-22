@@ -20,8 +20,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.otsi.retail.promotions.common.Applicability;
 import com.otsi.retail.promotions.common.PromoApplyType;
-import com.otsi.retail.promotions.common.PromotionType;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,7 +27,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "promotion_master")
+@Table(name = "pos_promotion_master")
 public class PromotionsEntity {
 
 	@Id
@@ -71,8 +69,11 @@ public class PromotionsEntity {
 	private List<PoolEntity> poolEntity;
 	
 	@OneToMany(targetEntity = BenfitEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinTable(name = "promo_benfit", joinColumns = @JoinColumn(name = "promoId"), inverseJoinColumns = @JoinColumn(name = "benfitId"))
+	@JoinTable(name = "promo_benefit", joinColumns = @JoinColumn(name = "promoId"), inverseJoinColumns = @JoinColumn(name = "benfitId"))
 	private List<BenfitEntity> benfitEntity;
-  
-
+	
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "promoId")
+	private List<PromotionSlabsEntity> promotionSlabEntity;
+	
 }

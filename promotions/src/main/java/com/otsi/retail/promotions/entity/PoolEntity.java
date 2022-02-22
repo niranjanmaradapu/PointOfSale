@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "pool_master")
+@Table(name = "pos_pool_master")
 public class PoolEntity {
 
 	@Id
@@ -50,14 +50,5 @@ public class PoolEntity {
 	
 	@ManyToMany(mappedBy = "poolEntity",cascade ={CascadeType.PERSIST, CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
 	private List<PromotionsEntity> promoEntity;
-	
-	
-	
-	
-
-//	@ManyToMany
-//	@JoinTable(name = "pool_promo", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
-//			@JoinColumn(referencedColumnName = "promoId") })
-//	private List<PromotionsEntity> promoEntity;
 
 }

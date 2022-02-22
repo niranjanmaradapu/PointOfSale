@@ -18,10 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.otsi.retail.promotions.common.CommonRequestMappigs;
 import com.otsi.retail.promotions.gatewayresponse.GateWayResponse;
 import com.otsi.retail.promotions.service.PromotionService;
-import com.otsi.retail.promotions.service.PromotionServiceImpl;
-import com.otsi.retail.promotions.vo.BenfitVo;
+import com.otsi.retail.promotions.vo.BarcodeTextileVo;
+import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
-import com.otsi.retail.promotions.vo.LineItemVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
 import com.otsi.retail.promotions.vo.SearchPromotionsVo;
@@ -124,14 +123,6 @@ public class PromotionController {
 
 	}
 
-	@PostMapping("/addpromotoproduct")
-	public GateWayResponse<?> addPromtionToBarcode(@RequestParam Long promoId, @RequestParam String barcode) {
-
-		String result = promoService.addPromtionToBarcode(promoId, barcode);
-
-		return new GateWayResponse<>("", result);
-
-	}
 
 	
 	@PostMapping(CommonRequestMappigs.LIST_OF_PROMOTIONS_BY_SEARCH_CRITERIA)
@@ -143,7 +134,7 @@ public class PromotionController {
 	}
 	
 	@PostMapping(CommonRequestMappigs.ADD_BENFIT)
-	public GateWayResponse<?> saveBenfit(@RequestBody BenfitVo vo) {
+	public GateWayResponse<?> saveBenfit(@RequestBody BenefitVo vo) {
 		log.info("Recieved request to addBenfit():" + vo);
 		String saveBenfit = promoService.saveBenfit(vo);
 		return new GateWayResponse<>("added benfit successfully", saveBenfit);
@@ -156,6 +147,13 @@ public class PromotionController {
 		List<ReportVo> vo = promoService.activeVSinactivePromos();
 		return new GateWayResponse<>("", vo);
 		
+	}
+	
+	@PostMapping("/checkPromtionTextile")
+	public GateWayResponse<?> checkPromtionTextile(@RequestBody List<BarcodeTextileVo> listofInvTxt,
+			                                @RequestParam Long storeId,
+			                                @RequestParam Long domainId) {
+		return new GateWayResponse<>("", promoService.checkPromtion(listofInvTxt,storeId,domainId));
 	}
 	
 

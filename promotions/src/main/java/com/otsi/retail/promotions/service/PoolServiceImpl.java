@@ -10,17 +10,18 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.otsi.retail.promotions.entity.Condition;
 import com.otsi.retail.promotions.entity.PoolEntity;
 import com.otsi.retail.promotions.entity.Pool_Rule;
 import com.otsi.retail.promotions.exceptions.DuplicateRecordException;
 import com.otsi.retail.promotions.exceptions.InvalidDataException;
 import com.otsi.retail.promotions.exceptions.RecordNotFoundException;
 import com.otsi.retail.promotions.mapper.PoolMapper;
+import com.otsi.retail.promotions.repository.ConditionRepo;
 import com.otsi.retail.promotions.repository.PoolRepo;
 import com.otsi.retail.promotions.repository.RuleRepo;
-import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.PoolVo;
-import com.otsi.retail.promotions.vo.Pool_RuleVo;
+import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.SearchPoolVo;
 
 /**
@@ -42,6 +43,9 @@ public class PoolServiceImpl implements PoolService {
 
 	@Autowired
 	private RuleRepo ruleRepo;
+	
+	@Autowired
+	private ConditionRepo conditionRepo;
 
 	// Method for saving pools from PromotionPoolVO
 	@Override
@@ -70,6 +74,7 @@ public class PoolServiceImpl implements PoolService {
 			Pool_Rule poolRule = poolMapper.convertPoolRuleVoToEntity(x);
 			poolRule.setPoolEntity(savePool);
 			ruleRepo.save(poolRule);
+			
 
 		});
 		log.warn("we are checking if pool is saved...");
@@ -94,7 +99,7 @@ public class PoolServiceImpl implements PoolService {
 				Pool_Rule poolRules = poolMapper.convertPoolRuleVoToEntity(x);
 				poolRules.setPoolEntity(pool.get());
 				ruleRepo.save(poolRules);
-
+          
 			});
 
 		} else {

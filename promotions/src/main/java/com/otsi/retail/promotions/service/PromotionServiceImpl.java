@@ -2,12 +2,9 @@ package com.otsi.retail.promotions.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,33 +18,30 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.otsi.retail.promotions.common.BenfitType;
-import com.otsi.retail.promotions.common.DiscountType;
-import com.otsi.retail.promotions.common.Operator;
-import com.otsi.retail.promotions.common.PromotionType;
+import com.otsi.retail.promotions.calculate.benefits.CalculateBenifits;
+import com.otsi.retail.promotions.check.pools.CheckPoolRules;
+import com.otsi.retail.promotions.common.Applicability;
+import com.otsi.retail.promotions.common.PromoApplyType;
 import com.otsi.retail.promotions.config.Config;
 import com.otsi.retail.promotions.entity.BenfitEntity;
 import com.otsi.retail.promotions.entity.PoolEntity;
-import com.otsi.retail.promotions.entity.PromoBarcodeEntity;
+import com.otsi.retail.promotions.entity.PromotionSlabsEntity;
 import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
 import com.otsi.retail.promotions.entity.PromotionsEntity;
-import com.otsi.retail.promotions.exceptions.DuplicateRecordException;
 import com.otsi.retail.promotions.exceptions.InvalidDataException;
 import com.otsi.retail.promotions.exceptions.RecordNotFoundException;
 import com.otsi.retail.promotions.gatewayresponse.GateWayResponse;
 import com.otsi.retail.promotions.mapper.PromotionMapper;
 import com.otsi.retail.promotions.repository.BenfitRepo;
 import com.otsi.retail.promotions.repository.PoolRepo;
-import com.otsi.retail.promotions.repository.PromoBarcodeEntityRepository;
 import com.otsi.retail.promotions.repository.PromotionRepo;
 import com.otsi.retail.promotions.repository.PromotionToStoreRepo;
-import com.otsi.retail.promotions.vo.BenfitVo;
-import com.otsi.retail.promotions.vo.PromotionPoolVo;
+import com.otsi.retail.promotions.vo.BarcodeTextileVo;
+import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
-import com.otsi.retail.promotions.vo.LineItemVo;
+import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
-import com.otsi.retail.promotions.vo.Pool_RuleVo;
 import com.otsi.retail.promotions.vo.SearchPromotionsVo;
 import com.otsi.retail.promotions.vo.StoreVo;
 
@@ -85,9 +79,12 @@ public class PromotionServiceImpl implements PromotionService {
 	@Autowired
 	private RestTemplate template;
 
-	@Autowired
-	private PromoBarcodeEntityRepository promoBarcodeRepo;
 
+	@Autowired
+	private CheckPoolRules checkPoolRules;
+
+	@Autowired
+	private CalculateBenifits calculateBenifits;
 
 	// Method for adding promotion to pools
 	@Override
@@ -166,7 +163,7 @@ public class PromotionServiceImpl implements PromotionService {
 		if (vo.getPoolVo() == null) {
 			throw new InvalidDataException("please enter valid data");
 		}
-		
+
 		Optional<PromotionsEntity> promotion = promoRepo.findById(vo.getPromoId());
 
 		if (promotion.isPresent()) {
@@ -175,7 +172,6 @@ public class PromotionServiceImpl implements PromotionService {
 			List<Long> poolIds = poolVo.stream().map(x -> x.getPoolId()).collect(Collectors.toList());
 
 			List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
-
 
 			if ((poolVo.size() == poolList.size())) {
 
@@ -248,9 +244,11 @@ public class PromotionServiceImpl implements PromotionService {
 		entity.setStoreId(storeId);
 		entity.setPriority(vo.getPriority());
 		entity.setCreatedBy(vo.getCreatedBy());
-		entity.setPromotionStartDate(vo.getPromotionStartDate());	
-		entity.setPromotionEndDate(vo.getPromotionEndDate());;
-		entity.setPromotionStatus(vo.getIsActive());		
+		entity.setPromotionStartDate(vo.getPromotionStartDate());
+		entity.setPromotionEndDate(vo.getPromotionEndDate());
+		// mapping promoId
+		// entity.setPromoId(promotionEntity);;
+		entity.setPromotionStatus(vo.getIsActive());
 		promostoreRepo.save(entity);
 
 		return "Promotion Mapped Successfully";
@@ -269,23 +267,23 @@ public class PromotionServiceImpl implements PromotionService {
 				promoDetails = promoRepo.findByPromotionStartDateAndPromotionEndDateAndPromotionNameAndIsActive(
 						vo.getPromotionStartDate(), vo.getPromotionEndDate(), vo.getPromotionName(), vo.getIsActive());
 			} else if (vo.getPromotionName() == null) {
-				promoDetails = promoRepo.findByPromotionStartDateAndPromotionEndDateAndIsActive(vo.getPromotionStartDate(),
-						vo.getPromotionEndDate(), vo.getIsActive());
+				promoDetails = promoRepo.findByPromotionStartDateAndPromotionEndDateAndIsActive(
+						vo.getPromotionStartDate(), vo.getPromotionEndDate(), vo.getIsActive());
 
 			} else if (vo.getPromotionName() != null) {
-				promoDetails = promoRepo.findByPromotionStartDateAndPromotionEndDateAndPromotionNameAndIsActive(vo.getPromotionStartDate(),
-						vo.getPromotionEndDate(), vo.getPromotionName(), vo.getIsActive());
+				promoDetails = promoRepo.findByPromotionStartDateAndPromotionEndDateAndPromotionNameAndIsActive(
+						vo.getPromotionStartDate(), vo.getPromotionEndDate(), vo.getPromotionName(), vo.getIsActive());
 
 			} else
-				promoDetails = promoRepo.findByPromotionStartDateAndPromotionEndDateAndIsActive(vo.getPromotionStartDate(), vo.getPromotionEndDate(),
-						vo.getIsActive());
+				promoDetails = promoRepo.findByPromotionStartDateAndPromotionEndDateAndIsActive(
+						vo.getPromotionStartDate(), vo.getPromotionEndDate(), vo.getIsActive());
 
 		} else if (vo.getPromotionStartDate() == null && vo.getPromotionEndDate() == null) {
 			if (vo.getPromotionName() != null) {
 				promoDetails = promoRepo.findByPromotionName(vo.getPromotionName());
 				// promoDetails.add(promoEntity);
 
-			} 
+			}
 
 			else
 				promoDetails = promoRepo.findByIsActive(vo.getIsActive());
@@ -316,7 +314,6 @@ public class PromotionServiceImpl implements PromotionService {
 		return searchPromoVo;
 	}
 
-
 	@Override
 	public String updatePromotionDates(SearchPromotionsVo vo) {
 		if (vo == null) {
@@ -327,9 +324,9 @@ public class PromotionServiceImpl implements PromotionService {
 
 		if (Objects.nonNull(vo.getPromotionStartDate()) && Objects.nonNull(vo.getPromotionEndDate())
 				&& Objects.nonNull(vo.getIsActive())) {
-			dto.setPromoId(vo.getPromoId());
+			// dto.setPromoId(vo.getPromoId());
 			dto.setPromotionStartDate(vo.getPromotionStartDate());
-			
+
 			dto.setPromotionEndDate(vo.getPromotionEndDate());
 			dto.setPromotionStatus(vo.getIsActive());
 		}
@@ -351,63 +348,43 @@ public class PromotionServiceImpl implements PromotionService {
 		PromotionsEntity newDto = new PromotionsEntity();
 		PromotionToStoreEntity promoStore = new PromotionToStoreEntity();
 
-			BeanUtils.copyProperties(dto, newDto);
-			newDto.setPromotionStartDate(dto.get().getPromotionStartDate());
-			newDto.setPromotionEndDate(dto.get().getPromotionEndDate());
-			newDto.setPromotionName(dto.get().getPromotionName());
-			newDto.setIsActive(true);
-			newDto.setDomainId(dto.get().getDomainId());
-			newDto.setCreatedBy(dto.get().getCreatedBy());
-			newDto.setCreatedDate(LocalDate.now());
-			newDto.setDescription(dto.get().getDescription());
-			newDto.setPromoApplyType(dto.get().getPromoApplyType());
-			newDto.setIsTaxExtra(dto.get().getIsTaxExtra());
-			newDto.setLastModified(LocalDate.now());
-			newDto.setPrintNameOnBill(dto.get().getPrintNameOnBill());
-			newDto.setApplicability(dto.get().getApplicability());
-			newDto.setBuyItemsFromPool(dto.get().getBuyItemsFromPool());
+		BeanUtils.copyProperties(dto, newDto);
+		newDto.setPromotionStartDate(dto.get().getPromotionStartDate());
+		newDto.setPromotionEndDate(dto.get().getPromotionEndDate());
+		newDto.setPromotionName(dto.get().getPromotionName());
+		newDto.setIsActive(true);
+		newDto.setDomainId(dto.get().getDomainId());
+		newDto.setCreatedBy(dto.get().getCreatedBy());
+		newDto.setCreatedDate(LocalDate.now());
+		newDto.setDescription(dto.get().getDescription());
+		newDto.setPromoApplyType(dto.get().getPromoApplyType());
+		newDto.setIsTaxExtra(dto.get().getIsTaxExtra());
+		newDto.setLastModified(LocalDate.now());
+		newDto.setPrintNameOnBill(dto.get().getPrintNameOnBill());
+		newDto.setApplicability(dto.get().getApplicability());
+		newDto.setBuyItemsFromPool(dto.get().getBuyItemsFromPool());
 
-			List<BenfitEntity> benfits = new ArrayList<>();
+		List<BenfitEntity> benfits = new ArrayList<>();
 
-			dto.get().getBenfitEntity().stream().forEach(b -> {
-				BenfitEntity benfit = new BenfitEntity();
-				benfit.setBenfitType(b.getBenfitType());
-				benfit.setDiscountType(b.getDiscountType());
-				benfit.setDiscount(b.getDiscount());
-				benfit.setNumOfItemsFromBuyPool(b.getNumOfItemsFromBuyPool());
-				benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
-				benfit.setItemValue(b.getItemValue());
-				benfit.setPercentageDiscountOn(b.getPercentageDiscountOn());
-				benfit.setPoolId(b.getPoolId());
-				benfit.setPoolName(b.getPoolName());
-				benfits.add(benfit);
-			});
-			newDto.setBenfitEntity(benfits);
-			promoRepo.save(newDto);
+		dto.get().getBenfitEntity().stream().forEach(b -> {
+			BenfitEntity benfit = new BenfitEntity();
+			benfit.setBenfitType(b.getBenfitType());
+			benfit.setDiscountType(b.getDiscountType());
+			benfit.setDiscount(b.getDiscount());
+			benfit.setNumOfItemsFromBuyPool(b.getNumOfItemsFromBuyPool());
+			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
+			benfit.setItemValue(b.getItemValue());
+			benfit.setDiscountSubTypes(b.getDiscountSubTypes());
+			benfit.setPoolId(b.getPoolId());
+			benfit.setPoolName(b.getPoolName());
+			benfits.add(benfit);
+		});
+		newDto.setBenfitEntity(benfits);
+		promoRepo.save(newDto);
 
 		return "Promotion Cloned Successfully";
 	}
 
-	// Method for adding promotion to product
-	@Override
-	public String addPromtionToBarcode(Long promoId, String barcode) {
-
-		PromotionsEntity promo = promoRepo.findByPromoId(promoId);
-
-		if (promo != null) {
-
-			PromoBarcodeEntity entity = new PromoBarcodeEntity();
-			entity.setPromoId(promoId);
-			entity.setBarCode(barcode);
-
-			promoBarcodeRepo.save(entity);
-
-		} else {
-			return "Promotion is not valid";
-		}
-
-		return "Successfully add promotion to Barcode";
-	}
 
 	@Override
 	public List<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo) {
@@ -419,19 +396,21 @@ public class PromotionServiceImpl implements PromotionService {
 
 			if ((svo.getPromoId() != null)) {
 
-				promotionsList = promoRepo.findByPromotionStartDateAndPromotionEndDateAndPromoId(svo.getPromotionStartDate(),
-						svo.getPromotionEndDate(), svo.getPromoId());
+				promotionsList = promoRepo.findByPromotionStartDateAndPromotionEndDateAndPromoId(
+						svo.getPromotionStartDate(), svo.getPromotionEndDate(), svo.getPromoId());
 
 			} else if ((svo.getPromoId() == null)) {
-				promotionsList = promoRepo.findByPromotionStartDateAndPromotionEndDate(svo.getPromotionStartDate(), svo.getPromotionEndDate());
+				promotionsList = promoRepo.findByPromotionStartDateAndPromotionEndDate(svo.getPromotionStartDate(),
+						svo.getPromotionEndDate());
 			} else if (svo.getPromoId() != null) {
 
-				promotionsList = promoRepo.findByPromotionStartDateAndPromotionEndDateAndPromoId(svo.getPromotionStartDate(), svo.getPromotionEndDate(),
-						svo.getPromoId());
+				promotionsList = promoRepo.findByPromotionStartDateAndPromotionEndDateAndPromoId(
+						svo.getPromotionStartDate(), svo.getPromotionEndDate(), svo.getPromoId());
 
 			} else {
 
-				promotionsList = promoRepo.findByPromotionStartDateAndPromotionEndDate(svo.getPromotionStartDate(), svo.getPromotionEndDate());
+				promotionsList = promoRepo.findByPromotionStartDateAndPromotionEndDate(svo.getPromotionStartDate(),
+						svo.getPromotionEndDate());
 			}
 
 		} else if ((svo.getPromotionStartDate() == null) && (svo.getPromotionEndDate() == null)) {
@@ -462,7 +441,7 @@ public class PromotionServiceImpl implements PromotionService {
 	}
 
 	@Override
-	public String saveBenfit(BenfitVo vo) {
+	public String saveBenfit(BenefitVo vo) {
 
 		BenfitEntity entity = new BenfitEntity();
 		BeanUtils.copyProperties(vo, entity);
@@ -496,5 +475,79 @@ public class PromotionServiceImpl implements PromotionService {
 		return rvo;
 	}
 
+	@Override
+	public List<BarcodeTextileVo> checkPromtion(List<BarcodeTextileVo> listofInvTxt, Long storeId, Long domainId) {
+
+		List<PromotionToStoreEntity> activePromos = promostoreRepo.findByStoreIdAndPromotionStatus(storeId, true);
+		System.out.println("Active Promo List::" + activePromos.toString());
+
+		List<Long> promoids = activePromos.stream().map(promo -> promo.getPromoId()).collect(Collectors.toList());
+
+		System.out.println("List Of Promo Ids:: " + promoids);
+
+		List<PromotionsEntity> listOfPromos = promoRepo.findByPromoIdInAndApplicability(promoids,
+				Applicability.promotionForEachBarcode);
+		listofInvTxt.stream().forEach(barcodevo -> {
+
+			listOfPromos.stream().forEach(p -> {
+
+				PromotionSlabsEntity checkPromoApplyTypeForSlabs = checkPromoApplyTypeForSlabs(p, barcodevo);
+
+				if (checkPromoApplyTypeForSlabs != null) {
+
+					if (checkPoolRules.checkPools(p.getPoolEntity(), barcodevo))
+						barcodevo.setCalculatedDiscountsVo(calculateBenifits.calculate(
+								promoMapper.convertBenfitEntityToVo(checkPromoApplyTypeForSlabs.getBenfitEntity()),
+								barcodevo));
+
+				} else if (checkPromoApplyType(p, barcodevo)) {
+
+					if (checkPoolRules.checkPools(p.getPoolEntity(), barcodevo))
+						barcodevo.setCalculatedDiscountsVo(calculateBenifits.calculate(
+								promoMapper.convertBenfitEntityToVo((BenfitEntity[]) p.getBenfitEntity().toArray()),
+								barcodevo));
+
+				}
+
+			});
+
+		});
+
+		return listofInvTxt;
+	}
+
+	private boolean checkPromoApplyType(PromotionsEntity promoEntity, BarcodeTextileVo barcodeVo) {
+
+		if (promoEntity.getPromoApplyType().equals(PromoApplyType.FixedQuantity)
+				&& promoEntity.getBuyItemsFromPool() >= barcodeVo.getProductTextile().getQty())
+			return true;
+
+		if (promoEntity.getPromoApplyType().equals(PromoApplyType.AnyQuantity)
+				&& barcodeVo.getProductTextile().getQty() > 0)
+			return true;
+
+		return false;
+	}
+
+	private PromotionSlabsEntity checkPromoApplyTypeForSlabs(PromotionsEntity promoEntity, BarcodeTextileVo barcodeVo) {
+
+		if (promoEntity.getPromoApplyType().equals(PromoApplyType.QuantitySlab)
+				|| promoEntity.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
+
+			for (PromotionSlabsEntity slab : promoEntity.getPromotionSlabEntity()) {
+				if (barcodeVo.getProductTextile().getQty() >= slab.getToSlab()
+						&& barcodeVo.getProductTextile().getQty() <= slab.getFromSlab()) {
+					if (slab.getBenfitEntity() == null)
+						return null;
+
+					return slab;
+				}
+
+			}
+
+		}
+
+		return null;
+	}
 
 }

@@ -1,46 +1,38 @@
-/**
- * 
- */
 package com.otsi.retail.promotions.vo;
 
 import com.otsi.retail.promotions.common.BenfitType;
 import com.otsi.retail.promotions.common.DiscountType;
 import com.otsi.retail.promotions.common.ItemValue;
-import com.otsi.retail.promotions.common.PercentageDiscountOn;
+import com.otsi.retail.promotions.common.DiscountSubTypes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * @author Sudheer.Swamy
- *
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BenfitVo {
-
-	private Long benfitId;
-
+public class BenefitVo {
+	
+	private Long benfitId;	
 	private BenfitType benfitType;
-
 	private DiscountType discountType;
-
 	private String discount;
-
-	private PercentageDiscountOn percentageDiscountOn;
-	
-    private Long numOfItemsFromBuyPool;
-	
 	private ItemValue itemValue;
-	
+	private Long numOfItemsFromBuyPool;
 	private Long numOfItemsFromGetPool;
+	private DiscountSubTypes discountSubType;
 	
-    private Long poolId;
-	
+	private Long poolId;
 	private String poolName;
 	
-    private PromotionSlabsVo promoSlabVo;
+
+
+
+
+
+
+	
+	
 
 }

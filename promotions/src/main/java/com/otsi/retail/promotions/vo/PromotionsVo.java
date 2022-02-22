@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.otsi.retail.promotions.common.Applicability;
 import com.otsi.retail.promotions.common.PromoApplyType;
 import com.otsi.retail.promotions.common.PromotionType;
+import com.otsi.retail.promotions.entity.PromotionSlabsEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -70,6 +71,8 @@ public class PromotionsVo {
 
 	private StoreVo storeVo;
 	
-	private List<BenfitVo> benfitVo;
+	private List<BenefitVo> benfitVo;
+	
+	private List<PromotionSlabsVo> promotionSlabVo;
 
 }

@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.otsi.retail.promotions.vo.BenfitVo;
+import com.otsi.retail.promotions.vo.BarcodeTextileVo;
+import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
@@ -31,13 +32,17 @@ public interface PromotionService {
 	String updatePromotionDates(SearchPromotionsVo vo);
 	
 	String clonePromotionByStore(SearchPromotionsVo vo);
-
-	String addPromtionToBarcode(Long promoId, String barcode);
 	
 	List<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo);
 	
-	String saveBenfit(BenfitVo vo);
+	String saveBenfit(BenefitVo vo);
 	
 	List<ReportVo> activeVSinactivePromos();
+
+	List<BarcodeTextileVo> checkPromtion(List<BarcodeTextileVo> listofInvTxt, Long storeId, Long domainId);
+	
+	
+	
+	
 	
 }

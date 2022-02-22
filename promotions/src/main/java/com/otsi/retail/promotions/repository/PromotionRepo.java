@@ -2,18 +2,23 @@ package com.otsi.retail.promotions.repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.otsi.retail.promotions.common.PromotionStatus;
+import com.otsi.retail.promotions.common.Applicability;
 import com.otsi.retail.promotions.entity.PromotionsEntity;
 
 @Repository
 public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	List<PromotionsEntity> findByIsActive(Boolean status);
+	
+//	@Query(value = "SELECT * FROM  PromotionsEntity p WHERE p.id IN (:promoIds)")
+//	List<PromotionsEntity> getAllPromotions(@Param("promoIds") List<Long> promoIds);
+	
 
 	void deleteByPromoId(Long id);
 
@@ -24,6 +29,7 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 	PromotionsEntity findByPromotionNameIs(String promoName);
 
 	PromotionsEntity findByPromoId(Long promoId);
+	
 
 	// boolean existsByStoreName(String storeName);
 
@@ -44,6 +50,8 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	List<PromotionsEntity> findByPromotionStartDateAndPromotionEndDate(LocalDate promotionStartDate,
 			LocalDate promotionEndDate);
+
+	List<PromotionsEntity> findByPromoIdInAndApplicability(List<Long> promoids, Applicability applicability);
 
 	
 }

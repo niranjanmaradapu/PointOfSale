@@ -1,8 +1,6 @@
 package com.otsi.retail.promotions.entity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -15,7 +13,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "promotion_store_mappings")
+@Table(name = "pos_promotion_store_mappings")
 public class PromotionToStoreEntity {
 	
 	@Id
@@ -23,6 +21,7 @@ public class PromotionToStoreEntity {
 	private Long id;
 	
 	private Long promoId;
+	
 
 	private Long storeId;
 

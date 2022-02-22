@@ -5,7 +5,6 @@ package com.otsi.retail.promotions.entity;
 
 import java.time.LocalDate;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,7 +20,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import com.otsi.retail.promotions.common.BenfitType;
 import com.otsi.retail.promotions.common.DiscountType;
 import com.otsi.retail.promotions.common.ItemValue;
-import com.otsi.retail.promotions.common.PercentageDiscountOn;
+import com.otsi.retail.promotions.common.DiscountSubTypes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +34,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "promotion_benfits")
+@Table(name = "pos_promotion_benfits")
 public class BenfitEntity {
 
 	@Id
@@ -48,7 +47,7 @@ public class BenfitEntity {
 
 	private String discount;
 
-	private PercentageDiscountOn percentageDiscountOn;
+	private DiscountSubTypes discountSubTypes;
 	
     private Long numOfItemsFromGetPool;
 	
@@ -61,17 +60,18 @@ public class BenfitEntity {
 	private String poolName;
 	
 	@CreationTimestamp
-	private LocalDate createdat;
+	private LocalDate createdAt;
 	
 	@UpdateTimestamp
-	private LocalDate updatedat;
+	private LocalDate updatedAt;
 	
 	@ManyToOne
 	@JoinColumn(name = "promoId")
 	private PromotionsEntity promotionEntity;
 	
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "promotionSlabId")
-	private PromotionSlabsEntity promotionSlabEntity;
+	@OneToOne(mappedBy = "benfitEntity")
+	private PromotionSlabsEntity promotionSlabsEntity;
+	
 
+	
 }
