@@ -40,9 +40,5 @@ public interface PromotionService {
 	List<ReportVo> activeVSinactivePromos();
 
 	List<BarcodeTextileVo> checkPromtion(List<BarcodeTextileVo> listofInvTxt, Long storeId, Long domainId);
-	
-	
-	
-	
-	
+		
 }

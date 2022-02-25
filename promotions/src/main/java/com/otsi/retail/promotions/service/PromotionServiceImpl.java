@@ -492,19 +492,23 @@ public class PromotionServiceImpl implements PromotionService {
 			listOfPromos.stream().forEach(p -> {
 
 				PromotionSlabsEntity checkPromoApplyTypeForSlabs = checkPromoApplyTypeForSlabs(p, barcodevo);
+				
 
 				if (checkPromoApplyTypeForSlabs != null) {
+					
+					List<BenfitEntity> benList = new ArrayList<>();
+					benList.add(checkPromoApplyTypeForSlabs.getBenfitEntity());
 
 					if (checkPoolRules.checkPools(p.getPoolEntity(), barcodevo))
 						barcodevo.setCalculatedDiscountsVo(calculateBenifits.calculate(
-								promoMapper.convertBenfitEntityToVo(checkPromoApplyTypeForSlabs.getBenfitEntity()),
+								promoMapper.convertBenfitEntityToVo(benList),
 								barcodevo));
 
 				} else if (checkPromoApplyType(p, barcodevo)) {
 
 					if (checkPoolRules.checkPools(p.getPoolEntity(), barcodevo))
 						barcodevo.setCalculatedDiscountsVo(calculateBenifits.calculate(
-								promoMapper.convertBenfitEntityToVo((BenfitEntity[]) p.getBenfitEntity().toArray()),
+								promoMapper.convertBenfitEntityToVo(p.getBenfitEntity()),
 								barcodevo));
 
 				}
@@ -519,7 +523,7 @@ public class PromotionServiceImpl implements PromotionService {
 	private boolean checkPromoApplyType(PromotionsEntity promoEntity, BarcodeTextileVo barcodeVo) {
 
 		if (promoEntity.getPromoApplyType().equals(PromoApplyType.FixedQuantity)
-				&& promoEntity.getBuyItemsFromPool() >= barcodeVo.getProductTextile().getQty())
+				&&  barcodeVo.getProductTextile().getQty() >= promoEntity.getBuyItemsFromPool()  )
 			return true;
 
 		if (promoEntity.getPromoApplyType().equals(PromoApplyType.AnyQuantity)
@@ -535,8 +539,8 @@ public class PromotionServiceImpl implements PromotionService {
 				|| promoEntity.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
 
 			for (PromotionSlabsEntity slab : promoEntity.getPromotionSlabEntity()) {
-				if (barcodeVo.getProductTextile().getQty() >= slab.getToSlab()
-						&& barcodeVo.getProductTextile().getQty() <= slab.getFromSlab()) {
+				if (barcodeVo.getProductTextile().getQty() >= slab.getFromSlab()
+						&& barcodeVo.getProductTextile().getQty() <= slab.getToSlab()) {
 					if (slab.getBenfitEntity() == null)
 						return null;
 

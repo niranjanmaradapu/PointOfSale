@@ -2,6 +2,7 @@ package com.otsi.retail.promotions.mapper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -185,25 +186,25 @@ public class PromotionMapper {
 		return listOfPromoVos;
 	}
 	
-	public List<BenefitVo> convertBenfitEntityToVo(BenfitEntity... beArray )
+	public List<BenefitVo> convertBenfitEntityToVo(List<BenfitEntity>  benefitEntities)
 	{
 		
-		List< BenefitVo> list = new ArrayList<>();
-	
-		for (int i = 0; i < beArray.length; i++) {
-			
+		List<BenefitVo> list = new ArrayList<>();
+		
+		for (BenfitEntity benfitEntity : benefitEntities) {
+
            BenefitVo bvo = new BenefitVo();
            
-			bvo.setBenfitId(beArray[i].getBenfitId());
-			bvo.setBenfitType(beArray[i].getBenfitType());
-			bvo.setDiscount(beArray[i].getDiscount());
-			bvo.setDiscountType(beArray[i].getDiscountType());
-			bvo.setDiscountSubType(beArray[i].getDiscountSubTypes());
-			bvo.setItemValue(beArray[i].getItemValue());
-			bvo.setNumOfItemsFromBuyPool(beArray[i].getNumOfItemsFromBuyPool());
-			bvo.setNumOfItemsFromGetPool(beArray[i].getNumOfItemsFromGetPool());
-			bvo.setPoolId(beArray[i].getPoolId());
-			bvo.setPoolName(beArray[i].getPoolName());
+			bvo.setBenfitId(benfitEntity.getBenfitId());
+			bvo.setBenfitType(benfitEntity.getBenfitType());
+			bvo.setDiscount(benfitEntity.getDiscount());
+			bvo.setDiscountType(benfitEntity.getDiscountType());
+			bvo.setDiscountSubType(benfitEntity.getDiscountSubTypes());
+			bvo.setItemValue(benfitEntity.getItemValue());
+			bvo.setNumOfItemsFromBuyPool(benfitEntity.getNumOfItemsFromBuyPool());
+			bvo.setNumOfItemsFromGetPool(benfitEntity.getNumOfItemsFromGetPool());
+			bvo.setPoolId(benfitEntity.getPoolId());
+			bvo.setPoolName(benfitEntity.getPoolName());
 			
 			list.add(bvo);
 			

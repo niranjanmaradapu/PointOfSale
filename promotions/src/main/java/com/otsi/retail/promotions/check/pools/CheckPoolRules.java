@@ -1,11 +1,12 @@
 package com.otsi.retail.promotions.check.pools;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.otsi.retail.promotions.common.ColumnName;
 import com.otsi.retail.promotions.common.Operator;
 import com.otsi.retail.promotions.entity.Condition;
 import com.otsi.retail.promotions.entity.PoolEntity;
@@ -14,8 +15,6 @@ import com.otsi.retail.promotions.vo.BarcodeTextileVo;
 
 @Component
 public class CheckPoolRules {
-
-	final private String dateFormat = "dd/mm/yyyy";
 
 	private boolean checkCondition(Condition condition, BarcodeTextileVo barcodeTextileVo) {
 
@@ -36,7 +35,7 @@ public class CheckPoolRules {
 			return checkLessThan(condition, barcodeTextileVo);
 
 		case GreaterThanOrEquals:
-			return checkGreaterThanAndEquals(condition, barcodeTextileVo);
+			return checkGreaterThanOrEquals(condition, barcodeTextileVo);
 
 		case LessThanOrEquals:
 			return checkLessThanAndEquals(condition, barcodeTextileVo);
@@ -53,15 +52,15 @@ public class CheckPoolRules {
 		switch (condition.getColumnName()) {
 
 		case Mrp:
-			return checkLessThanAndEqualsFloatDataTypeValues(condition,
+			return checkLessThanOrEqualsFloatDataTypeValues(condition,
 					barcodeTextileVo.getProductTextile().getItemMrp());
 
-		case BarcodeCreatedDate:
-			return checkLessThanAndEqualDateDataType(condition,
+		case BarcodeCreatedOn:
+			return checkLessThanOrEqualDateDataType(condition,
 					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
 
 		case BatchNo:
-			return checkLessThanAndEqualLongDataType(condition, barcodeTextileVo.getBatchNo());
+			return checkLessThanOrEqualLongDataType(condition, barcodeTextileVo.getBatchNo());
 		default:
 			return false;
 
@@ -69,60 +68,66 @@ public class CheckPoolRules {
 
 	}
 
-	private boolean checkLessThanAndEqualLongDataType(Condition condition, String batchNo) {
-		if (Long.valueOf(batchNo).longValue() <= Long.valueOf(condition.getGivenValues().get(0)).longValue())
+	private boolean checkLessThanOrEqualLongDataType(Condition condition, String batchNo) {
+
+		if (Long.valueOf(batchNo).longValue() <= Long.parseLong(condition.getGivenValues().get(0)))
 			return true;
 		return false;
 	}
 
-	private boolean checkLessThanAndEqualDateDataType(Condition condition, LocalDate originalBarcodeCreatedAt) {
-		LocalDate parse = LocalDate.parse(condition.getGivenValues().get(0), DateTimeFormatter.ofPattern(dateFormat));
-		if (originalBarcodeCreatedAt.isBefore(parse) || originalBarcodeCreatedAt.isEqual(parse))
+	private boolean checkLessThanOrEqualDateDataType(Condition condition, LocalDate originalBarcodeCreatedAt) {
+		LocalDate givenDate = LocalDate.parse(condition.getGivenValues().get(0));
+
+		if (originalBarcodeCreatedAt.isBefore(givenDate) || originalBarcodeCreatedAt.isEqual(givenDate))
 			return true;
 		return false;
 	}
 
-	private boolean checkLessThanAndEqualsFloatDataTypeValues(Condition condition, float purchasedValue) {
-		if (Float.valueOf(condition.getGivenValues().get(0)).floatValue() <= purchasedValue)
+	private boolean checkLessThanOrEqualsFloatDataTypeValues(Condition condition, float purchasedValue) {
+		if (purchasedValue <= Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 			return true;
 
 		return false;
 	}
 
-	private boolean checkGreaterThanAndEquals(Condition condition, BarcodeTextileVo barcodeTextileVo) {
+	private boolean checkGreaterThanOrEquals(Condition condition, BarcodeTextileVo barcodeTextileVo) {
 		switch (condition.getColumnName()) {
 
 		case Mrp:
-			return checkGreaterThanAndEqualsFloatDataTypeValues(condition,
+			return checkGreaterThanOrEqualsFloatDataTypeValues(condition,
 					barcodeTextileVo.getProductTextile().getItemMrp());
 
-		case BarcodeCreatedDate:
-			return checkGreaterThanAndEqualDateDataType(condition,
+		case BarcodeCreatedOn:
+			return checkGreaterThanOrEqualDateDataType(condition,
 					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
 
 		case BatchNo:
-			return checkGreaterThanAndEqualLongDataType(condition, barcodeTextileVo.getBatchNo());
+			return checkGreaterThanOrEqualLongDataType(condition, barcodeTextileVo.getBatchNo());
 		default:
 			return false;
 		}
 
 	}
 
-	private boolean checkGreaterThanAndEqualDateDataType(Condition condition, LocalDate originalBarcodeCreatedAt) {
-		LocalDate parse = LocalDate.parse(condition.getGivenValues().get(0), DateTimeFormatter.ofPattern(dateFormat));
-		if (originalBarcodeCreatedAt.isAfter(parse) || originalBarcodeCreatedAt.isEqual(parse))
+	private boolean checkGreaterThanOrEqualDateDataType(Condition condition, LocalDate originalBarcodeCreatedAt) {
+		LocalDate givenDate = LocalDate.parse(condition.getGivenValues().get(0));
+		if (originalBarcodeCreatedAt.isAfter(givenDate) || originalBarcodeCreatedAt.isEqual(givenDate))
 			return true;
 		return false;
 	}
 
-	private boolean checkGreaterThanAndEqualLongDataType(Condition condition, String batchNo) {
-		if (Long.valueOf(batchNo).longValue() >= Long.valueOf(condition.getGivenValues().get(0)).longValue())
+	 
+	
+	private boolean checkGreaterThanOrEqualLongDataType(Condition condition, String batchNo)
+			throws NumberFormatException {
+
+		if (Long.valueOf(batchNo).longValue() >= Long.parseLong(condition.getGivenValues().get(0)))
 			return true;
 		return false;
 	}
 
-	private boolean checkGreaterThanAndEqualsFloatDataTypeValues(Condition condition, float purchasedValue) {
-		if (Float.valueOf(condition.getGivenValues().get(0)).floatValue() >= purchasedValue)
+	private boolean checkGreaterThanOrEqualsFloatDataTypeValues(Condition condition, float purchasedValue) {
+		if (purchasedValue >= Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 			return true;
 
 		return false;
@@ -135,7 +140,7 @@ public class CheckPoolRules {
 		case Mrp:
 			return checkLessThanFloatDataTypeValues(condition, barcodeTextileVo.getProductTextile().getItemMrp());
 
-		case BarcodeCreatedDate:
+		case BarcodeCreatedOn:
 
 			return checkLessThanDateDataType(condition,
 					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
@@ -153,7 +158,7 @@ public class CheckPoolRules {
 	private boolean checkLessThanDateDataType(Condition condition, LocalDate originalBarcodeCreatedAt) {
 
 		if (originalBarcodeCreatedAt
-				.isBefore(LocalDate.parse(condition.getGivenValues().get(0), DateTimeFormatter.ofPattern(dateFormat))))
+				.isBefore(LocalDate.parse(condition.getGivenValues().get(0))))
 			return true;
 
 		return false;
@@ -161,13 +166,14 @@ public class CheckPoolRules {
 
 	private boolean checkLessThanLongDataType(Condition condition, String batchNo) {
 
-		if (Long.valueOf(batchNo).longValue() < Long.valueOf(condition.getGivenValues().get(0)).longValue())
+		if (Long.valueOf(batchNo).longValue() < Long.parseLong(condition.getGivenValues().get(0)))
 			return true;
+
 		return false;
 	}
 
 	private boolean checkLessThanFloatDataTypeValues(Condition condition, float purchasedValue) {
-		if (Float.valueOf(condition.getGivenValues().get(0)).floatValue() < purchasedValue)
+		if (purchasedValue < Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 			return true;
 
 		return false;
@@ -180,7 +186,7 @@ public class CheckPoolRules {
 		case Mrp:
 			return checkGreaterThanFloatDataTypeValues(condition, barcodeTextileVo.getProductTextile().getItemMrp());
 
-		case BarcodeCreatedDate:
+		case BarcodeCreatedOn:
 
 			return checkGreaterThanDateDataType(condition,
 					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
@@ -196,7 +202,8 @@ public class CheckPoolRules {
 	}
 
 	private boolean checkGreaterThanLongDataType(Condition condition, String batchNo) {
-		if (Long.valueOf(batchNo).longValue() > Long.valueOf(condition.getGivenValues().get(0)).longValue())
+
+		if (Long.valueOf(batchNo).longValue() > Long.parseLong(condition.getGivenValues().get(0)))
 			return true;
 
 		return false;
@@ -205,14 +212,14 @@ public class CheckPoolRules {
 	private boolean checkGreaterThanDateDataType(Condition condition, LocalDate originalBarcodeCreatedAt) {
 
 		if (originalBarcodeCreatedAt
-				.isAfter(LocalDate.parse(condition.getGivenValues().get(0), DateTimeFormatter.ofPattern(dateFormat))))
+				.isAfter(LocalDate.parse(condition.getGivenValues().get(0))))
 			return true;
 
 		return false;
 	}
 
 	private boolean checkGreaterThanFloatDataTypeValues(Condition condition, float purchasedValue) {
-		if (Float.valueOf(condition.getGivenValues().get(0)).floatValue() > purchasedValue)
+		if (purchasedValue > Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 			return true;
 		return false;
 	}
@@ -224,7 +231,7 @@ public class CheckPoolRules {
 		case Mrp:
 			return checkNotEqualsFloatDataTypeValues(condition, barcodeTextileVo.getProductTextile().getItemMrp());
 
-		case BarcodeCreatedDate:
+		case BarcodeCreatedOn:
 
 			return checkNotEqualsDateDataType(condition,
 					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
@@ -240,7 +247,7 @@ public class CheckPoolRules {
 
 	private boolean checkNotEqualsLongDataType(Condition condition, String batchNo) {
 
-		if (Long.valueOf(batchNo).longValue() != Long.valueOf(condition.getGivenValues().get(0)).longValue())
+		if (Long.valueOf(batchNo).longValue() != Long.parseLong(condition.getGivenValues().get(0)))
 			return true;
 
 		return false;
@@ -249,14 +256,14 @@ public class CheckPoolRules {
 	private boolean checkNotEqualsDateDataType(Condition condition, LocalDate originalBarcodeCreatedAt) {
 
 		if (!originalBarcodeCreatedAt
-				.isEqual(LocalDate.parse(condition.getGivenValues().get(0), DateTimeFormatter.ofPattern(dateFormat))))
+				.isEqual(LocalDate.parse(condition.getGivenValues().get(0))))
 			return true;
 
 		return false;
 	}
 
 	private boolean checkNotEqualsFloatDataTypeValues(Condition condition, float purchasedValue) {
-		if (Float.valueOf(condition.getGivenValues().get(0)).floatValue() != purchasedValue)
+		if (purchasedValue != Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 			return true;
 
 		return false;
@@ -269,7 +276,7 @@ public class CheckPoolRules {
 		case Mrp:
 			return checkEqualsFloatDataTypeValues(condition, barcodeTextileVo.getProductTextile().getItemMrp());
 
-		case BarcodeCreatedDate:
+		case BarcodeCreatedOn:
 
 			return checkEqualsOnDateDataTypeValues(condition,
 					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
@@ -285,8 +292,8 @@ public class CheckPoolRules {
 	}
 
 	private boolean checkEqualsOnDateDataTypeValues(Condition condition, LocalDate originalBarcodeCreatedAt) {
-		if (originalBarcodeCreatedAt
-				.isEqual(LocalDate.parse(condition.getGivenValues().get(0), DateTimeFormatter.ofPattern(dateFormat))))
+
+		if (originalBarcodeCreatedAt.isEqual(LocalDate.parse(condition.getGivenValues().get(0))))
 			return true;
 
 		return false;
@@ -294,7 +301,7 @@ public class CheckPoolRules {
 
 	private boolean checkEqualsOnBatchNumberData(Condition condition, String batchNo) {
 
-		if (Long.valueOf(batchNo).longValue() == Long.valueOf(condition.getGivenValues().get(0)).longValue())
+		if (Long.valueOf(batchNo).longValue() == Long.parseLong(condition.getGivenValues().get(0)))
 			return true;
 
 		return false;
@@ -341,5 +348,6 @@ public class CheckPoolRules {
 		return false;
 
 	}
+
 
 }
