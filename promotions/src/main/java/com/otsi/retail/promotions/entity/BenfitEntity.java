@@ -55,10 +55,6 @@ public class BenfitEntity {
 	
 	private ItemValue itemValue;
 	
-	private Long poolId;
-	
-	private String poolName;
-	
 	@CreationTimestamp
 	private LocalDate createdAt;
 	

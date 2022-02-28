@@ -92,6 +92,8 @@ public class PoolMapper {
 	public List<PromotionPoolVo> convertPoolEntityToVo(List<PoolEntity> poolEntity) {
 
 		List<PromotionPoolVo> listOfPool = new ArrayList<>();
+		List<Pool_RuleVo> pool_RuleVo = new ArrayList<>();
+		List<ConditionVo> conditionsVo = new ArrayList<>();
 
 		poolEntity.stream().forEach(x -> {
 
@@ -105,11 +107,6 @@ public class PoolMapper {
 			vo.setPoolType(x.getPoolType());
 			vo.setIsActive(x.getIsActive());
 			vo.setLastModified(x.getLastModified());
-			listOfPool.add(vo);
-
-			List<Pool_RuleVo> pool_RuleVo = new ArrayList<>();
-
-			List<ConditionVo> conditionsVo = new ArrayList<>();
 
 			x.getPool_Rule().stream().forEach(a -> {
 				Pool_RuleVo rule = new Pool_RuleVo();
@@ -127,13 +124,14 @@ public class PoolMapper {
 					condition.setGivenValues(cond.getGivenValues());
 					condition.setOperatorSymbol(cond.getOperatorSymbol());
 					conditionsVo.add(condition);
-
+					vo.setPool_RuleVo(pool_RuleVo);
 				});
+				
 				rule.setConditionVos(conditionsVo);
 				pool_RuleVo.add(rule);
-
 			});
-			vo.setPool_RuleVo(pool_RuleVo);
+			
+			listOfPool.add(vo);
 
 		});
 

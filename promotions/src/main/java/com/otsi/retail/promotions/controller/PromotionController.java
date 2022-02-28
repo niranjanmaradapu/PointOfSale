@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.otsi.retail.promotions.common.CommonRequestMappigs;
 import com.otsi.retail.promotions.gatewayresponse.GateWayResponse;
 import com.otsi.retail.promotions.service.PromotionService;
-import com.otsi.retail.promotions.vo.BarcodeTextileVo;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
+import com.otsi.retail.promotions.vo.ProductTextileVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
 import com.otsi.retail.promotions.vo.SearchPromotionsVo;
@@ -150,7 +150,7 @@ public class PromotionController {
 	}
 	
 	@PostMapping("/checkPromtionTextile")
-	public GateWayResponse<?> checkPromtionTextile(@RequestBody List<BarcodeTextileVo> listofInvTxt,
+	public GateWayResponse<?> checkPromtionTextile(@RequestBody List<ProductTextileVo> listofInvTxt,
 			                                @RequestParam Long storeId,
 			                                @RequestParam Long domainId) {
 		return new GateWayResponse<>("", promoService.checkPromtion(listofInvTxt,storeId,domainId));

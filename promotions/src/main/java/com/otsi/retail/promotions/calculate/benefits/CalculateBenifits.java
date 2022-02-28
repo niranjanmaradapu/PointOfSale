@@ -8,16 +8,16 @@ import com.otsi.retail.promotions.common.BenfitType;
 import com.otsi.retail.promotions.common.DiscountSubTypes;
 import com.otsi.retail.promotions.common.DiscountType;
 import com.otsi.retail.promotions.common.ItemValue;
-import com.otsi.retail.promotions.vo.BarcodeTextileVo;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.CalculatedDiscountsVo;
+import com.otsi.retail.promotions.vo.ProductTextileVo;
 
 @Component
 public class CalculateBenifits {
 
 	
 	
-	public CalculatedDiscountsVo calculate(List<BenefitVo> benifitVos,BarcodeTextileVo barcodeTextileVo) {
+	public CalculatedDiscountsVo calculate(List<BenefitVo> benifitVos,ProductTextileVo productTextileVo) {
 		
 		//Loop through benifitVos
 		CalculatedDiscountsVo calculatedDiscountsVo=new CalculatedDiscountsVo();
@@ -27,14 +27,14 @@ public class CalculateBenifits {
 			
 			
 			if(benifitVo.getBenfitType().equals(BenfitType.FlatDiscount)) {
-				calculatedDiscountsVo.setCalculatedDiscount(calculateBeniftForFlatDIscount(benifitVo,barcodeTextileVo));
+				calculatedDiscountsVo.setCalculatedDiscount(calculateBeniftForFlatDIscount(benifitVo,productTextileVo));
 			}
 			else if(benifitVo.getBenfitType().equals(BenfitType.XunitsFromBuyPool)) {
-				calculatedDiscountsVo.setCalculatedDiscountDetails(calculateBenifitsForXUnitsFromBuyPool(benifitVo,barcodeTextileVo));
+				calculatedDiscountsVo.setCalculatedDiscountDetails(calculateBenifitsForXUnitsFromBuyPool(benifitVo,productTextileVo));
 				
 			}
 			else if(benifitVo.getBenfitType().equals(BenfitType.XunitsFromGetPool)) {
-				calculatedDiscountsVo.setCalculatedDiscountDetails(calculateBenifitsForXUnitsFromGetPool(benifitVo,barcodeTextileVo));
+				calculatedDiscountsVo.setCalculatedDiscountDetails(calculateBenifitsForXUnitsFromGetPool(benifitVo,productTextileVo));
 				
 			}	
 		}
@@ -42,15 +42,15 @@ public class CalculateBenifits {
 	}
 
 	
-	private String calculateBeniftForFlatDIscount(BenefitVo benifitVo, BarcodeTextileVo barcodeTextileVo) {
+	private String calculateBeniftForFlatDIscount(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
 		
 		String calculatedDiscountAmount= "";
 		
         if(benifitVo.getDiscountType().equals(DiscountType.PercentageDiscountOn)) {
-			calculatedDiscountAmount=calculateBeniftForPercentageDiscountOn(benifitVo,barcodeTextileVo);
+			calculatedDiscountAmount=calculateBeniftForPercentageDiscountOn(benifitVo,productTextileVo);
 		}
 		else if(benifitVo.getDiscountType().equals(DiscountType.RupeesDiscountOn)) {
-			calculatedDiscountAmount=calculateBeniftForRupeesDiscountOn(benifitVo,barcodeTextileVo);
+			calculatedDiscountAmount=calculateBeniftForRupeesDiscountOn(benifitVo,productTextileVo);
 		}
 		else if(benifitVo.getDiscountType().equals(DiscountType.FixedAmountOn)) {
 			//calculateBeniftForFixedAmountOn(benifitVo,barcodeTextileVo);
@@ -59,20 +59,23 @@ public class CalculateBenifits {
 		return calculatedDiscountAmount;
 	}
 
-	private String calculateBeniftForPercentageDiscountOn(BenefitVo benifitVo, BarcodeTextileVo barcodeTextileVo) {
+	private String calculateBeniftForPercentageDiscountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
 	     
 		String calculatedDiscountAmount="";
 		if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP)){
 	          int discountPercentage= Integer.valueOf(benifitVo.getDiscount()).intValue() ;
-	          int purchasedQuantity= barcodeTextileVo.getProductTextile().getQty();
-	         float valueOfRSP= barcodeTextileVo.getProductTextile().getItemRsp();
-	         calculatedDiscountAmount= (discountPercentage/100)*(purchasedQuantity*valueOfRSP) +"";
+	          int purchasedQuantity= productTextileVo.getQty();
+	          
+	        /*comments added by sudheer */
+	          
+	        // float valueOfRSP= barcodeTextileVo.getProductTextile().getItemRsp();
+	        // calculatedDiscountAmount= (discountPercentage/100)*(purchasedQuantity*valueOfRSP) +"";
 	         
 		}
 		else if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemMRP)){
 	          int discountPercentage= Integer.valueOf(benifitVo.getDiscount()).intValue();
-	         int purchasedQuantity= barcodeTextileVo.getProductTextile().getQty();
-	        float valueOfMRP= barcodeTextileVo.getProductTextile().getItemMrp();
+	         int purchasedQuantity= productTextileVo.getQty();
+	        float valueOfMRP= productTextileVo.getItemMrp();
 	         calculatedDiscountAmount= (discountPercentage/100)*(purchasedQuantity*valueOfMRP) +"";
 	         
 		}
@@ -80,11 +83,11 @@ public class CalculateBenifits {
 		
 	}
 	
-	private String calculateBeniftForRupeesDiscountOn(BenefitVo benifitVo, BarcodeTextileVo barcodeTextileVo) {
+	private String calculateBeniftForRupeesDiscountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
 		String calculatedDiscountAmount="";
 		if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP) || benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemMRP)){
 	          int discountAmount= Integer.valueOf(benifitVo.getDiscount()).intValue();
-	         int purchasedQuantity= barcodeTextileVo.getProductTextile().getQty();
+	         int purchasedQuantity= productTextileVo.getQty();
 	         calculatedDiscountAmount= discountAmount*purchasedQuantity +"";
 	         
 		}
@@ -115,23 +118,23 @@ public class CalculateBenifits {
 	}
 	*/
 
-	private String calculateBenifitsForXUnitsFromBuyPool(BenefitVo benifitVo, BarcodeTextileVo barcodeTextileVo) {
+	private String calculateBenifitsForXUnitsFromBuyPool(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
 		
 		String discountDetails= new String();
 		
 		if(benifitVo.getDiscountType().equals(DiscountType.PercentageDiscountOn)) {
 			//calculatedDiscountAmount=calculateBeniftForPercentageDiscountOn(benifitVo,barcodeTextileVo);
-			discountDetails=calculateBenifitsForXUBAndPercentageDiscountOn(benifitVo,barcodeTextileVo);
+			discountDetails=calculateBenifitsForXUBAndPercentageDiscountOn(benifitVo,productTextileVo);
 		}
 		else if(benifitVo.getDiscountType().equals(DiscountType.RupeesDiscountOn)) {
 			//calculatedDiscountAmount=calculateBeniftForRupeesDiscountOn(benifitVo,barcodeTextileVo);
-			discountDetails=calculateBenifitsForXUBAndRupeesDiscountOn(benifitVo,barcodeTextileVo);
+			discountDetails=calculateBenifitsForXUBAndRupeesDiscountOn(benifitVo,productTextileVo);
 
 		}
 		else if(benifitVo.getDiscountType().equals(DiscountType.FixedAmountOn)) {
 			//calculateBeniftForFixedAmountOn(benifitVo,barcodeTextileVo);
 			//calculatedDiscountAmount=benifitVo.getDiscountOn();
-			discountDetails=calculateBenifitsForXUBAndFixedAmountOn(benifitVo,barcodeTextileVo);
+			discountDetails=calculateBenifitsForXUBAndFixedAmountOn(benifitVo,productTextileVo);
 
 			
 		}
@@ -143,7 +146,7 @@ public class CalculateBenifits {
 	
 	
 	private String calculateBenifitsForXUBAndPercentageDiscountOn(BenefitVo benifitVo,
-			BarcodeTextileVo barcodeTextileVo) {
+			ProductTextileVo productTextileVo) {
 		
 		StringBuilder discountDiscription =new StringBuilder();
         discountDiscription.append("Discount will be given on probucts of the related Buy pools. Quantity should be greater than or equal to ");
@@ -162,7 +165,7 @@ public class CalculateBenifits {
 	}
 	
 	
-    private String calculateBenifitsForXUBAndRupeesDiscountOn(BenefitVo benifitVo, BarcodeTextileVo barcodeTextileVo) {
+    private String calculateBenifitsForXUBAndRupeesDiscountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
 		
 		StringBuilder discountDiscription =new StringBuilder();
         discountDiscription.append("Discount will be given on probucts of the related Buy pools.");
@@ -182,7 +185,7 @@ public class CalculateBenifits {
 	
 	
 
-   private String calculateBenifitsForXUBAndFixedAmountOn(BenefitVo benifitVo, BarcodeTextileVo barcodeTextileVo) {
+   private String calculateBenifitsForXUBAndFixedAmountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
 		
 		StringBuilder discountDiscription =new StringBuilder();
         discountDiscription.append("Discount will be given on probucts of the related Buy pools.");
@@ -198,23 +201,23 @@ public class CalculateBenifits {
    return discountDiscription.toString();
 	}
 
-   private String calculateBenifitsForXUnitsFromGetPool(BenefitVo benifitVo, BarcodeTextileVo barcodeTextileVo) {
+   private String calculateBenifitsForXUnitsFromGetPool(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
 		String discountDetails= new String();
 
 
 		if(benifitVo.getDiscountType().equals(DiscountType.PercentageDiscountOn)) {
 			//calculatedDiscountAmount=calculateBeniftForPercentageDiscountOn(benifitVo,barcodeTextileVo);
-			discountDetails=calculateBenifitsForXUGAndPercentageDiscountOn(benifitVo,barcodeTextileVo);
+			discountDetails=calculateBenifitsForXUGAndPercentageDiscountOn(benifitVo,productTextileVo);
 		}
 		else if(benifitVo.getDiscountType().equals(DiscountType.RupeesDiscountOn)) {
 			//calculatedDiscountAmount=calculateBeniftForRupeesDiscountOn(benifitVo,barcodeTextileVo);
-			discountDetails=calculateBenifitsForXUGAndRupeesDiscountOn(benifitVo,barcodeTextileVo);
+			discountDetails=calculateBenifitsForXUGAndRupeesDiscountOn(benifitVo,productTextileVo);
 
 		}
 		else if(benifitVo.getDiscountType().equals(DiscountType.FixedAmountOn)) {
 			//calculateBeniftForFixedAmountOn(benifitVo,barcodeTextileVo);
 			//calculatedDiscountAmount=benifitVo.getDiscountOn();
-			discountDetails=calculateBenifitsForXUGAndFixedAmountOn(benifitVo,barcodeTextileVo);
+			discountDetails=calculateBenifitsForXUGAndFixedAmountOn(benifitVo,productTextileVo);
 
 			
 		}
@@ -222,7 +225,7 @@ public class CalculateBenifits {
 	}
 
 	private String calculateBenifitsForXUGAndPercentageDiscountOn(BenefitVo benifitVo,
-			BarcodeTextileVo barcodeTextileVo) {
+			ProductTextileVo productTextileVo) {
 		StringBuilder discountDiscription =new StringBuilder();
         discountDiscription.append("Discount will be given on probucts of the related Get pools. Quantity should be greater than or equal to ");
         discountDiscription.append(benifitVo.getNumOfItemsFromGetPool()+". ");
@@ -239,11 +242,11 @@ public class CalculateBenifits {
 
 	}
 	
-	private String calculateBenifitsForXUGAndRupeesDiscountOn(BenefitVo benifitVo, BarcodeTextileVo barcodeTextileVo) {
+	private String calculateBenifitsForXUGAndRupeesDiscountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
 		StringBuilder discountDiscription =new StringBuilder();
         discountDiscription.append("Discount will be given on probucts of the related Get pools.");
         discountDiscription.append("The Amount of discount is "+benifitVo.getDiscount() +".");
-        discountDiscription.append("Discount Amount is on the following Get Pool"+benifitVo.getPoolName()+" ");
+        discountDiscription.append("Discount Amount is on the following Get Pool"/*+benifitVo.getPoolName()+" " */);
 
        
 		 if(benifitVo.getItemValue().equals(ItemValue.MinValue)) {
@@ -256,11 +259,11 @@ public class CalculateBenifits {
 		return discountDiscription.toString();
 	}
 	
-	private String calculateBenifitsForXUGAndFixedAmountOn(BenefitVo benifitVo, BarcodeTextileVo barcodeTextileVo) {
+	private String calculateBenifitsForXUGAndFixedAmountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
 		StringBuilder discountDiscription =new StringBuilder();
         
         discountDiscription.append("Discount will be given on probucts of the related Get pools.");
-        discountDiscription.append("and Discount will be given on the following probucts."+benifitVo.getPoolName());
+        discountDiscription.append("and Discount will be given on the following probucts."/*+benifitVo.getPoolName()*/);
 
        // discountDiscription.append("The Fixed-Amount of discount is "+benifitVo.getDiscountOn() +" ");
 

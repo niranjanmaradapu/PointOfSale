@@ -36,9 +36,9 @@ import com.otsi.retail.promotions.repository.BenfitRepo;
 import com.otsi.retail.promotions.repository.PoolRepo;
 import com.otsi.retail.promotions.repository.PromotionRepo;
 import com.otsi.retail.promotions.repository.PromotionToStoreRepo;
-import com.otsi.retail.promotions.vo.BarcodeTextileVo;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
+import com.otsi.retail.promotions.vo.ProductTextileVo;
 import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
@@ -375,8 +375,6 @@ public class PromotionServiceImpl implements PromotionService {
 			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
 			benfit.setItemValue(b.getItemValue());
 			benfit.setDiscountSubTypes(b.getDiscountSubTypes());
-			benfit.setPoolId(b.getPoolId());
-			benfit.setPoolName(b.getPoolName());
 			benfits.add(benfit);
 		});
 		newDto.setBenfitEntity(benfits);
@@ -476,7 +474,7 @@ public class PromotionServiceImpl implements PromotionService {
 	}
 
 	@Override
-	public List<BarcodeTextileVo> checkPromtion(List<BarcodeTextileVo> listofInvTxt, Long storeId, Long domainId) {
+	public List<ProductTextileVo> checkPromtion(List<ProductTextileVo> listofInvTxt, Long storeId, Long domainId) {
 
 		List<PromotionToStoreEntity> activePromos = promostoreRepo.findByStoreIdAndPromotionStatus(storeId, true);
 		System.out.println("Active Promo List::" + activePromos.toString());
@@ -520,27 +518,27 @@ public class PromotionServiceImpl implements PromotionService {
 		return listofInvTxt;
 	}
 
-	private boolean checkPromoApplyType(PromotionsEntity promoEntity, BarcodeTextileVo barcodeVo) {
+	private boolean checkPromoApplyType(PromotionsEntity promoEntity, ProductTextileVo barcodeVo) {
 
 		if (promoEntity.getPromoApplyType().equals(PromoApplyType.FixedQuantity)
-				&&  barcodeVo.getProductTextile().getQty() >= promoEntity.getBuyItemsFromPool()  )
+				&&  barcodeVo.getQty() >= promoEntity.getBuyItemsFromPool()  )
 			return true;
 
 		if (promoEntity.getPromoApplyType().equals(PromoApplyType.AnyQuantity)
-				&& barcodeVo.getProductTextile().getQty() > 0)
+				&& barcodeVo.getQty() > 0)
 			return true;
 
 		return false;
 	}
 
-	private PromotionSlabsEntity checkPromoApplyTypeForSlabs(PromotionsEntity promoEntity, BarcodeTextileVo barcodeVo) {
+	private PromotionSlabsEntity checkPromoApplyTypeForSlabs(PromotionsEntity promoEntity, ProductTextileVo barcodeVo) {
 
 		if (promoEntity.getPromoApplyType().equals(PromoApplyType.QuantitySlab)
 				|| promoEntity.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
 
 			for (PromotionSlabsEntity slab : promoEntity.getPromotionSlabEntity()) {
-				if (barcodeVo.getProductTextile().getQty() >= slab.getFromSlab()
-						&& barcodeVo.getProductTextile().getQty() <= slab.getToSlab()) {
+				if (barcodeVo.getQty() >= slab.getFromSlab()
+						&& barcodeVo.getQty() <= slab.getToSlab()) {
 					if (slab.getBenfitEntity() == null)
 						return null;
 

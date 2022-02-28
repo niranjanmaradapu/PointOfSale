@@ -1,44 +1,42 @@
 package com.otsi.retail.promotions.check.pools;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.otsi.retail.promotions.common.ColumnName;
 import com.otsi.retail.promotions.common.Operator;
 import com.otsi.retail.promotions.entity.Condition;
 import com.otsi.retail.promotions.entity.PoolEntity;
 import com.otsi.retail.promotions.entity.Pool_Rule;
-import com.otsi.retail.promotions.vo.BarcodeTextileVo;
+import com.otsi.retail.promotions.vo.ProductTextileVo;
 
 @Component
 public class CheckPoolRules {
 
-	private boolean checkCondition(Condition condition, BarcodeTextileVo barcodeTextileVo) {
+	private boolean checkCondition(Condition condition, ProductTextileVo productTextileVo) {
 
 		Operator operatorSymbol = condition.getOperatorSymbol();
 
 		switch (operatorSymbol) {
 
 		case Equals:
-			return checkEquals(condition, barcodeTextileVo);
+			return checkEquals(condition, productTextileVo);
 
 		case NotEquals:
-			return checkNotEquals(condition, barcodeTextileVo);
+			return checkNotEquals(condition, productTextileVo);
 
 		case GreaterThan:
-			return checkGreaterThan(condition, barcodeTextileVo);
+			return checkGreaterThan(condition, productTextileVo);
 
 		case LessThan:
-			return checkLessThan(condition, barcodeTextileVo);
+			return checkLessThan(condition, productTextileVo);
 
 		case GreaterThanOrEquals:
-			return checkGreaterThanOrEquals(condition, barcodeTextileVo);
+			return checkGreaterThanOrEquals(condition, productTextileVo);
 
 		case LessThanOrEquals:
-			return checkLessThanAndEquals(condition, barcodeTextileVo);
+			return checkLessThanAndEquals(condition, productTextileVo);
 
 		default:
 			return false;
@@ -47,20 +45,20 @@ public class CheckPoolRules {
 
 	}
 
-	private boolean checkLessThanAndEquals(Condition condition, BarcodeTextileVo barcodeTextileVo) {
+	private boolean checkLessThanAndEquals(Condition condition, ProductTextileVo productTextileVo) {
 
 		switch (condition.getColumnName()) {
 
 		case Mrp:
 			return checkLessThanOrEqualsFloatDataTypeValues(condition,
-					barcodeTextileVo.getProductTextile().getItemMrp());
+					productTextileVo.getItemMrp());
 
 		case BarcodeCreatedOn:
 			return checkLessThanOrEqualDateDataType(condition,
-					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
+					productTextileVo.getOriginalBarcodeCreatedAt());
 
 		case BatchNo:
-			return checkLessThanOrEqualLongDataType(condition, barcodeTextileVo.getBatchNo());
+			return checkLessThanOrEqualLongDataType(condition, productTextileVo.getBatchNo());
 		default:
 			return false;
 
@@ -90,19 +88,19 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkGreaterThanOrEquals(Condition condition, BarcodeTextileVo barcodeTextileVo) {
+	private boolean checkGreaterThanOrEquals(Condition condition, ProductTextileVo productTextileVo) {
 		switch (condition.getColumnName()) {
 
 		case Mrp:
 			return checkGreaterThanOrEqualsFloatDataTypeValues(condition,
-					barcodeTextileVo.getProductTextile().getItemMrp());
+					productTextileVo.getItemMrp());
 
 		case BarcodeCreatedOn:
 			return checkGreaterThanOrEqualDateDataType(condition,
-					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
+					productTextileVo.getOriginalBarcodeCreatedAt());
 
 		case BatchNo:
-			return checkGreaterThanOrEqualLongDataType(condition, barcodeTextileVo.getBatchNo());
+			return checkGreaterThanOrEqualLongDataType(condition, productTextileVo.getBatchNo());
 		default:
 			return false;
 		}
@@ -133,20 +131,20 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkLessThan(Condition condition, BarcodeTextileVo barcodeTextileVo) {
+	private boolean checkLessThan(Condition condition, ProductTextileVo productTextileVo) {
 
 		switch (condition.getColumnName()) {
 
 		case Mrp:
-			return checkLessThanFloatDataTypeValues(condition, barcodeTextileVo.getProductTextile().getItemMrp());
+			return checkLessThanFloatDataTypeValues(condition, productTextileVo.getItemMrp());
 
 		case BarcodeCreatedOn:
 
 			return checkLessThanDateDataType(condition,
-					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
+					productTextileVo.getOriginalBarcodeCreatedAt());
 
 		case BatchNo:
-			return checkLessThanLongDataType(condition, barcodeTextileVo.getBatchNo());
+			return checkLessThanLongDataType(condition, productTextileVo.getBatchNo());
 
 		default:
 			return false;
@@ -179,20 +177,20 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkGreaterThan(Condition condition, BarcodeTextileVo barcodeTextileVo) {
+	private boolean checkGreaterThan(Condition condition, ProductTextileVo productTextileVo) {
 
 		switch (condition.getColumnName()) {
 
 		case Mrp:
-			return checkGreaterThanFloatDataTypeValues(condition, barcodeTextileVo.getProductTextile().getItemMrp());
+			return checkGreaterThanFloatDataTypeValues(condition, productTextileVo.getItemMrp());
 
 		case BarcodeCreatedOn:
 
 			return checkGreaterThanDateDataType(condition,
-					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
+					productTextileVo.getOriginalBarcodeCreatedAt());
 
 		case BatchNo:
-			return checkGreaterThanLongDataType(condition, barcodeTextileVo.getBatchNo());
+			return checkGreaterThanLongDataType(condition, productTextileVo.getBatchNo());
 
 		default:
 			return false;
@@ -224,20 +222,20 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkNotEquals(Condition condition, BarcodeTextileVo barcodeTextileVo) {
+	private boolean checkNotEquals(Condition condition, ProductTextileVo productTextileVo) {
 
 		switch (condition.getColumnName()) {
 
 		case Mrp:
-			return checkNotEqualsFloatDataTypeValues(condition, barcodeTextileVo.getProductTextile().getItemMrp());
+			return checkNotEqualsFloatDataTypeValues(condition, productTextileVo.getItemMrp());
 
 		case BarcodeCreatedOn:
 
 			return checkNotEqualsDateDataType(condition,
-					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
+					productTextileVo.getOriginalBarcodeCreatedAt());
 
 		case BatchNo:
-			return checkNotEqualsLongDataType(condition, barcodeTextileVo.getBatchNo());
+			return checkNotEqualsLongDataType(condition, productTextileVo.getBatchNo());
 
 		default:
 			return false;
@@ -269,21 +267,21 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkEquals(Condition condition, BarcodeTextileVo barcodeTextileVo) {
+	private boolean checkEquals(Condition condition, ProductTextileVo productTextileVo) {
 
 		switch (condition.getColumnName()) {
 
 		case Mrp:
-			return checkEqualsFloatDataTypeValues(condition, barcodeTextileVo.getProductTextile().getItemMrp());
+			return checkEqualsFloatDataTypeValues(condition, productTextileVo.getItemMrp());
 
 		case BarcodeCreatedOn:
 
 			return checkEqualsOnDateDataTypeValues(condition,
-					barcodeTextileVo.getProductTextile().getOriginalBarcodeCreatedAt());
+					productTextileVo.getOriginalBarcodeCreatedAt());
 
 		case BatchNo:
 
-			return checkEqualsOnBatchNumberData(condition, barcodeTextileVo.getBatchNo());
+			return checkEqualsOnBatchNumberData(condition, productTextileVo.getBatchNo());
 
 		default:
 			return false;
@@ -315,7 +313,7 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkRule(List<Pool_Rule> poolRules, BarcodeTextileVo barcodeTextileVo) {
+	private boolean checkRule(List<Pool_Rule> poolRules, ProductTextileVo productTextileVo) {
 
 		for (Pool_Rule rule : poolRules) {
 
@@ -324,7 +322,7 @@ public class CheckPoolRules {
 
 			for (Condition condition : conditions) {
 
-				if (!checkCondition(condition, barcodeTextileVo)) {
+				if (!checkCondition(condition, productTextileVo)) {
 					areAllConditionsPassed = false;
 					break;
 				}
@@ -340,10 +338,10 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	public boolean checkPools(List<PoolEntity> poolEntities, BarcodeTextileVo barcodeTextileVo) {
+	public boolean checkPools(List<PoolEntity> poolEntities, ProductTextileVo productTextileVo) {
 
 		for (PoolEntity poolEntity : poolEntities) {
-			return checkRule(poolEntity.getPool_Rule(), barcodeTextileVo);
+			return checkRule(poolEntity.getPool_Rule(), productTextileVo);
 		}
 		return false;
 

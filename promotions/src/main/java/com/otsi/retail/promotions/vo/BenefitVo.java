@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BenefitVo {
-	
-	private Long benfitId;	
+
+	private Long benfitId;
 	private BenfitType benfitType;
 	private DiscountType discountType;
 	private String discount;
@@ -22,17 +22,5 @@ public class BenefitVo {
 	private Long numOfItemsFromBuyPool;
 	private Long numOfItemsFromGetPool;
 	private DiscountSubTypes discountSubType;
-	
-	private Long poolId;
-	private String poolName;
-	
-
-
-
-
-
-
-	
-	
 
 }
