@@ -44,6 +44,7 @@ import com.otsi.retail.newSale.Entity.LineItemsReEntity;
 import com.otsi.retail.newSale.Entity.LoyalityPointsEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
+import com.otsi.retail.newSale.Exceptions.BusinessException;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
@@ -452,7 +453,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		if (barcodeDetails == null) {
 			log.error("Barcode with number " + barCode + " is not exists");
-			throw new RecordNotFoundException("Barcode with number " + barCode + " is not exists");
+			throw new RecordNotFoundException("Barcode with number " + barCode + " is not exists",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		} else {
 			BarcodeVo vo = newSaleMapper.convertBarcodeEntityToVo(barcodeDetails);
 			log.warn("we are fetching barcode details...");
@@ -484,7 +485,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		} else {
 			log.error("Line items are not valid : " + vo.getLineItems().toString());
-			throw new RecordNotFoundException("Provide line items");
+			throw new RecordNotFoundException("Provide line items",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 		List<LineItemsEntity> listLineItems = lineItemRepo.findByLineItemIdInAndDsEntityIsNull(lineItems);
 
@@ -502,7 +503,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			return entity.getDsNumber();
 		} else {
 			log.error("Line items are not valid : " + vo.getLineItems().toString());
-			throw new RecordNotFoundException("Provide valid line items");
+			throw new RecordNotFoundException("Provide valid line items",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 
 	}
@@ -520,7 +521,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		} else {
 			log.error("Deliveryslip number is not valid : " + dsNumber);
-			throw new RecordNotFoundException("Provide valid DS Number");
+			throw new RecordNotFoundException("Provide valid DS Number",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 	}
 
@@ -573,7 +574,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				else {
 					log.error("No record found with given mobilenumber");
-					throw new RecordNotFoundException("No record found with given mobilenumber");
+					throw new RecordNotFoundException("No record found with given mobilenumber",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 				}
 
 			}
@@ -639,7 +640,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				else {
 					log.error("No record found with given mobilenumber");
-					throw new RecordNotFoundException("No record found with given mobilenumber");
+					throw new RecordNotFoundException("No record found with given mobilenumber",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 				}
 
 			}
@@ -666,7 +667,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		if (saleDetails.isEmpty()) {
 
 			log.error("No record found with given information");
-			throw new RecordNotFoundException("No record found with given information");
+			throw new RecordNotFoundException("No record found with given information",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 
 		} else {
 
@@ -740,7 +741,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		List<HsnDetailsVo> vo = hsnService.getHsn();
 		if (vo == null) {
 			log.error("Record not found");
-			new RecordNotFoundException("Record not found");
+			new RecordNotFoundException("Record not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 		TaxVo tvo = new TaxVo();
 		HsnDetailsVo hvo = new HsnDetailsVo();
@@ -932,12 +933,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				return lvo;
 
 			} else {
-				throw new RecordNotFoundException("record not found");
+				throw new RecordNotFoundException("record not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 
 		} catch (Exception ex) {
 
-			throw new RecordNotFoundException("record not found");
+			throw new RecordNotFoundException("record not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		} finally {
 			dsDetails.clear();
 		}
@@ -1019,7 +1020,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			NewSaleEntity newSale = newSaleOpt.get();
 			if (!newSale.getOrderNumber().equals(vo.getInvoiceNumber())) {
 				log.error("invoice is not present");
-				throw new RecordNotFoundException("invoice is not present");
+				throw new RecordNotFoundException("invoice is not present",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 			vo.getPaymentAmountTypeId().forEach(p -> {
 				PaymentAmountType paymentAmountType = new PaymentAmountType();
@@ -1153,7 +1154,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			}
 		}
 		log.error("No records found with your inputs");
-		throw new RecordNotFoundException("No records found with your inputs");
+		throw new RecordNotFoundException("No records found with your inputs",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 	}
 
 	@Override
@@ -1350,7 +1351,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 
 		if (saleDetails.isEmpty()) {
-			throw new RecordNotFoundException("Sale bills are not exists");
+			throw new RecordNotFoundException(BusinessException.RNF_DESCRIPTION,BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		} else {
 
 			SaleReportVo slr = newSaleMapper.convertlistSaleReportEntityToVo(saleDetails);
@@ -1593,7 +1594,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.error("Passing invalid line item " + line);
-				throw new RecordNotFoundException("provide valid line item");
+				throw new RecordNotFoundException("provide valid line item",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 
 		} else {
@@ -1621,7 +1622,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				log.info("Successfully modified line item " + line);
 			} else {
 				log.error("Passing invalid line items " + line);
-				throw new RecordNotFoundException("provide valid line item");
+				throw new RecordNotFoundException("provide valid line item",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 		}
 		return "Successfully modified Line Item.";
@@ -1645,7 +1646,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.info("Provide valid barcode for getting line item : " + barCode);
-				throw new RecordNotFoundException("provide valide barcode");
+				throw new RecordNotFoundException("provide valide barcode",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 
 		} else {
@@ -1662,7 +1663,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				return lvo;
 			} else {
 				log.info("Provide valid barcode for getting line item : " + barCode);
-				throw new RecordNotFoundException("provide valide barcode");
+				throw new RecordNotFoundException("provide valide barcode",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 
 		}
@@ -1684,7 +1685,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				return "Successfully deleted";
 
 			} else {
-				throw new RecordNotFoundException("provide valid barcode");
+				throw new RecordNotFoundException("provide valid barcode",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 		} else {
 
@@ -1700,7 +1701,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.error("Entered Invalid barcode for delete line item : " + barCode);
-				throw new RecordNotFoundException("provide valid barcode");
+				throw new RecordNotFoundException("provide valid barcode",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 		}
 
@@ -1757,10 +1758,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 				});
 				return listVo;
 			} else {
-				throw new RecordNotFoundException("No records found");
+				throw new RecordNotFoundException("No records found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 		} catch (InvalidInputException iie) {
-			throw new RecordNotFoundException("Exception while fetching records");
+			throw new RecordNotFoundException("Exception while fetching records",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 	}
 
@@ -1794,7 +1795,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			NewSaleVo result = newSaleMapper.convertNewSaleDtoToVo(order);
 			return result;
 		} else {
-			throw new RecordNotFoundException("Provide valid order number");
+			throw new RecordNotFoundException("Provide valid order number",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 	}
 
@@ -1814,7 +1815,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		if (loyalityIds == null) {
 
-			throw new RecordNotFoundException("Records not found");
+			throw new RecordNotFoundException("Records not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 
 		} else {
 
@@ -1832,7 +1833,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		List<LoyalityPointsEntity> entity = loyalityRepo.findAll();
 
 		if (entity == null) {
-			throw new RecordNotFoundException("Records not found");
+			throw new RecordNotFoundException("Records not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		} else {
 
 			List<LoyalityPointsVo> result = newSaleMapper.convertLoyaltyEntityToVo(entity);
@@ -1849,7 +1850,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		if (userIdValue == null) {
 
-			throw new RecordNotFoundException("Records not found");
+			throw new RecordNotFoundException("Records not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 
 		} else {
 
@@ -1879,7 +1880,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 
 		if (loyaltylist.isEmpty()) {
-			throw new RecordNotFoundException("Records not found");
+			throw new RecordNotFoundException("Records not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 
 		List<LoyalityPointsVo> dataList = newSaleMapper.convertLoyaltyEntityToVo(loyaltylist);
@@ -1903,7 +1904,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			});
 			return "success";
 		} else {
-			throw new RecordNotFoundException("Record not found");
+			throw new RecordNotFoundException("Record not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 	}
 

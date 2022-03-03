@@ -21,9 +21,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(value = RecordNotFoundException.class)
 	public ResponseEntity<Object> handleRecordNotFoundException(RecordNotFoundException recordNotException) {
-		ErrorResponse<?> error = new ErrorResponse<>(404, "record not found");
+		ErrorResponse<?> error = new ErrorResponse<>( recordNotException.getStatusCode(),recordNotException.getMessage());
 		log.error("error response is:" + error);
-		return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<Object>(error, HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(value = DataNotFoundException.class)
