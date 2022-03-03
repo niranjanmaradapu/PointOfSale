@@ -120,6 +120,7 @@ public class PromotionMapper {
 			List<PromotionSlabsVo> slabVo = new ArrayList<>();
 			x.getPromotionSlabEntity().stream().forEach(s -> {
 				PromotionSlabsVo pslabVo = new PromotionSlabsVo();
+				pslabVo.setId(s.getId());
 				pslabVo.setFromSlab(s.getFromSlab());
 				pslabVo.setToSlab(s.getToSlab());
 
