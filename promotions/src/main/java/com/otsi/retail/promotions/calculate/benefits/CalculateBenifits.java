@@ -62,17 +62,17 @@ public class CalculateBenifits {
 	private String calculateBeniftForPercentageDiscountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
 	     
 		String calculatedDiscountAmount="";
-		if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP)){
-	          int discountPercentage= Integer.valueOf(benifitVo.getDiscount()).intValue() ;
-	          int purchasedQuantity= productTextileVo.getQty();
-	          
-	        /*comments added by sudheer */
-	          
-	        // float valueOfRSP= barcodeTextileVo.getProductTextile().getItemRsp();
-	        // calculatedDiscountAmount= (discountPercentage/100)*(purchasedQuantity*valueOfRSP) +"";
-	         
-		}
-		else if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemMRP)){
+//		if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP)){
+//	          int discountPercentage= Integer.valueOf(benifitVo.getDiscount()).intValue() ;
+//	          int purchasedQuantity= productTextileVo.getQty();
+//	          
+//	        /*comments added by sudheer */
+//	          
+//	        // float valueOfRSP= barcodeTextileVo.getProductTextile().getItemRsp();
+//	        // calculatedDiscountAmount= (discountPercentage/100)*(purchasedQuantity*valueOfRSP) +"";
+//	         
+//		}
+		if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemMRP)){
 	          int discountPercentage= Integer.valueOf(benifitVo.getDiscount()).intValue();
 	         int purchasedQuantity= productTextileVo.getQty();
 	        float valueOfMRP= productTextileVo.getItemMrp();
@@ -85,7 +85,7 @@ public class CalculateBenifits {
 	
 	private String calculateBeniftForRupeesDiscountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
 		String calculatedDiscountAmount="";
-		if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP) || benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemMRP)){
+		if(/*benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP) ||*/ benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemMRP)){
 	          int discountAmount= Integer.valueOf(benifitVo.getDiscount()).intValue();
 	         int purchasedQuantity= productTextileVo.getQty();
 	         calculatedDiscountAmount= discountAmount*purchasedQuantity +"";
@@ -300,11 +300,12 @@ public class CalculateBenifits {
     	
         StringBuilder eachItemDiscountDiscription =new StringBuilder();
 		
-		if( benifitVo.getDiscountSubType().equals( DiscountSubTypes.ItemRSP)  ){
-			eachItemDiscountDiscription.append("on the Maximum RSP of each Quantity.");
-	         
-		}
-		else if(benifitVo.getDiscountSubType().equals( DiscountSubTypes.ItemMRP)){
+//		if( benifitVo.getDiscountSubType().equals( DiscountSubTypes.ItemRSP)  ){
+//			eachItemDiscountDiscription.append("on the Maximum RSP of each Quantity.");
+//	         
+//		}
+//		else
+        if(benifitVo.getDiscountSubType().equals( DiscountSubTypes.ItemMRP)){
 				eachItemDiscountDiscription.append("on the Maximum MRP of each Quantity.");
 
 
@@ -317,11 +318,13 @@ public class CalculateBenifits {
       
 		StringBuilder eachItemDiscountDiscription =new StringBuilder();
 		
-		if( benifitVo.getDiscountSubType().equals( DiscountSubTypes.ItemRSP)  ){
-			eachItemDiscountDiscription.append("on the Minimum RSP of each Quantity.");
-	         
-		}
-		else if(benifitVo.getDiscountSubType().equals( DiscountSubTypes.ItemMRP)){
+//		if( benifitVo.getDiscountSubType().equals( DiscountSubTypes.ItemRSP)  ){
+//			eachItemDiscountDiscription.append("on the Minimum RSP of each Quantity.");
+//	         
+//		}
+//		else 
+		
+		if(benifitVo.getDiscountSubType().equals( DiscountSubTypes.ItemMRP)){
 				eachItemDiscountDiscription.append("on the Minimum MRP of each Quantity.");
 
 
@@ -351,11 +354,12 @@ public class CalculateBenifits {
 		
 		 StringBuilder eachItemDiscountDiscription =new StringBuilder();
 			
-			if( benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP)  ){
-				eachItemDiscountDiscription.append("on the Maximum RSP of each Quantity.");
-		         
-			}
-			else if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemMRP)){
+//			if( benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP)  ){
+//				eachItemDiscountDiscription.append("on the Maximum RSP of each Quantity.");
+//		         
+//			}
+//			else
+		   if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemMRP)){
 					eachItemDiscountDiscription.append("on the Maximum MRP of each Quantity.");
 			}
 			eachItemDiscountDiscription.append(" The maximum number of products that should be bought is "+benifitVo.getNumOfItemsFromBuyPool()+".");
@@ -367,11 +371,12 @@ public class CalculateBenifits {
 		
        StringBuilder eachItemDiscountDiscription =new StringBuilder();
 				
-		if( benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP)  ){
-			eachItemDiscountDiscription.append("on the RSP of each Quantity.");
-	         
-		}
-		else if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemMRP)){
+//		if( benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP)  ){
+//			eachItemDiscountDiscription.append("on the RSP of each Quantity.");
+//	         
+//		}
+//		else
+       if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemMRP)){
 				eachItemDiscountDiscription.append("on the MRP of each Quantity.");
 
 

@@ -9,7 +9,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -41,8 +40,7 @@ public class Pool_Rule {
 	@JoinColumn(name = "pool_Id")
 	private PoolEntity poolEntity;
 	
-	@OneToMany(targetEntity =Condition.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "rule_condition", joinColumns = @JoinColumn(name = "ruleId"), inverseJoinColumns = @JoinColumn(name = "conditionId"))
+	@OneToMany(targetEntity =Condition.class,mappedBy = "poolRule", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<Condition> conditions;
-
+	
 }

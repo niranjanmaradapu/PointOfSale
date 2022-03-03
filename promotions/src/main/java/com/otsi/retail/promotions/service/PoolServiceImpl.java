@@ -74,7 +74,6 @@ public class PoolServiceImpl implements PoolService {
 			Pool_Rule poolRule = poolMapper.convertPoolRuleVoToEntity(x);
 			poolRule.setPoolEntity(savePool);
 			ruleRepo.save(poolRule);
-			
 
 		});
 		log.warn("we are checking if pool is saved...");
@@ -189,6 +188,8 @@ public class PoolServiceImpl implements PoolService {
 		}
 		if (!poolEntity.isEmpty()) {
 			PoolVo poolvo = new PoolVo();
+					
+			
 			List<PromotionPoolVo> poolVo = poolMapper.convertPoolEntityToVo(poolEntity);
 			log.warn("we are checking if pool is fetching...");
 			log.info("fetching list of pools");

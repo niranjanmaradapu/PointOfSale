@@ -72,12 +72,17 @@ public class PoolMapper {
 				condition.setGivenValues(c.getGivenValues());
 				condition.setOperatorSymbol(c.getOperatorSymbol());
 				condition.setCreatedAt(LocalDate.now());
+				condition.setPoolRule(poolRule);
 				listOfConditions.add(condition);
+	
+				
 			});
 
 		}
 		poolRule.setConditions(listOfConditions);
 		poolRule.setRuleType(poolRuleVo.getRuleType());
+		
+		
 
 		return poolRule;
 
@@ -92,30 +97,27 @@ public class PoolMapper {
 	public List<PromotionPoolVo> convertPoolEntityToVo(List<PoolEntity> poolEntity) {
 
 		List<PromotionPoolVo> listOfPool = new ArrayList<>();
-		List<Pool_RuleVo> pool_RuleVo = new ArrayList<>();
-		List<ConditionVo> conditionsVo = new ArrayList<>();
-
 		poolEntity.stream().forEach(x -> {
 
 			PromotionPoolVo vo = new PromotionPoolVo();
-
+            vo.setPoolId(x.getPoolId());
 			vo.setPoolName(x.getPoolName());
-			vo.setPoolId(x.getPoolId());
 			vo.setDomainId(x.getDomainId());
 			vo.setCreatedBy(x.getCreatedBy());
 			vo.setCreatedDate(x.getCreatedDate());
 			vo.setPoolType(x.getPoolType());
 			vo.setIsActive(x.getIsActive());
 			vo.setLastModified(x.getLastModified());
-
+			
+			List<Pool_RuleVo> pool_RuleVo = new ArrayList<>();
 			x.getPool_Rule().stream().forEach(a -> {
 				Pool_RuleVo rule = new Pool_RuleVo();
-
 				rule.setRuleType(a.getRuleType());
 				rule.setRuleNumber(a.getRuleNumber());
 				rule.setLastModified(a.getUpdatedAt());
 				rule.setId(a.getId());
-
+				
+				List<ConditionVo> conditionsVo = new ArrayList<>();
 				a.getConditions().stream().forEach(cond -> {
 
 					ConditionVo condition = new ConditionVo();
@@ -124,13 +126,12 @@ public class PoolMapper {
 					condition.setGivenValues(cond.getGivenValues());
 					condition.setOperatorSymbol(cond.getOperatorSymbol());
 					conditionsVo.add(condition);
-					vo.setPool_RuleVo(pool_RuleVo);
 				});
 				
 				rule.setConditionVos(conditionsVo);
 				pool_RuleVo.add(rule);
 			});
-			
+			vo.setPool_RuleVo(pool_RuleVo);
 			listOfPool.add(vo);
 
 		});
