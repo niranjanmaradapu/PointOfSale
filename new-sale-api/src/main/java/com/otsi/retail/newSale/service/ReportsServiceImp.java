@@ -210,7 +210,7 @@ public class ReportsServiceImp implements ReportService {
 
 		return first5ElementsList;
 	}
-
+ 
 	@Override
 	public List<ReportVo> getsaleSummeryDetails(Long storeId,Long domainId) {
 
@@ -218,7 +218,7 @@ public class ReportsServiceImp implements ReportService {
 
 		LocalDate Date = LocalDate.now();
 
-		ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetAllListOfReturnSlips() + "?storeId=" + storeId + "?domainId=" + domainId,
+		ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetAllListOfReturnSlips() + "?storeId="+storeId+ "&" +"domainId=" + domainId,
 				HttpMethod.GET, null, GateWayResponse.class);
 
 		ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
@@ -410,7 +410,7 @@ public class ReportsServiceImp implements ReportService {
 			
 			List<ReportVo> sorted = lRvos.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
 					.collect(Collectors.toList());
-			List<ReportVo> first5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
+			List<ReportVo> first5ElementsList = sorted.stream().limit(4).collect(Collectors.toList());
 			
 				return first5ElementsList;
 
@@ -479,7 +479,7 @@ public class ReportsServiceImp implements ReportService {
 			
 			List<ReportVo> sorted = lRvos.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
 					.collect(Collectors.toList());
-			List<ReportVo> first5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
+			List<ReportVo> first5ElementsList = sorted.stream().limit(4).collect(Collectors.toList());
 			
 				return first5ElementsList;
 
