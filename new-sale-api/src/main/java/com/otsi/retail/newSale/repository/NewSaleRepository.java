@@ -54,16 +54,16 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 	List<NewSaleEntity> findByStoreIdAndDomainId(Long storeId, Long domainId);
 
 	List<NewSaleEntity> findByCreationDateBetweenAndStatusAndStoreIdAndDomainId(LocalDate dateFrom, LocalDate dateTo,
-			OrderStatus billStatus, Long domainId, Long storeId);
+			OrderStatus billStatus,Long storeId, Long domainId);
 
 	List<NewSaleEntity> findByUserIdInAndStoreIdAndDomainIdAndCreationDateBetween(List<Long> userIds,
-			LocalDate dateFrom, LocalDate dateTo, Long storeId, Long domainId);
+			 Long storeId, Long domainId,LocalDate dateFrom, LocalDate dateTo);
 
-	List<NewSaleEntity> findByOrderNumberAndStoreIdAndDomainIdAndCreationDateBetween(String invoiceNumber,
-			LocalDate dateFrom, LocalDate dateTo, Long domainId, Long storeId);
+	List<NewSaleEntity> findByOrderNumberAndStoreIdAndDomainIdAndCreationDateBetween(String invoiceNumber,Long storeId,
+			 Long domainId,LocalDate dateFrom, LocalDate dateTo);
 
-	List<NewSaleEntity> findByCreatedByAndStoreIdAndDomainIdAndCreationDateBetween(String empId, LocalDate dateFrom,
-			LocalDate dateTo, Long storeId, Long domainId);
+	List<NewSaleEntity> findByCreatedByAndStoreIdAndDomainIdAndCreationDateBetween(String empId, Long storeId, Long domainId,LocalDate dateFrom,
+			LocalDate dateTo);
 
 	List<NewSaleEntity> findByCreationDateBetweenAndStoreIdAndDomainId(LocalDate dateFrom, LocalDate dateTo,
 			Long storeId, Long domainId);
@@ -81,7 +81,7 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 	List<NewSaleEntity> findByCreationDateBetweenAndDomainIdAndStoreId(LocalDate dateFrom, LocalDate dateTo,
 			Long domainId, Long storeId);
 
-	
+	List<NewSaleEntity> findByDomainId(Long domainId);
 
 
 }

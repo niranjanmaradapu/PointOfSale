@@ -102,6 +102,12 @@ public class NewSaleMapper {
 						barvo.setNetValue(a.getNetValue());
 						barvo.setQuantity(a.getQuantity());
 						barvo.setDiscount(a.getDiscount());
+						barvo.setSection(a.getSection());
+						barvo.setHsnCode(a.getHsnCode());
+						barvo.setSgst(a.getSgst());
+						barvo.setCgst(a.getCgst());
+						barvo.setTaxValue(a.getTaxValue());
+						barvo.setUserId(a.getUserId());
 						listBarVo.add(barvo);
 						nsvo.setLineItemsReVo(listBarVo);
 					});
@@ -122,6 +128,12 @@ public class NewSaleMapper {
 							linevo.setQuantity(b.getQuantity());
 							linevo.setDiscount(b.getDiscount());
 							linevo.setSection(b.getSection());
+							linevo.setSection(b.getSection());
+							linevo.setHsnCode(b.getHsnCode());
+							linevo.setSgst(b.getSgst());
+							linevo.setCgst(b.getCgst());
+							linevo.setUserId(a.getUserId());
+							linevo.setTaxValue(b.getTaxValue());
 
 							listBarVo.add(linevo);
 							nsvo.setLineItemsReVo(listBarVo);

@@ -1,5 +1,7 @@
 package com.otsi.retail.newSale.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
@@ -11,16 +13,19 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Entity.LineItemsEntity;
 import com.otsi.retail.newSale.Entity.LineItemsReEntity;
@@ -34,6 +39,8 @@ import com.otsi.retail.newSale.repository.LineItemRepo;
 import com.otsi.retail.newSale.repository.NewSaleRepository;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReportVo;
+import com.otsi.retail.newSale.vo.StoreVo;
+import com.otsi.retail.newSale.vo.UserDetailsVo;
 
 @Service
 public class ReportsServiceImp implements ReportService {
@@ -43,10 +50,10 @@ public class ReportsServiceImp implements ReportService {
 
 	@Autowired
 	private DeliverySlipRepository dsRepo;
-	
+
 	@Autowired
 	private LineItemRepo lineItemRepo;
-	
+
 	@Autowired
 	private LineItemReRepo lineItemReRepo;
 
@@ -55,15 +62,57 @@ public class ReportsServiceImp implements ReportService {
 
 	@Autowired
 	private Config config;
+	public List<StoreVo> getStoresForGivenId(List<Long> storeIds) throws URISyntaxException{
+		HttpHeaders headers = new HttpHeaders();
+		URI uri = UriComponentsBuilder.fromUri(new URI(config.getStoreDetails())).build()
+				.encode().toUri();
+		
+		HttpEntity<List<Long>> request = new HttpEntity<List<Long>>(storeIds, headers);
+
+		ResponseEntity<?> newsaleResponse = template.exchange(uri, HttpMethod.POST, request,
+				GateWayResponse.class);
+
+		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
+		ObjectMapper mapper = new ObjectMapper();
+
+		GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
+
+		List<StoreVo> bvo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<List<StoreVo>>() {
+		});
+		return bvo;
+		
+	}
+	public List<UserDetailsVo> getUsersForGivenIds(List<Long> userIds) throws URISyntaxException{
+		
+		HttpHeaders headers = new HttpHeaders();
+		URI uri = UriComponentsBuilder.fromUri(new URI(config.getUserDetails())).build()
+				.encode().toUri();
+		
+		HttpEntity<List<Long>> request = new HttpEntity<List<Long>>(userIds, headers);
+
+		ResponseEntity<?> newsaleResponse = template.exchange(uri, HttpMethod.POST, request,
+				GateWayResponse.class);
+
+		System.out.println("Received Request to getBarcodeDetails:" + newsaleResponse);
+		ObjectMapper mapper = new ObjectMapper();
+
+		GateWayResponse<?> gatewayResponse = mapper.convertValue(newsaleResponse.getBody(), GateWayResponse.class);
+
+		List<UserDetailsVo> uvo = mapper.convertValue(gatewayResponse.getResult(), new TypeReference<List<UserDetailsVo>>() {
+		});
+		return uvo;
+		
+		
+	}
 
 	@Override
-	public List<ReportVo> getInvoicesGeneratedDetails(Long storeId) {
+	public List<ReportVo> getInvoicesGeneratedDetails(Long storeId,Long domainId) {
 
 		List<ReportVo> lrvo = new ArrayList<ReportVo>();
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreId(storeId);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
 
 		List<NewSaleEntity> nen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
@@ -103,12 +152,12 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public List<ReportVo> getTopfiveSalesByStore() {
+	public List<ReportVo> getTopfiveSalesByStore(Long domainId) {
 		List<ReportVo> rvo = new ArrayList<ReportVo>();
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
+		List<NewSaleEntity> nsentity = newsaleRepo.findByDomainId(domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -128,22 +177,48 @@ public class ReportsServiceImp implements ReportService {
 
 			rvo.add(vo);
 		});
-
+		
+         
 		List<ReportVo> sorted = rvo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
 				.collect(Collectors.toList());
 		List<ReportVo> first5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
+		List<Long> sIds =first5ElementsList.stream().map(s-> s.getStoreId()).collect(Collectors.toList());
+		List<StoreVo> svos=new ArrayList<>();
+		try {
+			 svos = getStoresForGivenId(sIds);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if (first5ElementsList.size() == svos.size()) {
+			
+			svos.stream().forEach( s-> {
+				
+				first5ElementsList.stream().forEach(r->{
+					
+					if(s.getId() == r.getStoreId()) {
+					
+						r.setName(s.getName());
+					}
+					
+				});
+				
+			});
+			
+		}
 
 		return first5ElementsList;
 	}
-
+ 
 	@Override
-	public List<ReportVo> getsaleSummeryDetails() {
+	public List<ReportVo> getsaleSummeryDetails(Long storeId,Long domainId) {
 
 		List<ReportVo> rvo = new ArrayList<ReportVo>();
 
 		LocalDate Date = LocalDate.now();
 
-		ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetAllListOfReturnSlips(),
+		ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetAllListOfReturnSlips() + "?storeId="+storeId+ "&" +"domainId=" + domainId,
 				HttpMethod.GET, null, GateWayResponse.class);
 
 		ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
@@ -167,7 +242,7 @@ public class ReportsServiceImp implements ReportService {
 		revo.setAmount(ramount);
 		rvo.add(revo);
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -184,11 +259,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getTodaysSale(Long storeId,Long domainId) {
+	public ReportVo getTodaysSale(Long storeId, Long domainId) {
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId, domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -208,11 +283,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getMonthlySale(Long storeId,Long domainId) {
+	public ReportVo getMonthlySale(Long storeId, Long domainId) {
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId, domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -229,11 +304,11 @@ public class ReportsServiceImp implements ReportService {
 	}
 
 	@Override
-	public ReportVo getcurrentMonthSalevsLastMonth(Long storeId,Long domainId) {
+	public ReportVo getcurrentMonthSalevsLastMonth(Long storeId, Long domainId) {
 
-		ReportVo currentMonth = getMonthlySale(storeId,domainId);
+		ReportVo currentMonth = getMonthlySale(storeId, domainId);
 		LocalDate Date = LocalDate.now().minusMonths(1);
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId,domainId);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainId(storeId, domainId);
 		List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -259,175 +334,242 @@ public class ReportsServiceImp implements ReportService {
 		}
 	}
 
-	
 	@Override
 	public List<ReportVo> getTopFiveSalesByRepresentative(Long storeId, Long domainId) {
 
 		List<ReportVo> vo = new ArrayList<>();
-		LocalDate Date =LocalDate.now();
-		
+
+		List<NewSaleEntity> lnesen = new ArrayList<>();
+		LocalDate Date = LocalDate.now();
+
 		if (domainId == DomainData.TE.getId()) {
-			
+			List<ReportVo> lRvos = new ArrayList<ReportVo>();
+
 
 			List<DeliverySlipEntity> dsEntity = dsRepo.findByStoreId(storeId);
-			
-			List<DeliverySlipEntity> desen = dsEntity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
+
+			List<DeliverySlipEntity> desen = dsEntity.stream()
+					.filter(a -> a.getCreationDate().getMonthValue() == (Date.getMonthValue()))
 					.collect(Collectors.toList());
 
-			List<Long> userids = desen.stream().map(a -> a.getUserId()).distinct().collect(Collectors.toList());
+			List<Long> userids = desen.stream().map(a -> a.getUserId()).filter(n -> n != null).distinct()
+					.collect(Collectors.toList());
 
 			userids.stream().forEach(u -> {
 
 				List<DeliverySlipEntity> dsen = dsRepo.findByUserId(u);
+				List<NewSaleEntity> nsen = dsen.stream().map(a -> a.getOrder()).filter(n -> n != null)
+						.collect(Collectors.toList());
 
-				List<Long> orderIds = dsen.stream().map(a -> a.getOrder().getOrderId()).distinct().filter(n -> n != null)
+				List<Long> orderIds = nsen.stream().map(a -> a.getOrderId()).filter(n -> n != null).distinct()
 						.collect(Collectors.toList());
 				orderIds.stream().forEach(d -> {
 					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(d);
 
-					Long amount = nen.get().getNetValue();
+					lnesen.add(nen.get());
+
+				});
+				if (!lnesen.isEmpty()) {
+					Long amount = lnesen.stream().mapToLong(x -> x.getNetValue()).sum();
 					ReportVo v = new ReportVo();
 					v.setAmount(amount);
 					v.setUserId(u);
 
 					vo.add(v);
-
-				});
+				}
 
 			});
-			List<ReportVo> sorted = vo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
+			List<Long> uids = vo.stream().map(u -> u.getUserId()).collect(Collectors.toList());
+			List<UserDetailsVo> uvos = new ArrayList<>();
+			try {
+				uvos = getUsersForGivenIds(uids);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(uvos!=null) {
+			
+				
+				uvos.stream().forEach( s-> {
+					
+					vo.stream().forEach(r->{
+						
+						if(s.getUserId().equals(r.getUserId())) {
+							
+					       r.setName(s.getUserName());
+							
+							lRvos.add(r);
+							
+		
+							
+						}
+						
+					});
+					
+				});
+			
+			List<ReportVo> sorted = lRvos.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
 					.collect(Collectors.toList());
-			List<ReportVo> first5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
-
-			return first5ElementsList;
-
-		}else if (domainId != DomainData.TE.getId()) {
+			List<ReportVo> first5ElementsList = sorted.stream().limit(4).collect(Collectors.toList());
 			
+				return first5ElementsList;
+
+			}
+			
+			
+
+		} else if (domainId != DomainData.TE.getId()) {
+			List<ReportVo> lRvos = new ArrayList<ReportVo>();
+
 			List<LineItemsReEntity> reent = lineItemReRepo.findByStoreId(storeId);
-			
-			List<LineItemsReEntity> desen = reent.stream().filter(a -> a.getCreationDate().getDayOfMonth() == (Date.getDayOfMonth()))
+
+			List<LineItemsReEntity> desen = reent.stream()
+					.filter(a -> a.getCreationDate().getMonthValue() == (Date.getMonthValue()))
 					.collect(Collectors.toList());
 			List<Long> userids = desen.stream().map(a -> a.getUserId()).distinct().collect(Collectors.toList());
-			
+
 			userids.stream().forEach(u -> {
 
 				List<LineItemsReEntity> len = lineItemReRepo.findByUserId(u);
-
-				List<Long> orderIds = len.stream().map(a -> a.getOrderId().getOrderId()).distinct()
+				List<NewSaleEntity> news = len.stream().map(a -> a.getOrderId()).filter(n -> n != null).distinct()
 						.collect(Collectors.toList());
+
+				List<Long> orderIds = news.stream().map(a -> a.getOrderId()).distinct().collect(Collectors.toList());
 				orderIds.stream().forEach(d -> {
 					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(d);
-
-					Long amount = nen.get().getNetValue();
-					ReportVo v = new ReportVo();
-					v.setAmount(amount);
-					v.setUserId(u);
-
-					vo.add(v);
+					lnesen.add(nen.get());
 
 				});
-				
+				Long amount = lnesen.stream().mapToLong(x -> x.getNetValue()).sum();
+				ReportVo v = new ReportVo();
+				v.setAmount(amount);
+				v.setUserId(u);
+
+				vo.add(v);
 
 			});
-			List<ReportVo> sorted = vo.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
-					.collect(Collectors.toList());
-			List<ReportVo> top5ElementsList = sorted.stream().limit(5).collect(Collectors.toList());
-
-			return top5ElementsList;
+			List<Long> uids = vo.stream().map(u -> u.getUserId()).collect(Collectors.toList());
+			List<UserDetailsVo> uvos = new ArrayList<>();
+			try {
+				uvos = getUsersForGivenIds(uids);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(uvos!=null) {
 			
-			
-			
-			
-			
-			
-		}else {
-			ReportVo v = new ReportVo();
-			
-			v.setName("There is no sale for today");
-			vo.add(v);
-			
-			return vo;
-		}
-			
+				
+				uvos.stream().forEach( s-> {
+					
+					vo.stream().forEach(r->{
+						
+						if(s.getUserId().equals(r.getUserId())) {
+							
+					       r.setName(s.getUserName());
+							
+							lRvos.add(r);
+							
 		
+							
+						}
+						
+					});
+					
+				});
+			
+			List<ReportVo> sorted = lRvos.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
+					.collect(Collectors.toList());
+			List<ReportVo> first5ElementsList = sorted.stream().limit(4).collect(Collectors.toList());
+			
+				return first5ElementsList;
+
+			}
+
+		}
+		
+		return vo;
+		
+
 	}
 
 	@Override
 	public List<ReportVo> getSalesByCategory(Long storeId, Long domainId) {
-		
-		
-			List<ReportVo> vo = new ArrayList<>();
-			List<NewSaleEntity> nsentity = new ArrayList<NewSaleEntity>();
-			LocalDate Date = LocalDate.now();
-			// System.out.println("id"+lineItemId);
-			if (domainId == DomainData.TE.getId()) {
-				List<LineItemsEntity> lineEntity = lineItemRepo.findByStoreId(storeId);
-				List<LineItemsEntity> lien = lineEntity.stream()
-						.filter(a -> a.getCreationDate().getMonth() == Date.getMonth()).collect(Collectors.toList());
-				List<Long> sections = lien.stream().map(a -> a.getSection()).distinct().collect(Collectors.toList());
 
-				sections.stream().forEach(b -> {
-
-					Long amount = 0l;
-
-					List<LineItemsEntity> data = lineItemRepo.findBySection(b);
-
-					List<Long> result = data.stream().map(num -> num.getDsEntity().getOrder().getOrderId())
-							.filter(n -> n != null).collect(Collectors.toList());
-
-					List<Long> orderIds = result.stream().map(q -> q).distinct().collect(Collectors.toList());
-					orderIds.stream().forEach(a -> {
-						Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(a);
-						nsentity.add(nen.get());
-					});
-
-					amount = nsentity.stream().mapToLong(x -> x.getNetValue()).sum();
-					ReportVo rvo = new ReportVo();
-					rvo.setAmount(amount);
-					rvo.setCategeoryType(b);
-					vo.add(rvo);
-				});
-				return vo;
-
-			}else if (domainId != DomainData.TE.getId()) {
-				List<LineItemsReEntity> lineReEntity = lineItemReRepo.findByStoreId(storeId);
-				List<LineItemsReEntity> lien = lineReEntity.stream()
-						.filter(a -> a.getCreationDate().getMonth() == Date.getMonth()).collect(Collectors.toList());
-				List<Long> sections = lien.stream().map(a -> a.getSection()).distinct().collect(Collectors.toList());
-
-				sections.stream().forEach(b -> {
-
-					Long amount = 0l;
-
-					List<LineItemsReEntity> data = lineItemReRepo.findBySection(b);
-
-					List<Long> result = data.stream().map(num -> num.getOrderId().getOrderId())
-							.filter(n -> n != null).collect(Collectors.toList());
-
-					List<Long> orderIds = result.stream().map(q -> q).distinct().collect(Collectors.toList());
-					orderIds.stream().forEach(a -> {
-						Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(a);
-						nsentity.add(nen.get());
-					});
-
-					amount = nsentity.stream().mapToLong(x -> x.getNetValue()).sum();
-					ReportVo rvo = new ReportVo();
-					rvo.setAmount(amount);
-					rvo.setCategeoryType(b);
-					vo.add(rvo);
-				});
-				return vo;
-				
-				
-			}
-			return vo;
+		List<ReportVo> vo = new ArrayList<>();
+		List<NewSaleEntity> nsentity = new ArrayList<NewSaleEntity>();
+		LocalDate Date = LocalDate.now();
+		// System.out.println("id"+lineItemId);
+		if (domainId == DomainData.TE.getId()) {
+			List<LineItemsEntity> lineEntity = lineItemRepo.findByStoreId(storeId);
 			
+			List<Long> sections = lineEntity.stream().map(a -> a.getSection()).filter(n -> n != null).distinct()
+					.collect(Collectors.toList());
+
+			sections.stream().forEach(b -> {
+
+				Long amount = 0l;
+
+				nsentity.clear();
+				List<LineItemsEntity> data = lineItemRepo.findBySectionAndStoreId(b, storeId);
+				List<LineItemsEntity> lien = data.stream()
+						.filter(a -> a.getCreationDate().getMonth() == Date.getMonth()).collect(Collectors.toList());
+				List<NewSaleEntity> nsen = lien.stream().map(num -> num.getDsEntity().getOrder()).filter(n -> n != null)
+						.collect(Collectors.toList());
+
+				List<Long> result = nsen.stream().map(num -> num.getOrderId()).filter(n -> n != null)
+						.collect(Collectors.toList());
+
+				List<Long> orderIds = result.stream().map(q -> q).distinct().collect(Collectors.toList());
+				orderIds.stream().forEach(a -> {
+					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(a);
+					nsentity.add(nen.get());
+				});
+
+				amount = nsentity.stream().mapToLong(x -> x.getNetValue()).sum();
+				ReportVo rvo = new ReportVo();
+				rvo.setAmount(amount);
+				rvo.setCategeoryType(b);
+				vo.add(rvo);
+			});
+			return vo;
+
+		} else if (domainId != DomainData.TE.getId()) {
+			List<LineItemsReEntity> lineReEntity = lineItemReRepo.findByStoreId(storeId);
+			
+			List<Long> sections = lineReEntity.stream().map(a -> a.getSection()).filter(n -> n != null).distinct().collect(Collectors.toList());
+
+			sections.stream().forEach(b -> {
+
+				Long amount = 0l;
+				nsentity.clear();
+
+				List<LineItemsReEntity> data = lineItemReRepo.findBySectionAndStoreId(b,storeId);
+				
+				List<LineItemsReEntity> lien = data.stream()
+						.filter(a -> a.getCreationDate().getMonth() == Date.getMonth()).collect(Collectors.toList());
+				List<NewSaleEntity> newen = lien.stream().map(num -> num.getOrderId()).filter(n -> n != null)
+						.collect(Collectors.toList());
+
+				List<Long> result = newen.stream().map(num -> num.getOrderId()).filter(n -> n != null)
+						.collect(Collectors.toList());
+
+				List<Long> orderIds = result.stream().map(q -> q).distinct().collect(Collectors.toList());
+				orderIds.stream().forEach(a -> {
+					Optional<NewSaleEntity> nen = newsaleRepo.findByOrderId(a);
+					nsentity.add(nen.get());
+				});
+
+				amount = nsentity.stream().mapToLong(x -> x.getNetValue()).sum();
+				ReportVo rvo = new ReportVo();
+				rvo.setAmount(amount);
+				rvo.setCategeoryType(b);
+				vo.add(rvo);
+			});
+			return vo;
+
 		}
+		return vo;
 
-	
+	}
+
 }
-
-		
-	
-
-

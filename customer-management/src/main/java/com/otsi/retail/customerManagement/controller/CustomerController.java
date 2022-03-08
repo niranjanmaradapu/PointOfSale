@@ -114,11 +114,11 @@ public class CustomerController {
 	}
 
 	@GetMapping("/getAllListOfReturnSlips")
-	public GateWayResponse<?> getAllListOfReturnSlips() {
+	public GateWayResponse<?> getAllListOfReturnSlips(@RequestParam Long storeId,@RequestParam Long domainId) {
 		log.info("Received request to getAllListOfReturnSlips()");
 		List<ListOfReturnSlipsVo> listVo = null;
 
-		listVo = customerService.getAllListOfReturnSlips();
+		listVo = customerService.getAllListOfReturnSlips(storeId,domainId);
 
 		return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
 

@@ -34,7 +34,7 @@ public interface CustomerService {
 
 	CustomerDetailsVo getCustomerFDetailsFromInvoice(String mobileNo) throws Exception;
 
-	List<ListOfReturnSlipsVo> getAllListOfReturnSlips();
+	List<ListOfReturnSlipsVo> getAllListOfReturnSlips(Long storeId, Long domainId);
 HsnDetailsVo getHsnDetails(double netAmt) throws JsonMappingException, JsonProcessingException;
 
 	

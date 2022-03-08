@@ -26,6 +26,7 @@ import org.springframework.web.client.ResourceAccessException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
+import com.otsi.retail.newSale.Exceptions.BusinessException;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
@@ -123,7 +124,7 @@ public class NewSaleController {
 			NewSaleVo result = newSaleService.getInvoiceDetails(orderNumber);
 			return new GateWayResponse<>("Success..", result);
 		} catch (RecordNotFoundException re) {
-			return new GateWayResponse<>(re.getMsg(), "Exception occurs while fetching invoice details");
+			return new GateWayResponse<>(re.getMessage(), "Exception occurs while fetching invoice details");
 		}
 	}
 
@@ -214,7 +215,7 @@ public class NewSaleController {
 			return new GateWayResponse<>("successfully created deliveryslip", saveDs);
 		} catch (RecordNotFoundException e) {
 			log.error("Exception occurs while saving delivery slip : " + vo);
-			return new GateWayResponse<>(e.getMsg(), "Exception occurs");
+			return new GateWayResponse<>(e.getMessage(), "Exception occurs");
 		}
 	}
 
@@ -273,7 +274,12 @@ public class NewSaleController {
 
 	}
 
-	public GateWayResponse<?> getSaleBillsFallBackMethod(Exception ex) {
+	public GateWayResponse<?> getSaleBillsFallBackMethod(Exception ex) throws Exception {
+		if (ex instanceof BusinessException) {
+			throw ex;
+			
+			
+		}
 
 		return new GateWayResponse<>("Third Party Service  is Down", null);
 
@@ -294,11 +300,11 @@ public class NewSaleController {
 	}
 	// Method for day closer
 
-	@GetMapping(CommonRequestMappigs.DAY_CLOSER)
-	public GateWayResponse<?> dayclose() {
+	@GetMapping(CommonRequestMappigs.GET_PENDINGDELIVERYSLIPS)
+	public GateWayResponse<?> dayclose(@RequestParam Long storeId) {
 		log.info("Recieved request to dayclose()");
 		try {
-			List<DeliverySlipEntity> dayclose = newSaleService.posDayClose();
+			List<DeliverySlipVo> dayclose = newSaleService.posDayClose(storeId);
 			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());
@@ -308,10 +314,10 @@ public class NewSaleController {
 
 	}
 
-	@GetMapping(CommonRequestMappigs.POS_CLOSEDAY)
-	public GateWayResponse<?> posclose(@RequestParam Boolean posclose) {
+	@PostMapping(CommonRequestMappigs.CLOSE_PENDINGDELIVERYSLIP)
+	public GateWayResponse<?> posclose(@RequestBody List<DeliverySlipVo> dsVo) {
 		try {
-			String dayclose = newSaleService.posClose(posclose);
+			String dayclose = newSaleService.posClose(dsVo);
 			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -417,7 +423,7 @@ public class NewSaleController {
 			String result = newSaleService.activateGiftvoucher(gvsList, flag);
 			return new GateWayResponse<>(result, "Success");
 		} catch (RecordNotFoundException rfe) {
-			return new GateWayResponse<>(rfe.getMsg(), "Exception occurs");
+			return new GateWayResponse<>(rfe.getMessage(), "Exception occurs");
 		}
 
 	}
@@ -445,7 +451,7 @@ public class NewSaleController {
 			List<GiftVoucherVo> result = newSaleService.getGvByUserId(userId);
 			return new GateWayResponse<>("Success", result);
 		} catch (RecordNotFoundException rfe) {
-			return new GateWayResponse<>(rfe.getMsg(), "No record found");
+			return new GateWayResponse<>(rfe.getMessage(), "No record found");
 		}
 	}
 
@@ -457,7 +463,7 @@ public class NewSaleController {
 			List<GiftVoucherVo> result = newSaleService.getListOfGiftvouchers();
 			return new GateWayResponse<>("Successfully fetch records", result);
 		} catch (RecordNotFoundException rfe) {
-			return new GateWayResponse<>(rfe.getMsg(), "Record not found");
+			return new GateWayResponse<>(rfe.getMessage(), "Record not found");
 		}
 	}
 
@@ -513,7 +519,9 @@ public class NewSaleController {
 
 	}
 
-	public GateWayResponse<?> getSaleReportFallBackMethod(Exception ex) {
+	public GateWayResponse<?> getSaleReportFallBackMethod(Exception ex) throws Exception {
+		if (ex instanceof BusinessException)
+			throw ex;
 
 		return new GateWayResponse<>("Third Party Service  is Down", null);
 
@@ -601,8 +609,5 @@ public class NewSaleController {
 		return new GateWayResponse<>(HttpStatus.OK, result, "");
 
 	}
-	
-	
-	
 
 }
