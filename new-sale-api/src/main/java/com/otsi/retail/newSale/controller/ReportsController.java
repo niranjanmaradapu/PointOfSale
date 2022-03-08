@@ -26,10 +26,10 @@ public class ReportsController {
 	private ReportService reportService;
 
 	@GetMapping(value = "/InvoicesGenerated")
-	public GateWayResponse<?> getInvoicesGeneratedDetails(@RequestParam Long storeId) {
+	public GateWayResponse<?> getInvoicesGeneratedDetails(@RequestParam Long storeId,@RequestParam Long domainId) {
 		try {
 
-			List<ReportVo> rvo = reportService.getInvoicesGeneratedDetails(storeId);
+			List<ReportVo> rvo = reportService.getInvoicesGeneratedDetails(storeId,domainId);
 
 			return new GateWayResponse<>(HttpStatus.OK, rvo, "");
 		} catch (Exception e) {
@@ -52,10 +52,10 @@ public class ReportsController {
 	}
 
 	@GetMapping(value = "/getTopfiveSalesByStore")
-	public GateWayResponse<?> getTopfiveSalesByStore() {
+	public GateWayResponse<?> getTopfiveSalesByStore(@RequestParam Long domainId) {
 		try {
 
-			List<ReportVo> rvo = reportService.getTopfiveSalesByStore();
+			List<ReportVo> rvo = reportService.getTopfiveSalesByStore(domainId);
 
 			return new GateWayResponse<>(HttpStatus.OK, rvo, "");
 		} catch (Exception e) {
@@ -65,10 +65,10 @@ public class ReportsController {
 	}
 
 	@GetMapping(value = "/getsaleSummery")
-	public GateWayResponse<?> getsaleSummeryDetails() {
+	public GateWayResponse<?> getsaleSummeryDetails(@RequestParam Long storeId,@RequestParam Long domainId) {
 		try {
 
-			List<ReportVo> rvo = reportService.getsaleSummeryDetails();
+			List<ReportVo> rvo = reportService.getsaleSummeryDetails(storeId,domainId);
 
 			return new GateWayResponse<>(HttpStatus.OK, rvo, "");
 		} catch (Exception e) {
@@ -135,5 +135,7 @@ public class ReportsController {
 		List<ReportVo> byCategory = reportService.getSalesByCategory(storeId, domainId);
 		return new GateWayResponse<>(HttpStatus.OK, byCategory, "");
 	}
+	
+	
 
 }

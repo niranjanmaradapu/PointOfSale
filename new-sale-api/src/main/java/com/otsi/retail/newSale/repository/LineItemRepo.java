@@ -28,4 +28,6 @@ public interface LineItemRepo extends JpaRepository<LineItemsEntity, Long> {
 	List<LineItemsEntity> findByStoreId(Long storeId);
 
 	List<LineItemsEntity> findBySection(Long b);
+
+	List<LineItemsEntity> findBySectionAndStoreId(Long b, Long storeId);
 }

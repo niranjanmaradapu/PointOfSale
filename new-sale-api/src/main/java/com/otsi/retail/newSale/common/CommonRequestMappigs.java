@@ -34,9 +34,9 @@ public class CommonRequestMappigs {
 
 	public static final String GET_NEWSALEBYCUSTOMERID = "getNewsaleByCustomerId";
 
-	public static final String DAY_CLOSER = "daycloser";
+	public static final String GET_PENDINGDELIVERYSLIPS = "getPendingDeliverySlips";
 
-	public static final String POS_CLOSEDAY = "poscloseday";
+	public static final String CLOSE_PENDINGDELIVERYSLIP = "closePendingDeliverySlips";
 
 	public static final String SAVE_LOYALTY = "saveLoyaltyPoints";
 
