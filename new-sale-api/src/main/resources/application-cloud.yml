@@ -40,19 +40,23 @@ springdoc:
 ######################### REST CALLS ###########################
   
   
-inventoryUpdateTextile_url: http://10.100.15.219:9092/inventoryTextile/fromNewsaleForTextile
+inventoryUpdateTextile_url: http://inventory-module:9092/inventoryTextile/fromNewsaleForTextile
 
-getreturnslip_url: http://10.100.67.139:8082/customer/getListOfReturnSlips
+getreturnslip_url: http://customer-management:8082/customer/getListOfReturnSlips
 
-getCustomerDetailsFromURM_url: http://10.100.160.240:8084/user/getUser
+getreturnslips_url: http://customer-management:8082/customer/getAllListOfReturnSlips
 
-inventoryUpdateRetail_url: http://10.100.15.219:9092/inventoryRetail/fromNewsaleForRetail
+getCustomerDetailsFromURM_url: http://usermanagement:8084/user/getUser
 
-getNewSaleWithHsn_url: http://10.100.177.121:8083/hsnDetails/getHsnDetails
+inventoryUpdateRetail_url: http://inventory-module:9092/inventoryRetail/fromNewsaleForRetail
 
-savecustomer_url: http://10.100.161.5:8081/customer/savecustomerdetails
- 
+getNewSaleWithHsn_url: http://hsn-details:8083/hsnDetails/getHsnDetails
+
 getStoreDetails_url: http://usermanagement:8084/store/storeList
 
 getUserDetails_url: http://usermanagement:8084/user/getUsersForGivenIds 
+
+updateCreditNotesDetails_url: http://hsn-details:8083/credit-debit-notes/updateCreditDebitNotes
+
+
   

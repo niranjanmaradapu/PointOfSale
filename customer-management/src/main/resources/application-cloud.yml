@@ -6,7 +6,7 @@ spring:
     name: customer-management
  datasource:
     platform: postgres
-    url: jdbc:postgresql://10.100.10.156:5432/customer-management
+    url: jdbc:postgresql://customer-management-pos:5432/customer-management
     username: postgres
     password: Otsi@123
  jpa:
@@ -67,13 +67,13 @@ management:
 ############################## REST CALLS #####################################
 
 
-NEW_SALE_GET_INVOICEDETAILS_URL : http://10.100.161.5:8081/newsale/getInvoiceDetails
+NEW_SALE_GET_INVOICEDETAILS_URL : http://new-sale-api:8081/newsale/getInvoiceDetails
 
-GET_CUSTOMER_FROM_NEWSALE_URL : http://10.100.161.5:8081/newsale/getCustomerFromNewSale
+GET_CUSTOMER_FROM_NEWSALE_URL : http://new-sale-api:8081/newsale/getCustomerFromNewSale
 
-TAG_CUSTOMER_TO_INVOICE : http://10.100.161.5:8081/newsale/tagCustomerToInvoice
+TAG_CUSTOMER_TO_INVOICE : http://new-sale-api:8081/newsale/tagCustomerToInvoice
 
-getbarcodes_url: http://10.100.161.5:8081/newsale/getbarcodes
+getbarcodes_url: http://new-sale-api:8081/newsale/getbarcodes
 
-getNewSaleWithHsn_url: http://10.100.177.121:8083/hsnDetails/getHsnDetails
+getNewSaleWithHsn_url: http://hsn-details:8083/hsnDetails/getHsnDetails
 
