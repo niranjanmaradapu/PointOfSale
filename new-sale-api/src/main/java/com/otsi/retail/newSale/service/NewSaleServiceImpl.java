@@ -1355,7 +1355,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		} else {
 
 			SaleReportVo slr = newSaleMapper.convertlistSaleReportEntityToVo(saleDetails);
-			HsnDetailsVo hsnDetails = getHsnDetails(slr.getBillValue());
+			//HsnDetailsVo hsnDetails = getHsnDetails(slr.getBillValue());
 			SalesSummeryVo salesSummery = new SalesSummeryVo();
 			// salesSummery.setTotalTaxableAmount(hsnDetails.getTaxVo().getTaxableAmount());
 			// salesSummery.setTotalCgst(hsnDetails.getTaxVo().getCgst());
