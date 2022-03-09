@@ -6,7 +6,7 @@ spring:
     name: new-sale-service 
  datasource:
     platform: postgres
-    url: jdbc:postgresql://10.100.165.80:5432/new-sale-api
+    url: jdbc:postgresql://new-sale-api-pos:5432/new-sale-api
     username: postgres
     password: Otsi@123
  jpa:
