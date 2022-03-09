@@ -1,0 +1,79 @@
+server:
+ port: 8082
+ 
+spring:
+ application:
+    name: customer-management
+ datasource:
+    platform: postgres
+    url: jdbc:postgresql://customer-management-pos:5432/customer-management
+    username: postgres
+    password: Otsi@123
+ jpa:
+   hibernate:
+    ddl-auto: update
+   database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+   show-sql: true
+   
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://10.100.143.45:8762/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${random.int}
+    hostname: localhost
+
+springdoc:
+  packagesToScan: com.otsi.retail.customerManagement
+  
+getbarcodes:
+  url: http://10.100.161.5:8081/newsale/getbarcodes
+getNewSaleWithHsn: 
+  url: http://10.100.177.121:8083/hsnDetails/getHsnDetails
+logging:
+    file:
+      name: C:/Users/ADMIN/Desktop/logs/customer-management.log
+    level:
+      com.otsi.retail.customerManagement.service: DEBUG   
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      newSale:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        waitDurationInOpenState: 5s
+        slidingWindowType: COUNT_BASED
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+      
+############################## REST CALLS #####################################
+
+
+NEW_SALE_GET_INVOICEDETAILS_URL : http://new-sale-api:8081/newsale/getInvoiceDetails
+
+GET_CUSTOMER_FROM_NEWSALE_URL : http://new-sale-api:8081/newsale/getCustomerFromNewSale
+
+TAG_CUSTOMER_TO_INVOICE : http://new-sale-api:8081/newsale/tagCustomerToInvoice
+
+getbarcodes_url: http://new-sale-api:8081/newsale/getbarcodes
+
+getNewSaleWithHsn_url: http://hsn-details:8083/hsnDetails/getHsnDetails
+
