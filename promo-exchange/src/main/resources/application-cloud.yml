@@ -8,7 +8,7 @@ spring:
     
  datasource:
     platform: postgres
-    url: jdbc:postgresql://10.100.127.220:5432/promo-exchange
+    url: jdbc:postgresql://promo-exchange-pos:5432/promo-exchange
     username: postgres
     password: root
     
@@ -36,9 +36,9 @@ springdoc:
   
 #==============================================RESTCALL==================================
 
-savecustomer_url: http://10.100.161.5:8081/customer/savecustomerdetails
-getdeliveryslip_url: http://10.100.161.5:8081/newsale/getdeliveryslip
-getreturnslip_url: http://10.100.67.139:8084/customer/getAllListOfReturnSlips
-GET_DS_DETAILS_FROM_NEWSALE_URl : http://10.100.161.5:8081/newsale/getdeliveryslip
+savecustomer_url: http://new-sale-api:8081/customer/savecustomerdetails
+getdeliveryslip_url: http://new-sale-api:8081/newsale/getdeliveryslip
+getreturnslip_url: http://customer-management:8082/customer/getAllListOfReturnSlips
+GET_DS_DETAILS_FROM_NEWSALE_URl : http://new-sale-api:8081/newsale/getdeliveryslip
 
 
