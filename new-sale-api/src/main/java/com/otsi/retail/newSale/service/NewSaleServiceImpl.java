@@ -1339,15 +1339,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() != null
 				&& srvo.getDomainId() != 0L) {
 			saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreIdAndDomainId(srvo.getDateFrom(),
-					srvo.getDateTo(), srvo.getStore().getId(), srvo.getDomainId());
+					srvo.getDateTo(), srvo.getStoreId(), srvo.getDomainId());
 		} else if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() == null
 				&& srvo.getDomainId() != 0L) {
 
 			saleDetails = newSaleRepository.findByCreationDateBetweenAndDomainIdAndStoreId(srvo.getDateFrom(),
 					srvo.getDateTo(), srvo.getDomainId(), srvo.getStoreId());
-		} else if (srvo.getDateFrom() == null && srvo.getDateTo() == null && srvo.getStore().getId() != 0L) {
+		} else if (srvo.getDateFrom() == null && srvo.getDateTo() == null && srvo.getStoreId() != 0L) {
 
-			saleDetails = newSaleRepository.findByStoreId(srvo.getStore().getId());
+			saleDetails = newSaleRepository.findByStoreId(srvo.getStoreId());
 		}
 
 		if (saleDetails.isEmpty()) {
@@ -1355,7 +1355,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		} else {
 
 			SaleReportVo slr = newSaleMapper.convertlistSaleReportEntityToVo(saleDetails);
-			HsnDetailsVo hsnDetails = getHsnDetails(slr.getBillValue());
+			//HsnDetailsVo hsnDetails = getHsnDetails(slr.getBillValue());
 			SalesSummeryVo salesSummery = new SalesSummeryVo();
 			// salesSummery.setTotalTaxableAmount(hsnDetails.getTaxVo().getTaxableAmount());
 			// salesSummery.setTotalCgst(hsnDetails.getTaxVo().getCgst());
