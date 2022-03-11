@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
 import com.otsi.retail.promotions.vo.ProductTextileVo;
+import com.otsi.retail.promotions.vo.PromotionToStoreVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
 import com.otsi.retail.promotions.vo.SearchPromotionsVo;
@@ -25,7 +26,8 @@ public interface PromotionService {
 
 	List<StoreVo> getAllStores();
 
-	String addPromotionToStore(PromotionsVo vo);
+	//String addPromotionToStore(PromotionsVo vo);
+	String addPromotionToStore(PromotionToStoreVo vo);
 
 	List<SearchPromotionsVo> searchPromotion(SearchPromotionsVo vo);
 
@@ -40,5 +42,7 @@ public interface PromotionService {
 	List<ReportVo> activeVSinactivePromos();
 
 	List<ProductTextileVo> checkPromtion(List<ProductTextileVo> listofInvTxt, Long storeId, Long domainId);
+
+	String updatePriority(SearchPromotionsVo vo);
 		
 }

@@ -4,16 +4,19 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.promotions.entity.BenfitEntity;
 import com.otsi.retail.promotions.entity.PoolEntity;
 import com.otsi.retail.promotions.entity.PromotionSlabsEntity;
+import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
 import com.otsi.retail.promotions.entity.PromotionsEntity;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.PromotionSlabsVo;
+import com.otsi.retail.promotions.vo.PromotionToStoreVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 
 /**
@@ -115,6 +118,7 @@ public class PromotionMapper {
 			vo.setPromotionStartDate(x.getPromotionStartDate());
 			vo.setPromotionEndDate(x.getPromotionEndDate());
 			vo.setPromoApplyType(x.getPromoApplyType());
+			
 			listOfPromoVos.add(vo);
 
 			List<PromotionSlabsVo> slabVo = new ArrayList<>();
@@ -205,5 +209,6 @@ public class PromotionMapper {
 		return list;
 
 	}
+	
 
 }

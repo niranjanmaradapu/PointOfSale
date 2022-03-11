@@ -76,7 +76,8 @@ public class CalculateBenifits {
 	          int discountPercentage= Integer.valueOf(benifitVo.getDiscount()).intValue();
 	         int purchasedQuantity= productTextileVo.getQty();
 	        float valueOfMRP= productTextileVo.getItemMrp();
-	         calculatedDiscountAmount= (discountPercentage/100)*(purchasedQuantity*valueOfMRP) +"";
+	        //calculatedDiscountAmount= (discountPercentage/100)*(purchasedQuantity*valueOfMRP) +"";
+	        calculatedDiscountAmount= (valueOfMRP/100)*purchasedQuantity*discountPercentage +"";
 	         
 		}
 		return calculatedDiscountAmount;

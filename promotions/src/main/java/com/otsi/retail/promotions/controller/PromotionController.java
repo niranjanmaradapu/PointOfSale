@@ -21,6 +21,7 @@ import com.otsi.retail.promotions.service.PromotionService;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
 import com.otsi.retail.promotions.vo.ProductTextileVo;
+import com.otsi.retail.promotions.vo.PromotionToStoreVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
 import com.otsi.retail.promotions.vo.SearchPromotionsVo;
@@ -90,10 +91,18 @@ public class PromotionController {
 
 	}
 
+//	@PostMapping(CommonRequestMappigs.ADD_PROMO_STORE)
+//	public GateWayResponse<?> addPromotionToStore(@RequestBody PromotionsVo vo) {
+//		log.info("Recieved request to addPromotionToStore():" + vo);
+//		String result = promoService.addPromotionToStore(vo);
+//		return new GateWayResponse<>("promotion mapped to store successfully", result);
+//
+//	}
+	
 	@PostMapping(CommonRequestMappigs.ADD_PROMO_STORE)
-	public GateWayResponse<?> addPromotionToStore(@RequestBody PromotionsVo vo) {
-		log.info("Recieved request to addPromotionToStore():" + vo);
-		String result = promoService.addPromotionToStore(vo);
+	public GateWayResponse<?> addPromotionToStore(@RequestBody PromotionToStoreVo vos) {
+		log.info("Recieved request to addPromotionToStore():" + vos);
+		String result = promoService.addPromotionToStore(vos);
 		return new GateWayResponse<>("promotion mapped to store successfully", result);
 
 	}
@@ -155,6 +164,14 @@ public class PromotionController {
 			                                @RequestParam Long domainId) {
 		return new GateWayResponse<>("", promoService.checkPromtion(listofInvTxt,storeId,domainId));
 	}
+	
+	@PutMapping("/updatePriority")
+	public GateWayResponse<?> updatePriority(@RequestBody SearchPromotionsVo vo) {
+		return new GateWayResponse<>("", promoService.updatePriority(vo));
+	}
+	
+	
+	
 	
 
 }

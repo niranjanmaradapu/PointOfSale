@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -75,5 +76,11 @@ public class PromotionsEntity {
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "promoId")
 	private List<PromotionSlabsEntity> promotionSlabEntity;
+	
+//	@ManyToMany(mappedBy = "promotions",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//	private List<PromotionToStoreEntity> promoStores;
+	
+//	@ManyToOne
+//	private PromotionToStoreEntity promoStores;
 	
 }

@@ -18,7 +18,13 @@ public class SearchPromotionsVo {
 	
 	private Long promoId;
 	
+	private Long promoToStoreId;
+	
+	private Long storeId;
+	
 	private String promotionName;
+	
+	private String storeName;
 	
 	private String description;
 	
