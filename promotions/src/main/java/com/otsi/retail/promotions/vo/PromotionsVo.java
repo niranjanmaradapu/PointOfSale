@@ -74,5 +74,7 @@ public class PromotionsVo {
 	private List<BenefitVo> benfitVo;
 	
 	private List<PromotionSlabsVo> promotionSlabVo;
+	
+	private List<PromotionToStoreVo> promoStores;
 
 }

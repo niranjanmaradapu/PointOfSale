@@ -56,12 +56,13 @@ public class PoolMapper {
 				condition.setGivenValues(c.getGivenValues());
 				condition.setOperatorSymbol(c.getOperatorSymbol());
 				condition.setUpdatedAt(LocalDate.now());
+				condition.setPoolRule(poolRule);
 				listOfConditions.add(condition);
 			});
 
 		} else {
 
-			poolRule.setRuleNumber(poolRuleVo.getRuleNumber() + 1);
+			poolRule.setRuleNumber(poolRuleVo.getRuleNumber());
 			System.out.println("RuleNumber is:: " + poolRule.getRuleNumber());
 			poolRule.setCreatedAt(LocalDate.now());
 
