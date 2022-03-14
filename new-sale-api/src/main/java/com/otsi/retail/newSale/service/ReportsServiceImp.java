@@ -408,13 +408,14 @@ public class ReportsServiceImp implements ReportService {
 					
 				});
 			
+			
+
+			}
 			List<ReportVo> sorted = lRvos.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
 					.collect(Collectors.toList());
 			List<ReportVo> first5ElementsList = sorted.stream().limit(4).collect(Collectors.toList());
 			
 				return first5ElementsList;
-
-			}
 			
 			
 
@@ -477,18 +478,19 @@ public class ReportsServiceImp implements ReportService {
 					
 				});
 			
+			
+
+			}
 			List<ReportVo> sorted = lRvos.stream().sorted(Comparator.comparingLong(ReportVo::getAmount).reversed())
 					.collect(Collectors.toList());
 			List<ReportVo> first5ElementsList = sorted.stream().limit(4).collect(Collectors.toList());
 			
 				return first5ElementsList;
 
-			}
-
 		}
+		else
 		
-		return vo;
-		
+		return null;
 
 	}
 
