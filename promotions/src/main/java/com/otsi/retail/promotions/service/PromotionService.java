@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
 import com.otsi.retail.promotions.vo.ProductTextileVo;
@@ -46,5 +47,7 @@ public interface PromotionService {
 	String updatePriority(SearchPromotionsVo vo);
 	
 	List<SearchPromotionsVo> searchPromotionByStoreName(SearchPromotionsVo vo);
+	
+	List<PromotionToStoreEntity> getAllStorePromotions();
 		
 }

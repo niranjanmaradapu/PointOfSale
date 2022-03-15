@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.otsi.retail.promotions.common.CommonRequestMappigs;
+import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
 import com.otsi.retail.promotions.gatewayresponse.GateWayResponse;
 import com.otsi.retail.promotions.service.PromotionService;
 import com.otsi.retail.promotions.vo.BenefitVo;
@@ -173,6 +174,14 @@ public class PromotionController {
 	@PostMapping("/searchPromoByStoreName")
 	public GateWayResponse<?> searchPromoByStoreName(@RequestBody SearchPromotionsVo vo) {
 		return new GateWayResponse<>("", promoService.searchPromotionByStoreName(vo));
+	}
+	
+	@GetMapping("/getAllStorePromos")
+	public GateWayResponse<?> getAllPromoStores() {
+		//log.info("Recieved request to getByStoreId():" + storeId);
+		List<PromotionToStoreEntity> getAllStorePromos = promoService.getAllStorePromotions();
+		return new GateWayResponse<>("fetching store promotions successfully", getAllStorePromos);
+
 	}
 	
 	

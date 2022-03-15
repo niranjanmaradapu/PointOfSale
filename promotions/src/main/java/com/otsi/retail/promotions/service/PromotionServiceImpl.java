@@ -142,6 +142,7 @@ public class PromotionServiceImpl implements PromotionService {
 		} else {
 			promoList = promoRepo.findByIsActiveAndDomainId(status, domainId);
 		}
+
 		if (!promoList.isEmpty()) {
 			ConnectionPromoVo promoVo = new ConnectionPromoVo();
 			List<PromotionsVo> listOfPromo = promoMapper.convertPromoEntityToVo(promoList);
@@ -627,6 +628,20 @@ public class PromotionServiceImpl implements PromotionService {
 		}
 
 		return listOfPromos;
+	}
+
+	@Override
+	public List<PromotionToStoreEntity> getAllStorePromotions() {
+
+		List<PromotionToStoreEntity> promoStoreList = promostoreRepo.findAll();
+		if (promoStoreList == null) {
+
+			throw new RecordNotFoundException("Store data not exists");
+
+		}
+		
+
+		return promoStoreList;
 	}
 
 }
