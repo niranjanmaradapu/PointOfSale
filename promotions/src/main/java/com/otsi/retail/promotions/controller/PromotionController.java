@@ -170,6 +170,11 @@ public class PromotionController {
 		return new GateWayResponse<>("", promoService.updatePriority(vo));
 	}
 	
+	@PostMapping("/searchPromoByStoreName")
+	public GateWayResponse<?> searchPromoByStoreName(@RequestBody SearchPromotionsVo vo) {
+		return new GateWayResponse<>("", promoService.searchPromotionByStoreName(vo));
+	}
+	
 	
 	
 	

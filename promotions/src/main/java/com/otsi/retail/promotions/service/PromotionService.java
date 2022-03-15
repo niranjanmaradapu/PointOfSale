@@ -44,5 +44,7 @@ public interface PromotionService {
 	List<ProductTextileVo> checkPromtion(List<ProductTextileVo> listofInvTxt, Long storeId, Long domainId);
 
 	String updatePriority(SearchPromotionsVo vo);
+	
+	List<SearchPromotionsVo> searchPromotionByStoreName(SearchPromotionsVo vo);
 		
 }

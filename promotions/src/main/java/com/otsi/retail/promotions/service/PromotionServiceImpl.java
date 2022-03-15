@@ -588,7 +588,6 @@ public class PromotionServiceImpl implements PromotionService {
 
 			PromotionToStoreEntity promotionToStoreEntity = promoStoreId.get();
 			promotionToStoreEntity.setPriority(vo.getPriority());
-			;
 
 		} else {
 
@@ -596,6 +595,38 @@ public class PromotionServiceImpl implements PromotionService {
 		}
 
 		return "Priority updated successfully for the id " + promoStoreId.get().getId();
+	}
+
+	@Override
+	public List<SearchPromotionsVo> searchPromotionByStoreName(SearchPromotionsVo vo) {
+
+		List<SearchPromotionsVo> listOfPromos = new ArrayList<>();
+		List<PromotionToStoreEntity> storeNames = promostoreRepo.findByStoreName(vo.getStoreName());
+
+		if (storeNames != null) {
+
+			storeNames.stream().forEach(s -> {
+
+				SearchPromotionsVo svo = new SearchPromotionsVo();
+
+				svo.setPromoToStoreId(s.getId());
+				svo.setPromoId(s.getPromoId());
+				svo.setPriority(s.getPriority());
+				svo.setPromotionName(s.getPromotionName());
+				svo.setPromotionStartDate(s.getStartDate());
+				svo.setPromotionEndDate(s.getEndDate());
+				svo.setStoreName(s.getStoreName());
+				svo.setIsActive(s.getPromotionStatus());
+				listOfPromos.add(svo);
+
+			});
+
+		} else {
+
+			throw new RecordNotFoundException("store name not exists");
+		}
+
+		return listOfPromos;
 	}
 
 }
