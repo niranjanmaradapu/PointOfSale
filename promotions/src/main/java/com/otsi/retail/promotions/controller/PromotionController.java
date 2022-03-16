@@ -168,7 +168,7 @@ public class PromotionController {
 	
 	@PutMapping("/updatePriority")
 	public GateWayResponse<?> updatePriority(@RequestBody SearchPromotionsVo vo) {
-		return new GateWayResponse<>("", promoService.updatePriority(vo));
+		return new GateWayResponse<>("priority updated successfully", promoService.updatePriority(vo));
 	}
 	
 	@PostMapping("/searchPromoByStoreName")

@@ -336,16 +336,16 @@ public class PromotionServiceImpl implements PromotionService {
 			throw new InvalidDataException("Please enter valid data");
 		}
 
-		PromotionToStoreEntity dto = promostoreRepo.findByPromoId(vo.getPromoId());
+		Optional<PromotionToStoreEntity> dto = promostoreRepo.findById(vo.getPromoToStoreId());
 
 		if (Objects.nonNull(vo.getPromotionStartDate()) && Objects.nonNull(vo.getPromotionEndDate())
 				&& Objects.nonNull(vo.getIsActive())) {
-			dto.setStartDate(vo.getPromotionStartDate());
-			dto.setEndDate(vo.getPromotionEndDate());
-			dto.setPromotionStatus(vo.getIsActive());
+			dto.get().setStartDate(vo.getPromotionStartDate());
+			dto.get().setEndDate(vo.getPromotionEndDate());
+			dto.get().setPromotionStatus(vo.getIsActive());
 		}
-
-		promostoreRepo.save(dto);
+         PromotionToStoreEntity promotionToStoreEntity = dto.get();
+		promostoreRepo.save(promotionToStoreEntity);
 
 		return "Promotion Dates Updated Successfully";
 	}
@@ -357,11 +357,11 @@ public class PromotionServiceImpl implements PromotionService {
 			throw new InvalidDataException("please enter valid data");
 		}
 
-		if (promostoreRepo.existsByStoreName(vo.getStoreName())) {
-			System.out.println("Promtion already mapped to the " + vo.getStoreName());
-			throw new DuplicateRecordException("Promotion already mapped to this store ");
-
-		}
+//		if (promostoreRepo.existsByStoreName(vo.getStoreName())) {
+//			System.out.println("Promtion already mapped to the " + vo.getStoreName());
+//			throw new DuplicateRecordException("Promotion already mapped to this store ");
+//
+//		}
 
 		Optional<PromotionToStoreEntity> storeDto = promostoreRepo.findById(vo.getPromoToStoreId());
 		PromotionToStoreEntity promoStore = new PromotionToStoreEntity();
@@ -640,7 +640,6 @@ public class PromotionServiceImpl implements PromotionService {
 
 		}
 		
-
 		return promoStoreList;
 	}
 
