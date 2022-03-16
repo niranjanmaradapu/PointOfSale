@@ -18,7 +18,8 @@ public class SearchPromotionsVo {
 	
 	private Long promoId;
 	
-	private Long promoToStoreId;
+	//primary key of promoStoreMapping table
+	private Long id;
 	
 	private Long storeId;
 	
@@ -32,10 +33,10 @@ public class SearchPromotionsVo {
 	
 	private Long promotionsCount;
 	
-	private LocalDate promotionStartDate;
+	private LocalDate startDate;
 	
-	private LocalDate promotionEndDate;
+	private LocalDate endDate;
 	
-	private Boolean isActive;
+	private Boolean promotionStatus;
 	
 }
