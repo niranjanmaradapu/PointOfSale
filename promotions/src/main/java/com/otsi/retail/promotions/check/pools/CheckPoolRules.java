@@ -78,7 +78,7 @@ public class CheckPoolRules {
 
 			return checkLessThanOrEqualsUomDataType(condition, productTextileVo.getUom());
 
-		case Dcode:
+		/*case Dcode:
 			return checkLessThanOrEqualsDcodeDataType(condition, productTextileVo.getHsnCode());
 
 		case StyleCode:
@@ -88,7 +88,7 @@ public class CheckPoolRules {
 			return checkLessThanOrEqualsSSIdDataType(condition, productTextileVo.getHsnCode());
 			
 		case DiscountType:
-			return checkLessThanOrEqualsDisDataType(condition,productTextileVo.getHsnCode());
+			return checkLessThanOrEqualsDisDataType(condition,productTextileVo.getHsnCode());*/
 			
 
 		default:
@@ -98,7 +98,7 @@ public class CheckPoolRules {
 
 	}
 
-	private boolean checkLessThanOrEqualsDisDataType(Condition condition, String hsnCode) {
+	/*private boolean checkLessThanOrEqualsDisDataType(Condition condition, String hsnCode) {
 		
 		if (Float.parseFloat(hsnCode) <= Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 
@@ -129,7 +129,7 @@ public class CheckPoolRules {
 		if (Float.parseFloat(hsnCode) <= Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 			return true;
 		return false;
-	}
+	}*/
 
 	private boolean checkLessThanOrEqualsUomDataType(Condition condition, String uom) {
 		if (Float.parseFloat(uom) <= Float.valueOf(condition.getGivenValues().get(0)).floatValue())
@@ -221,7 +221,7 @@ public class CheckPoolRules {
 		case Uom:
 			return checkGreaterThanOrEqualsUomDataType(condition, productTextileVo.getUom());
 
-		case Dcode:
+		/*case Dcode:
 			return checkGreaterThanOrEqualsDcodeDataType(condition, productTextileVo.getHsnCode());
 
 		case StyleCode:
@@ -231,7 +231,7 @@ public class CheckPoolRules {
 			return checkGreaterThanOrEqualsSSIdDataType(condition, productTextileVo.getHsnCode());
 			
 		case DiscountType:
-			return checkGreaterThanOrEqualsDisDataType(condition,productTextileVo.getHsnCode());
+			return checkGreaterThanOrEqualsDisDataType(condition,productTextileVo.getHsnCode());*/
 			
 
 		default:
@@ -240,7 +240,7 @@ public class CheckPoolRules {
 
 	}
 
-	private boolean checkGreaterThanOrEqualsDisDataType(Condition condition, String hsnCode) {
+	/*private boolean checkGreaterThanOrEqualsDisDataType(Condition condition, String hsnCode) {
 		
 		if (Float.parseFloat(hsnCode) >= Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 
@@ -272,7 +272,7 @@ public class CheckPoolRules {
 
 			return true;
 		return false;
-	}
+	}*/
 
 	private boolean checkGreaterThanOrEqualsUomDataType(Condition condition, String uom) {
 		if (Float.parseFloat(uom) >= Float.valueOf(condition.getGivenValues().get(0)).floatValue())
@@ -362,7 +362,7 @@ public class CheckPoolRules {
 		case Uom:
 			return checkLessThanUomDataType(condition, productTextileVo.getUom());
 
-		case Dcode:
+		/*case Dcode:
 			return checkLessThanDcodeDataType(condition, productTextileVo.getHsnCode());
 
 		case StyleCode:
@@ -374,7 +374,7 @@ public class CheckPoolRules {
 			
 		case DiscountType:
 			
-			return checkLessThanDisDataType(condition,productTextileVo.getHsnCode());
+			return checkLessThanDisDataType(condition,productTextileVo.getHsnCode());*/
 
 		default:
 			return false;
@@ -383,7 +383,7 @@ public class CheckPoolRules {
 
 	}
 
-	private boolean checkLessThanSSIdDataType(Condition condition, String hsnCode) {
+	/*private boolean checkLessThanSSIdDataType(Condition condition, String hsnCode) {
         if (Float.parseFloat(hsnCode) < Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 			
 			return true;
@@ -413,7 +413,7 @@ public class CheckPoolRules {
 		if (Float.parseFloat(hsnCode) < Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 			return true;
 		return false;
-	}
+	}*/
 
 	private boolean checkLessThanUomDataType(Condition condition, String uom) {
 
@@ -505,7 +505,7 @@ public class CheckPoolRules {
 		case Uom:
 			return checkGreaterThanUomDataType(condition, productTextileVo.getUom());
 
-		case Dcode:
+		/*case Dcode:
 			return checkGreaterThanDcodeDataType(condition, productTextileVo.getHsnCode());
 
 		case StyleCode:
@@ -516,6 +516,7 @@ public class CheckPoolRules {
 			
 		case DiscountType:
 			return checkGreaterThanDisDataType(condition,productTextileVo.getHsnCode());
+			*/
 			
 
 		default:
@@ -525,7 +526,7 @@ public class CheckPoolRules {
 
 	}
 
-	private boolean checkGreaterThanDisDataType(Condition condition, String hsnCode) {
+	/* private boolean checkGreaterThanDisDataType(Condition condition, String hsnCode) {
 		
 		if (Float.parseFloat(hsnCode) > Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 			return true;
@@ -555,6 +556,7 @@ public class CheckPoolRules {
 
 		return false;
 	}
+	*/
 
 	private boolean checkGreaterThanUomDataType(Condition condition, String uom) {
 
@@ -643,7 +645,7 @@ public class CheckPoolRules {
 
 		case Uom:
 			return checkNotEqualsUomDataType(condition, productTextileVo.getUom());
-		case Dcode:
+		 /*case Dcode:
 			return checkNotEqualsDcodeDataType(condition, productTextileVo.getHsnCode());
 
 		case StyleCode:
@@ -655,6 +657,7 @@ public class CheckPoolRules {
 			
 		case DiscountType:
 			return checkNotEqualsDisDataType(condition,productTextileVo.getHsnCode());
+			*/
 			
 			
 	
@@ -664,7 +667,7 @@ public class CheckPoolRules {
 
 	}
 
-	private boolean checkNotEqualsDisDataType(Condition condition, String hsnCode) {
+	/*private boolean checkNotEqualsDisDataType(Condition condition, String hsnCode) {
 		
 		if (Float.parseFloat(hsnCode) != Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 			return true;
@@ -693,7 +696,7 @@ public class CheckPoolRules {
 			return true;
 		return false;
 	}
-
+*/
 	private boolean checkNotEqualsUomDataType(Condition condition, String uom) {
 
 		if (Float.parseFloat(uom) != Float.valueOf(condition.getGivenValues().get(0)).floatValue())
@@ -787,7 +790,7 @@ public class CheckPoolRules {
 		case Uom:
 			return checkEqualsUomDatatype(condition, productTextileVo.getUom());
 
-		case Dcode:
+		/* case Dcode:
 			return checkEqualsDcodeDataType(condition, productTextileVo.getHsnCode());
 
 		case StyleCode:
@@ -798,7 +801,7 @@ public class CheckPoolRules {
 			return checkEqualsSSIdDataType(condition,productTextileVo.getHsnCode());
 			
 		case DiscountType:
-			return checkEqualsDisDataType(condition,productTextileVo.getHsnCode());
+			return checkEqualsDisDataType(condition,productTextileVo.getHsnCode());*/
 
 		default:
 			return false;
@@ -806,7 +809,7 @@ public class CheckPoolRules {
 
 	}
 
-	private boolean checkEqualsDisDataType(Condition condition, String hsnCode) {
+	/*private boolean checkEqualsDisDataType(Condition condition, String hsnCode) {
 		
 		if (Float.parseFloat(hsnCode) == Float.valueOf(condition.getGivenValues().get(0)).floatValue())
 
@@ -839,7 +842,7 @@ public class CheckPoolRules {
 
 			return true;
 		return false;
-	}
+	}*/
 
 	private boolean checkEqualsUomDatatype(Condition condition, String uom) {
 		if (Float.parseFloat(uom) == Float.valueOf(condition.getGivenValues().get(0)).floatValue())
