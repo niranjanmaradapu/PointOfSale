@@ -56,7 +56,7 @@ public interface NewSaleService {
 
 	CustomerVo getCustomerFromNewSale(String mobileNo) throws DataNotFoundException;
 
-	String posClose(List<DeliverySlipVo> dsVo);
+	String posClose(Long storeId);
 
 	void tagCustomerToExisitingNewSale(String mobileNo, Long invoiceNo) throws CustomerNotFoundExcecption;
 

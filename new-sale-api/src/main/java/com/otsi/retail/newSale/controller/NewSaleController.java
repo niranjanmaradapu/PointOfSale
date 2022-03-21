@@ -315,9 +315,9 @@ public class NewSaleController {
 	}
 
 	@PostMapping(CommonRequestMappigs.CLOSE_PENDINGDELIVERYSLIP)
-	public GateWayResponse<?> posclose(@RequestBody List<DeliverySlipVo> dsVo) {
+	public GateWayResponse<?> posclose(Long storeId) {
 		try {
-			String dayclose = newSaleService.posClose(dsVo);
+			String dayclose = newSaleService.posClose(storeId);
 			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());

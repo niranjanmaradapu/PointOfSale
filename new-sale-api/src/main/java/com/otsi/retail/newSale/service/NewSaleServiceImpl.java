@@ -696,7 +696,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 * }); }
 			 */
 			/////////
-			lsvo.getNewSaleVo().stream().forEach(x -> {
+			lsvo.getNewSaleVo().stream().forEach(x ->{
 				List<UserDetailsVo> uvo = getUserDetailsFromURM(null, x.getUserId());
 
 				/////////
@@ -978,9 +978,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 		
 
 	@Override
-	public String posClose(List<DeliverySlipVo> dsVo) {
-		List<String> dsNumbers = dsVo.stream().map(a->a.getDsNumber()).collect(Collectors.toList());
-		List<DeliverySlipEntity> DsList = dsRepo.findByDsNumberIn(dsNumbers);
+	public String posClose(Long storeId) {
+		
+		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreationDateAndStoreId(DSStatus.Pending, LocalDate.now(),storeId);
+		if(DsList!=null&&!DsList.isEmpty()) {
 		DsList.stream().forEach(d->{
 			
 			d.setStatus(DSStatus.Cancelled);
@@ -991,6 +992,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 		
 		
 		return "successFully updated deliverySlips";
+		}else
+			return "there is no  pending delivery slips with this storeId:"+storeId;
 
 		
 	}
