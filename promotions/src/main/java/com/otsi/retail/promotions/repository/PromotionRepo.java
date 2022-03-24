@@ -55,5 +55,9 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	List<PromotionsEntity> findByPromoIdInAndIsActive(List<Long> promoIds, Boolean true1);
 
+	List<PromotionsEntity> findByApplicability(Applicability promotionforeachbarcode);
+
+	List<PromotionsEntity> findByIsActiveAndApplicability(Boolean promotionStatus, Applicability promotionforeachbarcode);
+
 	
 }

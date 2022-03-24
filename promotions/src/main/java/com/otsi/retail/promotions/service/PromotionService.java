@@ -27,10 +27,9 @@ public interface PromotionService {
 
 	List<StoreVo> getAllStores();
 
-	//String addPromotionToStore(PromotionsVo vo);
 	String addPromotionToStore(PromotionToStoreVo vo);
 
-	List<SearchPromotionsVo> searchPromotion(SearchPromotionsVo vo);
+	List<SearchPromotionsVo> storeLevelPromoSearching(SearchPromotionsVo vo);
 
 	String updatePromotionDates(SearchPromotionsVo vo);
 	
@@ -49,5 +48,7 @@ public interface PromotionService {
 	List<SearchPromotionsVo> searchPromotionByStoreName(SearchPromotionsVo vo);
 	
 	List<PromotionToStoreEntity> getAllStorePromotions();
+	
+	List<SearchPromotionsVo> promotionSearching(SearchPromotionsVo svo);
 		
 }

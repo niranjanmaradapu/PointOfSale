@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -32,7 +34,8 @@ public class PoolEntity {
 	private Long domainId;
 
 	private String poolName;
-
+    
+	@Enumerated(EnumType.STRING)
 	private PoolType poolType;
 	
 	private Long createdBy;

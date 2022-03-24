@@ -108,10 +108,10 @@ public class PromotionController {
 
 	}
 
-	@PostMapping(CommonRequestMappigs.SEARCH_PROMOTION)
-	public GateWayResponse<?> searchPromotion(@RequestBody SearchPromotionsVo vo) {
+	@PostMapping(CommonRequestMappigs.STORE_LEVEL_PROMOTIONS_SEARCHING)
+	public GateWayResponse<?> storeLevelPromoSearching(@RequestBody SearchPromotionsVo vo) {
 		log.info("Recieved request to searchPromotion():" + vo);
-		List<SearchPromotionsVo> result = promoService.searchPromotion(vo);
+		List<SearchPromotionsVo> result = promoService.storeLevelPromoSearching(vo);
 		return new GateWayResponse<>("successfully getting promotions", result);
 
 	}
@@ -134,7 +134,7 @@ public class PromotionController {
 	}
 
 
-	
+	//this api wrote for reports
 	@PostMapping(CommonRequestMappigs.LIST_OF_PROMOTIONS_BY_SEARCH_CRITERIA)
 	public GateWayResponse<?> listOfPromotions(@RequestBody SearchPromotionsVo vo) {
 		
@@ -184,7 +184,13 @@ public class PromotionController {
 
 	}
 	
-	
+	@PostMapping(CommonRequestMappigs.PROMOTIONS_SEARCHING)
+	public GateWayResponse<?> promotionSearching(@RequestBody SearchPromotionsVo vo) {
+		log.info("Recieved request to searchPromotion():" + vo);
+		List<SearchPromotionsVo> result = promoService.promotionSearching(vo);
+		return new GateWayResponse<>("successfully getting promotions", result);
+
+	}
 	
 	
 

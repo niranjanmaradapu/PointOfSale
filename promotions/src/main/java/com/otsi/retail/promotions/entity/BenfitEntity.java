@@ -6,6 +6,8 @@ package com.otsi.retail.promotions.entity;
 import java.time.LocalDate;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,19 +42,23 @@ public class BenfitEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long benfitId;
-
+    
+	@Enumerated(EnumType.STRING)
 	private BenfitType benfitType;
-
+    
+	@Enumerated(EnumType.STRING)
 	private DiscountType discountType;
 
 	private String discount;
-
+    
+	@Enumerated(EnumType.STRING)
 	private DiscountSubTypes discountSubTypes;
 	
     private Long numOfItemsFromGetPool;
 	
 	private Long numOfItemsFromBuyPool;
 	
+	@Enumerated(EnumType.STRING)
 	private ItemValue itemValue;
 	
 	@CreationTimestamp

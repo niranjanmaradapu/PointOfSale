@@ -6,6 +6,8 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -28,9 +30,11 @@ public class Condition {
 	@Id
 	@GeneratedValue
 	private Long id;
-
+    
+	@Enumerated(EnumType.STRING)
 	private ColumnName columnName;
-
+    
+	@Enumerated(EnumType.STRING)
 	private Operator operatorSymbol;
 
 	@ElementCollection
