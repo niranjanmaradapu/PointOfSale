@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReportVo {
 
-	private Month Month;
+	private Long Month;
 	private Long amount;
 	private Long storeId;
 

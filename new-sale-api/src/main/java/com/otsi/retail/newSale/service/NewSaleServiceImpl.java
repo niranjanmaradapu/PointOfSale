@@ -697,6 +697,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 			/////////
 			lsvo.getNewSaleVo().stream().forEach(x ->{
+				if(x.getUserId()!=null) {
 				List<UserDetailsVo> uvo = getUserDetailsFromURM(null, x.getUserId());
 
 				/////////
@@ -706,6 +707,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 						x.setMobileNumber(u.getPhoneNumber());
 					});
 				}
+				}
+				
 			});
 
 			/*
