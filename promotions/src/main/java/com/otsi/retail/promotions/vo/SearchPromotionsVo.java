@@ -40,9 +40,9 @@ public class SearchPromotionsVo {
 	
 	private Boolean promotionStatus;
 	
-	private Applicability promotype;
+	private Applicability applicability;
 	
-	private PromoApplyType applyOn;
+	private PromoApplyType promoApplyType;
 	
 	private String printNameOnBill;
 	

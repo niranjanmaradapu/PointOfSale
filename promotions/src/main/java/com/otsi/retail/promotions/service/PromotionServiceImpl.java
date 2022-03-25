@@ -619,26 +619,28 @@ public class PromotionServiceImpl implements PromotionService {
 		List<SearchPromotionsVo> searchVoList = new ArrayList<>();
 		List<PromotionsEntity> promoList = new ArrayList<>();
 
-		if (svo.getPromotionStatus() != null && svo.getPromotype().equals(Applicability.promotionForEachBarcode)) {
+		if (svo.getPromotionStatus() != null && svo.getApplicability().equals(Applicability.promotionForEachBarcode)) {
 			promoList = promoRepo.findByIsActiveAndApplicability(svo.getPromotionStatus(),
 					Applicability.promotionForEachBarcode);
 
-		} else if (svo.getPromotionStatus() != null && svo.getPromotype().equals(Applicability.promotionForWholeBill)) {
+		} else if (svo.getPromotionStatus() != null
+				&& svo.getApplicability().equals(Applicability.promotionForWholeBill)) {
 			promoList = promoRepo.findByIsActiveAndApplicability(svo.getPromotionStatus(),
 					Applicability.promotionForWholeBill);
 
 		} else if (svo.getPromotionStatus() == null
-				&& svo.getPromotype().equals(Applicability.promotionForEachBarcode)) {
+				&& svo.getApplicability().equals(Applicability.promotionForEachBarcode)) {
 			promoList = promoRepo.findByApplicability(Applicability.promotionForEachBarcode);
 
-		} else if (svo.getPromotionStatus() == null && svo.getPromotype().equals(Applicability.promotionForWholeBill)) {
+		} else if (svo.getPromotionStatus() == null
+				&& svo.getApplicability().equals(Applicability.promotionForWholeBill)) {
 			promoList = promoRepo.findByApplicability(Applicability.promotionForWholeBill);
 
-		} else if (svo.getPromotionStatus() != null && svo.getPromotype().equals(Applicability.All)) {
+		} else if (svo.getPromotionStatus() != null && svo.getApplicability().equals(Applicability.All)) {
 
 			promoList = promoRepo.findByIsActive(svo.getPromotionStatus());
 
-		} else if (svo.getPromotionStatus() == null && svo.getPromotype().equals(Applicability.All)) {
+		} else if (svo.getPromotionStatus() == null && svo.getApplicability().equals(Applicability.All)) {
 
 			promoList = promoRepo.findByIsActive(svo.getPromotionStatus());
 
@@ -654,8 +656,8 @@ public class PromotionServiceImpl implements PromotionService {
 				vo.setPromoId(listOfPromos.getPromoId());
 				vo.setPromotionName(listOfPromos.getPromotionName());
 				vo.setDescription(listOfPromos.getDescription());
-				vo.setPromotype(listOfPromos.getApplicability());
-				vo.setApplyOn(listOfPromos.getPromoApplyType());
+				vo.setApplicability(listOfPromos.getApplicability());
+				vo.setPromoApplyType(listOfPromos.getPromoApplyType());
 				vo.setPrintNameOnBill(listOfPromos.getPrintNameOnBill());
 
 				searchVoList.add(vo);
