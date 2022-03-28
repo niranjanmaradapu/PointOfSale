@@ -89,6 +89,9 @@ public class PromotionMapper {
 			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromBuyPool());
 			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
 			benfit.setDiscountSubTypes(b.getDiscountSubType());
+			
+			//mapping benefits to promotions 
+			benfit.setPromotionEntity(promo);
 			benfitEntity.add(benfit);
 		});
 		promo.setBenfitEntity(benfitEntity);
