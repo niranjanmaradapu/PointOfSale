@@ -38,6 +38,7 @@ import com.otsi.retail.promotions.repository.PromotionRepo;
 import com.otsi.retail.promotions.repository.PromotionToStoreRepo;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
+import com.otsi.retail.promotions.vo.LineItemVo;
 import com.otsi.retail.promotions.vo.ProductTextileVo;
 import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.PromotionToStoreVo;
@@ -614,59 +615,142 @@ public class PromotionServiceImpl implements PromotionService {
 	}
 
 	@Override
-	public List<SearchPromotionsVo> promotionSearching(SearchPromotionsVo svo) {
+	public List<PromotionsVo> promotionSearching(PromotionsVo svo) {
 
-		List<SearchPromotionsVo> searchVoList = new ArrayList<>();
 		List<PromotionsEntity> promoList = new ArrayList<>();
 
-		if (svo.getPromotionStatus() != null && svo.getApplicability().equals(Applicability.promotionForEachBarcode)) {
-			promoList = promoRepo.findByIsActiveAndApplicability(svo.getPromotionStatus(),
+		if (svo.getIsActive() != null && svo.getApplicability().equals(Applicability.promotionForEachBarcode)) {
+			promoList = promoRepo.findByIsActiveAndApplicability(svo.getIsActive(),
 					Applicability.promotionForEachBarcode);
 
-		} else if (svo.getPromotionStatus() != null
-				&& svo.getApplicability().equals(Applicability.promotionForWholeBill)) {
-			promoList = promoRepo.findByIsActiveAndApplicability(svo.getPromotionStatus(),
+		} else if (svo.getIsActive() != null && svo.getApplicability().equals(Applicability.promotionForWholeBill)) {
+			promoList = promoRepo.findByIsActiveAndApplicability(svo.getIsActive(),
 					Applicability.promotionForWholeBill);
 
-		} else if (svo.getPromotionStatus() == null
-				&& svo.getApplicability().equals(Applicability.promotionForEachBarcode)) {
+		} else if (svo.getIsActive() == null && svo.getApplicability().equals(Applicability.promotionForEachBarcode)) {
 			promoList = promoRepo.findByApplicability(Applicability.promotionForEachBarcode);
 
-		} else if (svo.getPromotionStatus() == null
-				&& svo.getApplicability().equals(Applicability.promotionForWholeBill)) {
+		} else if (svo.getIsActive() == null && svo.getApplicability().equals(Applicability.promotionForWholeBill)) {
 			promoList = promoRepo.findByApplicability(Applicability.promotionForWholeBill);
 
-		} else if (svo.getPromotionStatus() != null && svo.getApplicability().equals(Applicability.All)) {
+		} else if (svo.getIsActive() != null && svo.getApplicability().equals(Applicability.All)) {
 
-			promoList = promoRepo.findByIsActive(svo.getPromotionStatus());
+			promoList = promoRepo.findByIsActive(svo.getIsActive());
 
-		} else if (svo.getPromotionStatus() == null && svo.getApplicability().equals(Applicability.All)) {
+		} else if (svo.getIsActive() == null && svo.getApplicability().equals(Applicability.All)) {
 
-			promoList = promoRepo.findByIsActive(svo.getPromotionStatus());
+			promoList = promoRepo.findByIsActive(svo.getIsActive());
 
 		}
 		if (promoList.isEmpty()) {
 			throw new RecordNotFoundException("Promotions data not exists");
 		} else {
+			List<PromotionsVo> listOfPromos = promoMapper.convertPromoEntityToVo(promoList);
+			return listOfPromos;
+		}
 
-			promoList.stream().forEach(listOfPromos -> {
+	}
 
-				SearchPromotionsVo vo = new SearchPromotionsVo();
+	@Override
+	public List<LineItemVo> checkInvoiceLevelPromtion(List<LineItemVo> listofLineItemsTxt, Long storeId,
+			Long domainId) {
 
-				vo.setPromoId(listOfPromos.getPromoId());
-				vo.setPromotionName(listOfPromos.getPromotionName());
-				vo.setDescription(listOfPromos.getDescription());
-				vo.setApplicability(listOfPromos.getApplicability());
-				vo.setPromoApplyType(listOfPromos.getPromoApplyType());
-				vo.setPrintNameOnBill(listOfPromos.getPrintNameOnBill());
+		// we need to cover the major scenarios of total value and total quantity
+		// flat discount, x units from buy pool, x units from get pool
 
-				searchVoList.add(vo);
+		// getting active promotions from the store
+		List<PromotionToStoreEntity> activePromos = promostoreRepo.findByStoreIdAndPromotionStatus(storeId, true);
 
-			});
+		// collecting promoIds
+		List<Long> promoIds = activePromos.stream().map(promo -> promo.getPromoId()).collect(Collectors.toList());
+		System.out.println("Active Promo Ids >>" + promoIds);
+
+		// get promotions by based on applicability, promoIds
+		List<PromotionsEntity> listOfPromos = promoRepo.findByPromoIdInAndApplicability(promoIds,
+				Applicability.promotionForWholeBill);
+
+		// System.out.println("Bill level Promos >>" + listOfPromos.toString());
+
+		// fetch all invoice level active and store related promotions and loop through
+		// them
+		// listOfPromos.stream().forEach(promo -> {
+
+		for (PromotionsEntity promo : listOfPromos) {
+
+			List<Double> totalQuantityAndMrp = calculateTotalMrpAndQuantity(listofLineItemsTxt);
+			BenfitEntity slabBenefit = null;
+
+			if (promo.getPromoApplyType().equals(PromoApplyType.QuantitySlab)) {
+
+				slabBenefit = getSlabBenefit(promo, totalQuantityAndMrp.get(0));
+
+				// call benefits calculation engine with required fields
+
+			} else if (promo.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
+
+				slabBenefit = getSlabBenefit(promo, totalQuantityAndMrp.get(1));
+
+			}
+
+			listofLineItemsTxt = calculateInvoiceLevelBenefits(promo, totalQuantityAndMrp, listofLineItemsTxt);
 
 		}
 
-		return searchVoList;
+		// });
+
+		// if apply type is quantity slab
+
+		// calculate the total quantity and mrp being purchased, check in which slab,
+		// the derived total quantity or mrp value is falling in..
+		// fetch benefit of the slab, and then derive the benefit
+		// when benefit type is flat discount, total mrp value and benefit objects need
+		// to send
+		// when benefit type is x units from buy pool,buy pool object, need to send
+		// benefit object, min, max value product information
+
+		return listofLineItemsTxt;
+	}
+
+	private List<LineItemVo> calculateInvoiceLevelBenefits(PromotionsEntity promo, List<Double> totalQuantityAndMrp,
+			List<LineItemVo> lineItemTextileVo) {
+
+		System.out.println("Calculate Invoice Level Benefits Method Called..");
+
+		return null;
+	}
+
+	private BenfitEntity getSlabBenefit(PromotionsEntity promo, Double value) {
+
+		BenfitEntity benefitEntity = null;
+
+		for (PromotionSlabsEntity promotionSlabsEntity : promo.getPromotionSlabEntity()) {
+
+			if (value >= promotionSlabsEntity.getFromSlab() && value <= promotionSlabsEntity.getToSlab())
+				benefitEntity = promotionSlabsEntity.getBenfitEntity();
+
+		}
+
+		return benefitEntity;
+	}
+
+	private List<Double> calculateTotalMrpAndQuantity(List<LineItemVo> listofLineItemsTxt) {
+
+		List<Double> calculatedValues = new ArrayList<>();
+
+		double totalQuantity = 0;
+		double totalMrp = 0.0;
+
+		for (LineItemVo lineItemTextileVo : listofLineItemsTxt) {
+
+			totalQuantity = totalQuantity + lineItemTextileVo.getQuantity();
+			totalMrp = totalMrp + lineItemTextileVo.getItemPrice();
+
+		}
+		calculatedValues.add(totalQuantity);
+		calculatedValues.add(totalMrp);
+
+		return calculatedValues;
+
 	}
 
 }

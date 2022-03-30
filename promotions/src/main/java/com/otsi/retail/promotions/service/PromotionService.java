@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
+import com.otsi.retail.promotions.vo.LineItemVo;
 import com.otsi.retail.promotions.vo.ProductTextileVo;
 import com.otsi.retail.promotions.vo.PromotionToStoreVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
@@ -49,6 +50,8 @@ public interface PromotionService {
 	
 	List<PromotionToStoreEntity> getAllStorePromotions();
 	
-	List<SearchPromotionsVo> promotionSearching(SearchPromotionsVo svo);
+	List<LineItemVo> checkInvoiceLevelPromtion(List<LineItemVo> listofInvTxt, Long storeId, Long domainId);
+
+	List<PromotionsVo> promotionSearching(PromotionsVo svo);
 		
 }

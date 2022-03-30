@@ -21,6 +21,7 @@ import com.otsi.retail.promotions.gatewayresponse.GateWayResponse;
 import com.otsi.retail.promotions.service.PromotionService;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
+import com.otsi.retail.promotions.vo.LineItemVo;
 import com.otsi.retail.promotions.vo.ProductTextileVo;
 import com.otsi.retail.promotions.vo.PromotionToStoreVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
@@ -166,6 +167,13 @@ public class PromotionController {
 		return new GateWayResponse<>("", promoService.checkPromtion(listofInvTxt,storeId,domainId));
 	}
 	
+	@PostMapping("/invoiceLevelCheckPromtionTextile")
+	public GateWayResponse<?> invoiceLevelCheckPromtionTextile(@RequestBody List<LineItemVo> listofLineItemsTxt,
+			                                @RequestParam Long storeId,
+			                                @RequestParam Long domainId) {
+		return new GateWayResponse<>("", promoService.checkInvoiceLevelPromtion(listofLineItemsTxt,storeId,domainId));
+	}
+	
 	@PutMapping("/updatePriority")
 	public GateWayResponse<?> updatePriority(@RequestBody SearchPromotionsVo vo) {
 		return new GateWayResponse<>("priority updated successfully", promoService.updatePriority(vo));
@@ -185,9 +193,9 @@ public class PromotionController {
 	}
 	
 	@PostMapping(CommonRequestMappigs.PROMOTIONS_SEARCHING)
-	public GateWayResponse<?> promotionSearching(@RequestBody SearchPromotionsVo vo) {
+	public GateWayResponse<?> promotionSearching(@RequestBody PromotionsVo vo) {
 		log.info("Recieved request to searchPromotion():" + vo);
-		List<SearchPromotionsVo> result = promoService.promotionSearching(vo);
+		List<PromotionsVo> result = promoService.promotionSearching(vo);
 		return new GateWayResponse<>("successfully getting promotions", result);
 
 	}
