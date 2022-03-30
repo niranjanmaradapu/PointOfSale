@@ -73,7 +73,7 @@ public class PromotionsEntity {
 	@JoinTable(name = "pool_promo", joinColumns = @JoinColumn(name = "promoId"), inverseJoinColumns = @JoinColumn(name = "poolId"))
 	private List<PoolEntity> poolEntity;
 	
-	@OneToMany(targetEntity = BenfitEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(targetEntity = BenfitEntity.class, mappedBy = "promotionEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<BenfitEntity> benfitEntity;
 	
 	@OneToMany(cascade = CascadeType.ALL)
