@@ -35,9 +35,9 @@ public interface LineItemReRepo extends JpaRepository<LineItemsReEntity, Long>{
 	List<LineItemsReEntity> findBySection(Long b);
 
 	List<LineItemsReEntity> findBySectionAndStoreId(Long b, Long storeId);
-@Query(value="select lineItem.user_id,sum(net_value) as net_value from (select line_re.store_id,line_re.user_id,line_re.creation_date,line_re.bar_code,line_re.line_item_re_id,odr.order_id,odr.net_value from lineitems_re line_re join order_table odr on line_re.order_id =odr.order_id where line_re.store_id= :storeId and line_re.creation_date >=:fromDate and line_re.creation_date <= :toDate) lineItem  group by lineItem.user_id order by net_value desc limit 5",nativeQuery=true)
+@Query(value="select lineItem.user_id,sum(net_value) as net_value from (select line_re.store_id,line_re.user_id,line_re.creation_date,line_re.bar_code,line_re.line_item_re_id,odr.order_id,odr.net_value from lineitems_re line_re join order_table odr on line_re.order_id =odr.order_id where line_re.store_id= :storeId and line_re.creation_date >=:fromDate and line_re.creation_date <= :toDate and line_re.user_id is not null) lineItem  group by lineItem.user_id order by net_value desc limit 5",nativeQuery=true)
 	List<Object[]> getByStoreIdAndCreationDateBetween(Long storeId, LocalDate fromDate, LocalDate toDate);
-	@Query(value="select lineItem.section,sum(net_value) as net_value from (select line_re.store_id,line_re.section,line_re.creation_date,line_re.line_item_re_id,odr.order_id,odr.net_value from lineitems_re line_re join order_table odr on line_re.order_id =odr.order_id where line_re.store_id= 2879 and line_re.creation_date >='2022-01-11' and line_re.creation_date <= '2022-03-18')lineItem group by lineItem.section",nativeQuery=true)
-List<Object[]> findByStoreIdAndCreation_dateBetween(Long storeId, LocalDate fromDate, LocalDate toDate);
+	@Query(value="select lineItem.section ,sum(net_value) as net_value from (select line_re.store_id,line_re.section,line_re.creation_date,line_re.line_item_id,odr.order_id,odr.net_value from lineitems_re line_re  join order_table odr on line_re.order_id =odr.order_id where line_re.store_id= :storeId and line_re.creation_date >= :fromDate and line_re.creation_date <= :toDate and line_re.section is not null)lineItem group by lineItem.section",nativeQuery=true)
+	List<Object[]> findByStoreIdAndCreation_dateBetween(Long storeId, LocalDate fromDate, LocalDate toDate);
 	
 }
