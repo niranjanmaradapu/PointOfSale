@@ -2,6 +2,7 @@ package com.otsi.retail.promotions.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -673,7 +674,6 @@ public class PromotionServiceImpl implements PromotionService {
 
 		// fetch all invoice level active and store related promotions and loop through
 		// them
-		// listOfPromos.stream().forEach(promo -> {
 
 		for (PromotionsEntity promo : listOfPromos) {
 
@@ -681,12 +681,16 @@ public class PromotionServiceImpl implements PromotionService {
 			BenfitEntity slabBenefit = null;
 
 			if (promo.getPromoApplyType().equals(PromoApplyType.QuantitySlab)) {
+				
+				System.out.println("Quantity Slab");
 
 				slabBenefit = getSlabBenefit(promo, totalQuantityAndMrp.get(0));
 
 				// call benefits calculation engine with required fields
 
 			} else if (promo.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
+				
+				System.out.println("Value Slab");
 
 				slabBenefit = getSlabBenefit(promo, totalQuantityAndMrp.get(1));
 
@@ -695,8 +699,6 @@ public class PromotionServiceImpl implements PromotionService {
 			listofLineItemsTxt = calculateInvoiceLevelBenefits(promo, totalQuantityAndMrp, listofLineItemsTxt);
 
 		}
-
-		// });
 
 		// if apply type is quantity slab
 
@@ -720,6 +722,8 @@ public class PromotionServiceImpl implements PromotionService {
 	}
 
 	private BenfitEntity getSlabBenefit(PromotionsEntity promo, Double value) {
+		
+		System.out.println("getSlabBenefit() method called");
 
 		BenfitEntity benefitEntity = null;
 
@@ -729,13 +733,14 @@ public class PromotionServiceImpl implements PromotionService {
 				benefitEntity = promotionSlabsEntity.getBenfitEntity();
 
 		}
-
+		
+		
 		return benefitEntity;
 	}
 
 	private List<Double> calculateTotalMrpAndQuantity(List<LineItemVo> listofLineItemsTxt) {
 
-		List<Double> calculatedValues = new ArrayList<>();
+		List<Double> calculatedValues = new LinkedList<>();
 
 		double totalQuantity = 0;
 		double totalMrp = 0.0;
@@ -743,11 +748,13 @@ public class PromotionServiceImpl implements PromotionService {
 		for (LineItemVo lineItemTextileVo : listofLineItemsTxt) {
 
 			totalQuantity = totalQuantity + lineItemTextileVo.getQuantity();
-			totalMrp = totalMrp + lineItemTextileVo.getItemPrice();
+			totalMrp = totalMrp + (lineItemTextileVo.getItemPrice()*lineItemTextileVo.getQuantity());
 
 		}
 		calculatedValues.add(totalQuantity);
 		calculatedValues.add(totalMrp);
+		
+		System.out.println("Calculate totalMrpAndQuantityMethod() called");
 
 		return calculatedValues;
 
