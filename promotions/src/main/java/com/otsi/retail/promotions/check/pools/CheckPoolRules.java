@@ -923,8 +923,11 @@ public class CheckPoolRules {
 				return true;
 			else if (areAllConditionsPassed && rule.getRuleType().equalsIgnoreCase("Exclude"))
 				return false;
+			
 
 		}
+		
+		// when all rules failed in case of exclude return true: this scenario is not covered
 
 		return false;
 	}

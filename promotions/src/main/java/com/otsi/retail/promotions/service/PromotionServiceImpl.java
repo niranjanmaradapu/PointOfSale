@@ -680,49 +680,49 @@ public class PromotionServiceImpl implements PromotionService {
 			List<Double> totalQuantityAndMrp = calculateTotalMrpAndQuantity(listofLineItemsTxt);
 			BenfitEntity slabBenefit = null;
 
-			if (promo.getPromoApplyType().equals(PromoApplyType.QuantitySlab)) {
+			// need to check buyAny
+
+			int buyItemsFromPool = promo.getBuyItemsFromPool();
+
+			List<LineItemVo> promoEligibleLineItems = calculateBenifits.getPromoEligibleLineItems(listofLineItemsTxt,
+					promo, totalQuantityAndMrp, slabBenefit);
+
+			if (promoEligibleLineItems.size() >= buyItemsFromPool) {
+
+				if (promo.getPromoApplyType().equals(PromoApplyType.QuantitySlab)) {
+
+					System.out.println("Quantity Slab");
+
+					slabBenefit = getSlabBenefit(promo, totalQuantityAndMrp.get(0));
+
+					// call benefits calculation engine with required fields
+
+				} else if (promo.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
+
+					System.out.println("Value Slab");
+
+					slabBenefit = getSlabBenefit(promo, totalQuantityAndMrp.get(1));
+
+				}
+
+				listofLineItemsTxt = calculateBenifits.calculateInvoiceLevelBenefits(promo, slabBenefit,
+						totalQuantityAndMrp, listofLineItemsTxt);
+
+			} else {
 				
-				System.out.println("Quantity Slab");
-
-				slabBenefit = getSlabBenefit(promo, totalQuantityAndMrp.get(0));
-
-				// call benefits calculation engine with required fields
-
-			} else if (promo.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
+				// call the distribute to all line items method..
 				
-				System.out.println("Value Slab");
-
-				slabBenefit = getSlabBenefit(promo, totalQuantityAndMrp.get(1));
+				
+				
 
 			}
-
-			listofLineItemsTxt = calculateInvoiceLevelBenefits(promo, totalQuantityAndMrp, listofLineItemsTxt);
-
 		}
-
-		// if apply type is quantity slab
-
-		// calculate the total quantity and mrp being purchased, check in which slab,
-		// the derived total quantity or mrp value is falling in..
-		// fetch benefit of the slab, and then derive the benefit
-		// when benefit type is flat discount, total mrp value and benefit objects need
-		// to send
-		// when benefit type is x units from buy pool,buy pool object, need to send
-		// benefit object, min, max value product information
 
 		return listofLineItemsTxt;
 	}
 
-	private List<LineItemVo> calculateInvoiceLevelBenefits(PromotionsEntity promo, List<Double> totalQuantityAndMrp,
-			List<LineItemVo> lineItemTextileVo) {
-
-		System.out.println("Calculate Invoice Level Benefits Method Called..");
-
-		return null;
-	}
-
 	private BenfitEntity getSlabBenefit(PromotionsEntity promo, Double value) {
-		
+
 		System.out.println("getSlabBenefit() method called");
 
 		BenfitEntity benefitEntity = null;
@@ -733,8 +733,7 @@ public class PromotionServiceImpl implements PromotionService {
 				benefitEntity = promotionSlabsEntity.getBenfitEntity();
 
 		}
-		
-		
+
 		return benefitEntity;
 	}
 
@@ -748,12 +747,12 @@ public class PromotionServiceImpl implements PromotionService {
 		for (LineItemVo lineItemTextileVo : listofLineItemsTxt) {
 
 			totalQuantity = totalQuantity + lineItemTextileVo.getQuantity();
-			totalMrp = totalMrp + (lineItemTextileVo.getItemPrice()*lineItemTextileVo.getQuantity());
+			totalMrp = totalMrp + (lineItemTextileVo.getItemPrice() * lineItemTextileVo.getQuantity());
 
 		}
 		calculatedValues.add(totalQuantity);
 		calculatedValues.add(totalMrp);
-		
+
 		System.out.println("Calculate totalMrpAndQuantityMethod() called");
 
 		return calculatedValues;
