@@ -4,7 +4,9 @@
 package com.otsi.retail.promotions.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -12,6 +14,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -20,9 +24,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.otsi.retail.promotions.common.BenfitType;
+import com.otsi.retail.promotions.common.DiscountSubTypes;
 import com.otsi.retail.promotions.common.DiscountType;
 import com.otsi.retail.promotions.common.ItemValue;
-import com.otsi.retail.promotions.common.DiscountSubTypes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -74,6 +78,13 @@ public class BenfitEntity {
 	@OneToOne(mappedBy = "benfitEntity")
 	private PromotionSlabsEntity promotionSlabsEntity;
 	
-
+	//newly added
+//	@ManyToOne
+//	@JoinColumn(name = "poolId")
+//	private PoolEntity poolEntityy;
+	
+	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
+	@JoinTable(name = "pool_benefit", joinColumns = @JoinColumn(name = "benefitId"), inverseJoinColumns = @JoinColumn(name = "poolId"))
+	private List<PoolEntity> poolEntities;
 	
 }

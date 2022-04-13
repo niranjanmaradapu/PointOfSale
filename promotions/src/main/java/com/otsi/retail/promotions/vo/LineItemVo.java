@@ -47,6 +47,8 @@ public class LineItemVo {
 	private Long sgst;
 
 	private Long discount;
+	
+	private String description;
 
 	private Long netValue;
 

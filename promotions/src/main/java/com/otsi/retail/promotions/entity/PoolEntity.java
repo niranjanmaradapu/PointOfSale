@@ -53,5 +53,12 @@ public class PoolEntity {
 	
 	@ManyToMany(mappedBy = "poolEntity",cascade ={CascadeType.PERSIST, CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
 	private List<PromotionsEntity> promoEntity;
+	
+    //newly added
+//	@OneToMany(targetEntity = BenfitEntity.class, mappedBy = "poolEntityy", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//	private List<BenfitEntity> benefitEntities;
+	
+	@ManyToMany(mappedBy = "poolEntities",cascade ={CascadeType.PERSIST, CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
+	private List<BenfitEntity> benefits;
 
 }

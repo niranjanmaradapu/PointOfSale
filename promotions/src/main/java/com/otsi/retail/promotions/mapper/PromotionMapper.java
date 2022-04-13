@@ -89,9 +89,13 @@ public class PromotionMapper {
 			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromBuyPool());
 			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
 			benfit.setDiscountSubTypes(b.getDiscountSubType());
-			
-			//mapping benefits to promotions 
+
+			// mapping benefits to promotions
 			benfit.setPromotionEntity(promo);
+			
+			// mapping benefits to pools
+			benfit.setPoolEntities(poolList);
+
 			benfitEntity.add(benfit);
 		});
 		promo.setBenfitEntity(benfitEntity);
@@ -105,7 +109,7 @@ public class PromotionMapper {
 
 		promoList.stream().forEach(x -> {
 			PromotionsVo vo = new PromotionsVo();
-            
+
 			vo.setPromoId(x.getPromoId());
 			vo.setPromotionName(x.getPromotionName());
 			vo.setDomainId(x.getDomainId());
@@ -121,7 +125,7 @@ public class PromotionMapper {
 			vo.setPromotionStartDate(x.getPromotionStartDate());
 			vo.setPromotionEndDate(x.getPromotionEndDate());
 			vo.setPromoApplyType(x.getPromoApplyType());
-			
+
 			listOfPromoVos.add(vo);
 
 			List<PromotionSlabsVo> slabVo = new ArrayList<>();
@@ -212,6 +216,5 @@ public class PromotionMapper {
 		return list;
 
 	}
-	
 
 }

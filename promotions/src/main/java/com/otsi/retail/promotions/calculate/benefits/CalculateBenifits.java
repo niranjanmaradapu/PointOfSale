@@ -4,30 +4,22 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.comparator.Comparators;
-
 import com.otsi.retail.promotions.check.pools.CheckPoolRules;
-import com.otsi.retail.promotions.common.Applicability;
 import com.otsi.retail.promotions.common.BenfitType;
 import com.otsi.retail.promotions.common.DiscountSubTypes;
 import com.otsi.retail.promotions.common.DiscountType;
 import com.otsi.retail.promotions.common.ItemValue;
-import com.otsi.retail.promotions.common.PromoApplyType;
 import com.otsi.retail.promotions.entity.BenfitEntity;
+import com.otsi.retail.promotions.entity.PoolEntity;
 import com.otsi.retail.promotions.entity.PromotionsEntity;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.CalculatedDiscountsVo;
 import com.otsi.retail.promotions.vo.LineItemVo;
 import com.otsi.retail.promotions.vo.ProductTextileVo;
-import com.thoughtworks.xstream.converters.javabean.ComparingPropertySorter;
 
 @Component
 public class CalculateBenifits {
@@ -416,7 +408,8 @@ public class CalculateBenifits {
 	// For Invoice Level Benefits Calculation
 
 	public List<LineItemVo> calculateInvoiceLevelBenefits(PromotionsEntity promo, BenfitEntity benfitEntity,
-			List<Double> totalQuantityAndMrp, List<LineItemVo> listofLineItems) {
+			List<Double> totalQuantityAndMrp, List<LineItemVo> listofLineItems,
+			List<LineItemVo> promoEligibleLineItems) {
 
 		List<LineItemVo> resultList = null;
 		for (LineItemVo itemVo : listofLineItems) {
@@ -432,6 +425,8 @@ public class CalculateBenifits {
 				break;
 
 			case XunitsFromGetPool:
+				resultList = calculateXUGForDiscountType(benfitEntity, totalQuantityAndMrp, listofLineItems, promo,
+						promoEligibleLineItems);
 				break;
 
 			default:
@@ -440,6 +435,279 @@ public class CalculateBenifits {
 			}
 		}
 		return null;
+
+	}
+
+	private List<LineItemVo> calculateXUGForDiscountType(BenfitEntity benfitEntity, List<Double> totalQuantityAndMrp,
+			List<LineItemVo> listofLineItems, PromotionsEntity promo, List<LineItemVo> promoEligibleLineItems) {
+
+//		List<LineItemVo> promoEligibleLineItems = getPromoEligibleLineItems(listofLineItems, promo, totalQuantityAndMrp,
+//				benfitEntity);
+		List<LineItemVo> calculateXUBDiscountForPercentageDiscountOn = null;
+		List<LineItemVo> calculateXUBDiscountForRupeesDiscountOn = null;
+		List<LineItemVo> calculateXUBDiscountForFixedAmountOn = null;
+
+		switch (benfitEntity.getDiscountType()) {
+
+		case PercentageDiscountOn:
+			calculateXUBDiscountForPercentageDiscountOn = calcolateXUGDiscountForPercentageDiscountOn(benfitEntity,
+					totalQuantityAndMrp, promoEligibleLineItems, listofLineItems);
+			break;
+
+		case RupeesDiscountOn:
+			calculateXUBDiscountForRupeesDiscountOn = calculateXUGDiscountForRupeesDiscountOn(benfitEntity,
+					promoEligibleLineItems, totalQuantityAndMrp, listofLineItems);
+			break;
+
+		case FixedAmountOn:
+			calculateXUBDiscountForFixedAmountOn = calculateXUGDiscountForFixedAmountOn(benfitEntity,
+					totalQuantityAndMrp, promoEligibleLineItems, listofLineItems);
+			break;
+
+		default:
+			break;
+
+		}
+
+		return listofLineItems;
+	}
+
+	private List<LineItemVo> calculateXUGDiscountForFixedAmountOn(BenfitEntity benfitEntity,
+			List<Double> totalQuantityAndMrp, List<LineItemVo> promoEligibleLineItems,
+			List<LineItemVo> listofAllLineItems) {
+
+		double invoiceLevelDiscount = 0.0;
+		List<LineItemVo> distributeXUGDiscount = null;
+
+		//get the getPools from the benefits
+		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
+
+		//get the eligible line items from get pool
+		List<LineItemVo> eligibleLineItemsFromGetPools = fetchEligibleLineItemsFromGetPools(listofAllLineItems,
+				poolEntities);
+
+		//get the number of items from get pool
+		int numOfItemsFromGetPool = Integer.valueOf(benfitEntity.getNumOfItemsFromGetPool().intValue());
+        
+		//checking the get pools line items size
+		if (eligibleLineItemsFromGetPools.size() >= numOfItemsFromGetPool) {
+
+			if (benfitEntity.getDiscountSubTypes().equals(DiscountSubTypes.EachItem)) {
+
+				invoiceLevelDiscount = (benfitEntity.getNumOfItemsFromGetPool()
+						* Long.parseLong(benfitEntity.getDiscount()));
+				distributeXUGDiscount = distributeXUBDiscountToAllProductsInFixedAmountOnForEachItemAndAllItems(
+						promoEligibleLineItems, invoiceLevelDiscount, totalQuantityAndMrp);
+
+			} else if (benfitEntity.getDiscountSubTypes().equals(DiscountSubTypes.AllItems)) {
+
+				invoiceLevelDiscount = Long.parseLong(benfitEntity.getDiscount());
+				distributeXUGDiscount = distributeXUBDiscountToAllProductsInFixedAmountOnForEachItemAndAllItems(
+						promoEligibleLineItems, invoiceLevelDiscount, totalQuantityAndMrp);
+
+			}
+		} else {
+
+			for (LineItemVo lineItemVo : listofAllLineItems) {
+
+				if (promoEligibleLineItems.indexOf(lineItemVo) >= 0) {
+
+					lineItemVo.setDescription(
+							"The customer can buy products from get pools beacuase the customer is buying products from buy pool");
+
+				}
+
+			}
+
+		}
+
+		return distributeXUGDiscount;
+
+	}
+
+	private List<LineItemVo> calculateXUGDiscountForRupeesDiscountOn(BenfitEntity benfitEntity,
+			List<LineItemVo> promoEligibleLineItems, List<Double> totalQuantityAndMrp,
+			List<LineItemVo> listofAllLineItems) {
+
+		double calculatedInvoiceLevelDiscount = 0.0;
+
+		// get the getPools from the benefits
+		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
+
+		// get the eligible line items from get pool
+		List<LineItemVo> eligibleLineItemsFromGetPools = fetchEligibleLineItemsFromGetPools(listofAllLineItems,
+				poolEntities);
+
+		// get the number of items from get pool
+		int numOfItemsFromGetPool = Integer.valueOf(benfitEntity.getNumOfItemsFromGetPool().intValue());
+
+		double rupeesDiscount = Double.valueOf(benfitEntity.getDiscount()).doubleValue();
+
+		if (eligibleLineItemsFromGetPools.size() >= numOfItemsFromGetPool) {
+
+			calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount + rupeesDiscount;
+
+		} else {
+
+			for (LineItemVo lineItemVo : listofAllLineItems) {
+
+				if (promoEligibleLineItems.indexOf(lineItemVo) >= 0) {
+
+					lineItemVo.setDescription(
+							"The customer can buy products from get pools beacuase the customer is buying products from buy pool");
+
+				}
+
+			}
+
+		}
+
+		return distributeDiscountToAllProductsInRupees(eligibleLineItemsFromGetPools, calculatedInvoiceLevelDiscount,
+				rupeesDiscount);
+
+	}
+
+	private List<LineItemVo> calcolateXUGDiscountForPercentageDiscountOn(BenfitEntity benfitEntity,
+			List<Double> totalQuantityAndMrp, List<LineItemVo> promoEligibleLineItems,
+			List<LineItemVo> listofAllLineItems) {
+
+		List<LineItemVo> results = null;
+
+		switch (benfitEntity.getItemValue()) {
+		case MinValue: {
+
+			results = getXugPercentageDiscountForMinimumValue(benfitEntity, promoEligibleLineItems, totalQuantityAndMrp,
+					listofAllLineItems);
+
+			break;
+
+		}
+
+		case MaxValue: {
+
+			results = getXugPercentageDiscountForMaximumValue(benfitEntity, promoEligibleLineItems, totalQuantityAndMrp,
+					listofAllLineItems);
+
+			break;
+		}
+
+		default:
+			results = listofAllLineItems;
+			break;
+		}
+
+		return null;
+	}
+
+	private List<LineItemVo> getXugPercentageDiscountForMaximumValue(BenfitEntity benfitEntity,
+			List<LineItemVo> promoEligibleLineItems, List<Double> totalQuantityAndMrp,
+			List<LineItemVo> listofAllLineItems) {
+
+		double calculatedInvoiceLevelDiscount = 0.0;
+
+		// get the getPools from the benefits
+		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
+
+		// LineItemVo maxValueMRP = orderedLineItems.get(orderedLineItems.size());
+
+		double percentageDiscount = Double.valueOf(benfitEntity.getDiscount()).doubleValue();
+
+		List<LineItemVo> orderedLineItems = sortLineItemsByPrice(
+				fetchEligibleLineItemsFromGetPools(promoEligibleLineItems, poolEntities));
+
+		Long numOfItemsFromGetPool = benfitEntity.getNumOfItemsFromGetPool();
+
+		if (orderedLineItems.size() >= numOfItemsFromGetPool) {
+
+			for (int i = orderedLineItems.size(); i > (orderedLineItems.size() - numOfItemsFromGetPool); i--) {
+
+				LineItemVo maxValueMRP = orderedLineItems.get(i - 1);
+
+				calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount
+						+ (percentageDiscount * maxValueMRP.getItemPrice()) / 100;
+
+			}
+		} else {
+
+			for (LineItemVo lineItemVo : listofAllLineItems) {
+
+				if (promoEligibleLineItems.indexOf(lineItemVo) >= 0) {
+
+					lineItemVo.setDescription(
+							"The customer can buy products from get pools beacuase the customer is buying products from buy pool");
+
+				}
+
+			}
+
+		}
+
+		return distributeDiscountToAllProductsInPercentage(listofAllLineItems, calculatedInvoiceLevelDiscount,
+				percentageDiscount);
+	}
+
+	// calculate x units from get pool discount for minimum value
+
+	private List<LineItemVo> getXugPercentageDiscountForMinimumValue(BenfitEntity benfitEntity,
+			List<LineItemVo> promoEligibleLineItems, List<Double> totalQuantityAndMrp,
+			List<LineItemVo> listofAllLineItems) {
+
+		double calculateInvoiceLevelDiscount = 0.0;
+		// double barcodeLevelTotalDiscount = 0.0;
+
+		// get the number of items from get pool and check the all line items
+
+		// get the getPools from the benefits
+		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
+
+		// get the eligible line items from get pool
+		List<LineItemVo> eligibleLineItemsFromGetPools = fetchEligibleLineItemsFromGetPools(promoEligibleLineItems,
+				poolEntities);
+
+		// sort the eligibleLineItemsFromGetPools
+		List<LineItemVo> orderedGetItems = sortLineItemsByPrice(eligibleLineItemsFromGetPools);
+
+		// get the number of items from get pool
+		int numOfItemsFromGetPool = Integer.valueOf(benfitEntity.getNumOfItemsFromGetPool().intValue());
+
+		// get the discount from benefit
+		double percentageDiscount = Double.valueOf(benfitEntity.getDiscount()).doubleValue();
+
+		// checking the eligible line items size
+		if (eligibleLineItemsFromGetPools.size() >= numOfItemsFromGetPool) {
+
+			int val = 0;
+
+			// loop through, discount calculation
+
+			for (int i = numOfItemsFromGetPool; i > val; i--) {
+
+				LineItemVo minValueMRP = orderedGetItems.get(i - 1);
+
+				calculateInvoiceLevelDiscount = calculateInvoiceLevelDiscount
+						+ (percentageDiscount * minValueMRP.getItemPrice()) / 100;
+
+			}
+
+		} else {
+
+			for (LineItemVo lineItemVo : listofAllLineItems) {
+
+				if (promoEligibleLineItems.indexOf(lineItemVo) >= 0) {
+
+					lineItemVo.setDescription(
+							"The customer can buy products from get pools beacuase the customer is buying products from buy pool");
+
+				}
+
+//				barcodeLevelTotalDiscount = barcodeLevelTotalDiscount + lineItemVo.getDiscount();
+
+			}
+
+		}
+
+		return distributeDiscountToAllProductsInPercentage(listofAllLineItems, calculateInvoiceLevelDiscount,
+				percentageDiscount);
 
 	}
 
@@ -485,8 +753,8 @@ public class CalculateBenifits {
 		return listofLineItems;
 	}
 
-	private List<LineItemVo> calculateXUBDiscountForFixedAmountOn(BenfitEntity benfitEntity, List<Double> totalQuantityAndMrp,
-			List<LineItemVo> promoEligibleLineItems) {
+	private List<LineItemVo> calculateXUBDiscountForFixedAmountOn(BenfitEntity benfitEntity,
+			List<Double> totalQuantityAndMrp, List<LineItemVo> promoEligibleLineItems) {
 
 		double invoiceLevelDiscount = 0.0;
 
@@ -676,6 +944,26 @@ public class CalculateBenifits {
 
 	}
 
+	public List<LineItemVo> fetchEligibleLineItemsFromGetPools(List<LineItemVo> allLineItems,
+			List<PoolEntity> listOfGetPools) {
+		List<LineItemVo> promoEligibleLineItems = new ArrayList<>();
+
+		for (LineItemVo lineItemVo : allLineItems) {
+
+			ProductTextileVo productTextile = convertLineItemsIntoProductTextile(lineItemVo);
+
+			if (checkPoolRules.checkPools(listOfGetPools, productTextile)) {
+
+				promoEligibleLineItems.add(lineItemVo);
+
+			}
+
+		}
+
+		return promoEligibleLineItems;
+
+	}
+
 	private ProductTextileVo convertLineItemsIntoProductTextile(LineItemVo lineItem) {
 
 		ProductTextileVo productTextile = new ProductTextileVo();
@@ -807,13 +1095,6 @@ public class CalculateBenifits {
 		List<LineItemVo> resultList = new LinkedList<>();
 		for (LineItemVo lineItemVo : listofLineItems) {
 
-			// findout the percentage of the product mrp in the total mrp
-
-			// findout the value of the percentage(percentage that is derived in the above
-			// line) of the total discount
-
-			// set above derived value to line items vos discount
-
 			Double discountAmountToBeAddedToTheProduct = (percentage * lineItemVo.getItemPrice()) / 100;
 			lineItemVo.setDiscount(discountAmountToBeAddedToTheProduct.longValue());
 			resultList.add(lineItemVo);
@@ -834,36 +1115,21 @@ public class CalculateBenifits {
 	 * }
 	 */
 
-	// main method
-	public static void main(String[] args) {
+	// distribute discount to all line items
+	public List<LineItemVo> distributeDiscountToAllProductsAndAllLineItems(List<LineItemVo> listofLineItemsTxt,
+			List<Double> totalQuantityAndMrp) {
+		List<LineItemVo> resultList = new LinkedList<>();
 
-		List<LineItemVo> lineItemList = new ArrayList<>();
-	
+		for (LineItemVo lineItemVo : listofLineItemsTxt) {
+			// x = (100 * currentItemPrice)/ totalMRP
+			// discountAmountForThisItem = x/100 * totalDiscount
+			double discountPercentagePerItem = (100 * lineItemVo.getItemPrice()) / totalQuantityAndMrp.get(1);
+			Double discountAmountForThisItem = (discountPercentagePerItem / 100);
+			lineItemVo.setDiscount(discountAmountForThisItem.longValue());
+			resultList.add(lineItemVo);
+		}
 
-		LineItemVo lineItemVo = new LineItemVo();
-		lineItemVo.setItemPrice(400l);
-		lineItemVo.setQuantity(5);
-		
-		PromotionsEntity promo1 = new PromotionsEntity();
-		promo1.setPromotionName("Buy2@1999");
-		promo1.setPromoApplyType(PromoApplyType.QuantitySlab);
-		promo1.setApplicability(Applicability.promotionForWholeBill);
-		promo1.setBuyItemsFromPool(2);
-		
-		BenfitEntity benefit1 = new BenfitEntity();
-		benefit1.setBenfitType(BenfitType.FlatDiscount);
-		
-		
-		
-		
-
-		
-
-		
-
-		
-
-
+		return resultList;
 	}
 
 }

@@ -3,6 +3,8 @@ package com.otsi.retail.promotions.service;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import com.otsi.retail.promotions.repository.ColumnNameAndOperatorRepository;
 
 @Service
 @Configuration
+@Transactional
 public class ColumnNameAndOperatorServiceImpl implements ColumnNameAndOperatorService {
 
 	private Logger log = LogManager.getLogger(ColumnNameAndOperatorServiceImpl.class);

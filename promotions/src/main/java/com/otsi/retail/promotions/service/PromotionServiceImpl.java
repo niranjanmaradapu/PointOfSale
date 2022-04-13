@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
@@ -57,6 +59,7 @@ import com.otsi.retail.promotions.vo.StoreVo;
  */
 
 @Service
+@Transactional
 public class PromotionServiceImpl implements PromotionService {
 
 	private Logger log = LogManager.getLogger(PromotionServiceImpl.class);
@@ -706,13 +709,13 @@ public class PromotionServiceImpl implements PromotionService {
 				}
 
 				listofLineItemsTxt = calculateBenifits.calculateInvoiceLevelBenefits(promo, slabBenefit,
-						totalQuantityAndMrp, listofLineItemsTxt);
+						totalQuantityAndMrp, listofLineItemsTxt, promoEligibleLineItems);
 
 			} else {
 				
 				// call the distribute to all line items method..
 				
-				
+				listofLineItemsTxt = calculateBenifits.distributeDiscountToAllProductsAndAllLineItems(listofLineItemsTxt, totalQuantityAndMrp);
 				
 
 			}

@@ -29,6 +29,7 @@ public class PoolMapper {
 		poolEntity.setLastModified(LocalDate.now());
 		poolEntity.setIsActive(Boolean.TRUE);
 
+
 		if (vo.getIsForEdit()) {
 			poolEntity.setModifiedBy(vo.getModifiedBy());
 
