@@ -7,11 +7,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 
 import com.otsi.retail.promotions.entity.ColumnNameAndOperators;
+import com.otsi.retail.promotions.vo.ColumnNameAndOperatorsVo;
 
 @Repository
 public interface ColumnNameAndOperatorRepository extends JpaRepository<ColumnNameAndOperators, Long> {
 
-	ColumnNameAndOperators save(ColumnNameAndOperators columnNameAndOperators);
+	ColumnNameAndOperators save(ColumnNameAndOperatorsVo columnNameAndOperatorsVo);
 
 	//List<ColumnNameAndOperators>  findByColumnNameOrOperator(String columnName,String operator);
 

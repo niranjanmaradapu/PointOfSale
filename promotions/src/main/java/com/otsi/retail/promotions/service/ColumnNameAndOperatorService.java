@@ -5,11 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.promotions.entity.ColumnNameAndOperators;
+import com.otsi.retail.promotions.vo.ColumnNameAndOperatorsVo;
 
 @Component
 public interface ColumnNameAndOperatorService {
 	
-	ColumnNameAndOperators saveColumnNameAndOperator(ColumnNameAndOperators columnNameAndOperators);
+	ColumnNameAndOperatorsVo save(ColumnNameAndOperatorsVo columnNameAndOperatorsVo);
 	
 	List<ColumnNameAndOperators> getListofColumnNames();
 	

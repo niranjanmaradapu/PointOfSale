@@ -12,7 +12,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
 import com.otsi.retail.promotions.entity.ColumnNameAndOperators;
+import com.otsi.retail.promotions.mapper.ColumnNameAndOperatorMapper;
 import com.otsi.retail.promotions.repository.ColumnNameAndOperatorRepository;
+import com.otsi.retail.promotions.vo.ColumnNameAndOperatorsVo;
 
 @Service
 @Configuration
@@ -23,13 +25,28 @@ public class ColumnNameAndOperatorServiceImpl implements ColumnNameAndOperatorSe
 
 	@Autowired
 	ColumnNameAndOperatorRepository columnNameAndOperatorRepository;
+	
+	@Autowired
+	private ColumnNameAndOperatorMapper  columnNameAndOperatorMapper;
+
 
 	@Override
-	public ColumnNameAndOperators saveColumnNameAndOperator(ColumnNameAndOperators columnNameAndOperators) {
-
-		ColumnNameAndOperators saveColumnNameAndOperator = columnNameAndOperatorRepository.save(columnNameAndOperators);
-
-		return saveColumnNameAndOperator;
+	public ColumnNameAndOperatorsVo save(ColumnNameAndOperatorsVo columnNameAndOperatorsVo) {
+       
+		ColumnNameAndOperators columnNameAndOperatorVoToEntity =null;
+		ColumnNameAndOperatorsVo vo = null;
+		if(columnNameAndOperatorsVo != null) {
+		
+		 columnNameAndOperatorVoToEntity = columnNameAndOperatorMapper.columnNameAndOperatorVoToEntity(columnNameAndOperatorsVo);
+		
+		}
+		ColumnNameAndOperators saveColumnNameAndOperator = columnNameAndOperatorRepository.save(columnNameAndOperatorVoToEntity);
+        
+		if(saveColumnNameAndOperator!=null) {
+			vo = columnNameAndOperatorMapper.columnNameAndOperatorEntityToVo(saveColumnNameAndOperator);
+		}
+		
+		return vo;
 	}
 
 	@Override

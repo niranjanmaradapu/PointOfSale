@@ -22,6 +22,7 @@ import com.otsi.retail.promotions.gatewayresponse.GateWayResponse;
 import com.otsi.retail.promotions.service.ColumnNameAndOperatorService;
 import com.otsi.retail.promotions.service.PromotionService;
 import com.otsi.retail.promotions.vo.BenefitVo;
+import com.otsi.retail.promotions.vo.ColumnNameAndOperatorsVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
 import com.otsi.retail.promotions.vo.LineItemVo;
 import com.otsi.retail.promotions.vo.ProductTextileVo;
@@ -202,15 +203,16 @@ public class PromotionController {
 	}
 
 	@PostMapping("/save")
-	public GateWayResponse<?> saveColumnNameAndOperator(@RequestBody ColumnNameAndOperators columnNameAndOperators) {
-		log.info("Recieved request to columnNamesAndOperator():" + columnNameAndOperators);
+	public GateWayResponse<?> saveColumnNameAndOperatorsVo(@RequestBody ColumnNameAndOperatorsVo columnNameAndOperatorsVo) {
+		log.info("Recieved request to columnNamesAndOperator():" + columnNameAndOperatorsVo);
 
-		ColumnNameAndOperators saveColumnNameAndOperator = columnNameAndOperatorService
-				.saveColumnNameAndOperator(columnNameAndOperators);
+		ColumnNameAndOperatorsVo saveColumnNameAndOperator = columnNameAndOperatorService
+				.save(columnNameAndOperatorsVo);
 
 		return new GateWayResponse<>("SuccessFully Added ColumnNames data", saveColumnNameAndOperator);
 
 	}
+
 
 	// deletebyId .getbyOperation/
 	@ApiOperation(value = "Delete columnNameOperators")
