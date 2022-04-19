@@ -659,9 +659,6 @@ public class PromotionServiceImpl implements PromotionService {
 	public List<LineItemVo> checkInvoiceLevelPromtion(List<LineItemVo> listofLineItemsTxt, Long storeId,
 			Long domainId) {
 
-		// we need to cover the major scenarios of total value and total quantity
-		// flat discount, x units from buy pool, x units from get pool
-
 		// getting active promotions from the store
 		List<PromotionToStoreEntity> activePromos = promostoreRepo.findByStoreIdAndPromotionStatus(storeId, true);
 
@@ -673,22 +670,14 @@ public class PromotionServiceImpl implements PromotionService {
 		List<PromotionsEntity> listOfPromos = promoRepo.findByPromoIdInAndApplicability(promoIds,
 				Applicability.promotionForWholeBill);
 
-		// System.out.println("Bill level Promos >>" + listOfPromos.toString());
-
-		// fetch all invoice level active and store related promotions and loop through
-		// them
-
 		for (PromotionsEntity promo : listOfPromos) {
 
-			List<Double> totalQuantityAndMrp = calculateTotalMrpAndQuantity(listofLineItemsTxt);
 			BenfitEntity slabBenefit = null;
 
-			// need to check buyAny
-
-			//int buyItemsFromPool = promo.getBuyItemsFromPool();
-
 			List<LineItemVo> promoEligibleLineItems = calculateBenifits.getPromoEligibleLineItems(listofLineItemsTxt,
-					promo, totalQuantityAndMrp, slabBenefit);
+					promo, slabBenefit);
+
+			List<Double> totalQuantityAndMrp = calculateTotalMrpAndQuantity(promoEligibleLineItems);
 
 			if (promoEligibleLineItems.size() > 0) {
 
@@ -700,7 +689,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 					// call benefits calculation engine with required fields
 
-   				} else if (promo.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
+				} else if (promo.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
 
 					System.out.println("Value Slab");
 
@@ -712,11 +701,11 @@ public class PromotionServiceImpl implements PromotionService {
 						totalQuantityAndMrp, listofLineItemsTxt, promoEligibleLineItems);
 
 			} else {
-				
+
 				// call the distribute to all line items method..
-				
-				listofLineItemsTxt = calculateBenifits.distributeDiscountToAllProductsAndAllLineItems(listofLineItemsTxt, totalQuantityAndMrp);
-				
+
+				listofLineItemsTxt = calculateBenifits.distributeDiscountToAllProducts(listofLineItemsTxt, 0.0);
+
 			}
 		}
 
@@ -760,6 +749,5 @@ public class PromotionServiceImpl implements PromotionService {
 		return calculatedValues;
 
 	}
-	
 
 }
