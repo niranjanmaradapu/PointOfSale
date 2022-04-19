@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.otsi.retail.promotions.entity.Condition;
 import com.otsi.retail.promotions.entity.PoolEntity;
 import com.otsi.retail.promotions.entity.Pool_Rule;
 import com.otsi.retail.promotions.exceptions.DuplicateRecordException;

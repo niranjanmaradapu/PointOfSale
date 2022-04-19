@@ -685,12 +685,12 @@ public class PromotionServiceImpl implements PromotionService {
 
 			// need to check buyAny
 
-			int buyItemsFromPool = promo.getBuyItemsFromPool();
+			//int buyItemsFromPool = promo.getBuyItemsFromPool();
 
 			List<LineItemVo> promoEligibleLineItems = calculateBenifits.getPromoEligibleLineItems(listofLineItemsTxt,
 					promo, totalQuantityAndMrp, slabBenefit);
 
-			if (promoEligibleLineItems.size() >= buyItemsFromPool) {
+			if (promoEligibleLineItems.size() > 0) {
 
 				if (promo.getPromoApplyType().equals(PromoApplyType.QuantitySlab)) {
 
@@ -700,7 +700,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 					// call benefits calculation engine with required fields
 
-				} else if (promo.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
+   				} else if (promo.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
 
 					System.out.println("Value Slab");
 
@@ -717,7 +717,6 @@ public class PromotionServiceImpl implements PromotionService {
 				
 				listofLineItemsTxt = calculateBenifits.distributeDiscountToAllProductsAndAllLineItems(listofLineItemsTxt, totalQuantityAndMrp);
 				
-
 			}
 		}
 
@@ -761,5 +760,6 @@ public class PromotionServiceImpl implements PromotionService {
 		return calculatedValues;
 
 	}
+	
 
 }

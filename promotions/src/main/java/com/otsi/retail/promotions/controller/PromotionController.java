@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.otsi.retail.promotions.calculate.benefits.CalculateBenifits;
 import com.otsi.retail.promotions.common.CommonRequestMappigs;
 import com.otsi.retail.promotions.entity.ColumnNameAndOperators;
 import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
@@ -51,6 +52,9 @@ public class PromotionController {
 
 	@Autowired
 	private PromotionService promoService;
+	
+	@Autowired
+	private CalculateBenifits calculateBenifits;
 
 	@Autowired
 	private ColumnNameAndOperatorService columnNameAndOperatorService;
@@ -170,6 +174,28 @@ public class PromotionController {
 		return new GateWayResponse<>("", promoService.checkPromtion(listofInvTxt, storeId, domainId));
 	}
 
+	// check the flags for the both promos
+	@PostMapping("/checkPromtion")
+	public GateWayResponse<?> checkPromotion(@RequestBody List<ProductTextileVo> listofInvTxt,
+			@RequestParam Long storeId, @RequestParam Long domainId, boolean checkPromoSwitch) {
+		
+		
+		// barcode level check promotion for textile
+		List<LineItemVo> listOfLineItems = calculateBenifits.convertProductTextileIntoLineItems(listofInvTxt);
+		
+		if (checkPromoSwitch) {
+
+			GateWayResponse<?> barcodeLevelCheckPromoForTxtile = checkPromtionTextile(listofInvTxt, storeId, domainId);
+
+		} else {
+
+			GateWayResponse<?> invoiceLevelCheckPromoForTxtile = invoiceLevelCheckPromtionTextile(listOfLineItems , storeId,
+					domainId);
+		}
+
+		return new GateWayResponse<>();
+	}
+
 	@PostMapping("/invoiceLevelCheckPromtionTextile")
 	public GateWayResponse<?> invoiceLevelCheckPromtionTextile(@RequestBody List<LineItemVo> listofLineItemsTxt,
 			@RequestParam Long storeId, @RequestParam Long domainId) {
@@ -203,7 +229,8 @@ public class PromotionController {
 	}
 
 	@PostMapping("/save")
-	public GateWayResponse<?> saveColumnNameAndOperatorsVo(@RequestBody ColumnNameAndOperatorsVo columnNameAndOperatorsVo) {
+	public GateWayResponse<?> saveColumnNameAndOperatorsVo(
+			@RequestBody ColumnNameAndOperatorsVo columnNameAndOperatorsVo) {
 		log.info("Recieved request to columnNamesAndOperator():" + columnNameAndOperatorsVo);
 
 		ColumnNameAndOperatorsVo saveColumnNameAndOperator = columnNameAndOperatorService
@@ -212,7 +239,6 @@ public class PromotionController {
 		return new GateWayResponse<>("SuccessFully Added ColumnNames data", saveColumnNameAndOperator);
 
 	}
-
 
 	// deletebyId .getbyOperation/
 	@ApiOperation(value = "Delete columnNameOperators")

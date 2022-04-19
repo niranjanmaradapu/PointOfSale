@@ -1,12 +1,10 @@
 package com.otsi.retail.promotions.check.pools;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.otsi.retail.promotions.common.ColumnName;
 import com.otsi.retail.promotions.common.Operator;
 import com.otsi.retail.promotions.entity.Condition;
 import com.otsi.retail.promotions.entity.PoolEntity;
