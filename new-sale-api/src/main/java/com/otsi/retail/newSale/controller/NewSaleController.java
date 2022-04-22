@@ -254,10 +254,10 @@ public class NewSaleController {
 
 	// method for deleting pending delivery slip data
 	@DeleteMapping(CommonRequestMappigs.DELETE_DS)
-	public GateWayResponse<?> deleteDeliverySlipDetails(@RequestParam Long dsId) throws RecordNotFoundException {
-		log.info("Received Request to getDeliverySlipDetails :" + dsId);
+	public GateWayResponse<?> deleteDeliverySlipDetails(@RequestParam String dsNumber) throws RecordNotFoundException {
+		log.info("Received Request to getDeliverySlipDetails :" + dsNumber);
 
-		String dsDetails = newSaleService.deleteDeliverySlipDetails(dsId);
+		String dsDetails = newSaleService.deleteDeliverySlipDetails(dsNumber);
 		return new GateWayResponse<>("Success", dsDetails);
 	}
 

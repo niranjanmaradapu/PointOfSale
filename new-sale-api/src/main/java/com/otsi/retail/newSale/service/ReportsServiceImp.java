@@ -357,6 +357,7 @@ public class ReportsServiceImp implements ReportService {
 
 		List<NewSaleEntity> lnesen = new ArrayList<>();
 		
+		
 		if (domainId == DomainData.TE.getId()) {
 			List<ReportVo> lRvos = new ArrayList<ReportVo>();
 	

@@ -1733,13 +1733,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public String deleteDeliverySlipDetails(Long dsId) {
+	public String deleteDeliverySlipDetails(String dsNumber) {
 
-		Optional<DeliverySlipEntity> dsVo = dsRepo.findById(dsId);
+		DeliverySlipEntity dsEntity = dsRepo.findByDsNumber(dsNumber);
 
-		if (dsVo.get() != null && dsVo.get().getOrder() == null) {
-
-			dsRepo.deleteById(dsId);
+		if (dsEntity!= null && dsEntity.getOrder() == null) {
+			
+			dsEntity.setStatus(DSStatus.Cancelled);
+			dsRepo.save(dsEntity);
 
 		}
 
