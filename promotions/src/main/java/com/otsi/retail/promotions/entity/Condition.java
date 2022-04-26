@@ -1,6 +1,5 @@
 package com.otsi.retail.promotions.entity;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -25,7 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "pos_pool_rule_conditions")
-public class Condition {
+public class Condition extends BaseEntity {
 
 	@Id
 	@GeneratedValue
@@ -40,10 +39,6 @@ public class Condition {
 	@ElementCollection
 	@Column(name = "givenValues")
 	private List<String> givenValues;
-
-	private LocalDate createdAt;
-
-	private LocalDate updatedAt;
 
 	@ManyToOne
 	@JoinColumn(name = "poolRuleId")

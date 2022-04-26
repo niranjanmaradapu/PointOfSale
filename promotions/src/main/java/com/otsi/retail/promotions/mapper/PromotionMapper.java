@@ -1,22 +1,17 @@
 package com.otsi.retail.promotions.mapper;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.promotions.entity.BenfitEntity;
 import com.otsi.retail.promotions.entity.PoolEntity;
 import com.otsi.retail.promotions.entity.PromotionSlabsEntity;
-import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
 import com.otsi.retail.promotions.entity.PromotionsEntity;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.PromotionSlabsVo;
-import com.otsi.retail.promotions.vo.PromotionToStoreVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 
 /**
@@ -46,8 +41,6 @@ public class PromotionMapper {
 		promo.setPromoApplyType(vo.getPromoApplyType());
 		promo.setBuyItemsFromPool(vo.getBuyItemsFromPool());
 		promo.setIsActive(Boolean.TRUE);
-		promo.setCreatedDate(LocalDate.now());
-		promo.setLastModified(LocalDate.now());
 		// promo.setPriority(vo.getPriority());
 		promo.setPromotionStartDate(vo.getPromotionStartDate());
 		promo.setPromotionEndDate(vo.getPromotionEndDate());
@@ -120,8 +113,6 @@ public class PromotionMapper {
 			vo.setIsTaxExtra(x.getIsTaxExtra());
 			vo.setIsActive(x.getIsActive());
 			vo.setBuyItemsFromPool(x.getBuyItemsFromPool());
-			vo.setCreatedDate(x.getCreatedDate());
-			vo.setLastModified(x.getLastModified());
 			vo.setPromotionStartDate(x.getPromotionStartDate());
 			vo.setPromotionEndDate(x.getPromotionEndDate());
 			vo.setPromoApplyType(x.getPromoApplyType());
@@ -182,7 +173,6 @@ public class PromotionMapper {
 				pool.setPoolName(a.getPoolName());
 				pool.setPoolType(a.getPoolType());
 				pool.setIsActive(a.getIsActive());
-				pool.setCreatedDate(a.getCreatedDate());
 				poolList.add(pool);
 			});
 			vo.setPoolVo(poolList);

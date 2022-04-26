@@ -412,7 +412,7 @@ public class CalculateBenifits {
 			List<LineItemVo> promoEligibleLineItems) {
 
 		List<LineItemVo> resultList = null;
-		for (LineItemVo itemVo : listofLineItems) {
+//		for (LineItemVo itemVo : listofLineItems) {
 
 			switch (benfitEntity.getBenfitType()) {
 
@@ -436,7 +436,7 @@ public class CalculateBenifits {
 				break;
 
 			}
-		}
+	//	}
 		return resultList;
 
 	}
@@ -812,9 +812,9 @@ public class CalculateBenifits {
 
 		Long numOfItemsFromBuyPool = benfitEntity.getNumOfItemsFromBuyPool();
 
-		for (int i = numOfItemsFromBuyPool.intValue() - 1; i > -1; i--) {
+		for (int i = numOfItemsFromBuyPool.intValue(); i > 0; i--) {
 
-			LineItemVo maxValueMRP = orderedLineItems.get(i - 1);
+			LineItemVo maxValueMRP = orderedLineItems.get(i + 1);
 
 			double individualLineItemTotalPrice = maxValueMRP.getItemPrice().doubleValue() * maxValueMRP.getQuantity();
 

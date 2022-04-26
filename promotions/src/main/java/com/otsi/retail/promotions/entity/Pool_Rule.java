@@ -1,6 +1,5 @@
 package com.otsi.retail.promotions.entity;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -22,7 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "pos_pool_rule")
-public class Pool_Rule {
+public class Pool_Rule extends BaseEntity {
 
 	@Id
 	@GeneratedValue
@@ -31,10 +30,6 @@ public class Pool_Rule {
 	private String ruleType;
 	
 	private Long ruleNumber;
-	
-	private LocalDate createdAt;
-
-	private LocalDate updatedAt;
 	
 	@ManyToOne
 	@JoinColumn(name = "pool_Id")

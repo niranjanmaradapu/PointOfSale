@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.otsi.retail.promotions.common.Operator;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

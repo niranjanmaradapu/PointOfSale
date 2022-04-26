@@ -1,6 +1,6 @@
 package com.otsi.retail.promotions.service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,6 +72,7 @@ public class PoolServiceImpl implements PoolService {
 		}
 		PoolEntity savePool = savedPool;
 		vo.getPool_RuleVo().forEach(x -> {
+			
 
 			Pool_Rule poolRule = poolMapper.convertPoolRuleVoToEntity(x);
 			poolRule.setPoolEntity(savePool);
@@ -126,7 +127,6 @@ public class PoolServiceImpl implements PoolService {
 			PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
 
 			poolEntity.setPoolId(vo.getPoolId());
-			poolEntity.setLastModified(LocalDate.now());
 
 			PoolEntity savedPool = poolRepo.save(poolEntity);
 

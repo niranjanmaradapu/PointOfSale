@@ -21,7 +21,5 @@ public class ColumnNameAndOperators {
 	Long domainId;
 	String columnName;
 	String operator;
-	
-	
 
 }

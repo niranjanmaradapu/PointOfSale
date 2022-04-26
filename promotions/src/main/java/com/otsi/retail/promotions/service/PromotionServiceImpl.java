@@ -1,6 +1,7 @@
 package com.otsi.retail.promotions.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -350,8 +351,6 @@ public class PromotionServiceImpl implements PromotionService {
 		promoStore.setStoreId(vo.getStoreId());
 		promoStore.setPromotionStatus(true);
 		promoStore.setCreatedBy(storeDto.get().getCreatedBy());
-		promoStore.setCreatedat(LocalDate.now());
-		promoStore.setUpdatedat(LocalDate.now());
 
 		promostoreRepo.save(promoStore);
 

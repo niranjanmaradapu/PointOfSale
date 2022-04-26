@@ -1,14 +1,13 @@
 package com.otsi.retail.promotions.vo;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.promotions.common.Applicability;
 import com.otsi.retail.promotions.common.PromoApplyType;
-import com.otsi.retail.promotions.common.PromotionType;
-import com.otsi.retail.promotions.entity.PromotionSlabsEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

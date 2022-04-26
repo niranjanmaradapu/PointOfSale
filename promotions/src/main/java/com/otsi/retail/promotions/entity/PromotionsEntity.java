@@ -14,12 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import com.otsi.retail.promotions.common.Applicability;
 import com.otsi.retail.promotions.common.PromoApplyType;
@@ -31,7 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "pos_promotion_master")
-public class PromotionsEntity {
+public class PromotionsEntity extends BaseEntity{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,8 +40,6 @@ public class PromotionsEntity {
 	private String description;
 
 	private String printNameOnBill;
-
-	private Long createdBy;
     
 	@Enumerated(EnumType.STRING)
 	private Applicability applicability;
@@ -62,12 +56,6 @@ public class PromotionsEntity {
 	private LocalDate promotionStartDate;
 
 	private LocalDate promotionEndDate;
-    
-	@CreationTimestamp
-	private LocalDate createdDate;
-    
-	@UpdateTimestamp
-	private LocalDate lastModified;
 
 	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
 	@JoinTable(name = "pool_promo", joinColumns = @JoinColumn(name = "promoId"), inverseJoinColumns = @JoinColumn(name = "poolId"))

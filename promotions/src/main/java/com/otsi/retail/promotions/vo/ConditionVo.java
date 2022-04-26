@@ -2,7 +2,6 @@ package com.otsi.retail.promotions.vo;
 
 import java.util.List;
 
-import com.google.inject.spi.PrivateElements;
 import com.otsi.retail.promotions.common.ColumnName;
 import com.otsi.retail.promotions.common.Operator;
 
@@ -22,6 +21,10 @@ public class ConditionVo {
 	private Operator operatorSymbol;
 
 	private List<String> givenValues;
+	
+	private Long createdBy;
+
+	private Long modifiedBy;
 	
 	private Pool_RuleVo poolRuleVo;
 

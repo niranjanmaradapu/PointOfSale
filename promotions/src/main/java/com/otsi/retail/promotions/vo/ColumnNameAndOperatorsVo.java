@@ -1,8 +1,5 @@
 package com.otsi.retail.promotions.vo;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;

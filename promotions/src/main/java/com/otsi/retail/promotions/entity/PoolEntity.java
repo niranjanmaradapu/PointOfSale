@@ -1,6 +1,5 @@
 package com.otsi.retail.promotions.entity;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -25,7 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "pos_pool_master")
-public class PoolEntity {
+public class PoolEntity extends BaseEntity {
 
 	@Id
 	@GeneratedValue
@@ -37,14 +36,6 @@ public class PoolEntity {
     
 	@Enumerated(EnumType.STRING)
 	private PoolType poolType;
-	
-	private Long createdBy;
-	
-	private Long modifiedBy;
-
-	private LocalDate createdDate;
-
-	private LocalDate lastModified;
 
 	private Boolean isActive;
 	

@@ -1,6 +1,5 @@
 package com.otsi.retail.promotions.mapper;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,10 +24,7 @@ public class PoolMapper {
 		poolEntity.setDomainId(vo.getDomainId());
 		poolEntity.setPoolType(vo.getPoolType());
 		poolEntity.setCreatedBy(vo.getCreatedBy());
-		poolEntity.setCreatedDate(LocalDate.now());
-		poolEntity.setLastModified(LocalDate.now());
 		poolEntity.setIsActive(Boolean.TRUE);
-
 
 		if (vo.getIsForEdit()) {
 			poolEntity.setModifiedBy(vo.getModifiedBy());
@@ -47,7 +43,6 @@ public class PoolMapper {
 		if (poolRuleVo.getIsForEdit()) {
 
 			poolRule.setRuleNumber(poolRuleVo.getRuleNumber());
-			poolRule.setUpdatedAt(LocalDate.now());
 
 			poolRuleVo.getConditionVos().stream().forEach(c -> {
 
@@ -56,16 +51,21 @@ public class PoolMapper {
 				condition.setColumnName(c.getColumnName());
 				condition.setGivenValues(c.getGivenValues());
 				condition.setOperatorSymbol(c.getOperatorSymbol());
-				condition.setUpdatedAt(LocalDate.now());
+				condition.setCreatedBy(c.getCreatedBy());
+				condition.setModifiedBy(c.getModifiedBy());
+				
 				condition.setPoolRule(poolRule);
 				listOfConditions.add(condition);
+
 			});
 
 		} else {
 
 			poolRule.setRuleNumber(poolRuleVo.getRuleNumber());
+			poolRule.setCreatedBy(poolRuleVo.getCreatedBy());
+			poolRule.setModifiedBy(poolRuleVo.getModifiedBy());
+
 			System.out.println("RuleNumber is:: " + poolRule.getRuleNumber());
-			poolRule.setCreatedAt(LocalDate.now());
 
 			poolRuleVo.getConditionVos().stream().forEach(c -> {
 
@@ -73,24 +73,19 @@ public class PoolMapper {
 				condition.setColumnName(c.getColumnName());
 				condition.setGivenValues(c.getGivenValues());
 				condition.setOperatorSymbol(c.getOperatorSymbol());
-				condition.setCreatedAt(LocalDate.now());
 				condition.setPoolRule(poolRule);
 				listOfConditions.add(condition);
-	
-				
+
 			});
 
 		}
 		poolRule.setConditions(listOfConditions);
 		poolRule.setRuleType(poolRuleVo.getRuleType());
-		
-		
 
 		return poolRule;
 
 	}
 
-	
 	public List<Pool_Rule> PoolRuleVoToEntities(List<Pool_RuleVo> poolRuleVos) {
 		return poolRuleVos.stream().map(poolRuleVo -> convertPoolRuleVoToEntity(poolRuleVo))
 				.collect(Collectors.toList());
@@ -102,23 +97,20 @@ public class PoolMapper {
 		poolEntity.stream().forEach(x -> {
 
 			PromotionPoolVo vo = new PromotionPoolVo();
-            vo.setPoolId(x.getPoolId());
+			vo.setPoolId(x.getPoolId());
 			vo.setPoolName(x.getPoolName());
 			vo.setDomainId(x.getDomainId());
 			vo.setCreatedBy(x.getCreatedBy());
-			vo.setCreatedDate(x.getCreatedDate());
 			vo.setPoolType(x.getPoolType());
 			vo.setIsActive(x.getIsActive());
-			vo.setLastModified(x.getLastModified());
-			
+
 			List<Pool_RuleVo> pool_RuleVo = new ArrayList<>();
 			x.getPool_Rule().stream().forEach(a -> {
 				Pool_RuleVo rule = new Pool_RuleVo();
 				rule.setRuleType(a.getRuleType());
 				rule.setRuleNumber(a.getRuleNumber());
-				rule.setLastModified(a.getUpdatedAt());
 				rule.setId(a.getId());
-				
+
 				List<ConditionVo> conditionsVo = new ArrayList<>();
 				a.getConditions().stream().forEach(cond -> {
 
@@ -129,7 +121,7 @@ public class PoolMapper {
 					condition.setOperatorSymbol(cond.getOperatorSymbol());
 					conditionsVo.add(condition);
 				});
-				
+
 				rule.setConditionVos(conditionsVo);
 				pool_RuleVo.add(rule);
 			});

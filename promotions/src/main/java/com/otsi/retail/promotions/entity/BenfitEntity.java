@@ -3,7 +3,6 @@
  */
 package com.otsi.retail.promotions.entity;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -19,9 +18,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import com.otsi.retail.promotions.common.BenfitType;
 import com.otsi.retail.promotions.common.DiscountSubTypes;
@@ -41,7 +37,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "pos_promotion_benfits")
-public class BenfitEntity {
+public class BenfitEntity extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -64,12 +60,6 @@ public class BenfitEntity {
 	
 	@Enumerated(EnumType.STRING)
 	private ItemValue itemValue;
-	
-	@CreationTimestamp
-	private LocalDate createdAt;
-	
-	@UpdateTimestamp
-	private LocalDate updatedAt;
 	
 	@ManyToOne
 	@JoinColumn(name = "promoId")
