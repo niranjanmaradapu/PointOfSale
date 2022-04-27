@@ -53,12 +53,12 @@ public class PoolController {
 	}
 	
 	
-
 	// Method for getting List of Pools from status flag
 	@GetMapping(CommonRequestMappigs.GET_POOL_LIST)
-	public GateWayResponse<?> getListOfPools(@RequestParam String isActive, Long domainId) {
+	public GateWayResponse<?> getListOfPools(@RequestParam String isActive, @RequestParam Long domainId, 
+			@RequestParam Long clientId, @RequestParam Long storeId) {
 		log.info("Recieved request to getListOfPools():" + isActive);
-		PoolVo poolvo = poolService.getListOfPools(isActive,domainId);
+		PoolVo poolvo = poolService.getListOfPools(isActive,domainId,clientId, storeId);
 		return new GateWayResponse<>("fetching list of pools successfully", poolvo);
 
 	}

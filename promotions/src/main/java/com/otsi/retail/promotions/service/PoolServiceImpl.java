@@ -45,7 +45,7 @@ public class PoolServiceImpl implements PoolService {
 
 	@Autowired
 	private RuleRepo ruleRepo;
-	
+
 	@Autowired
 	private ConditionRepo conditionRepo;
 
@@ -72,7 +72,6 @@ public class PoolServiceImpl implements PoolService {
 		}
 		PoolEntity savePool = savedPool;
 		vo.getPool_RuleVo().forEach(x -> {
-			
 
 			Pool_Rule poolRule = poolMapper.convertPoolRuleVoToEntity(x);
 			poolRule.setPoolEntity(savePool);
@@ -84,6 +83,7 @@ public class PoolServiceImpl implements PoolService {
 		return "Pool saved Successfully with id: " + savedPool.getPoolId();
 
 	}
+
 	// Method for create rules if pool exists from PromotionPoolVO
 	@Override
 	public String poolExistsCreateRules(PromotionPoolVo vo) {
@@ -101,7 +101,7 @@ public class PoolServiceImpl implements PoolService {
 				Pool_Rule poolRules = poolMapper.convertPoolRuleVoToEntity(x);
 				poolRules.setPoolEntity(pool.get());
 				ruleRepo.save(poolRules);
-          
+
 			});
 
 		} else {
@@ -111,7 +111,7 @@ public class PoolServiceImpl implements PoolService {
 
 		return "Rules Created If Pool Exists: " + pool.get().getPoolId();
 	}
-   
+
 	// Method for modifying/edit existing pools and rules from PromotionPoolVO
 	@Override
 	public String modifyPool(PromotionPoolVo vo) {
@@ -154,7 +154,7 @@ public class PoolServiceImpl implements PoolService {
 
 	// Method for getting list of pools based on the status flag
 	@Override
-	public PoolVo getListOfPools(String isActive, Long domainId) {
+	public PoolVo getListOfPools(String isActive, Long domainId, Long clientId, Long storeId) {
 		log.debug("debugging savePool():" + isActive);
 		List<PoolEntity> poolEntity = new ArrayList<>();
 		Boolean flag = null;
@@ -174,24 +174,34 @@ public class PoolServiceImpl implements PoolService {
 		} else if (isActive.isEmpty() && domainId != null) {
 
 			poolEntity = poolRepo.findByDomainId(domainId);
-			poolEntity.stream().forEach(p -> {
+//			poolEntity.stream().forEach(p -> {
+//
+//				p.setDomainId(null);
+//			});
+		} else if (!(isActive.isEmpty()) && storeId == null) {
+			poolEntity = poolRepo.findByIsActive(flag);
+		} else if (isActive.isEmpty() && storeId != null) {
 
-				p.setDomainId(null);
-			});
+			poolEntity = poolRepo.findByStoreId(storeId);
+		}else if(!(isActive.isEmpty()) && clientId == null)
+		{
+			poolEntity = poolRepo.findByIsActive(flag);
+		}else if(isActive.isEmpty() && clientId !=null)
+		{
+			poolEntity = poolRepo.findByClientId(clientId);
 		}
 
 		else {
-			poolEntity = poolRepo.findByIsActiveAndDomainId(flag, domainId);
-			poolEntity.stream().forEach(p -> {
-
-				p.setDomainId(null);
-			});
+			poolEntity = poolRepo.findByIsActiveAndDomainIdAndStoreIdAndClientId(flag, domainId,storeId,clientId);
+//			poolEntity.stream().forEach(p -> {
+//
+//				p.setDomainId(null);
+//			});
 
 		}
 		if (!poolEntity.isEmpty()) {
 			PoolVo poolvo = new PoolVo();
-					
-			
+
 			List<PromotionPoolVo> poolVo = poolMapper.convertPoolEntityToVo(poolEntity);
 			log.warn("we are checking if pool is fetching...");
 			log.info("fetching list of pools");
@@ -204,8 +214,8 @@ public class PoolServiceImpl implements PoolService {
 			log.error("record not found");
 			throw new RecordNotFoundException("record not found");
 		}
-	} 
-	
+	}
+
 	// Method for delete the existing pool details
 	@Override
 	public String deletePool(Long poolId) {
@@ -221,7 +231,7 @@ public class PoolServiceImpl implements PoolService {
 		// TODO Auto-generated method stub
 		return "pool deleted sucessfully";
 	}
-	
+
 	// Method for searchPools from SearchPoolVo
 	@Override
 	public List<PromotionPoolVo> searchPool(SearchPoolVo pvo) {

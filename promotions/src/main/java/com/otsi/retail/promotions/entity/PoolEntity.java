@@ -33,6 +33,10 @@ public class PoolEntity extends BaseEntity {
 	private Long domainId;
 
 	private String poolName;
+	
+	private Long clientId;
+	
+	private Long storeId;
     
 	@Enumerated(EnumType.STRING)
 	private PoolType poolType;

@@ -34,6 +34,10 @@ public class PromotionsEntity extends BaseEntity{
 	private Long promoId;
 
 	private Long domainId;
+	
+	private Long clientId;
+	
+	private Long storeId;
 
 	private String promotionName;
 

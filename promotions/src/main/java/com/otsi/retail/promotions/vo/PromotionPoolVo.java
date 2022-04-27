@@ -23,6 +23,10 @@ public class PromotionPoolVo {
 	private Long poolId;
 	
 	private Long domainId;
+	
+	private Long clientId;
+	
+	private Long storeId;
 
 	private PoolType poolType;
 

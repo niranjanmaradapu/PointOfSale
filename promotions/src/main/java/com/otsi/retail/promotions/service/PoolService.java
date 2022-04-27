@@ -2,11 +2,10 @@ package com.otsi.retail.promotions.service;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.PoolVo;
+import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.SearchPoolVo;
 
 /**
@@ -20,7 +19,7 @@ public interface PoolService {
 
 	String savePool(PromotionPoolVo vo);
 
-	PoolVo getListOfPools(String isActive, Long domainId);
+	PoolVo getListOfPools(String isActive, Long domainId, Long clientId, Long storeId);
 
 	String modifyPool(PromotionPoolVo vo);
 

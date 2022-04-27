@@ -20,7 +20,7 @@ public interface PromotionService {
 
 	String addPromotion(PromotionsVo vo);
 
-	ConnectionPromoVo getListOfPromotions(String flag, Long domainId);
+	ConnectionPromoVo getListOfPromotions(String flag, Long domainId, Long clientId, Long storeId);
 
 	String editPromotion(PromotionsVo vo);
 	

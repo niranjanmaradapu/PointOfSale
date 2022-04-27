@@ -125,7 +125,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 	// Method for getting list of Promotions by using flag(Status)
 	@Override
-	public ConnectionPromoVo getListOfPromotions(String flag, Long domainId) {
+	public ConnectionPromoVo getListOfPromotions(String flag, Long domainId, Long clientId, Long storeId) {
 		log.debug("debugging getListOfPromotions:" + flag);
 		List<PromotionsEntity> promoList = new ArrayList<>();
 
@@ -144,8 +144,20 @@ public class PromotionServiceImpl implements PromotionService {
 		} else if (flag.isEmpty() && domainId != null) {
 
 			promoList = promoRepo.findByDomainId(domainId);
+		} else if (!(flag.isEmpty()) && storeId == null) {
+
+			promoList = promoRepo.findByIsActive(status);
+		} else if (flag.isEmpty() && storeId != null) {
+
+			promoList = promoRepo.findByStoreId(storeId);
+		} else if (!(flag.isEmpty()) && clientId == null) {
+
+			promoList = promoRepo.findByIsActive(status);
+		} else if ((flag.isEmpty()) && clientId != null) {
+
+			promoList = promoRepo.findByClientId(clientId);
 		} else {
-			promoList = promoRepo.findByIsActiveAndDomainId(status, domainId);
+			promoList = promoRepo.findByIsActiveAndDomainIdAndStoreIdAndClientId(status, domainId, storeId, clientId);
 		}
 
 		if (!promoList.isEmpty()) {

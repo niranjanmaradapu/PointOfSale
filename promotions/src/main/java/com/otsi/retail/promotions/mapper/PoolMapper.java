@@ -22,6 +22,8 @@ public class PoolMapper {
 
 		poolEntity.setPoolName(vo.getPoolName());
 		poolEntity.setDomainId(vo.getDomainId());
+		poolEntity.setStoreId(vo.getStoreId());
+		poolEntity.setClientId(vo.getClientId());
 		poolEntity.setPoolType(vo.getPoolType());
 		poolEntity.setCreatedBy(vo.getCreatedBy());
 		poolEntity.setIsActive(Boolean.TRUE);
@@ -100,6 +102,8 @@ public class PoolMapper {
 			vo.setPoolId(x.getPoolId());
 			vo.setPoolName(x.getPoolName());
 			vo.setDomainId(x.getDomainId());
+			vo.setStoreId(x.getStoreId());
+			vo.setClientId(x.getClientId());
 			vo.setCreatedBy(x.getCreatedBy());
 			vo.setPoolType(x.getPoolType());
 			vo.setIsActive(x.getIsActive());
