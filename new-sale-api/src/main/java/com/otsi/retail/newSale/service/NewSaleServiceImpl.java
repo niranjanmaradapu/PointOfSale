@@ -510,7 +510,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Override
 	public DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws RecordNotFoundException {
-		log.info("Request for getting Delivery slip : " + dsNumber);
+		log.info("Request for getting estimation slip : " + dsNumber);
 
 		DeliverySlipEntity ds = dsRepo.findByDsNumber(dsNumber);
 
@@ -520,7 +520,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			return dsVo;
 
 		} else {
-			log.error("Deliveryslip number is not valid : " + dsNumber);
+			log.error("Estimationslip number is not valid : " + dsNumber);
 			throw new RecordNotFoundException("Provide valid DS Number",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 	}
@@ -1274,8 +1274,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 		Optional<GiftVoucherEntity> gvEntity = gvRepo.findByGvNumberAndClientId(gvNumber, clientId);
 
 		if (gvEntity.isPresent() && gvEntity.get().getIsActivated()
-				&& gvEntity.get().getFromDate().isBefore(LocalDate.now())
-				&& gvEntity.get().getToDate().isAfter(LocalDate.now())) {
+				
+				&& gvEntity.get().getFromDate().isBefore(LocalDate.now()) ||
+				gvEntity.get().getFromDate().isEqual(LocalDate.now())&&
+				gvEntity.get().getToDate().isAfter(LocalDate.now())||
+				gvEntity.get().getToDate().isEqual(LocalDate.now())){
+			
 			GiftVoucherVo vo = new GiftVoucherVo();
 			BeanUtils.copyProperties(gvEntity.get(), vo);
 			return vo;
@@ -1745,7 +1749,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 
 		// TODO Auto-generated method stub
-		return " delivery Slip sucessfully deleted ";
+		return " estimation slip sucessfully deleted ";
 	}
 
 	// Method for fetching list of Gift vouchers
@@ -1945,4 +1949,36 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	}
 
+	@Override
+	public List<GiftVoucherEntity> giftVoucherSearching(String gvNumber, 
+			LocalDate fromDate, LocalDate toDate){
+		List<GiftVoucherEntity> searchByGvNumber = null;
+		
+		if (fromDate != null) {
+			
+		searchByGvNumber = gvRepo.findByfromDateLike(fromDate);
+		}
+		
+		  if(gvNumber !=null) {
+
+			  searchByGvNumber = gvRepo.findByGvNumberLike(gvNumber);
+			  
+		  }
+		  
+		  if(toDate !=null) {
+			  
+		searchByGvNumber = gvRepo.findBytoDateLike(toDate);
+         
+        }
+		
+        return searchByGvNumber;
+	}
+
+	
+	/*public List<GiftVoucherEntity> listAll(String gvNumber,LocalDate fromDate,LocalDate toDate) {
+        if (gvNumber!= null || fromDate != null || toDate != null) {
+            return gvRepo.searchByGvNumberAndFromDateAndToDate(gvNumber, fromDate, toDate);
+        }
+        return gvRepo.findAll();
+}*/
 }

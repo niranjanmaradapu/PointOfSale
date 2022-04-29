@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
+import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
@@ -105,6 +107,10 @@ public interface NewSaleService {
 	List<GiftVoucherVo> getGvByUserId(Long userId) throws RecordNotFoundException;
 
 	String activateGiftvoucher(List<String> gvsList, Boolean flag) throws RecordNotFoundException;
+
+	public List<GiftVoucherEntity> giftVoucherSearching(String gvNumber,LocalDate fromDate,LocalDate toDate);
+	
+	
 
 	
 

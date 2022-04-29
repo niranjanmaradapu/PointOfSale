@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
@@ -19,5 +21,19 @@ public interface GiftVoucherRepo extends JpaRepository<GiftVoucherEntity, Long> 
 	List<GiftVoucherEntity> findByGvNumberIn(List<String> gvsList);
 
 	Optional<GiftVoucherEntity> findByGvNumberAndClientId(String gvNumber, Long clientId);
+	
+	//@Modifying
+	//@Query(value = "Select gv from GiftVoucherEntity gv where gv.gvNumber like '%gvNumber%'",nativeQuery = true)
+	//public List<GiftVoucherEntity> searchByGvNumberOrFromDateLike(@Param("gvNumber") String gvNumber);
+
+	@Query("from GiftVoucherEntity s where DATE(s.fromDate) = :fromDate")
+	List<GiftVoucherEntity> findByfromDateLike(@Param("fromDate")LocalDate fromDate);
+
+	List<GiftVoucherEntity> findByGvNumberLike(String gvNumber);
+	
+	@Query("from GiftVoucherEntity s where DATE(s.toDate) = :toDate")
+	List<GiftVoucherEntity> findBytoDateLike(@Param("toDate")LocalDate toDate);
+	
+	
 
 }
