@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.otsi.retail.promotions.common.AppConstants;
 import com.otsi.retail.promotions.entity.PoolEntity;
 import com.otsi.retail.promotions.entity.Pool_Rule;
 import com.otsi.retail.promotions.exceptions.DuplicateRecordException;
@@ -80,7 +81,7 @@ public class PoolServiceImpl implements PoolService {
 		});
 		log.warn("we are checking if pool is saved...");
 		log.info("pool saved Successfully");
-		return "Pool saved Successfully with id: " + savedPool.getPoolId();
+		return AppConstants.POOL_SAVE + savedPool.getPoolId();
 
 	}
 
@@ -148,7 +149,7 @@ public class PoolServiceImpl implements PoolService {
 		}
 		log.warn("we are checking if pool is modify...");
 		log.info("Pool Modified Successfully...");
-		return "Pool Modified Successfully...";
+		return AppConstants.MODIFY_POOL;
 
 	}
 
@@ -166,7 +167,7 @@ public class PoolServiceImpl implements PoolService {
 			flag = Boolean.FALSE;
 		}
 
-		if (isActive.equalsIgnoreCase("ALL") && domainId == null) {
+		if (isActive.equalsIgnoreCase("ALL") && domainId == null && storeId == null && clientId == null) {
 			poolEntity = poolRepo.findAll();
 
 		} else if (!(isActive.isEmpty()) && domainId == null) {
@@ -229,7 +230,7 @@ public class PoolServiceImpl implements PoolService {
 
 		}
 		// TODO Auto-generated method stub
-		return "pool deleted sucessfully";
+		return AppConstants.DELETE_POOL;
 	}
 
 	// Method for searchPools from SearchPoolVo

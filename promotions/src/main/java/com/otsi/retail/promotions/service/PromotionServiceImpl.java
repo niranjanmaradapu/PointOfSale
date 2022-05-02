@@ -136,7 +136,7 @@ public class PromotionServiceImpl implements PromotionService {
 		if (flag.equalsIgnoreCase("false")) {
 			status = Boolean.FALSE;
 		}
-		if (flag.equalsIgnoreCase("all") && domainId == null) {
+		if (flag.equalsIgnoreCase("ALL") && domainId == null && clientId == null && storeId == null) {
 			promoList = promoRepo.findAll();
 		} else if (!(flag.isEmpty()) && domainId == null) {
 
@@ -504,10 +504,10 @@ public class PromotionServiceImpl implements PromotionService {
 	private boolean checkPromoApplyType(PromotionsEntity promoEntity, ProductTextileVo barcodeVo) {
 
 		if (promoEntity.getPromoApplyType().equals(PromoApplyType.FixedQuantity)
-				&& barcodeVo.getQty() >= promoEntity.getBuyItemsFromPool())
+				&& barcodeVo.getQuantity() >= promoEntity.getBuyItemsFromPool())
 			return true;
 
-		if (promoEntity.getPromoApplyType().equals(PromoApplyType.AnyQuantity) && barcodeVo.getQty() > 0)
+		if (promoEntity.getPromoApplyType().equals(PromoApplyType.AnyQuantity) && barcodeVo.getQuantity() > 0)
 			return true;
 
 		return false;
@@ -519,7 +519,7 @@ public class PromotionServiceImpl implements PromotionService {
 				|| promoEntity.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
 
 			for (PromotionSlabsEntity slab : promoEntity.getPromotionSlabEntity()) {
-				if (barcodeVo.getQty() >= slab.getFromSlab() && barcodeVo.getQty() <= slab.getToSlab()) {
+				if (barcodeVo.getQuantity() >= slab.getFromSlab() && barcodeVo.getQuantity() <= slab.getToSlab()) {
 					if (slab.getBenfitEntity() == null)
 						return null;
 

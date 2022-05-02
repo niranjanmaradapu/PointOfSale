@@ -81,7 +81,7 @@ public class CalculateBenifits {
 //		}
 		if (benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemMRP)) {
 			int discountPercentage = Integer.valueOf(benifitVo.getDiscount()).intValue();
-			int purchasedQuantity = productTextileVo.getQty();
+			int purchasedQuantity = productTextileVo.getQuantity();
 			float valueOfMRP = productTextileVo.getItemMrp();
 			// calculatedDiscountAmount=
 			// (discountPercentage/100)*(purchasedQuantity*valueOfMRP) +"";
@@ -97,7 +97,7 @@ public class CalculateBenifits {
 		if (/* benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP) || */ benifitVo.getDiscountSubType()
 				.equals(DiscountSubTypes.ItemMRP)) {
 			int discountAmount = Integer.valueOf(benifitVo.getDiscount()).intValue();
-			int purchasedQuantity = productTextileVo.getQty();
+			int purchasedQuantity = productTextileVo.getQuantity();
 			calculatedDiscountAmount = discountAmount * purchasedQuantity + "";
 
 		}

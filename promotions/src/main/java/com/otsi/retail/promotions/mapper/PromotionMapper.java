@@ -230,6 +230,8 @@ public class PromotionMapper {
 		promo.setPromoApplyType(promotions.getPromoApplyType());
 		promo.setBuyItemsFromPool(promotions.getBuyItemsFromPool());
 		promo.setIsActive(Boolean.TRUE);
+		promo.setStoreId(promotions.getStoreId());
+		promo.setClientId(promotions.getClientId());
 		// promo.setPriority(vo.getPriority());
 		promo.setPromotionStartDate(promotions.getPromotionStartDate());
 		promo.setPromotionEndDate(promotions.getPromotionEndDate());

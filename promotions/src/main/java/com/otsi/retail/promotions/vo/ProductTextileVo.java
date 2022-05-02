@@ -47,6 +47,8 @@ public class ProductTextileVo {
 	private String uom;
 
 	private int qty;
+	
+	private int quantity;
 
 	private String hsnCode;
 

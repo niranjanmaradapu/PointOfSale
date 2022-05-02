@@ -105,6 +105,7 @@ public class PoolMapper {
 			vo.setStoreId(x.getStoreId());
 			vo.setClientId(x.getClientId());
 			vo.setCreatedBy(x.getCreatedBy());
+			vo.setCreatedDate(x.getCreatedDate().toLocalDate());
 			vo.setPoolType(x.getPoolType());
 			vo.setIsActive(x.getIsActive());
 
