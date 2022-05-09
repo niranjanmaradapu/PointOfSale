@@ -25,6 +25,8 @@ public class BenefitVo {
 	private Long numOfItemsFromBuyPool;
 	private Long numOfItemsFromGetPool;
 	private DiscountSubTypes discountSubType;
+	private Long poolId;
+	private String poolName;
 	private List<PoolEntity> poolEntities;
 
 }

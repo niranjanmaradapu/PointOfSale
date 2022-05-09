@@ -42,39 +42,43 @@ public class BenfitEntity extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long benfitId;
-    
+
 	@Enumerated(EnumType.STRING)
 	private BenfitType benfitType;
-    
+
 	@Enumerated(EnumType.STRING)
 	private DiscountType discountType;
 
 	private String discount;
-    
+
 	@Enumerated(EnumType.STRING)
 	private DiscountSubTypes discountSubTypes;
-	
-    private Long numOfItemsFromGetPool;
-	
+
+	private Long numOfItemsFromGetPool;
+
 	private Long numOfItemsFromBuyPool;
-	
+
 	@Enumerated(EnumType.STRING)
 	private ItemValue itemValue;
+    
+	private Long poolId;
 	
+	private String poolName;
+
 	@ManyToOne
 	@JoinColumn(name = "promoId")
 	private PromotionsEntity promotionEntity;
-	
+
 	@OneToOne(mappedBy = "benfitEntity")
 	private PromotionSlabsEntity promotionSlabsEntity;
-	
-	//newly added
+
+	// newly added
 //	@ManyToOne
 //	@JoinColumn(name = "poolId")
 //	private PoolEntity poolEntityy;
-	
+
 	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH })
 	@JoinTable(name = "pool_benefit", joinColumns = @JoinColumn(name = "benefitId"), inverseJoinColumns = @JoinColumn(name = "poolId"))
 	private List<PoolEntity> poolEntities;
-	
+
 }

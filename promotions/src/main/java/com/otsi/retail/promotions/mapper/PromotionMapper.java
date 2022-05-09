@@ -64,6 +64,8 @@ public class PromotionMapper {
 			benefit.setNumOfItemsFromBuyPool(s.getBenfitVo().getNumOfItemsFromBuyPool());
 			benefit.setNumOfItemsFromGetPool(s.getBenfitVo().getNumOfItemsFromGetPool());
 			benefit.setDiscountSubTypes(s.getBenfitVo().getDiscountSubType());
+			benefit.setPoolId(s.getBenfitVo().getPoolId());
+			benefit.setPoolName(s.getBenfitVo().getPoolName());
 
 			// mapping benefits to slab
 			slab.setBenfitEntity(benefit);
@@ -139,7 +141,8 @@ public class PromotionMapper {
 				bvo.setItemValue(s.getBenfitEntity().getItemValue());
 				bvo.setNumOfItemsFromBuyPool(s.getBenfitEntity().getNumOfItemsFromBuyPool());
 				bvo.setNumOfItemsFromGetPool(s.getBenfitEntity().getNumOfItemsFromGetPool());
-
+                bvo.setPoolId(s.getBenfitEntity().getPoolId());
+                bvo.setPoolName(s.getBenfitEntity().getPoolName());
 				pslabVo.setBenfitVo(bvo);
 				slabVo.add(pslabVo);
 			});
@@ -158,6 +161,7 @@ public class PromotionMapper {
 				bvo.setDiscountSubType(b.getDiscountSubTypes());
 				bvo.setNumOfItemsFromBuyPool(b.getNumOfItemsFromBuyPool());
 				bvo.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
+				
 				benfitVos.add(bvo);
 				// setting promoSlabValues to benefits
 
@@ -179,6 +183,7 @@ public class PromotionMapper {
 				pool.setPoolName(a.getPoolName());
 				pool.setPoolType(a.getPoolType());
 				pool.setIsActive(a.getIsActive());
+				
 				poolList.add(pool);
 			});
 			vo.setPoolVo(poolList);
