@@ -318,7 +318,7 @@ public class NewSaleController {
 
 	}
 
-	@PostMapping(CommonRequestMappigs.CLOSE_PENDINGDELIVERYSLIP)
+	@PutMapping(CommonRequestMappigs.CLOSE_PENDINGDELIVERYSLIP)
 	public GateWayResponse<?> posclose(Long storeId) {
 		try {
 			String dayclose = newSaleService.posClose(storeId);

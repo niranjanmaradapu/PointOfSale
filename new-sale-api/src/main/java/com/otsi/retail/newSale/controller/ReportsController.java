@@ -131,7 +131,7 @@ public class ReportsController {
 	}
 
 	@GetMapping(value = "/getSalesByCategory")
-	public GateWayResponse<?> getSalesByCategory(@RequestParam Long storeId, Long domainId,String name) {
+	public GateWayResponse<?> getSalesByCategory(@RequestParam("storeId") Long storeId, @RequestParam("domainId") Long domainId, @RequestParam("name") String name) {
 		System.out.println("data" + storeId);
 		List<ReportVo> byCategory = reportService.getSalesByCategory(storeId, domainId,name);
 		return new GateWayResponse<>(HttpStatus.OK, byCategory, "");

@@ -196,8 +196,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 		if (vo.getPaymentAmountType() != null) {
 			paymentValue = vo.getPaymentAmountType().stream().mapToLong(x -> x.getPaymentAmount()).sum();
 		}
-		if (paymentValue.equals(vo.getNetPayableAmount())) {
-			entity.setStatus(OrderStatus.success);// Status should override once it is cash only
+		if (vo.getReturnAmount() != null) {
+			paymentValue = vo.getRecievedAmount() - vo.getReturnAmount();
+			if (paymentValue.equals(vo.getNetPayableAmount())) {
+				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
+			}
+		} else if (vo.getReturnAmount() == 0){
+			if (paymentValue.equals(vo.getNetPayableAmount())) {
+				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
+			}
 		}
 
 		if (vo.getDomainId() == DomainData.TE.getId()) {
@@ -262,8 +269,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 					log.info("payment is done for order : " + saveEntity.getOrderNumber());
 				}
 				// Condition to update inventory
-				if (paymentValue.equals(vo.getNetPayableAmount())) {
-					updateOrderItemsInInventory(saveEntity);
+				if (vo.getReturnAmount() != null) {
+					// Condition to update inventory
+					if (paymentValue.equals(vo.getNetPayableAmount())) {
+						updateOrderItemsInInventory(saveEntity);
+					}
 				}
 
 			} else {
