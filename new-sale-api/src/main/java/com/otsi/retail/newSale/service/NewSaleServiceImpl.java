@@ -1992,10 +1992,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 		} else if (searchVo.getFromDate() == null && searchVo.getToDate() == null && searchVo.getGvNumber() != null) {
 			Optional<GiftVoucherEntity> gv = gvRepo.findByGvNumber(searchVo.getGvNumber());
 			giftVoucherEntities.add(gv.get());
-		}else {
-			
-			giftVoucherEntities = gvRepo.findByIsActivated(searchVo.getIsActivated());
-			
 		}
 
 		if (CollectionUtils.isEmpty(giftVoucherEntities)) {

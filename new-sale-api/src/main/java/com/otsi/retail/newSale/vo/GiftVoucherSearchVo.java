@@ -19,7 +19,5 @@ public class GiftVoucherSearchVo {
 	private LocalDate fromDate;
 
 	private LocalDate toDate;
-	
-	private Boolean isActivated;
 
 }
