@@ -43,6 +43,7 @@ import com.otsi.retail.newSale.service.NewSaleService;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
+import com.otsi.retail.newSale.vo.GiftVoucherSearchVo;
 import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
@@ -617,13 +618,10 @@ public class NewSaleController {
 	/**Search Operation GiftVoucher By number and toDate And fromDate
 	 * 
 	 */
-     @GetMapping("/searchingBy")
-	public GateWayResponse <?> serchByGv(
-			@RequestParam(value = "gvNumber",required = false) String gvNumber,
-			@RequestParam(value = "fromDate",required = false) @DateTimeFormat(iso = ISO.DATE)LocalDate fromDate,
-			@RequestParam(value = "toDate",required = false) @DateTimeFormat(iso = ISO.DATE)LocalDate toDate){
+     @PostMapping("/gvSearching")
+	public GateWayResponse <?> serchByGv(@RequestBody GiftVoucherSearchVo searchVo){
     	 
-    	 List<GiftVoucherEntity> searchByGvNumberAndFromDateAndToDate = newSaleService.giftVoucherSearching(gvNumber, fromDate, toDate);
+    	 List<GiftVoucherVo> searchByGvNumberAndFromDateAndToDate = newSaleService.giftVoucherSearching(searchVo);
 		
 		return new GateWayResponse<>(HttpStatus.OK,searchByGvNumberAndFromDateAndToDate,"") ;
 		

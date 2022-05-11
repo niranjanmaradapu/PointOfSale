@@ -33,7 +33,14 @@ public interface GiftVoucherRepo extends JpaRepository<GiftVoucherEntity, Long> 
 	
 	@Query("from GiftVoucherEntity s where DATE(s.toDate) = :toDate")
 	List<GiftVoucherEntity> findBytoDateLike(@Param("toDate")LocalDate toDate);
-	
-	
 
+	List<GiftVoucherEntity> findByFromDateAndToDateAndGvNumber(LocalDate fromDate, LocalDate toDate, String gvNumber);
+
+	List<GiftVoucherEntity> findByFromDateAndToDate(LocalDate fromDate, LocalDate toDate);
+
+	List<GiftVoucherEntity> findByFromDateAndGvNumber(LocalDate fromDate, String gvNumber);
+
+	List<GiftVoucherEntity> findByIsActivated(Boolean isActivated);
+	
+	
 }

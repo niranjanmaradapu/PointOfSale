@@ -17,6 +17,7 @@ import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
+import com.otsi.retail.newSale.vo.GiftVoucherSearchVo;
 import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
@@ -108,13 +109,7 @@ public interface NewSaleService {
 
 	String activateGiftvoucher(List<String> gvsList, Boolean flag) throws RecordNotFoundException;
 
-	public List<GiftVoucherEntity> giftVoucherSearching(String gvNumber,LocalDate fromDate,LocalDate toDate);
-	
-	
-
-	
-
-	 
+	public List<GiftVoucherVo> giftVoucherSearching(GiftVoucherSearchVo searchVo);
 	
 
 }
