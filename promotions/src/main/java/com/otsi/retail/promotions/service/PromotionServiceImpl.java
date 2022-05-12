@@ -1,7 +1,5 @@
 package com.otsi.retail.promotions.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +30,7 @@ import com.otsi.retail.promotions.entity.PoolEntity;
 import com.otsi.retail.promotions.entity.PromotionSlabsEntity;
 import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
 import com.otsi.retail.promotions.entity.PromotionsEntity;
+import com.otsi.retail.promotions.exceptions.DuplicateRecordException;
 import com.otsi.retail.promotions.exceptions.InvalidDataException;
 import com.otsi.retail.promotions.exceptions.RecordNotFoundException;
 import com.otsi.retail.promotions.gatewayresponse.GateWayResponse;
@@ -344,11 +343,10 @@ public class PromotionServiceImpl implements PromotionService {
 			throw new InvalidDataException("please enter valid data");
 		}
 
-//		if (promostoreRepo.existsByStoreName(vo.getStoreName())) {
-//			System.out.println("Promtion already mapped to the " + vo.getStoreName());
-//			throw new DuplicateRecordException("Promotion already mapped to this store ");
-//
-//		}
+		if (promostoreRepo.existsByStoreName(vo.getStoreName())) {
+			System.out.println("Promtion already mapped to the " + vo.getStoreName());
+			throw new DuplicateRecordException("Promotion already mapped to this store ");
+		}
 
 		Optional<PromotionToStoreEntity> storeDto = promostoreRepo.findById(vo.getId());
 		PromotionToStoreEntity promoStore = new PromotionToStoreEntity();
