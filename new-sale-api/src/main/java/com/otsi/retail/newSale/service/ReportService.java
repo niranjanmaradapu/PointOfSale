@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -23,9 +24,9 @@ public interface ReportService {
 
 	ReportVo getcurrentMonthSalevsLastMonth(Long storeId, Long domainId);
 
-	List<ReportVo> getTopFiveSalesByRepresentative(Long storeId, Long domainId);
+	List<ReportVo> getTopFiveSalesByRepresentative(Long storeId, Long domainId, String name);
 	
-	List<ReportVo> getSalesByCategory(Long storeId, Long domainId);
+	List<ReportVo> getSalesByCategory(Long storeId, Long domainId, String name);
 	
 
 }

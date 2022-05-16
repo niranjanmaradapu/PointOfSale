@@ -8,12 +8,17 @@ spring:
     platform: postgres
     url: jdbc:postgresql://localhost:5432/customer-management
     username: postgres
-    password: root
+    password: Otsi@123
  jpa:
    hibernate:
     ddl-auto: update
    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
    show-sql: true
+ rabbitmq:
+     host: localhost
+     port: 5672
+     username: guest
+     password: guest 
    
 eureka:
   client:

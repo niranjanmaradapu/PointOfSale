@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.retail.customerManagement.model.Barcode;
 import com.otsi.retail.customerManagement.model.TaggedItems;
+import com.otsi.retail.customerManagement.utils.ReturnSlipStatus;
 
 import lombok.Data;
 
@@ -30,6 +31,8 @@ public class ListOfReturnSlipsVo {
 	private String barcode;
 	
 	private Long domainId;
+	
+	private ReturnSlipStatus rtStatus;
 
 	//private String rtStatus;
 

@@ -56,7 +56,7 @@ public interface NewSaleService {
 
 	CustomerVo getCustomerFromNewSale(String mobileNo) throws DataNotFoundException;
 
-	String posClose(List<DeliverySlipVo> dsVo);
+	String posClose(Long storeId);
 
 	void tagCustomerToExisitingNewSale(String mobileNo, Long invoiceNo) throws CustomerNotFoundExcecption;
 
@@ -82,7 +82,7 @@ public interface NewSaleService {
 
 	String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo);
 
-	String deleteDeliverySlipDetails(Long dsId);
+	String deleteDeliverySlipDetails(String dsNumber);
 
 	List<LineItemVo> getBarcodes(List<String> barCode, Long domainId) throws RecordNotFoundException;
 

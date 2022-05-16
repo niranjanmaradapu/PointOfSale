@@ -1,9 +1,11 @@
 package com.otsi.retail.newSale.repository;
 
+import java.lang.annotation.Native;
 import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
@@ -50,9 +52,12 @@ public interface DeliverySlipRepository extends JpaRepository<DeliverySlipEntity
 			LocalDate dateTo, String dsNumber);
 
 	List<DeliverySlipEntity> findByDsNumberInAndOrderIsNull(List<String> dlsList);
-
-	List<DeliverySlipEntity> findByStoreId(Long storeId);
-
+	
+	
+	@Query(value="select dl_summary.user_id,sum(net_value) as net_value from (select dl_slip.store_id,dl_slip.user_id,dl_slip.creation_date,dl_slip.ds_number,dl_slip.ds_id,odr.order_id,odr.net_value from delivery_slip dl_slip join order_table odr on dl_slip.order_id =odr.order_id where dl_slip.store_id= :storeId and dl_slip.creation_date >= :fromDate and dl_slip.creation_date <= :toDate and dl_slip.user_id is not null) dl_summary  group by dl_summary.user_id order by net_value desc limit 5",nativeQuery = true)
+	List<Object[]> getByStoreIdAndCreationDateBetween(Long storeId,LocalDate fromDate,LocalDate toDate);
+	
+    List<DeliverySlipEntity> findByStoreId(Long storeId);
 	List<DeliverySlipEntity> findByUserId(Long u);
 
 	DeliverySlipEntity findByCreationDateBetweenAndDsIdAndDsNumberAndStatusAndStoreIdOrderByCreationDateAsc(
@@ -79,6 +84,9 @@ public interface DeliverySlipRepository extends JpaRepository<DeliverySlipEntity
 	void save(List<DeliverySlipEntity> dsList);
 
 	List<DeliverySlipEntity> findByStatusAndCreationDateAndStoreId(DSStatus pending, LocalDate now, Long storeId);
+	
+//	List<DeliverySlipEntity> getByYearAndMonthAndStoreId(int year, int month, Long storeId);
+	
 
 
 }

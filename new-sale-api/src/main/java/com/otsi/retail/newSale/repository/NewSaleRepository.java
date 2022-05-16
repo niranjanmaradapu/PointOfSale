@@ -7,11 +7,13 @@ import java.util.Optional;
 import java.util.stream.LongStream;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.common.OrderStatus;
+import com.otsi.retail.newSale.vo.ReportVo;
 
 @Repository
 public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
@@ -82,6 +84,15 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 			Long domainId, Long storeId);
 
 	List<NewSaleEntity> findByDomainId(Long domainId);
+@Query(value="select sum(sale_sum.net_value) As net_value,EXTRACT(MONTH FROM sale_sum.creation_date)  AS Month from order_table sale_sum where sale_sum.store_id=:storeId and sale_sum.domain_id=:domainId and sale_sum.creation_date>=:dateFrom and sale_sum.creation_date <= :dateto group by Month",nativeQuery=true)
+	List<Object[]> getByStoreIdAndDomainIdAndCreationDateBetween(Long storeId, Long domainId, LocalDate dateFrom,LocalDate dateto);
+
+List<NewSaleEntity> findByStoreIdAndDomainIdAndCreationDateBetween(Long storeId, Long domainId, LocalDate dateFrom,
+		LocalDate dateTo);
+
+List<NewSaleEntity> findByStoreIdAndDomainIdAndCreationDate(Long storeId, Long domainId, LocalDate date);
+@Query(value="select store_id,sum(net_value) As net_value from order_table otable where domain_id=:domainId and creation_date >=:dateFrom and creation_date <=:dateTo group by store_id order by net_value desc limit 5",nativeQuery=true)
+List<Object[]> findByDomainIdAndCreationDateBetween(Long domainId, LocalDate dateFrom, LocalDate dateTo);
 
 
 }
