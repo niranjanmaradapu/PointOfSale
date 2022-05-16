@@ -44,6 +44,7 @@ import com.otsi.retail.newSale.Entity.LineItemsReEntity;
 import com.otsi.retail.newSale.Entity.LoyalityPointsEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
+import com.otsi.retail.newSale.Entity.TaggedItems;
 import com.otsi.retail.newSale.Exceptions.BusinessException;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
@@ -91,7 +92,6 @@ import com.otsi.retail.newSale.vo.ReturnSummeryVo;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.SalesSummeryVo;
 import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
-import com.otsi.retail.newSale.vo.TaggedItems;
 import com.otsi.retail.newSale.vo.TaxVo;
 import com.otsi.retail.newSale.vo.UserDetailsVo;
 import com.otsi.retail.newSale.vo.UpdateCreditRequest;
@@ -341,17 +341,17 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@RabbitListener(queues = "newsale_queue")
 	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
 
-		List<NewSaleEntity> entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
+		NewSaleEntity entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
 
-		NewSaleEntity orderRecord = null;
+		/*NewSaleEntity orderRecord = null;
 
 		if (entity.size() != 0) {
 			orderRecord = entity.stream().findFirst().get();
-		}
-		if (orderRecord != null) {
+		}*/
+		if (entity != null) {
 
 			PaymentAmountType payDetails = new PaymentAmountType();
-			payDetails.setOrderId(orderRecord);
+			payDetails.setOrderId(entity);
 			payDetails.setPaymentType(paymentDetails.getPayType());
 			payDetails.setPaymentAmount(paymentDetails.getAmount());
 			payDetails.setPaymentId(paymentDetails.getRazorPayId());
@@ -359,7 +359,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			paymentAmountTypeRepository.save(payDetails);
 
-			log.info("save payment details for order : " + orderRecord.getOrderNumber());
+			log.info("save payment details for order : " + entity.getOrderNumber());
 		}
 	}
 
@@ -1081,11 +1081,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 		if (null != vo.getInvoiceNo() && !vo.getInvoiceNo().isEmpty()) {
 			if (vo.getDomianId() != 0) {
 				List<ReturnSlipVo> rtSlipVoList = new ArrayList<>();
-				List<NewSaleEntity> newSaleEntity = newSaleRepository.findByOrderNumber(vo.getInvoiceNo());
-				if (!CollectionUtils.isEmpty(newSaleEntity)) {
-					newSaleEntity.stream().forEach(a -> {
+				NewSaleEntity newSaleEntity = newSaleRepository.findByOrderNumber(vo.getInvoiceNo());
+				if (newSaleEntity != null) {
+					
 						if (vo.getDomianId() == DomainData.TE.getId()) {
-							a.getDlSlip().stream().forEach(dSlip -> {
+							newSaleEntity.getDlSlip().stream().forEach(dSlip -> {
 								dSlip.getLineItems().stream().forEach(lItem -> {
 									ReturnSlipVo rtSlipVo = new ReturnSlipVo();
 									rtSlipVo.setBarcode(lItem.getBarCode());
@@ -1096,17 +1096,17 @@ public class NewSaleServiceImpl implements NewSaleService {
 							});
 						}
 						if (vo.getDomianId() == DomainData.RE.getId()) {
-							newSaleEntity.stream().forEach(newSale -> {
-								newSale.getLineItemsRe().stream().forEach(lItem -> {
+							
+								newSaleEntity.getLineItemsRe().stream().forEach(lItem -> {
 									ReturnSlipVo rtSlipVo = new ReturnSlipVo();
 									rtSlipVo.setBarcode(lItem.getBarCode());
 									rtSlipVo.setNetValue(lItem.getNetValue());
 									rtSlipVo.setQuantity(lItem.getQuantity());
 									rtSlipVoList.add(rtSlipVo);
 								});
-							});
+							
 						}
-					});
+					
 					return rtSlipVoList;
 				} else {
 					throw new RuntimeException("Invoice details not found with this OrderId : " + vo.getInvoiceNo());
@@ -1398,7 +1398,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			rvo.setDateTo(srvo.getDateTo());
 			rvo.setDomainId(srvo.getDomainId());
 			rvo.setStoreId(srvo.getStoreId());
-			;
+			
 			HttpEntity<ListOfReturnSlipsVo> entity = new HttpEntity<>(rvo, headers);
 
 			ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetListOfReturnSlips(),
@@ -1820,10 +1820,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 	public NewSaleVo getInvoiceDetails(String orderNumber) throws RecordNotFoundException {
 
 		log.info("Request for fetching invoice details : " + orderNumber);
-		List<NewSaleEntity> orderRecord = newSaleRepository.findByOrderNumber(orderNumber);
-		if (!orderRecord.isEmpty()) {
-			NewSaleEntity order = orderRecord.stream().findFirst().get();
-			NewSaleVo result = newSaleMapper.convertNewSaleDtoToVo(order);
+		NewSaleEntity orderRecord = newSaleRepository.findByOrderNumber(orderNumber);
+		if (orderRecord!=null) {
+			//NewSaleEntity order = orderRecord.stream().findFirst().get();
+			NewSaleVo result = newSaleMapper.convertNewSaleDtoToVo(orderRecord);
 			return result;
 		} else {
 			throw new RecordNotFoundException("Provide valid order number",

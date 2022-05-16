@@ -22,7 +22,7 @@ public interface NewSaleRepository extends JpaRepository<NewSaleEntity, Long> {
 
 	Optional<NewSaleEntity> findByOrderId(Long newsaleId);
 
-	List<NewSaleEntity> findByOrderNumber(String billNumber);
+	NewSaleEntity findByOrderNumber(String billNumber);
 
 	List<NewSaleEntity> findByOrderNumber(Long invoiceNumber);
 

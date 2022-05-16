@@ -76,11 +76,24 @@ public class Config {
 	@Value("${inventory_rk}")
 	private String updateInventoryRK;
 	
+	
+	@Value("${returnslip_queue}")
+	private String returnSlipinventoryUpdateQueue;
+
+	@Value("${returnslip_exchange}")
+	private String returnSlipupdateInventoryExchange;
+
+	@Value("${returnslip_rk}")
+	private String returnSlipupdateInventoryRK;
+	
 	@Value("${getStoreDetails_url}")
 	private String storeDetails;
 	
 	@Value("${getUserDetails_url}")
 	private String userDetails;
+	
+	@Value("${getCustomerDetails_url}")
+	private String customerDetails;
 	
 	@Bean
 	public Queue inventoryUpdateQueue() {
@@ -99,6 +112,28 @@ public class Config {
 		return BindingBuilder.bind(inventoryUpdateQueue).to(updateInventoryExchange)
 				.with(updateInventoryRK);
 	}
+	
+
+
+	@Bean
+	public Queue returnSlipinventoryUpdateQueue() {
+		return new Queue(returnSlipinventoryUpdateQueue);
+	}
+
+	@Bean
+	public DirectExchange returnSlipupdateInventoryExchange() {
+		return new DirectExchange(returnSlipupdateInventoryExchange);
+	}
+
+	@Bean
+	public Binding bindingReturnslipUpdateInventory(Queue returnSlipinventoryUpdateQueue,
+			DirectExchange returnSlipupdateInventoryExchange) {
+
+		return BindingBuilder.bind(returnSlipinventoryUpdateQueue).to(returnSlipupdateInventoryExchange)
+				.with(returnSlipupdateInventoryRK);
+	}
+	
+	
 	
 	@Bean
 	public Queue queue() {
@@ -129,5 +164,6 @@ public class Config {
 		return template;
 
 	}
+	
 
 }

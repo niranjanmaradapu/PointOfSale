@@ -10,9 +10,10 @@ import lombok.Data;
  *
  */
 @Data
-public class TaggedItems {
+public class TaggedItemsVo {
 	
 	private Long taggedItemId;
 	private String barCode;
+	private int qty;
 
 }
