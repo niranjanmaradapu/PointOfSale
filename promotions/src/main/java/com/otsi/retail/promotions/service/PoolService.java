@@ -19,7 +19,7 @@ public interface PoolService {
 
 	String savePool(PromotionPoolVo vo);
 
-	PoolVo getListOfPools(String isActive, Long domainId, Long clientId, Long storeId);
+	PoolVo getListOfPools(String isActive, Long domainId, Long clientId);
 
 	String modifyPool(PromotionPoolVo vo);
 

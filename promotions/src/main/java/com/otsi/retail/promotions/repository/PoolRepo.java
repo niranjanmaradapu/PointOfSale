@@ -40,8 +40,7 @@ public interface PoolRepo extends JpaRepository<PoolEntity, Long> {
 
 	List<PoolEntity> findByClientId(Long clientId);
 
-	List<PoolEntity> findByIsActiveAndDomainIdAndStoreIdAndClientId(Boolean flag, Long domainId, Long storeId,
-			Long clientId);
+	List<PoolEntity> findByIsActiveAndDomainIdAndClientId(Boolean flag, Long domainId, Long clientId);
 
 
 

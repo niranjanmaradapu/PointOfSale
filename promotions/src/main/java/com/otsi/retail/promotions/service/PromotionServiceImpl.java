@@ -124,7 +124,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 	// Method for getting list of Promotions by using flag(Status)
 	@Override
-	public ConnectionPromoVo getListOfPromotions(String flag, Long domainId, Long clientId, Long storeId) {
+	public ConnectionPromoVo getListOfPromotions(String flag, Long domainId, Long clientId) {
 		log.debug("debugging getListOfPromotions:" + flag);
 		List<PromotionsEntity> promoList = new ArrayList<>();
 
@@ -135,7 +135,7 @@ public class PromotionServiceImpl implements PromotionService {
 		if (flag.equalsIgnoreCase("false")) {
 			status = Boolean.FALSE;
 		}
-		if (flag.equalsIgnoreCase("ALL") && domainId == null && clientId == null && storeId == null) {
+		if (flag.equalsIgnoreCase("ALL") && domainId == null && clientId == null) {
 			promoList = promoRepo.findAll();
 		} else if (!(flag.isEmpty()) && domainId == null) {
 
@@ -143,12 +143,6 @@ public class PromotionServiceImpl implements PromotionService {
 		} else if (flag.isEmpty() && domainId != null) {
 
 			promoList = promoRepo.findByDomainId(domainId);
-		} else if (!(flag.isEmpty()) && storeId == null) {
-
-			promoList = promoRepo.findByIsActive(status);
-		} else if (flag.isEmpty() && storeId != null) {
-
-			promoList = promoRepo.findByStoreId(storeId);
 		} else if (!(flag.isEmpty()) && clientId == null) {
 
 			promoList = promoRepo.findByIsActive(status);
@@ -156,7 +150,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 			promoList = promoRepo.findByClientId(clientId);
 		} else {
-			promoList = promoRepo.findByIsActiveAndDomainIdAndStoreIdAndClientId(status, domainId, storeId, clientId);
+			promoList = promoRepo.findByIsActiveAndDomainIdAndClientId(status, domainId,clientId);
 		}
 
 		if (!promoList.isEmpty()) {
