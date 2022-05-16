@@ -50,8 +50,8 @@ public class Config {
 	@Value("${inventoryUpdateRetail_url}")
 	private String inventoryUpdateForRetail;
 	
-	@Value("${updateAccounting_url}")
-	private String updateAccountingDetails;
+	@Value("${updateCreditNotesDetails_url}")
+	private String updateCreditNotesDetails;
 	
 	
 	//For Payment RabbitMQ Config
