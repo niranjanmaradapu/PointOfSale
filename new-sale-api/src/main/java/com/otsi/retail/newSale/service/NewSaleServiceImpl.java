@@ -50,6 +50,7 @@ import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
 import com.otsi.retail.newSale.Exceptions.InvalidInputException;
 import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
+import com.otsi.retail.newSale.common.AccountType;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.DomainData;
 import com.otsi.retail.newSale.common.OrderStatus;
@@ -78,6 +79,7 @@ import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.HsnDetailsVo;
 import com.otsi.retail.newSale.vo.InventoryUpdateVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
+import com.otsi.retail.newSale.vo.LedgerLogBookVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
@@ -202,7 +204,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			if (paymentValue.equals(vo.getNetPayableAmount())) {
 				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
 			}
-		} else if (vo.getReturnAmount() == 0) {
+		} else if (vo.getReturnAmount() == null||vo.getReturnAmount() == 0) {
 			if (paymentValue.equals(vo.getNetPayableAmount())) {
 				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
 			}
@@ -252,7 +254,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 							try {
 
 								// Calling the credit notes method
-								updateCreditNotes(vo.getNetPayableAmount(), vo.getMobileNumber(), vo.getStoreId(),
+								updateAccounting(vo.getNetPayableAmount(), vo.getMobileNumber(), vo.getStoreId(),
 										x.getPaymentType().getType());
 
 							} catch (Exception e) {
@@ -270,11 +272,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 					log.info("payment is done for order : " + saveEntity.getOrderNumber());
 				}
 				// Condition to update inventory
-				if (vo.getReturnAmount() != null) {
+				
 					// Condition to update inventory
 					if (paymentValue.equals(vo.getNetPayableAmount())) {
 						updateOrderItemsInInventory(saveEntity);
-					}
+					
 				}
 
 			} else {
@@ -337,6 +339,36 @@ public class NewSaleServiceImpl implements NewSaleService {
 		log.info("Order generated with number : " + entity.getOrderNumber());
 		return entity.getOrderNumber();
 	}
+	
+	
+	// UPDATE CREDIT NOTES METHOD
+	private String updateAccounting(Long amount, String mobileNumber, Long storeId, String type) {
+
+			LedgerLogBookVo ledgerLogBookRequest = new LedgerLogBookVo();
+
+			ledgerLogBookRequest.setAmount(amount);
+			ledgerLogBookRequest.setMobileNumber(mobileNumber);
+			ledgerLogBookRequest.setStoreId(storeId);
+			if (type.equals("PKTADVANCE")) {
+				ledgerLogBookRequest.setAccountType(AccountType.CREDIT);
+			} else if (type.equals("PKTPENDING")) {
+				ledgerLogBookRequest.setAccountType(AccountType.DEBIT);
+			}
+
+			System.out.println("Update updateAccounting Request:" + ledgerLogBookRequest);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			HttpEntity<LedgerLogBookVo> entity = new HttpEntity<>(ledgerLogBookRequest, headers);
+
+			ResponseEntity<?> creditNotesResponse = template.exchange(config.getUpdateAccountingDetails(), HttpMethod.POST,
+					entity, GateWayResponse.class);
+
+			System.out.println("Credit Rest Call Response:: " + creditNotesResponse.toString());
+
+			return "Notes Updated Successfully";
+
+		}
 
 	@RabbitListener(queues = "newsale_queue")
 	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
@@ -1940,36 +1972,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 	}
 
-	// UPDATE CREDIT NOTES METHOD
-	private String updateCreditNotes(Long amount, String mobileNumber, Long storeId, String type) {
-
-		UpdateCreditRequest req = new UpdateCreditRequest();
-
-		req.setAmount(amount);
-		req.setMobileNumber(mobileNumber);
-		req.setStoreId(storeId);
-		if (type.equals("PKTADVANCE")) {
-			req.setCreditDebit("C");
-
-		} else if (type.equals("PKTPENDING")) {
-			req.setCreditDebit("D");
-		}
-
-		System.out.println("Update Credit Notes Request:: " + req);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<UpdateCreditRequest> entity = new HttpEntity<>(req, headers);
-
-		ResponseEntity<?> creditNotesResponse = template.exchange(config.getUpdateCreditNotesDetails(), HttpMethod.POST,
-				entity, GateWayResponse.class);
-
-		System.out.println("Credit Rest Call Response:: " + creditNotesResponse.toString());
-
-		return "Credit Notes Updated Successfully";
-
-	}
-
+	
 	@Override
 	public List<GiftVoucherVo> giftVoucherSearching(GiftVoucherSearchVo searchVo) {
 
