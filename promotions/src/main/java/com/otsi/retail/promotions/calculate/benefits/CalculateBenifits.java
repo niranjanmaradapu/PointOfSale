@@ -450,17 +450,17 @@ public class CalculateBenifits {
 
 		case PercentageDiscountOn:
 			resultList = calcolateXUGDiscountForPercentageDiscountOn(benfitEntity, totalQuantityAndMrp,
-					promoEligibleLineItems, listofLineItems);
+					promoEligibleLineItems, listofLineItems,promo);
 			break;
 
 		case RupeesDiscountOn:
 			resultList = calculateXUGDiscountForRupeesDiscountOn(benfitEntity, promoEligibleLineItems,
-					totalQuantityAndMrp, listofLineItems);
+					totalQuantityAndMrp, listofLineItems,promo);
 			break;
 
 		case FixedAmountOn:
 			resultList = calculateXUGDiscountForFixedAmountOn(benfitEntity, totalQuantityAndMrp, promoEligibleLineItems,
-					listofLineItems);
+					listofLineItems,promo);
 			break;
 
 		default:
@@ -474,12 +474,12 @@ public class CalculateBenifits {
 
 	private List<LineItemVo> calculateXUGDiscountForFixedAmountOn(BenfitEntity benfitEntity,
 			List<Double> totalQuantityAndMrp, List<LineItemVo> promoEligibleLineItems,
-			List<LineItemVo> listofAllLineItems) {
+			List<LineItemVo> listofAllLineItems, PromotionsEntity promo) {
 
 		double invoiceLevelDiscount = 0.0;
 
 		// get the getPools from the benefits
-		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
+		List<PoolEntity> poolEntities = promo.getPoolEntity();
 
 		// get the eligible line items from get pool
 		List<LineItemVo> eligibleLineItemsFromGetPools = fetchBenefitEligibleLineItems(listofAllLineItems,
@@ -523,12 +523,12 @@ public class CalculateBenifits {
 
 	private List<LineItemVo> calculateXUGDiscountForRupeesDiscountOn(BenfitEntity benfitEntity,
 			List<LineItemVo> promoEligibleLineItems, List<Double> totalQuantityAndMrp,
-			List<LineItemVo> listofAllLineItems) {
+			List<LineItemVo> listofAllLineItems, PromotionsEntity promo) {
 
 		double calculatedInvoiceLevelDiscount = 0.0;
 
 		// get the getPools from the benefits
-		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
+		List<PoolEntity> poolEntities = promo.getPoolEntity();
 
 		// get the eligible line items from get pool
 		List<LineItemVo> eligibleLineItemsFromGetPools = fetchBenefitEligibleLineItems(listofAllLineItems,
@@ -562,7 +562,7 @@ public class CalculateBenifits {
 
 	private List<LineItemVo> calcolateXUGDiscountForPercentageDiscountOn(BenfitEntity benfitEntity,
 			List<Double> totalQuantityAndMrp, List<LineItemVo> promoEligibleLineItems,
-			List<LineItemVo> listofAllLineItems) {
+			List<LineItemVo> listofAllLineItems, PromotionsEntity promo) {
 
 		List<LineItemVo> results = null;
 
@@ -570,7 +570,7 @@ public class CalculateBenifits {
 		case MinValue: {
 
 			results = getXugPercentageDiscountForMinimumValue(benfitEntity, promoEligibleLineItems, totalQuantityAndMrp,
-					listofAllLineItems);
+					listofAllLineItems,promo);
 
 			break;
 
@@ -645,12 +645,12 @@ public class CalculateBenifits {
 
 	private List<LineItemVo> getXugPercentageDiscountForMinimumValue(BenfitEntity benfitEntity,
 			List<LineItemVo> promoEligibleLineItems, List<Double> totalQuantityAndMrp,
-			List<LineItemVo> listofAllLineItems) {
+			List<LineItemVo> listofAllLineItems, PromotionsEntity promo) {
 
 		double calculateInvoiceLevelDiscount = 0.0;
 
 		// get the getPools from the benefits
-		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
+		List<PoolEntity> poolEntities = promo.getPoolEntity();
 
 		// get the eligible line items from get pool
 		List<LineItemVo> benefitEligibleLineItems = fetchBenefitEligibleLineItems(listofAllLineItems, poolEntities);

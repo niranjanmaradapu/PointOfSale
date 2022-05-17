@@ -511,7 +511,8 @@ public class PromotionServiceImpl implements PromotionService {
 				|| promoEntity.getPromoApplyType().equals(PromoApplyType.ValueSlab)) {
 
 			for (PromotionSlabsEntity slab : promoEntity.getPromotionSlabEntity()) {
-				if (barcodeVo.getQuantity() >= slab.getFromSlab() && barcodeVo.getQuantity() <= slab.getToSlab()) {
+				if ((barcodeVo.getQuantity() >= slab.getFromSlab() && barcodeVo.getQuantity() <= slab.getToSlab()) ||
+						(barcodeVo.getItemMrp() >= slab.getFromSlab() && barcodeVo.getItemMrp() <= slab.getToSlab())) {
 					if (slab.getBenfitEntity() == null)
 						return null;
 
