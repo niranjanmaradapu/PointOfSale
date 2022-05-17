@@ -7,7 +7,7 @@ import com.otsi.retail.newSale.common.PaymentType;
 
 import lombok.Data;
 @Data
-public class LedgerLogBookVo {
+public class LedgerLogBookVo extends BaseEntityVo{
 	
 	private Long ledgerLogBookId;
 
@@ -32,5 +32,7 @@ public class LedgerLogBookVo {
 	private PaymentStatus paymentStatus;
 	
 	private String referenceNumber;
+	
+	private String mobileNumber;
 
 }

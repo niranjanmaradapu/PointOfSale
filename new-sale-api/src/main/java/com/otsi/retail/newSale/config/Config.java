@@ -50,8 +50,8 @@ public class Config {
 	@Value("${inventoryUpdateRetail_url}")
 	private String inventoryUpdateForRetail;
 	
-	@Value("${updateCreditNotesDetails_url}")
-	private String updateCreditNotesDetails;
+	@Value("${updateAccounting_url}")
+	private String updateAccountingDetails;
 	
 	
 	//For Payment RabbitMQ Config
@@ -65,6 +65,17 @@ public class Config {
 	@Value("${payment_newsale_rk}")
 	private String paymentNewsaleRK;
 	
+	//accounting queue
+	
+	@Value("${accounting_queue}")
+	private String accoutingQueue;
+	
+	@Value("${accounting_exchange}")
+	private String accountingExchange;
+	
+	@Value("${accounting_rk}")
+	private String accountingRk;
+
 	//For Inventory Config
 
 	@Value("${inventory_queue}")

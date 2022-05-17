@@ -4,12 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.otsi.retail.newSale.Entity.ReturnSlip;
-import com.otsi.retail.newSale.vo.GenerateReturnSlipRequest;
-import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipRequestVo;
-import com.otsi.retail.newSale.vo.ReturnSlipVo;
 
 @Component
 public interface ReturnslipService {
