@@ -33,6 +33,7 @@ public class ReturnSlip extends BaseEntity {
 	private Long customerId;
 	private Long amount;
 	private String mobileNumber;
+	private String reason;
 	private Boolean isReviewed;
 	private ReturnSlipStatus rtStatus;
 	private String reviewedBy;

@@ -133,6 +133,9 @@ public class ReturnSlipServiceImp implements ReturnslipService {
 			returnSlipDto.setRtStatus(ReturnSlipStatus.PENDING);
 			returnSlipDto.setMobileNumber(returnSlipRequestVo.getMobileNumber());
 			returnSlipDto.setStoreId(returnSlipRequestVo.getStoreId());
+			returnSlipDto.setReason(returnSlipRequestVo.getReason());
+			returnSlipDto.setCustomerId(returnSlipRequestVo.getCustomerId());
+			returnSlipDto.setSettelmentInfo(returnSlipRequestVo.getComments());
 			ReturnSlip returnSlip = returnSlipRepo.save(returnSlipDto);
 
 			updateReturnItemsInInventory(returnSlip);

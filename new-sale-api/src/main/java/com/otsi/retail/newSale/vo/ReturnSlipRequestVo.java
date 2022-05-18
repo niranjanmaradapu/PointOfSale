@@ -13,8 +13,11 @@ public class ReturnSlipRequestVo {
 	
 	private Long rsId;
 	private Long storeId;
+	private String reason;
+	private Long customerId;
 	private String returnReference;
 	private List<TaggedItems> barcodes;
+	private String comments;
 	private Long createdBy;
 	private String mobileNumber;
 	private Long totalAmount;
