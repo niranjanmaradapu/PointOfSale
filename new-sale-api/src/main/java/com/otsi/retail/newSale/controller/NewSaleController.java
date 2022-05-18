@@ -254,10 +254,10 @@ public class NewSaleController {
 
 	// method for deleting pending delivery slip data
 	@DeleteMapping(CommonRequestMappigs.DELETE_DS)
-	public GateWayResponse<?> deleteDeliverySlipDetails(@RequestParam Long dsId) throws RecordNotFoundException {
-		log.info("Received Request to getDeliverySlipDetails :" + dsId);
+	public GateWayResponse<?> deleteDeliverySlipDetails(@RequestParam String dsNumber) throws RecordNotFoundException {
+		log.info("Received Request to getDeliverySlipDetails :" + dsNumber);
 
-		String dsDetails = newSaleService.deleteDeliverySlipDetails(dsId);
+		String dsDetails = newSaleService.deleteDeliverySlipDetails(dsNumber);
 		return new GateWayResponse<>("Success", dsDetails);
 	}
 
@@ -315,9 +315,9 @@ public class NewSaleController {
 	}
 
 	@PostMapping(CommonRequestMappigs.CLOSE_PENDINGDELIVERYSLIP)
-	public GateWayResponse<?> posclose(@RequestBody List<DeliverySlipVo> dsVo) {
+	public GateWayResponse<?> posclose(Long storeId) {
 		try {
-			String dayclose = newSaleService.posClose(dsVo);
+			String dayclose = newSaleService.posClose(storeId);
 			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());

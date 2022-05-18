@@ -31,4 +31,5 @@ public class GenerateReturnSlipRequest {
 	 private String customerName;
 	 private Long totalAmount;
 	 private Long domianId;
+	 private int qty;
 }

@@ -4,28 +4,48 @@ on:
     branches:
       - DevOps
       - master
+<<<<<<< HEAD
 
+=======
+>>>>>>> 33a514a8d70b02a1e5cf6af4092d54268bcdb2ab
   pull_request:
     branches: 
       - DevOps
       - master
   workflow_call:
+<<<<<<< HEAD
     secrets: 
       AWS_ACCESS_KEY_ID:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
+=======
+    secrets:
+      AWS_ACCESS_ KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+
+>>>>>>> 33a514a8d70b02a1e5cf6af4092d54268bcdb2ab
 jobs:
   build:
     runs-on: ubuntu-latest
     env: 
       MODULE_NAME: customer-management
+<<<<<<< HEAD
 
     steps:
       - uses: actions/checkout@v3
         with:
           repository: 'niranjanmaradapu/PointOfSale/customer-management' 
           ref: DevOps
+=======
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: 'niranjanmaradapu/customer-management'
+          ref: DevOps 
+>>>>>>> 33a514a8d70b02a1e5cf6af4092d54268bcdb2ab
       - name: Set up Maven
         uses: stCarolas/setup-maven@v4
         with:
@@ -64,12 +84,20 @@ jobs:
     runs-on: ubuntu-latest
     env: 
       MODULE_NAME: customer-management
+<<<<<<< HEAD
 
     steps:
       - uses: actions/checkout@v3
         with:
           repository: 'niranjanmaradapu/PointOfSale/customer-management'
           ref: DevOps         
+=======
+    steps:
+      - uses: actions/checkout@v2  
+        with:
+          repository: 'niranjanmaradapu/customer-management'        
+          ref: DevOps       
+>>>>>>> 33a514a8d70b02a1e5cf6af4092d54268bcdb2ab
       - name: AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

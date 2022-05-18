@@ -696,7 +696,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 * }); }
 			 */
 			/////////
-			lsvo.getNewSaleVo().stream().forEach(x -> {
+			lsvo.getNewSaleVo().stream().forEach(x ->{
+				if(x.getUserId()!=null) {
 				List<UserDetailsVo> uvo = getUserDetailsFromURM(null, x.getUserId());
 
 				/////////
@@ -706,6 +707,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 						x.setMobileNumber(u.getPhoneNumber());
 					});
 				}
+				}
+				
 			});
 
 			/*
@@ -978,9 +981,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 		
 
 	@Override
-	public String posClose(List<DeliverySlipVo> dsVo) {
-		List<String> dsNumbers = dsVo.stream().map(a->a.getDsNumber()).collect(Collectors.toList());
-		List<DeliverySlipEntity> DsList = dsRepo.findByDsNumberIn(dsNumbers);
+	public String posClose(Long storeId) {
+		
+		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreationDateAndStoreId(DSStatus.Pending, LocalDate.now(),storeId);
+		if(DsList!=null&&!DsList.isEmpty()) {
 		DsList.stream().forEach(d->{
 			
 			d.setStatus(DSStatus.Cancelled);
@@ -991,6 +995,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 		
 		
 		return "successFully updated deliverySlips";
+		}else
+			return "there is no  pending delivery slips with this storeId:"+storeId;
 
 		
 	}
@@ -1727,13 +1733,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public String deleteDeliverySlipDetails(Long dsId) {
+	public String deleteDeliverySlipDetails(String dsNumber) {
 
-		Optional<DeliverySlipEntity> dsVo = dsRepo.findById(dsId);
+		DeliverySlipEntity dsEntity = dsRepo.findByDsNumber(dsNumber);
 
-		if (dsVo.get() != null && dsVo.get().getOrder() == null) {
-
-			dsRepo.deleteById(dsId);
+		if (dsEntity!= null && dsEntity.getOrder() == null) {
+			
+			dsEntity.setStatus(DSStatus.Cancelled);
+			dsRepo.save(dsEntity);
 
 		}
 

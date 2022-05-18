@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.otsi.retail.customerManagement.model.ReturnSlip;
+import com.otsi.retail.customerManagement.utils.ReturnSlipStatus;
 import com.otsi.retail.customerManagement.vo.ListOfReturnSlipsVo;
 
 /**
@@ -136,5 +137,13 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 			Long domainId);
 
 	List<ReturnSlip> findByStoreIdAndDomianId(Long storeId, Long domainId);
+
+	List<ReturnSlip> findByCreatedDateBetweenAndRtStatusAndStoreIdAndDomianIdOrderByCreatedDateAsc(LocalDate dateFrom,
+			LocalDate dateTo, ReturnSlipStatus rtStatus, Long storeId, Long domainId);
+
+	List<ReturnSlip> findByRtStatusAndStoreIdAndDomianIdOrderByCreatedDateAsc(ReturnSlipStatus rtStatus, Long storeId,
+			Long domainId);
+
+	List<ReturnSlip> findByStoreIdAndDomianIdOrderByCreatedDateAsc(Long storeId, Long domainId);
 
 }

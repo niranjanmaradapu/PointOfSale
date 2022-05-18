@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -26,6 +27,7 @@ public class ReportsController {
 	private ReportService reportService;
 
 	@GetMapping(value = "/InvoicesGenerated")
+
 	public GateWayResponse<?> getInvoicesGeneratedDetails(@RequestParam Long storeId,@RequestParam Long domainId) {
 		try {
 
@@ -117,10 +119,9 @@ public class ReportsController {
 	}
 
 	@GetMapping(value = "/getTopFiveSalesByRepresentative")
-	public GateWayResponse<?> getTopFiveSaleByRepresentative(@RequestParam Long storeId, Long domainId) {
+	public GateWayResponse<?> getTopFiveSaleByRepresentative(@RequestParam("storeId") Long storeId, @RequestParam("domainId") Long domainId, @RequestParam("name") String name) {
 		try {
-
-			List<ReportVo> rvo = reportService.getTopFiveSalesByRepresentative(storeId, domainId);
+			List<ReportVo> rvo = reportService.getTopFiveSalesByRepresentative(storeId, domainId,name);
 
 			return new GateWayResponse<>(HttpStatus.OK, rvo, "");
 		} catch (Exception e) {
@@ -130,9 +131,9 @@ public class ReportsController {
 	}
 
 	@GetMapping(value = "/getSalesByCategory")
-	public GateWayResponse<?> getSalesByCategory(@RequestParam Long storeId, Long domainId) {
+	public GateWayResponse<?> getSalesByCategory(@RequestParam Long storeId, Long domainId,String name) {
 		System.out.println("data" + storeId);
-		List<ReportVo> byCategory = reportService.getSalesByCategory(storeId, domainId);
+		List<ReportVo> byCategory = reportService.getSalesByCategory(storeId, domainId,name);
 		return new GateWayResponse<>(HttpStatus.OK, byCategory, "");
 	}
 	
