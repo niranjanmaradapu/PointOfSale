@@ -3,21 +3,30 @@ on:
   push:
     branches:
       - DevOps
+      - master
 
   pull_request:
     branches: 
       - DevOps
-
+      - master
+  workflow_call:
+    secrets: 
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+        
 jobs:
   build:
     runs-on: ubuntu-latest
     env: 
       MODULE_NAME: promo-exchange
-    permissions:
-      contents: read
-      packages: write
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          repository: 'niranjanmaradapu/PointOfSale/promo-exchange'
+          ref: DevOps
       - name: Set up Maven
         uses: stCarolas/setup-maven@v4
         with:
@@ -56,11 +65,12 @@ jobs:
     runs-on: ubuntu-latest
     env: 
       MODULE_NAME: promo-exchange
-    permissions:
-      contents: read
-      packages: write
+
     steps:
-      - uses: actions/checkout@v2         
+      - uses: actions/checkout@v3
+        with:
+          repository: 'niranjanmaradapu/PointOfSale/promo-exchange'
+          ref: DevOps         
       - name: AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
