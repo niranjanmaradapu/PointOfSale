@@ -138,6 +138,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 	private CustomerMapper customerMapper;
 
 	@Autowired
+	private ReturnSlipServiceImp returnSlipServiceImp;
+
+	@Autowired
 	private PaymentAmountTypeMapper paymentAmountTypeMapper;
 
 	@Autowired
@@ -165,57 +168,57 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// Method for saving order
 	@Override
-	public String saveNewSaleRequest(NewSaleVo vo) throws InvalidInputException {
+	public String saveNewSaleRequest(NewSaleVo newsaleVo) throws InvalidInputException {
 
 		NewSaleEntity entity = new NewSaleEntity();
 
-		entity.setUserId(vo.getUserId());
-		entity.setNatureOfSale(vo.getNatureOfSale());
-		entity.setNote(vo.getNote());
-		entity.setDomainId(vo.getDomainId());
-		entity.setGrossValue(vo.getGrossAmount());
-		entity.setPromoDisc(vo.getTotalPromoDisc());
-		entity.setManualDisc(vo.getTotalManualDisc());
-		entity.setTaxValue(vo.getTaxAmount());
-		entity.setCreatedBy(vo.getApprovedBy());
-		entity.setDiscApprovedBy(vo.getDiscApprovedBy());
-		entity.setDiscType(vo.getDiscType());
+		entity.setUserId(newsaleVo.getUserId());
+		entity.setNatureOfSale(newsaleVo.getNatureOfSale());
+		entity.setNote(newsaleVo.getNote());
+		entity.setDomainId(newsaleVo.getDomainId());
+		entity.setGrossValue(newsaleVo.getGrossAmount());
+		entity.setPromoDisc(newsaleVo.getTotalPromoDisc());
+		entity.setManualDisc(newsaleVo.getTotalManualDisc());
+		entity.setTaxValue(newsaleVo.getTaxAmount());
+		entity.setCreatedBy(newsaleVo.getApprovedBy());
+		entity.setDiscApprovedBy(newsaleVo.getDiscApprovedBy());
+		entity.setDiscType(newsaleVo.getDiscType());
 		entity.setCreationDate(LocalDate.now());
 		entity.setLastModified(LocalDate.now());
 		entity.setStatus(OrderStatus.New);// Initial Order status should be new
-		entity.setStatus(vo.getStatus());
-		entity.setNetValue(vo.getNetPayableAmount());
-		entity.setStoreId(vo.getStoreId());
-		entity.setOfflineNumber(vo.getOfflineNumber());
+		entity.setStatus(newsaleVo.getStatus());
+		entity.setNetValue(newsaleVo.getNetPayableAmount());
+		entity.setStoreId(newsaleVo.getStoreId());
+		entity.setOfflineNumber(newsaleVo.getOfflineNumber());
 		Random ran = new Random();
 		entity.setOrderNumber(
 				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
 
 		// Check for payment type
 		Long paymentValue = 0l;
-		if (vo.getPaymentAmountType() != null) {
-			paymentValue = vo.getPaymentAmountType().stream().mapToLong(x -> x.getPaymentAmount()).sum();
+		if (newsaleVo.getPaymentAmountType() != null) {
+			paymentValue = newsaleVo.getPaymentAmountType().stream().mapToLong(x -> x.getPaymentAmount()).sum();
 		}
-		if (vo.getReturnAmount() != null) {
-			paymentValue = vo.getRecievedAmount() - vo.getReturnAmount();
-			if (paymentValue.equals(vo.getNetPayableAmount())) {
+		if (newsaleVo.getReturnAmount() != null) {
+			paymentValue = newsaleVo.getRecievedAmount() - newsaleVo.getReturnAmount();
+			if (paymentValue.equals(newsaleVo.getNetPayableAmount())) {
 				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
 			}
-		} else if (vo.getReturnAmount() == null || vo.getReturnAmount() == 0) {
-			if (paymentValue.equals(vo.getNetPayableAmount())) {
+		} else if (newsaleVo.getReturnAmount() == null || newsaleVo.getReturnAmount() == 0) {
+			if (paymentValue.equals(newsaleVo.getNetPayableAmount())) {
 				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
 			}
 		}
 
-		if (vo.getDomainId() == DomainData.TE.getId()) {
+		if (newsaleVo.getDomainId() == DomainData.TE.getId()) {
 
-			List<DeliverySlipVo> dlSlips = vo.getDlSlip();
+			List<DeliverySlipVo> dlSlips = newsaleVo.getDlSlip();
 
 			List<String> dlsList = dlSlips.stream().map(x -> x.getDsNumber()).collect(Collectors.toList());
 
 			List<DeliverySlipEntity> dsList = dsRepo.findByDsNumberInAndOrderIsNull(dlsList);
 
-			if (dsList.size() == vo.getDlSlip().size()) {
+			if (dsList.size() == newsaleVo.getDlSlip().size()) {
 
 				NewSaleEntity saveEntity = newSaleRepository.save(entity);
 
@@ -242,16 +245,30 @@ public class NewSaleServiceImpl implements NewSaleService {
 				saveEntity.setDlSlip(dsLists);
 				// Saving order details in order_transaction
 
-				if (vo.getPaymentAmountType() != null) {
-					vo.getPaymentAmountType().stream().forEach(x -> {
+				if (newsaleVo.getPaymentAmountType() != null) {
+					newsaleVo.getPaymentAmountType().stream().forEach(x -> {
 
 						// Checking the payment type condition
 						if ((x.getPaymentType().equals(PaymentType.PKTADVANCE))
 								|| (x.getPaymentType().equals(PaymentType.PKTPENDING))) {
+							// Calling the accounting(either debit/credit)
+							updateAccounting(newsaleVo);
+						}
+						if ((x.getPaymentType().equals(PaymentType.RTSlip))) {
 							try {
-								// Calling the credit notes method
-								updateAccounting(vo.getNetPayableAmount(), vo.getMobileNumber(), vo.getStoreId(),
-										x.getPaymentType().getType());
+								if (newsaleVo.getNetPayableAmount() >= x.getPaymentAmount()) {
+
+									// update returnSlipStatus
+									returnSlipServiceImp.updateReturnSlip(newsaleVo.getStoreId(), newsaleVo.getReturnSlipNumber());
+
+								} else if (newsaleVo.getNetPayableAmount() < x.getPaymentAmount()) {
+									Long creditAmount =0l;
+									returnSlipServiceImp.updateReturnSlip(newsaleVo.getStoreId(), newsaleVo.getReturnSlipNumber());
+									 creditAmount = x.getPaymentAmount() - newsaleVo.getNetPayableAmount();
+									saveCreditNotes(creditAmount, newsaleVo.getMobileNumber(), newsaleVo.getStoreId(),newsaleVo.getReturnSlipNumber(),newsaleVo.getUserId());
+									
+
+								}
 
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -270,21 +287,21 @@ public class NewSaleServiceImpl implements NewSaleService {
 				// Condition to update inventory
 				// if (vo.getReturnAmount() != null) {
 				// Condition to update inventory
-				if (paymentValue.equals(vo.getNetPayableAmount())) {
+				if (paymentValue.equals(newsaleVo.getNetPayableAmount())) {
 					updateOrderItemsInInventory(saveEntity);
 				}
 				// }
 
 			} else {
-				log.error("Delivery slips are not valid" + vo);
+				log.error("Delivery slips are not valid" + newsaleVo);
 				throw new InvalidInputException("Please provide Valid delivery slips..");
 			}
 		}
-		if (vo.getDomainId() != DomainData.TE.getId()) {
+		if (newsaleVo.getDomainId() != DomainData.TE.getId()) {
 
 			Map<String, Integer> map = new HashMap<>();
 
-			List<LineItemVo> lineItems = vo.getLineItemsReVo();
+			List<LineItemVo> lineItems = newsaleVo.getLineItemsReVo();
 
 			List<Long> lineItemIds = lineItems.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
 
@@ -307,9 +324,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 				});
 				saveEntity.setLineItemsRe(lineItemsForUpdate);
 				// Saving order details in order_transaction table
-				if (vo.getPaymentAmountType() != null) {
+				if (newsaleVo.getPaymentAmountType() != null) {
 
-					vo.getPaymentAmountType().stream().forEach(x -> {
+					newsaleVo.getPaymentAmountType().stream().forEach(x -> {
 
 						PaymentAmountType type = new PaymentAmountType();
 						type.setOrderId(saveEntity);
@@ -322,12 +339,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				}
 
 				// Condition to update inventory
-				if (paymentValue.equals(vo.getNetPayableAmount())) {
+				if (paymentValue.equals(newsaleVo.getNetPayableAmount())) {
 					updateOrderItemsInInventory(saveEntity);
 				}
 
 			} else {
-				log.error("LineItems are not valid : " + vo);
+				log.error("LineItems are not valid : " + newsaleVo);
 				throw new InvalidInputException("Please provide Valid delivery slips..");
 
 			}
@@ -336,33 +353,36 @@ public class NewSaleServiceImpl implements NewSaleService {
 		return entity.getOrderNumber();
 	}
 
-	private String updateAccouting(NewSaleVo newSaleVo) {
+	// UPDATE ACCOUNTING
 
-		if (newSaleVo.getDomainId() == DomainData.TE.getId()) {
-                LedgerLogBookVo ledgerLogBookVo = new LedgerLogBookVo();
-				ledgerLogBookVo.setStoreId(newSaleVo.getStoreId());
-				ledgerLogBookVo.setMobileNumber(newSaleVo.getMobileNumber());
-				ledgerLogBookVo.setAmount(newSaleVo.getNetPayableAmount());
-				newSaleVo.getPaymentAmountType().stream().forEach(paymentAmountType -> {
+		private void updateAccounting(NewSaleVo newsaleVo) {
 
-					// Checking the payment type condition
-					if (paymentAmountType.getPaymentType().equals(PaymentType.PKTADVANCE)){
-						ledgerLogBookVo.setAccountType(AccountType.CREDIT);
-					}
-					else if(paymentAmountType.getPaymentType().equals(PaymentType.PKTPENDING)) {
-						ledgerLogBookVo.setAccountType(AccountType.DEBIT);
-					}
-				});
-			
-			log.info("Update request to accounting: " + ledgerLogBookVo);
-			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(), config.getUpdateInventoryRK(), ledgerLogBookVo);
-				
-		}
-		return "updated accounting successfully:"+newSaleVo;
-	}
+				if (newsaleVo.getDomainId() == DomainData.TE.getId()) {
+					LedgerLogBookVo ledgerLogBookVo = new LedgerLogBookVo();
+					ledgerLogBookVo.setStoreId(newsaleVo.getStoreId());
+					ledgerLogBookVo.setMobileNumber(newsaleVo.getMobileNumber());
+					ledgerLogBookVo.setAmount(newsaleVo.getNetPayableAmount());
+					newsaleVo.getPaymentAmountType().stream().forEach(paymentAmountType -> {
 
-	// UPDATE CREDIT NOTES METHOD
-	private String updateAccounting(Long amount, String mobileNumber, Long storeId, String type) {
+						// Checking the payment type condition
+						if (paymentAmountType.getPaymentType().equals(PaymentType.PKTADVANCE)) {
+							ledgerLogBookVo.setAccountType(AccountType.CREDIT);
+						} else if (paymentAmountType.getPaymentType().equals(PaymentType.PKTPENDING)) {
+							ledgerLogBookVo.setAccountType(AccountType.DEBIT);
+						} else if (paymentAmountType.getPaymentType().equals(PaymentType.Cash)) {
+							ledgerLogBookVo.setPaymentType(PaymentType.Cash);
+						} else if (paymentAmountType.getPaymentType().equals(PaymentType.Card)) {
+							ledgerLogBookVo.setPaymentType(PaymentType.Card);
+						}
+					});
+
+					log.info("Update request to accounting: " + ledgerLogBookVo);
+					rabbitTemplate.convertAndSend(config.getAccountingExchange(), config.getAccountingRK(), ledgerLogBookVo);
+
+				}
+			}
+
+	private String updateCreditNotes(Long amount, String mobileNumber, Long storeId, String type) {
 
 		LedgerLogBookVo ledgerLogBookRequest = new LedgerLogBookVo();
 
@@ -390,6 +410,28 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	}
 
+	// save creditnotes
+
+	private void saveCreditNotes(Long amount, String mobileNumber, Long storeId,String returnSlipNumber,Long customerId) {
+
+		LedgerLogBookVo ledgerLogBookRequest = new LedgerLogBookVo();
+
+		ledgerLogBookRequest.setAmount(amount);
+		ledgerLogBookRequest.setMobileNumber(mobileNumber);
+		ledgerLogBookRequest.setStoreId(storeId);
+		ledgerLogBookRequest.setAccountType(AccountType.CREDIT);
+		ledgerLogBookRequest.setPaymentType(PaymentType.RTSlip);
+		ledgerLogBookRequest.setReturnSlipNumber(returnSlipNumber);
+		ledgerLogBookRequest.setIsReturned(Boolean.TRUE);
+		ledgerLogBookRequest.setCustomerId(customerId);
+		
+
+		// Pass object to Rabbit queue
+		rabbitTemplate.convertAndSend(config.getCreditNotesExchange(), config.getCreditnotesRK(), ledgerLogBookRequest);
+
+	}
+
+/////////////
 	@RabbitListener(queues = "newsale_queue")
 	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
 

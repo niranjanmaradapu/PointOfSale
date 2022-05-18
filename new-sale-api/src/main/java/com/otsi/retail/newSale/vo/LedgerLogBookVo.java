@@ -33,6 +33,10 @@ public class LedgerLogBookVo extends BaseEntityVo{
 	
 	private String referenceNumber;
 	
+	private String returnSlipNumber;
+	
+	private Boolean isReturned;
+	
 	private String mobileNumber;
 
 }

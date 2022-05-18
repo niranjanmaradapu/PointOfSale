@@ -48,16 +48,16 @@ public class ReturnSlipController {
 
 		String msg = returnSlipService.deleteReturnSlips(rsId);
 		return new GateWayResponse<>(HttpStatus.OK, msg, "Success");
-	}
+	}*/
 	
 	@PostMapping("/createReturnSlip")
-	public GateWayResponse<?> createReturnSlip(@RequestBody GenerateReturnSlipRequest request) throws Exception {
+	public GateWayResponse<?> createReturnSlip(@RequestBody ReturnSlipRequestVo request) throws Exception {
 		log.info("Received request to createReturnSlip:" + request);
-		String message = returnSlipService.createReturnSlip(request);
+		ReturnSlipRequestVo message = returnSlipService.createReturnSlip(request);
 		return new GateWayResponse<>("ReturnSlip Created Successfully", message);
 	}
 
-	@PostMapping("/updateReturnSlip")
+/*	@PostMapping("/updateReturnSlip")
 	public GateWayResponse<?> updateReturnSlip(@RequestParam String rtNumber,
 			@RequestBody GenerateReturnSlipRequest request) throws Exception {
 		log.info("Received request to updateReturnSlip:" + rtNumber + "and the request is:" + request);
@@ -65,14 +65,14 @@ public class ReturnSlipController {
 		return new GateWayResponse<>("Return Slip Details Updated Successfully", message);
 
 	}*/
-	@PostMapping("/createReturnSlip")
-	public GateWayResponse<?> createReturnSlip(@RequestBody ReturnSlipRequestVo returnSlipRequestVo) throws Exception {
+	/*@PostMapping("/generateReturnSlip")
+	public GateWayResponse<?> generateReturnSlip(@RequestBody ReturnSlipRequestVo returnSlipRequestVo) throws Exception {
 		log.info("Received request to createReturnSlip:" + returnSlipRequestVo);
-		List<ReturnSlipRequestVo> returnSlip = returnSlipService.createReturnSlip(returnSlipRequestVo);
+		List<ReturnSlipRequestVo> returnSlip = returnSlipService.generateReturnSlip(returnSlipRequestVo);
 		return new GateWayResponse<>("Return Slip created Successfully", returnSlip);
 
 	}
-	
+*/	
 	@GetMapping("/getReturnSlip")
 	public GateWayResponse<?> getReturnSlip(@RequestParam String returnReferenceNumber,@RequestParam Long storeId) throws Exception {
 		log.info("Received request to updateReturnSlip:" + returnReferenceNumber + "and storeId is:" + storeId);

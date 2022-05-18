@@ -68,14 +68,14 @@ public class Config {
 	//accounting queue
 	
 	@Value("${accounting_queue}")
-	private String accoutingQueue;
+	private String accountingQueue;
 	
 	@Value("${accounting_exchange}")
 	private String accountingExchange;
 	
 	@Value("${accounting_rk}")
-	private String accountingRk;
-
+	private String accountingRK;
+	
 	//For Inventory Config
 
 	@Value("${inventory_queue}")
@@ -87,6 +87,7 @@ public class Config {
 	@Value("${inventory_rk}")
 	private String updateInventoryRK;
 	
+	//ineventory update for returnslip
 	
 	@Value("${returnslip_queue}")
 	private String returnSlipinventoryUpdateQueue;
@@ -96,6 +97,18 @@ public class Config {
 
 	@Value("${returnslip_rk}")
 	private String returnSlipupdateInventoryRK;
+	
+	//creditNotesSave
+	@Value("${return_credit_queue}")
+	private String creditNotesQueue;
+
+	@Value("${return_credit_exchange}")
+	private String creditNotesExchange;
+
+	@Value("${return_credit_rk}")
+	private String creditnotesRK;
+	
+	
 	
 	@Value("${getStoreDetails_url}")
 	private String storeDetails;
@@ -124,6 +137,26 @@ public class Config {
 				.with(updateInventoryRK);
 	}
 	
+	
+	@Bean
+	public Queue accountingQueue() {
+		return new Queue(accountingQueue);
+	}
+	
+	@Bean
+	public DirectExchange accountingExchange() {
+		return new DirectExchange(accountingExchange);
+	}
+
+
+	@Bean
+	public Binding bindingAccounting(Queue accountingQueue, DirectExchange accountingExchange) {
+
+		return BindingBuilder.bind(accountingQueue).to(accountingExchange).with(accountingRK);
+	}
+	
+	
+	
 
 
 	@Bean
@@ -143,6 +176,25 @@ public class Config {
 		return BindingBuilder.bind(returnSlipinventoryUpdateQueue).to(returnSlipupdateInventoryExchange)
 				.with(returnSlipupdateInventoryRK);
 	}
+	
+	@Bean
+	public Queue creditNotesQueue() {
+		return new Queue(creditNotesQueue);
+	}
+
+	@Bean
+	public DirectExchange creditNotesExchange() {
+		return new DirectExchange(creditNotesExchange);
+	}
+
+	@Bean
+	public Binding bindingcreditnotes(Queue creditNotesQueue,
+			DirectExchange creditNotesExchange) {
+
+		return BindingBuilder.bind(creditNotesQueue).to(creditNotesExchange)
+				.with(creditnotesRK);
+	}
+	
 	
 	
 	

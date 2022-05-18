@@ -18,7 +18,7 @@ import lombok.Data;
 @Data
 public class ListOfReturnSlipsVo {
 	
-	private int rsId;
+	private Long rsId;
 
 	private LocalDate dateFrom;
 

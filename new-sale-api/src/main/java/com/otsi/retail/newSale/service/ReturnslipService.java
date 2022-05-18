@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.otsi.retail.newSale.vo.ReturnSlipRequestVo;
 
 @Component
@@ -19,6 +20,8 @@ public interface ReturnslipService {
 
 	ReturnSlipRequestVo getReturnSlip(String mobileNumber, Long storeId);
 
-	List<ReturnSlipRequestVo> createReturnSlip(ReturnSlipRequestVo returnSlipRequestVo);
+	ReturnSlipRequestVo createReturnSlip(ReturnSlipRequestVo returnSlipRequestVo) throws JsonProcessingException;
+
+	//List<ReturnSlipRequestVo> generateReturnSlip(ReturnSlipRequestVo returnSlipRequestVo);
 
 }
