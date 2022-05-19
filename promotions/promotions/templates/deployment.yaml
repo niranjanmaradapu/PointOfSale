@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "connection-pool.fullname" . }}
+  name: {{ include "promotions.fullname" . }}
   namespace: {{ .Values.namespace.name }}
   labels:
-    {{- include "connection-pool.labels" . | nindent 4 }}
+    {{- include "promotions.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "connection-pool.selectorLabels" . | nindent 6 }}
+      {{- include "promotions.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -19,9 +19,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "connection-pool.selectorLabels" . | nindent 8 }}
+        {{- include "promotions.selectorLabels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "connection-pool.serviceAccountName" . }}
+      serviceAccountName: {{ include "promotions.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -36,7 +36,7 @@ spec:
           - name: SPRING_DATASOURCE_PASSWORD
             value: {{ .Values.env.postgres_password }}
           - name: SPRING_DATASOURCE_URL
-            value: jdbc:postgresql://{{ include "connection-pool.fullname" . }}-pos:5432/{{ .Values.env.postgres_db }}
+            value: jdbc:postgresql://{{ include "promotions.fullname" . }}-pos:5432/{{ .Values.env.postgres_db }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -50,7 +50,7 @@ spec:
           #    path: /
           #    port: http
           #volumeMounts:
-          #  - name: connection-pool-data
+          #  - name: promotions-data
           #    mountPath: /app/database
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -67,10 +67,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       #volumes:
-      #  - name: connection-pool-data
+      #  - name: promotions-data
       #  {{- if .Values.persistence.enabled }}
       #    persistentVolumeClaim:
-      #      claimName: {{ include "connection-pool.fullname" . }}
+      #      claimName: {{ include "promotions.fullname" . }}
       #  {{- else }}
       #    emptyDir: {}
       #  {{- end -}}

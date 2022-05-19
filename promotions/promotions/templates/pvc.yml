@@ -2,9 +2,9 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ include "connection-pool.fullname" . }}
+  name: {{ include "promotions.fullname" . }}
   labels:
-    {{- include "connection-pool.labels" . | nindent 4 }}
+    {{- include "promotions.labels" . | nindent 4 }}
   annotations:
   {{- if .Values.persistence.storageClass }}
     volume.beta.kubernetes.io/storage-class: {{ .Values.persistence.storageClass | quote }}

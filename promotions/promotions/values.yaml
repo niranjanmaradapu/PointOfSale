@@ -1,13 +1,13 @@
-# Default values for connection-pool.
+# Default values for promotions.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-name: connection-pool
+name: promotions
 
 env:
   postgres_user: postgres
   postgres_password: Otsi@123
   postgres_data: /var/lib/postgresql/data/pgdata
-  postgres_db: connectionpool
+  postgres_db: promotions
 
 replicaCount: 1
 replicaCountPos: 1
@@ -15,7 +15,7 @@ replicaCountPos: 1
 namespace: 
   name: default
 image:
-  repository: 604430719928.dkr.ecr.ap-south-1.amazonaws.com/connection-pool
+  repository: 604430719928.dkr.ecr.ap-south-1.amazonaws.com/promotions
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
