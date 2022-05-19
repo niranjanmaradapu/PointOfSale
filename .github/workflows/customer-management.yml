@@ -58,7 +58,7 @@ jobs:
          docker build -t ${{ env.MODULE_NAME }}  ${{ env.MODULE_NAME }}
          docker tag ${{ env.MODULE_NAME }}  ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/${{ env.MODULE_NAME }}:${{ github.sha }}
          docker push ${{ steps.ecr.outputs.account }}.dkr.ecr.ap-south-1.amazonaws.com/${{ env.MODULE_NAME }}:${{ github.sha }}
-         
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -83,6 +83,3 @@ jobs:
           cluster-name: Microservice-K8S-Cluster
           command: helm upgrade --set image.tag="$GITHUB_SHA" --install ${{ env.MODULE_NAME }} ./${{ env.MODULE_NAME }}/${{ env.MODULE_NAME }}
             
-      
-       
-
