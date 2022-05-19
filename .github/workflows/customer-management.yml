@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          repository: 'niranjanmaradapu/PointOfSale/customer-management' 
+          repository: 'niranjanmaradapu/PointOfSale' 
           ref: DevOps
       - name: Set up Maven
         uses: stCarolas/setup-maven@v4
@@ -67,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          repository: 'niranjanmaradapu/PointOfSale/customer-management'
+          repository: 'niranjanmaradapu/PointOfSale'
           ref: DevOps         
       - name: AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
