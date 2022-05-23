@@ -97,6 +97,12 @@ public class NewSaleVo {
 	private String customerName;
 	
 	private String mobileNumber;
+	
+	private Long returnAmount;
+	
+	private Long returnSlipAmount;
+	
+	private String returnSlipNumber;
 
 	// private List<HsnDetailsVo> HsnDetailsVo;
 

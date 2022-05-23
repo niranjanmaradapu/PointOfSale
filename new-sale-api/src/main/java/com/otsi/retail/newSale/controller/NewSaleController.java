@@ -1,6 +1,7 @@
 package com.otsi.retail.newSale.controller;
 
 import java.net.ConnectException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.AmqpConnectException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +29,7 @@ import org.springframework.web.client.ResourceAccessException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
+import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
 import com.otsi.retail.newSale.Exceptions.BusinessException;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
@@ -39,6 +43,7 @@ import com.otsi.retail.newSale.service.NewSaleService;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
+import com.otsi.retail.newSale.vo.GiftVoucherSearchVo;
 import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
@@ -208,13 +213,13 @@ public class NewSaleController {
 	// Method for creating Delivery slip using List of LineItems
 	@PostMapping(CommonRequestMappigs.CREATE_DS)
 	public GateWayResponse<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo) throws RecordNotFoundException {
-		log.info("Received Request to saveDeliverySlip :" + vo);
+		log.info("Received Request to save estimationslip :" + vo);
 		try {
 
 			String saveDs = newSaleService.saveDeliverySlip(vo);
-			return new GateWayResponse<>("successfully created deliveryslip", saveDs);
+			return new GateWayResponse<>("successfully created estimation slip", saveDs);
 		} catch (RecordNotFoundException e) {
-			log.error("Exception occurs while saving delivery slip : " + vo);
+			log.error("Exception occurs while saving estimation slip : " + vo);
 			return new GateWayResponse<>(e.getMessage(), "Exception occurs");
 		}
 	}
@@ -245,7 +250,7 @@ public class NewSaleController {
 	// Method for getting Delivery slip Data using DsNumber
 	@GetMapping(CommonRequestMappigs.GET_DS)
 	public GateWayResponse<?> getDeliverySlipDetails(@RequestParam String dsNumber) throws RecordNotFoundException {
-		log.info("Received Request to getDeliverySlipDetails :" + dsNumber);
+		log.info("Received Request to get estimation slip Details :" + dsNumber);
 
 		DeliverySlipVo dsDetails = newSaleService.getDeliverySlipDetails(dsNumber);
 		return new GateWayResponse<>(HttpStatus.OK, dsDetails, "");
@@ -255,7 +260,7 @@ public class NewSaleController {
 	// method for deleting pending delivery slip data
 	@DeleteMapping(CommonRequestMappigs.DELETE_DS)
 	public GateWayResponse<?> deleteDeliverySlipDetails(@RequestParam String dsNumber) throws RecordNotFoundException {
-		log.info("Received Request to getDeliverySlipDetails :" + dsNumber);
+		log.info("Received Request to deleted estimation slip details :" + dsNumber);
 
 		String dsDetails = newSaleService.deleteDeliverySlipDetails(dsNumber);
 		return new GateWayResponse<>("Success", dsDetails);
@@ -290,7 +295,7 @@ public class NewSaleController {
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_DS)
 	public GateWayResponse<?> getlistofDeliverySlips(@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo)
 			throws RecordNotFoundException {
-		log.info("Received Request to getlistofDeliverySlips :" + listOfDeliverySlipVo.toString());
+		log.info("Received Request to get estimation slip :" + listOfDeliverySlipVo.toString());
 		// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 		ListOfDeliverySlipVo getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo);
@@ -314,7 +319,7 @@ public class NewSaleController {
 
 	}
 
-	@PostMapping(CommonRequestMappigs.CLOSE_PENDINGDELIVERYSLIP)
+	@PutMapping(CommonRequestMappigs.CLOSE_PENDINGDELIVERYSLIP)
 	public GateWayResponse<?> posclose(Long storeId) {
 		try {
 			String dayclose = newSaleService.posClose(storeId);
@@ -609,5 +614,17 @@ public class NewSaleController {
 		return new GateWayResponse<>(HttpStatus.OK, result, "");
 
 	}
-
+	
+	/**Search Operation GiftVoucher By number and toDate And fromDate
+	 * 
+	 */
+     @PostMapping("/gvSearching")
+	public GateWayResponse <?> serchByGv(@RequestBody GiftVoucherSearchVo searchVo){
+    	 
+    	 List<GiftVoucherVo> searchByGvNumberAndFromDateAndToDate = newSaleService.giftVoucherSearching(searchVo);
+		
+		return new GateWayResponse<>(HttpStatus.OK,searchByGvNumberAndFromDateAndToDate,"") ;
+		
+	}
 }
+
