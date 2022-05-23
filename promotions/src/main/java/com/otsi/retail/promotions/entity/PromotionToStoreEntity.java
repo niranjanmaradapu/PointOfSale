@@ -24,6 +24,8 @@ public class PromotionToStoreEntity extends BaseEntity {
 	
 	private Long storeId;
 	
+	private Long clientId;
+	
 	private String storeName;
 
 	private int priority;

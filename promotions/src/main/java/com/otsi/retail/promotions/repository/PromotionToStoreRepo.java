@@ -17,9 +17,6 @@ public interface PromotionToStoreRepo  extends JpaRepository<PromotionToStoreEnt
 
 	List<PromotionToStoreEntity> findByStoreIdAndPromotionStatus(Long storeId, Boolean promoStatus);
 
-	List<PromotionToStoreEntity> findByStartDateAndEndDateAndPromotionStatus(LocalDate promotionStartDate,
-			LocalDate promotionEndDate, Boolean isActive);
-
 	List<PromotionToStoreEntity> findByPromotionStatus(Boolean isActive);
 
 	List<PromotionToStoreEntity> findByPromotionName(String promotionName);
@@ -27,6 +24,15 @@ public interface PromotionToStoreRepo  extends JpaRepository<PromotionToStoreEnt
 	List<PromotionToStoreEntity> findByStoreName(String storeName);
 
 	boolean existsByStoreName(String storeName);
+
+	List<PromotionToStoreEntity> findByStartDateAndEndDateAndPromotionStatusAndClientId(LocalDate startDate,
+			LocalDate endDate, Boolean promotionStatus, Long clientId);
+
+	List<PromotionToStoreEntity> findByPromotionNameAndClientId(String promotionName, Long clientId);
+
+	List<PromotionToStoreEntity> findByStoreNameAndClientId(String storeName, Long clientId);
+
+	List<PromotionToStoreEntity> findByPromotionStatusAndClientId(Boolean promotionStatus, Long clientId);
 
 	
 }

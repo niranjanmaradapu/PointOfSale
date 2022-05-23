@@ -20,6 +20,8 @@ public class PromotionToStoreVo {
 	
 	private List<StoreVo> stores;
 	
+	private Long clientId;
+	
 	private LocalDate startDate;
 	
 	private LocalDate endDate;

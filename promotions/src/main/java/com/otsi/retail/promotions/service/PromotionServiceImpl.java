@@ -245,43 +245,43 @@ public class PromotionServiceImpl implements PromotionService {
 		if (vo.getStartDate() != null && vo.getEndDate() != null) {
 			if (vo.getPromotionName() != null) {
 
-				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatus(vo.getStartDate(),
-						vo.getEndDate(), vo.getPromotionStatus());
+				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatusAndClientId(vo.getStartDate(),
+						vo.getEndDate(), vo.getPromotionStatus(), vo.getClientId());
 			} else if (vo.getPromotionName() == null) {
-				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatus(vo.getStartDate(),
-						vo.getEndDate(), vo.getPromotionStatus());
+				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatusAndClientId(vo.getStartDate(),
+						vo.getEndDate(), vo.getPromotionStatus(),vo.getClientId());
 
 			} else if (vo.getPromotionName() != null) {
-				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatus(vo.getStartDate(),
-						vo.getEndDate(), vo.getPromotionStatus());
+				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatusAndClientId(vo.getStartDate(),
+						vo.getEndDate(), vo.getPromotionStatus(), vo.getClientId());
 
 			} else if (vo.getStoreName() == null) {
-				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatus(vo.getStartDate(),
-						vo.getEndDate(), vo.getPromotionStatus());
+				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatusAndClientId(vo.getStartDate(),
+						vo.getEndDate(), vo.getPromotionStatus(),vo.getClientId());
 
 			} else if (vo.getStoreName() != null) {
-				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatus(vo.getStartDate(),
-						vo.getEndDate(), vo.getPromotionStatus());
+				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatusAndClientId(vo.getStartDate(),
+						vo.getEndDate(), vo.getPromotionStatus(),vo.getClientId());
 
 			}
 
 			else {
-				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatus(
+				promoDetails = promostoreRepo.findByStartDateAndEndDateAndPromotionStatusAndClientId(
 
-						vo.getStartDate(), vo.getEndDate(), vo.getPromotionStatus());
+						vo.getStartDate(), vo.getEndDate(), vo.getPromotionStatus(),vo.getClientId());
 			}
 
 		} else if (vo.getStartDate() == null && vo.getEndDate() == null) {
 			if (vo.getPromotionName() != null) {
-				promoDetails = promostoreRepo.findByPromotionName(vo.getPromotionName());
+				promoDetails = promostoreRepo.findByPromotionNameAndClientId(vo.getPromotionName(),vo.getClientId());
 
 			} else if (vo.getStoreName() != null) {
-				promoDetails = promostoreRepo.findByStoreName(vo.getStoreName());
+				promoDetails = promostoreRepo.findByStoreNameAndClientId(vo.getStoreName(),vo.getClientId());
 
 			}
 
 			else
-				promoDetails = promostoreRepo.findByPromotionStatus(vo.getPromotionStatus());
+				promoDetails = promostoreRepo.findByPromotionStatusAndClientId(vo.getPromotionStatus(), vo.getClientId());
 		}
 		if (promoDetails.isEmpty()) {
 			throw new RecordNotFoundException("No record found with given information");
@@ -294,6 +294,7 @@ public class PromotionServiceImpl implements PromotionService {
 				SearchPromotionsVo searchVo = new SearchPromotionsVo();
 				searchVo.setPromotionName(p.getPromotionName());
 				searchVo.setStoreName(p.getStoreName());
+				searchVo.setClientId(p.getClientId());
 				searchVo.setStartDate(p.getStartDate());
 				searchVo.setEndDate(p.getEndDate());
 				searchVo.setPromotionStatus(p.getPromotionStatus());
@@ -466,7 +467,6 @@ public class PromotionServiceImpl implements PromotionService {
 		listofInvTxt.stream().forEach(barcodevo -> {
 
 			listOfPromos.stream().forEach(p -> {
-
 				PromotionSlabsEntity checkPromoApplyTypeForSlabs = checkPromoApplyTypeForSlabs(p, barcodevo);
 
 				if (checkPromoApplyTypeForSlabs != null) {
@@ -548,6 +548,7 @@ public class PromotionServiceImpl implements PromotionService {
 				promoStoreEntity.setPromoId(promotionsVo.getPromoId());
 				promoStoreEntity.setPromotionName(promotionsVo.getPromotionName());
 				promoStoreEntity.setStoreName(storeVo.getName());
+				promoStoreEntity.setClientId(vo.getClientId());
 
 				promoStoreList.add(promoStoreEntity);
 			}

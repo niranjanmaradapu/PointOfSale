@@ -24,6 +24,8 @@ public class SearchPromotionsVo {
 	
 	private Long storeId;
 	
+	private Long clientId;
+	
 	private String promotionName;
 	
 	private String storeName;
