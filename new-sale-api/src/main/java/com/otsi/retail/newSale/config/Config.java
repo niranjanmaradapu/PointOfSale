@@ -30,11 +30,8 @@ public class Config {
 
 	public List<HsnDetailsVo> vo;
 
-<<<<<<< HEAD
-=======
 	
 
->>>>>>> Release-2
 	@Value("${getNewSaleWithHsn_url}")
 	private String HsnUrl;
 
