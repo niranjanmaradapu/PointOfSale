@@ -629,26 +629,26 @@ public class PromotionServiceImpl implements PromotionService {
 		List<PromotionsEntity> promoList = new ArrayList<>();
 
 		if (svo.getIsActive() != null && svo.getApplicability().equals(Applicability.promotionForEachBarcode)) {
-			promoList = promoRepo.findByIsActiveAndApplicability(svo.getIsActive(),
-					Applicability.promotionForEachBarcode);
+			promoList = promoRepo.findByIsActiveAndApplicabilityAndClientId(svo.getIsActive(),
+					Applicability.promotionForEachBarcode, svo.getClientId());
 
 		} else if (svo.getIsActive() != null && svo.getApplicability().equals(Applicability.promotionForWholeBill)) {
-			promoList = promoRepo.findByIsActiveAndApplicability(svo.getIsActive(),
-					Applicability.promotionForWholeBill);
+			promoList = promoRepo.findByIsActiveAndApplicabilityAndClientId(svo.getIsActive(),
+					Applicability.promotionForWholeBill, svo.getClientId());
 
 		} else if (svo.getIsActive() == null && svo.getApplicability().equals(Applicability.promotionForEachBarcode)) {
-			promoList = promoRepo.findByApplicability(Applicability.promotionForEachBarcode);
+			promoList = promoRepo.findByApplicabilityAndClientId(Applicability.promotionForEachBarcode, svo.getClientId());
 
 		} else if (svo.getIsActive() == null && svo.getApplicability().equals(Applicability.promotionForWholeBill)) {
-			promoList = promoRepo.findByApplicability(Applicability.promotionForWholeBill);
+			promoList = promoRepo.findByApplicabilityAndClientId(Applicability.promotionForWholeBill,svo.getClientId());
 
 		} else if (svo.getIsActive() != null && svo.getApplicability().equals(Applicability.All)) {
 
-			promoList = promoRepo.findByIsActive(svo.getIsActive());
+			promoList = promoRepo.findByIsActiveAndClientId(svo.getIsActive(),svo.getClientId());
 
 		} else if (svo.getIsActive() == null && svo.getApplicability().equals(Applicability.All)) {
 
-			promoList = promoRepo.findByIsActive(svo.getIsActive());
+			promoList = promoRepo.findByIsActiveAndClientId(svo.getIsActive(),svo.getClientId());
 
 		}
 		if (promoList.isEmpty()) {

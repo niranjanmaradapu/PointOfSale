@@ -18,6 +18,8 @@ public class SearchPoolVo {
 	
 	private Long poolId;
 	
+	private Long clientId;
+	
 	private String poolName;
 
 	private PoolType poolType;

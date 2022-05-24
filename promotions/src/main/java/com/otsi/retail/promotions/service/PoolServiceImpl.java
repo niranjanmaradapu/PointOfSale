@@ -238,32 +238,32 @@ public class PoolServiceImpl implements PoolService {
 		if (pvo.getIsActive() != null) {
 			if (pvo.getCreatedBy() != null && pvo.getPoolType() != null) {
 
-				pools = poolRepo.findByCreatedByAndPoolTypeAndIsActive(pvo.getCreatedBy(), pvo.getPoolType(),
-						pvo.getIsActive());
+				pools = poolRepo.findByCreatedByAndPoolTypeAndIsActiveAndClientId(pvo.getCreatedBy(), pvo.getPoolType(),
+						pvo.getIsActive(), pvo.getClientId());
 
 			} else if (pvo.getCreatedBy() != null && pvo.getPoolType() == null) {
 
-				pools = poolRepo.findByCreatedByAndIsActive(pvo.getCreatedBy(), pvo.getIsActive());
+				pools = poolRepo.findByCreatedByAndIsActiveAndClientId(pvo.getCreatedBy(), pvo.getIsActive(), pvo.getClientId());
 			} else if (pvo.getPoolType() != null && pvo.getCreatedBy() == null) {
-				pools = poolRepo.findByPoolTypeAndIsActive(pvo.getPoolType(), pvo.getIsActive());
+				pools = poolRepo.findByPoolTypeAndIsActiveAndClientId(pvo.getPoolType(), pvo.getIsActive(),pvo.getClientId());
 			} else {
 
-				pools = poolRepo.findByIsActive(pvo.getIsActive());
+				pools = poolRepo.findByIsActiveAndClientId(pvo.getIsActive(),pvo.getClientId());
 			}
 
 		} else if (pvo.getIsActive() == null) {
 
 			if (pvo.getCreatedBy() != null && pvo.getPoolType() == null) {
 
-				pools = poolRepo.findByCreatedBy(pvo.getCreatedBy());
+				pools = poolRepo.findByCreatedByAndClientId(pvo.getCreatedBy(),pvo.getClientId());
 
 			} else if (pvo.getCreatedBy() == null && pvo.getPoolType() != null) {
 
-				pools = poolRepo.findByPoolType(pvo.getPoolType());
+				pools = poolRepo.findByPoolTypeAndClientId(pvo.getPoolType(),pvo.getClientId());
 
 			} else {
 
-				pools = poolRepo.findByCreatedByAndPoolType(pvo.getCreatedBy(), pvo.getPoolType());
+				pools = poolRepo.findByCreatedByAndPoolTypeAndClientId(pvo.getCreatedBy(), pvo.getPoolType(),pvo.getClientId());
 			}
 
 		}
