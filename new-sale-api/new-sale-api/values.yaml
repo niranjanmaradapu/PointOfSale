@@ -9,8 +9,8 @@ env:
   postgres_data: /var/lib/postgresql/data/pgdata
   postgres_db: newSale
 
-replicaCount: 2
-replicaCountPos: 2
+replicaCount: 1
+replicaCountPos: 1
 namespace: 
   name: default
 image:
