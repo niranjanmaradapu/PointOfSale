@@ -39,13 +39,13 @@ public class StoreVo {
 	@JsonIgnore
 	private LocalDate createdDate;
 	@JsonIgnore
-	private LocalDate lastModifyedDate;
+	private LocalDate lastModifiedDate;
 	@JsonIgnore
 	private String createdBy;
 	@JsonIgnore
 	private String modifiedBy;
 	@JsonIgnore
-	private boolean isActive;
+	private Boolean isActive;
 
 	@JsonIgnore
 	@OneToOne

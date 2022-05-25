@@ -17,13 +17,13 @@ public class UserDetailsVo {
 	@JsonIgnore
 	private LocalDate createdDate;
 	@JsonIgnore
-	private LocalDate lastModifyedDate;
+	private LocalDate lastModifiedDate;
 	@JsonIgnore
 	private String createdBy;
 	@JsonIgnore
 	private String modifiedBy;
 	@JsonIgnore
-	private boolean isActive;
+	private Boolean isActive;
 	@JsonIgnore
 	private Role role;
 	@JsonIgnore
@@ -35,8 +35,8 @@ public class UserDetailsVo {
 	@JsonIgnore
     private StoreVo ownerOf;
 	@JsonIgnore
-	private boolean isSuperAdmin;
+	private Boolean isSuperAdmin;
 	@JsonIgnore
-	private boolean isCustomer;
+	private Boolean isCustomer;
 
 }
