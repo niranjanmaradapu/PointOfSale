@@ -18,4 +18,8 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 
 	ReturnSlip findByRtNoAndStoreId(String returnReferenceNumber, Long storeId);
 
+	ReturnSlip findByInvoiceNumberAndTaggedItems_BarCodeIn(String invoiceNumber, List<String> barcodesIn);
+
+
+
 }

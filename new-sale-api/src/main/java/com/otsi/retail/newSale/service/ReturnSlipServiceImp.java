@@ -4,13 +4,16 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,6 +21,7 @@ import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.Entity.ReturnSlip;
 import com.otsi.retail.newSale.Entity.TaggedItems;
+import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
 import com.otsi.retail.newSale.Exceptions.InvalidInputException;
 import com.otsi.retail.newSale.common.ReturnSlipStatus;
 import com.otsi.retail.newSale.config.Config;
@@ -102,9 +106,12 @@ public class ReturnSlipServiceImp implements ReturnslipService {
 */
 	@Override
 	public ReturnSlipRequestVo createReturnSlip(ReturnSlipRequestVo returnSlipRequestVo)
-			throws JsonProcessingException {
+			throws JsonProcessingException, DuplicateRecordException {
+List<String> barcodesIn = returnSlipRequestVo.getBarcodes().stream().map(barcode->barcode.getBarCode()).collect(Collectors.toList());
 
-		if (returnSlipRequestVo.getMobileNumber() != null || returnSlipRequestVo.getMobileNumber() != "") {
+ReturnSlip returnslip =	returnSlipRepo.findByInvoiceNumberAndTaggedItems_BarCodeIn(returnSlipRequestVo.getInvoiceNumber(),barcodesIn);
+//ReturnSlip returnslip = null;
+if(returnslip==null) {
 			ReturnSlip returnSlipDto = new ReturnSlip();
 			returnSlipDto.setRtNo(generateRtNumber());
 
@@ -136,6 +143,7 @@ public class ReturnSlipServiceImp implements ReturnslipService {
 			returnSlipDto.setReason(returnSlipRequestVo.getReason());
 			returnSlipDto.setCustomerId(returnSlipRequestVo.getCustomerId());
 			returnSlipDto.setSettelmentInfo(returnSlipRequestVo.getComments());
+			returnSlipDto.setInvoiceNumber(returnSlipRequestVo.getInvoiceNumber());
 			ReturnSlip returnSlip = returnSlipRepo.save(returnSlipDto);
 
 			updateReturnItemsInInventory(returnSlip);
@@ -145,10 +153,10 @@ public class ReturnSlipServiceImp implements ReturnslipService {
 			log.warn("we are checking if return slip is saved...");
 			log.info("Successfully saved " + returnSlipDto.getRtNo());
 			return returnSlipVo;
-		} else {
-
-			throw new InvalidInputException("please provide the mobileNumber");
-		}
+		
+	}else {
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Returnslip already Generated");
+	}
 	}
 
 	private void updateReturnItemsInInventory(ReturnSlip returnSlipDto) throws JsonProcessingException {
