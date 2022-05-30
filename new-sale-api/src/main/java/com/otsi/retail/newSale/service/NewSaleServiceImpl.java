@@ -44,6 +44,7 @@ import com.otsi.retail.newSale.Entity.LineItemsReEntity;
 import com.otsi.retail.newSale.Entity.LoyalityPointsEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
+import com.otsi.retail.newSale.Exceptions.BusinessException;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
@@ -236,14 +237,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				if (vo.getPaymentAmountType() != null) {
 					vo.getPaymentAmountType().stream().forEach(x -> {
-						
+
 						// Checking the payment type condition
-						if ((x.getPaymentType().equals(PaymentType.PKTADVANCE)) || 
-								(x.getPaymentType().equals(PaymentType.PKTPENDING))) {
+						if ((x.getPaymentType().equals(PaymentType.PKTADVANCE))
+								|| (x.getPaymentType().equals(PaymentType.PKTPENDING))) {
 							try {
-                                
+
 								// Calling the credit notes method
-								updateCreditNotes(vo.getNetPayableAmount(), vo.getMobileNumber(), vo.getStoreId(), x.getPaymentType().getType());
+								updateCreditNotes(vo.getNetPayableAmount(), vo.getMobileNumber(), vo.getStoreId(),
+										x.getPaymentType().getType());
 
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -451,7 +453,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		if (barcodeDetails == null) {
 			log.error("Barcode with number " + barCode + " is not exists");
-			throw new RecordNotFoundException("Barcode with number " + barCode + " is not exists");
+			throw new RecordNotFoundException("Barcode with number " + barCode + " is not exists",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		} else {
 			BarcodeVo vo = newSaleMapper.convertBarcodeEntityToVo(barcodeDetails);
 			log.warn("we are fetching barcode details...");
@@ -483,7 +485,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		} else {
 			log.error("Line items are not valid : " + vo.getLineItems().toString());
-			throw new RecordNotFoundException("Provide line items");
+			throw new RecordNotFoundException("Provide line items",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 		List<LineItemsEntity> listLineItems = lineItemRepo.findByLineItemIdInAndDsEntityIsNull(lineItems);
 
@@ -501,7 +503,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			return entity.getDsNumber();
 		} else {
 			log.error("Line items are not valid : " + vo.getLineItems().toString());
-			throw new RecordNotFoundException("Provide valid line items");
+			throw new RecordNotFoundException("Provide valid line items",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 
 	}
@@ -519,7 +521,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		} else {
 			log.error("Deliveryslip number is not valid : " + dsNumber);
-			throw new RecordNotFoundException("Provide valid DS Number");
+			throw new RecordNotFoundException("Provide valid DS Number",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 	}
 
@@ -539,7 +541,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					&& svo.getInvoiceNumber() == null) {
 
 				saleDetails = newSaleRepository.findByCreationDateBetweenAndStatusAndStoreIdAndDomainId(
-						svo.getDateFrom(), svo.getDateTo(), svo.getBillStatus(), svo.getStoreId(),svo.getDomainId());
+						svo.getDateFrom(), svo.getDateTo(), svo.getBillStatus(), svo.getStoreId(), svo.getDomainId());
 			}
 			/*
 			 * getting the record using custmobilenumber
@@ -566,13 +568,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 					List<Long> userIds = uvo.stream().map(x -> x.getUserId()).collect(Collectors.toList());
 
 					saleDetails = newSaleRepository.findByUserIdInAndStoreIdAndDomainIdAndCreationDateBetween(userIds,
-							 svo.getStoreId(), svo.getDomainId(),svo.getDateFrom(), svo.getDateTo());
+							svo.getStoreId(), svo.getDomainId(), svo.getDateFrom(), svo.getDateTo());
 
 				}
 
 				else {
 					log.error("No record found with given mobilenumber");
-					throw new RecordNotFoundException("No record found with given mobilenumber");
+					throw new RecordNotFoundException("No record found with given mobilenumber",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 				}
 
 			}
@@ -583,8 +585,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getEmpId() == null
 					&& svo.getInvoiceNumber() != null) {
 				saleDetails = newSaleRepository.findByOrderNumberAndStoreIdAndDomainIdAndCreationDateBetween(
-						svo.getInvoiceNumber(),
-						svo.getStoreId(),svo.getDomainId(),svo.getDateFrom(), svo.getDateTo());
+						svo.getInvoiceNumber(), svo.getStoreId(), svo.getDomainId(), svo.getDateFrom(),
+						svo.getDateTo());
 			}
 			/*
 			 * getting the record using empId
@@ -592,7 +594,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			else if (svo.getBillStatus() == null && svo.getCustMobileNumber() == null && svo.getInvoiceNumber() == null
 					&& svo.getEmpId() != null) {
 				saleDetails = newSaleRepository.findByCreatedByAndStoreIdAndDomainIdAndCreationDateBetween(
-						svo.getEmpId(), svo.getStoreId(), svo.getDomainId(),svo.getDateFrom(), svo.getDateTo());
+						svo.getEmpId(), svo.getStoreId(), svo.getDomainId(), svo.getDateFrom(), svo.getDateTo());
 
 			} else
 				saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreIdAndDomainId(svo.getDateFrom(),
@@ -638,7 +640,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				else {
 					log.error("No record found with given mobilenumber");
-					throw new RecordNotFoundException("No record found with given mobilenumber");
+					throw new RecordNotFoundException("No record found with given mobilenumber",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 				}
 
 			}
@@ -665,7 +667,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		if (saleDetails.isEmpty()) {
 
 			log.error("No record found with given information");
-			throw new RecordNotFoundException("No record found with given information");
+			throw new RecordNotFoundException("No record found with given information",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 
 		} else {
 
@@ -673,28 +675,29 @@ public class NewSaleServiceImpl implements NewSaleService {
 			////////////////////
 
 			// List<HsnDetailsVo> list = new ArrayList<>();
-			/*NewSaleVo nsvo = new NewSaleVo();
-			List<NewSaleVo> sVoList = new ArrayList<>();
-
-			lsvo.getNewSaleVo().stream().forEach(x -> {
-				List<LineItemVo> listBar = new ArrayList<>();
-
-				if (x.getLineItemsReVo() != null) {
-
-					x.getLineItemsReVo().stream().forEach(l -> {
-						// BarcodeVo barVo = new BarcodeVo();
-
-						HsnDetailsVo hsnDetails = getHsnDetails(l.getNetValue());
-
-						l.setHsnDetailsVo(hsnDetails);
-
-						listBar.add(l);
-
-					});
-				}
-*/
-				/////////
-			lsvo.getNewSaleVo().stream().forEach(x -> {
+			/*
+			 * NewSaleVo nsvo = new NewSaleVo(); List<NewSaleVo> sVoList = new
+			 * ArrayList<>();
+			 * 
+			 * lsvo.getNewSaleVo().stream().forEach(x -> { List<LineItemVo> listBar = new
+			 * ArrayList<>();
+			 * 
+			 * if (x.getLineItemsReVo() != null) {
+			 * 
+			 * x.getLineItemsReVo().stream().forEach(l -> { // BarcodeVo barVo = new
+			 * BarcodeVo();
+			 * 
+			 * HsnDetailsVo hsnDetails = getHsnDetails(l.getNetValue());
+			 * 
+			 * l.setHsnDetailsVo(hsnDetails);
+			 * 
+			 * listBar.add(l);
+			 * 
+			 * }); }
+			 */
+			/////////
+			lsvo.getNewSaleVo().stream().forEach(x ->{
+				if(x.getUserId()!=null) {
 				List<UserDetailsVo> uvo = getUserDetailsFromURM(null, x.getUserId());
 
 				/////////
@@ -704,23 +707,28 @@ public class NewSaleServiceImpl implements NewSaleService {
 						x.setMobileNumber(u.getPhoneNumber());
 					});
 				}
+				}
+				
 			});
 
-				/*x.setLineItemsReVo(listBar);
-				x.setTotalqQty(x.getLineItemsReVo().stream().mapToInt(q -> q.getQuantity()).sum());
-				x.setTotalMrp(x.getLineItemsReVo().stream().mapToLong(m -> m.getGrossValue()).sum());
-				x.setTotalNetAmount(x.getLineItemsReVo().stream().mapToLong(m -> m.getNetValue()).sum());
-
-				x.setTotaltaxableAmount((float) listBar.stream()
-						.mapToDouble(t -> t.getHsnDetailsVo().getTaxVo().getTaxableAmount()).sum());
-				x.setTotalCgst(
-						(float) listBar.stream().mapToDouble(t -> t.getHsnDetailsVo().getTaxVo().getCgst()).sum());
-				x.setTotalSgst(
-						(float) listBar.stream().mapToDouble(t -> t.getHsnDetailsVo().getTaxVo().getSgst()).sum());
-				x.setTotalIgst(
-						(float) listBar.stream().mapToDouble(t -> t.getHsnDetailsVo().getTaxVo().getIgst()).sum());
-*/
-			
+			/*
+			 * x.setLineItemsReVo(listBar);
+			 * x.setTotalqQty(x.getLineItemsReVo().stream().mapToInt(q ->
+			 * q.getQuantity()).sum());
+			 * x.setTotalMrp(x.getLineItemsReVo().stream().mapToLong(m ->
+			 * m.getGrossValue()).sum());
+			 * x.setTotalNetAmount(x.getLineItemsReVo().stream().mapToLong(m ->
+			 * m.getNetValue()).sum());
+			 * 
+			 * x.setTotaltaxableAmount((float) listBar.stream() .mapToDouble(t ->
+			 * t.getHsnDetailsVo().getTaxVo().getTaxableAmount()).sum()); x.setTotalCgst(
+			 * (float) listBar.stream().mapToDouble(t ->
+			 * t.getHsnDetailsVo().getTaxVo().getCgst()).sum()); x.setTotalSgst( (float)
+			 * listBar.stream().mapToDouble(t ->
+			 * t.getHsnDetailsVo().getTaxVo().getSgst()).sum()); x.setTotalIgst( (float)
+			 * listBar.stream().mapToDouble(t ->
+			 * t.getHsnDetailsVo().getTaxVo().getIgst()).sum());
+			 */
 
 			//////////////////
 
@@ -736,7 +744,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		List<HsnDetailsVo> vo = hsnService.getHsn();
 		if (vo == null) {
 			log.error("Record not found");
-			new RecordNotFoundException("Record not found");
+			new RecordNotFoundException("Record not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 		TaxVo tvo = new TaxVo();
 		HsnDetailsVo hvo = new HsnDetailsVo();
@@ -797,7 +805,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 								.findByCreationDateBetweenAndDsIdAndDsNumberAndStatusAndStoreIdOrderByCreationDateAsc(
 										listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
 										b.getDsEntity().getDsId(), listOfDeliverySlipVo.getDsNumber(),
-										listOfDeliverySlipVo.getStatus(),listOfDeliverySlipVo.getStoreId());
+										listOfDeliverySlipVo.getStatus(), listOfDeliverySlipVo.getStoreId());
 						dsDetails.add(dsEntity);
 					});
 
@@ -839,15 +847,16 @@ public class NewSaleServiceImpl implements NewSaleService {
 						listOfDeliverySlipVo.getStoreId());
 
 				if (bar != null) {
-                List<DeliverySlipEntity> den=  bar.stream().map(d->d.getDsEntity()).filter(n->n!=null).collect(Collectors.toList());
-                den.stream().forEach(b -> {
+					List<DeliverySlipEntity> den = bar.stream().map(d -> d.getDsEntity()).filter(n -> n != null)
+							.collect(Collectors.toList());
+					den.stream().forEach(b -> {
 						DeliverySlipEntity dentity = new DeliverySlipEntity();
 
 						dentity = dsRepo.findByCreationDateBetweenAndDsIdAndStoreIdOrderByCreationDateAsc(
-								listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-								 b.getDsId(),listOfDeliverySlipVo.getStoreId());
-						if(dentity!=null) {
-						dsDetails.add(dentity);
+								listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(), b.getDsId(),
+								listOfDeliverySlipVo.getStoreId());
+						if (dentity != null) {
+							dsDetails.add(dentity);
 						}
 					});
 
@@ -874,7 +883,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				dsDetails = dsRepo.findByCreationDateBetweenAndStatusAndStoreIdOrderByCreationDateAsc(
 						listOfDeliverySlipVo.getDateFrom(), listOfDeliverySlipVo.getDateTo(),
-						listOfDeliverySlipVo.getStatus(),listOfDeliverySlipVo.getStoreId());
+						listOfDeliverySlipVo.getStatus(), listOfDeliverySlipVo.getStoreId());
 
 			}
 
@@ -927,12 +936,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 				return lvo;
 
 			} else {
-				throw new RecordNotFoundException("record not found");
+				throw new RecordNotFoundException("record not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 
 		} catch (Exception ex) {
 
-			throw new RecordNotFoundException("record not found");
+			throw new RecordNotFoundException("record not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		} finally {
 			dsDetails.clear();
 		}
@@ -940,26 +949,56 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public List<DeliverySlipEntity> posDayClose() {
+	public List<DeliverySlipVo> posDayClose(Long storeId) {
 		log.debug(" debugging posDayClose");
+		 List<DeliverySlipVo> dvo = new ArrayList<>(); 
 
-		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreationDate(DSStatus.Pending, LocalDate.now());
+
+		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreationDateAndStoreId(DSStatus.Pending, LocalDate.now(),storeId);
+		if(!DsList.isEmpty()) {
+		
+		 List<DeliverySlipVo> dsVo = new ArrayList<>(); 
+		 DsList.stream().forEach(d->{
+		  DeliverySlipVo dVo=new DeliverySlipVo(); 
+		  dVo.setDsNumber(d.getDsNumber());
+		  dVo.setDsId(d.getDsId()); 
+		  dVo.setLastModified(d.getLastModified());
+		  dVo.setCreatedDate(d.getCreationDate());
+		  dVo.setStatus(d.getStatus());
+		  dVo.setSalesMan(d.getUserId());
+		  dsVo.add(dVo);
+		 
+		  });
+		 
+		
 
 		log.info("successfully we can close the day of pos " + " uncleared delivery Slips count :" + DsList.size());
-		return DsList;
-
+		return dsVo;
+		}
+		else
+		return dvo;
 	}
+		
 
 	@Override
-	public String posClose(Boolean posclose) {
-		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreationDate(DSStatus.Pending, LocalDate.now());
+	public String posClose(Long storeId) {
+		
+		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreationDateAndStoreId(DSStatus.Pending, LocalDate.now(),storeId);
+		if(DsList!=null&&!DsList.isEmpty()) {
+		DsList.stream().forEach(d->{
+			
+			d.setStatus(DSStatus.Cancelled);
+			dsRepo.save(d);
 
-		if (DsList.isEmpty() && (posclose == true)) {
-			return "successfully we can close the day of pos ";
+			
+		});
+		
+		
+		return "successFully updated deliverySlips";
+		}else
+			return "there is no  pending delivery slips with this storeId:"+storeId;
 
-		} else
-			return "to  close the day of pos please clear pending  delivery Slips"
-					+ " uncleared delivery Slips count   " + DsList.size();
+		
 	}
 
 	@Override
@@ -987,7 +1026,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			NewSaleEntity newSale = newSaleOpt.get();
 			if (!newSale.getOrderNumber().equals(vo.getInvoiceNumber())) {
 				log.error("invoice is not present");
-				throw new RecordNotFoundException("invoice is not present");
+				throw new RecordNotFoundException("invoice is not present",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 			vo.getPaymentAmountTypeId().forEach(p -> {
 				PaymentAmountType paymentAmountType = new PaymentAmountType();
@@ -1121,7 +1160,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			}
 		}
 		log.error("No records found with your inputs");
-		throw new RecordNotFoundException("No records found with your inputs");
+		throw new RecordNotFoundException("No records found with your inputs",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 	}
 
 	@Override
@@ -1306,23 +1345,23 @@ public class NewSaleServiceImpl implements NewSaleService {
 		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() != null
 				&& srvo.getDomainId() != 0L) {
 			saleDetails = newSaleRepository.findByCreationDateBetweenAndStoreIdAndDomainId(srvo.getDateFrom(),
-					srvo.getDateTo(), srvo.getStore().getId(), srvo.getDomainId());
+					srvo.getDateTo(), srvo.getStoreId(), srvo.getDomainId());
 		} else if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStore() == null
 				&& srvo.getDomainId() != 0L) {
 
 			saleDetails = newSaleRepository.findByCreationDateBetweenAndDomainIdAndStoreId(srvo.getDateFrom(),
 					srvo.getDateTo(), srvo.getDomainId(), srvo.getStoreId());
-		} else if (srvo.getDateFrom() == null && srvo.getDateTo() == null && srvo.getStore().getId() != 0L) {
+		} else if (srvo.getDateFrom() == null && srvo.getDateTo() == null && srvo.getStoreId() != 0L) {
 
-			saleDetails = newSaleRepository.findByStoreId(srvo.getStore().getId());
+			saleDetails = newSaleRepository.findByStoreId(srvo.getStoreId());
 		}
 
 		if (saleDetails.isEmpty()) {
-			throw new RecordNotFoundException("Sale bills are not exists");
+			throw new RecordNotFoundException(BusinessException.RNF_DESCRIPTION,BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		} else {
 
 			SaleReportVo slr = newSaleMapper.convertlistSaleReportEntityToVo(saleDetails);
-			HsnDetailsVo hsnDetails = getHsnDetails(slr.getBillValue());
+			//HsnDetailsVo hsnDetails = getHsnDetails(slr.getBillValue());
 			SalesSummeryVo salesSummery = new SalesSummeryVo();
 			// salesSummery.setTotalTaxableAmount(hsnDetails.getTaxVo().getTaxableAmount());
 			// salesSummery.setTotalCgst(hsnDetails.getTaxVo().getCgst());
@@ -1561,7 +1600,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.error("Passing invalid line item " + line);
-				throw new RecordNotFoundException("provide valid line item");
+				throw new RecordNotFoundException("provide valid line item",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 
 		} else {
@@ -1589,7 +1628,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				log.info("Successfully modified line item " + line);
 			} else {
 				log.error("Passing invalid line items " + line);
-				throw new RecordNotFoundException("provide valid line item");
+				throw new RecordNotFoundException("provide valid line item",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 		}
 		return "Successfully modified Line Item.";
@@ -1613,7 +1652,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.info("Provide valid barcode for getting line item : " + barCode);
-				throw new RecordNotFoundException("provide valide barcode");
+				throw new RecordNotFoundException("provide valide barcode",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 
 		} else {
@@ -1630,7 +1669,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				return lvo;
 			} else {
 				log.info("Provide valid barcode for getting line item : " + barCode);
-				throw new RecordNotFoundException("provide valide barcode");
+				throw new RecordNotFoundException("provide valide barcode",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 
 		}
@@ -1652,7 +1691,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				return "Successfully deleted";
 
 			} else {
-				throw new RecordNotFoundException("provide valid barcode");
+				throw new RecordNotFoundException("provide valid barcode",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 		} else {
 
@@ -1668,7 +1707,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			} else {
 				log.error("Entered Invalid barcode for delete line item : " + barCode);
-				throw new RecordNotFoundException("provide valid barcode");
+				throw new RecordNotFoundException("provide valid barcode",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 		}
 
@@ -1694,13 +1733,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public String deleteDeliverySlipDetails(Long dsId) {
+	public String deleteDeliverySlipDetails(String dsNumber) {
 
-		Optional<DeliverySlipEntity> dsVo = dsRepo.findById(dsId);
+		DeliverySlipEntity dsEntity = dsRepo.findByDsNumber(dsNumber);
 
-		if (dsVo.get() != null && dsVo.get().getOrder() == null) {
-
-			dsRepo.deleteById(dsId);
+		if (dsEntity!= null && dsEntity.getOrder() == null) {
+			
+			dsEntity.setStatus(DSStatus.Cancelled);
+			dsRepo.save(dsEntity);
 
 		}
 
@@ -1725,10 +1765,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 				});
 				return listVo;
 			} else {
-				throw new RecordNotFoundException("No records found");
+				throw new RecordNotFoundException("No records found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 		} catch (InvalidInputException iie) {
-			throw new RecordNotFoundException("Exception while fetching records");
+			throw new RecordNotFoundException("Exception while fetching records",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 	}
 
@@ -1762,7 +1802,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			NewSaleVo result = newSaleMapper.convertNewSaleDtoToVo(order);
 			return result;
 		} else {
-			throw new RecordNotFoundException("Provide valid order number");
+			throw new RecordNotFoundException("Provide valid order number",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 	}
 
@@ -1782,7 +1822,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		if (loyalityIds == null) {
 
-			throw new RecordNotFoundException("Records not found");
+			throw new RecordNotFoundException("Records not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 
 		} else {
 
@@ -1800,7 +1840,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		List<LoyalityPointsEntity> entity = loyalityRepo.findAll();
 
 		if (entity == null) {
-			throw new RecordNotFoundException("Records not found");
+			throw new RecordNotFoundException("Records not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		} else {
 
 			List<LoyalityPointsVo> result = newSaleMapper.convertLoyaltyEntityToVo(entity);
@@ -1817,7 +1857,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		if (userIdValue == null) {
 
-			throw new RecordNotFoundException("Records not found");
+			throw new RecordNotFoundException("Records not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 
 		} else {
 
@@ -1847,7 +1887,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 
 		if (loyaltylist.isEmpty()) {
-			throw new RecordNotFoundException("Records not found");
+			throw new RecordNotFoundException("Records not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 
 		List<LoyalityPointsVo> dataList = newSaleMapper.convertLoyaltyEntityToVo(loyaltylist);
@@ -1871,7 +1911,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			});
 			return "success";
 		} else {
-			throw new RecordNotFoundException("Record not found");
+			throw new RecordNotFoundException("Record not found",BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 	}
 
@@ -1879,31 +1919,28 @@ public class NewSaleServiceImpl implements NewSaleService {
 	private String updateCreditNotes(Long amount, String mobileNumber, Long storeId, String type) {
 
 		UpdateCreditRequest req = new UpdateCreditRequest();
-       
+
 		req.setAmount(amount);
 		req.setMobileNumber(mobileNumber);
 		req.setStoreId(storeId);
-		if(type.equals("PKTADVANCE"))
-		{
+		if (type.equals("PKTADVANCE")) {
 			req.setCreditDebit("C");
-			
-		}else if(type.equals("PKTPENDING"))
-		{
+
+		} else if (type.equals("PKTPENDING")) {
 			req.setCreditDebit("D");
 		}
 
 		System.out.println("Update Credit Notes Request:: " + req);
-		
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<UpdateCreditRequest> entity = new HttpEntity<>(req, headers);
 
-		
-		  ResponseEntity<?> creditNotesResponse = template.exchange(
-		         config.getUpdateCreditNotesDetails(), HttpMethod.POST, entity, GateWayResponse.class);
-		  
-		  System.out.println("Credit Rest Call Response:: "+creditNotesResponse.toString());
-		  	 
+		ResponseEntity<?> creditNotesResponse = template.exchange(config.getUpdateCreditNotesDetails(), HttpMethod.POST,
+				entity, GateWayResponse.class);
+
+		System.out.println("Credit Rest Call Response:: " + creditNotesResponse.toString());
+
 		return "Credit Notes Updated Successfully";
 
 	}

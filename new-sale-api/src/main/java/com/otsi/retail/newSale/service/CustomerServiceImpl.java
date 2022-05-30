@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
 import com.otsi.retail.newSale.Entity.UserData;
 import com.otsi.retail.newSale.Entity.UserDataAv;
+import com.otsi.retail.newSale.Exceptions.BusinessException;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
 import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
@@ -205,7 +206,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 		} else {
 			log.error("User not found with mobile number " + mobileNum);
-			throw new RecordNotFoundException("User not found with mobile number " + mobileNum);
+			throw new RecordNotFoundException("User not found with mobile number " + mobileNum,BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 		log.warn("we are checking if user is fetching with mobile no...");
 		log.info("after fetching user with mobile no:" + mobileNum);

@@ -30,8 +30,7 @@ public class Config {
 
 	public List<HsnDetailsVo> vo;
 
-	@Value("${savecustomer_url}")
-	private String url;
+	
 
 	@Value("${getNewSaleWithHsn_url}")
 	private String HsnUrl;

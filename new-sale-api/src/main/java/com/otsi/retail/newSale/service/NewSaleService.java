@@ -44,7 +44,7 @@ public interface NewSaleService {
 	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo)
 			throws RecordNotFoundException;
 
-	List<DeliverySlipEntity> posDayClose();
+	List<DeliverySlipVo> posDayClose(Long storeId);
 
 	double getNewSaleWithHsn(double netAmt) throws JsonMappingException, JsonProcessingException, DataNotFoundException;
 
@@ -56,7 +56,7 @@ public interface NewSaleService {
 
 	CustomerVo getCustomerFromNewSale(String mobileNo) throws DataNotFoundException;
 
-	String posClose(Boolean posclose);
+	String posClose(Long storeId);
 
 	void tagCustomerToExisitingNewSale(String mobileNo, Long invoiceNo) throws CustomerNotFoundExcecption;
 
@@ -82,7 +82,7 @@ public interface NewSaleService {
 
 	String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo);
 
-	String deleteDeliverySlipDetails(Long dsId);
+	String deleteDeliverySlipDetails(String dsNumber);
 
 	List<LineItemVo> getBarcodes(List<String> barCode, Long domainId) throws RecordNotFoundException;
 
