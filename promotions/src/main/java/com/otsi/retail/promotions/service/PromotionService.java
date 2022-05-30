@@ -53,5 +53,8 @@ public interface PromotionService {
 	List<LineItemVo> checkInvoiceLevelPromtion(List<LineItemVo> listofInvTxt, Long storeId, Long domainId);
 
 	List<PromotionsVo> promotionSearching(PromotionsVo svo);
+	
+	String updatePromotionStatus(Long id, Boolean isActive);
+	
 		
 }

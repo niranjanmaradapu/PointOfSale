@@ -268,5 +268,10 @@ public class PromotionController {
 		System.out.println("anyMatchingData" + anyMatchingData);
 		return new GateWayResponse<>("Reterived matching data", anyMatchingData);
 	}
+	
+	@PutMapping("/updatePromoStatus")
+	public GateWayResponse<?> updatePromoStatus(@RequestParam Long id,@RequestParam Boolean isActive ) {
+		return new GateWayResponse<>("promotion status updated successfully", promoService.updatePromotionStatus(id,isActive));
+	}
 
 }

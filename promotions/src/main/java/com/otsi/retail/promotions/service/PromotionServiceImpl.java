@@ -776,4 +776,21 @@ public class PromotionServiceImpl implements PromotionService {
 
 	}
 
+	@Override
+	public String updatePromotionStatus(Long id, Boolean isActive) {
+
+		PromotionToStoreEntity promoId = promostoreRepo.findByPromoId(id);
+
+		if (promoId != null) {
+
+			promoId.setPromotionStatus(isActive);
+
+		}else {
+			
+			throw new RecordNotFoundException("Promo Id not exists");
+		}
+
+		return "Promotion Status Updated Successfully";
+	}
+
 }

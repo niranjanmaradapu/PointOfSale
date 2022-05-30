@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
 
@@ -14,7 +15,8 @@ public interface PromotionToStoreRepo  extends JpaRepository<PromotionToStoreEnt
 	PromotionToStoreEntity findByPromoId(Long promoId);
 	
 	//List<Long> findPromosByStore(Long storeId);
-
+    
+	@Query(value="select * from pos_promotion_store_mappings as p where p.store_id=:storeId and p.promotion_status=:promoStatus order by p.priority asc limit 1",nativeQuery=true)
 	List<PromotionToStoreEntity> findByStoreIdAndPromotionStatus(Long storeId, Boolean promoStatus);
 
 	List<PromotionToStoreEntity> findByPromotionStatus(Boolean isActive);
