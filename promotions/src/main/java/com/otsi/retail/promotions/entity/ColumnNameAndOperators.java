@@ -8,20 +8,18 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "promo_barcode")
-public class PromoBarcodeEntity {
-
+@Table(name = "column_names_operators")
+public class ColumnNameAndOperators {
+	
 	@Id
 	@GeneratedValue
-	private Long promoBarcodeId;
-
-	private Long promoId;
-
-	private String barCode;
+	Long Id;
+	Long domainId;
+	String columnName;
+	String operator;
 
 }

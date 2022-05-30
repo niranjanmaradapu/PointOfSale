@@ -7,8 +7,8 @@ package com.otsi.retail.promotions.common;
  * @author Sudheer.Swamy
  *
  */
-public enum PercentageDiscountOn {
+public enum DiscountSubTypes {
 	
-	ItemRSP, ItemMRP;
+	ItemRSP,ItemMRP,EachItem,AllItems;
 
 }
