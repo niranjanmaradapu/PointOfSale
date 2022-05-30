@@ -846,7 +846,11 @@ public class CalculateBenifits {
 
 			calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount
 					+ (percentageDiscount * individualLineItemTotalPrice) / 100;
-
+			
+//			if(i<numOfItemsFromBuyPool)
+//			{
+//				break;
+//			}
 		}
 
 		return calculatedInvoiceLevelDiscount;
