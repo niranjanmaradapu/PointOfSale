@@ -1,13 +1,13 @@
 package com.otsi.retail.promotions.vo;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.promotions.common.Applicability;
 import com.otsi.retail.promotions.common.PromoApplyType;
-import com.otsi.retail.promotions.common.PromotionType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,9 +30,11 @@ public class PromotionsVo {
 
 	private Long promoId;
 
-	private Long storeId;
-
 	private Long domainId;
+	
+	private Long clientId;
+	
+	private Long storeId;
 
 	private String promotionName;
 
@@ -70,6 +72,10 @@ public class PromotionsVo {
 
 	private StoreVo storeVo;
 	
-	private List<BenfitVo> benfitVo;
+	private List<BenefitVo> benfitVo;
+	
+	private List<PromotionSlabsVo> promotionSlabVo;
+	
+	private List<PromotionToStoreVo> promoStores;
 
 }

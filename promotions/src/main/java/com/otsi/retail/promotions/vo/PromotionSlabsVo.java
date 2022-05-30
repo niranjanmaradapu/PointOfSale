@@ -12,11 +12,11 @@ public class PromotionSlabsVo {
 	private float toSlab;
 
 	private float fromSlab;
-	
-	private Long promoId;
 
 	private LocalDate createdat;
 
 	private LocalDate updatedat;
+	
+	private BenefitVo benfitVo;
 
 }

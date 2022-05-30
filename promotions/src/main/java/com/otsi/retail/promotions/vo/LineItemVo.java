@@ -18,7 +18,17 @@ public class LineItemVo {
 
 	private Long domainId;
 
+	private Long storeId;
+
 	private String barCode;
+
+	private Long section;
+	
+	private Long subSection;
+
+	private Long division;
+
+	private Long userId;
 
 	private Long itemPrice;
 
@@ -26,7 +36,19 @@ public class LineItemVo {
 
 	private Long grossValue;
 
+	private String hsnCode;
+
+	private Long actualValue;
+
+	private Long taxValue;
+
+	private Long cgst;
+
+	private Long sgst;
+
 	private Long discount;
+	
+	private String description;
 
 	private Long netValue;
 

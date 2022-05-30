@@ -1,10 +1,11 @@
 package com.otsi.retail.promotions.entity;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -22,8 +23,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "pool_master")
-public class PoolEntity {
+@Table(name = "pos_pool_master")
+public class PoolEntity extends BaseEntity {
 
 	@Id
 	@GeneratedValue
@@ -32,16 +33,13 @@ public class PoolEntity {
 	private Long domainId;
 
 	private String poolName;
-
+	
+	private Long clientId;
+	
+	private Long storeId;
+    
+	@Enumerated(EnumType.STRING)
 	private PoolType poolType;
-	
-	private Long createdBy;
-	
-	private Long modifiedBy;
-
-	private LocalDate createdDate;
-
-	private LocalDate lastModified;
 
 	private Boolean isActive;
 	
@@ -51,13 +49,11 @@ public class PoolEntity {
 	@ManyToMany(mappedBy = "poolEntity",cascade ={CascadeType.PERSIST, CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
 	private List<PromotionsEntity> promoEntity;
 	
+    //newly added
+//	@OneToMany(targetEntity = BenfitEntity.class, mappedBy = "poolEntityy", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//	private List<BenfitEntity> benefitEntities;
 	
-	
-	
-
-//	@ManyToMany
-//	@JoinTable(name = "pool_promo", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = {
-//			@JoinColumn(referencedColumnName = "promoId") })
-//	private List<PromotionsEntity> promoEntity;
+	@ManyToMany(mappedBy = "poolEntities",cascade ={CascadeType.PERSIST, CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
+	private List<BenfitEntity> benefits;
 
 }

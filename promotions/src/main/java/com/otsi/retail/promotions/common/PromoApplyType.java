@@ -1,6 +1,9 @@
 package com.otsi.retail.promotions.common;
 
-public enum PromoApplyType {
 
+public enum PromoApplyType {
+	
 	FixedQuantity, AnyQuantity, QuantitySlab, ValueSlab, PoolQuantityRatio, PoolValueRatio;
+	
 }
+

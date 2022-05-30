@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.promotions.common.PoolType;
+import com.otsi.retail.promotions.entity.BenfitEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,10 @@ public class PromotionPoolVo {
 	private Long poolId;
 	
 	private Long domainId;
+	
+	private Long clientId;
+	
+	private Long storeId;
 
 	private PoolType poolType;
 
@@ -39,5 +44,6 @@ public class PromotionPoolVo {
 
 	private Boolean isForEdit;
 	
+	private List<BenfitEntity> benefits;
 
 }

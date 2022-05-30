@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.otsi.retail.promotions.common.AppConstants;
 import com.otsi.retail.promotions.common.CommonRequestMappigs;
 import com.otsi.retail.promotions.gatewayresponse.GateWayResponse;
 import com.otsi.retail.promotions.service.PoolService;
@@ -40,7 +41,7 @@ public class PoolController {
 	public GateWayResponse<?> saveNewPool(@RequestBody PromotionPoolVo vo) {
 		log.info("Recieved request to saveNewPool():" + vo);
 		String savePool = poolService.savePool(vo);
-		return new GateWayResponse<>("saved pool successfully", savePool);
+		return new GateWayResponse<>(AppConstants.POOL_SAVE, savePool);
 
 	}
 	
@@ -48,18 +49,17 @@ public class PoolController {
 	public GateWayResponse<?> poolExistsCreateRules(@RequestBody PromotionPoolVo vo) {
 		log.info("Recieved request to saveNewPool():" + vo);
 		String savePool = poolService.poolExistsCreateRules(vo);
-		return new GateWayResponse<>("saved pool successfully", savePool);
+		return new GateWayResponse<>(AppConstants.POOL_SAVE, savePool);
 
 	}
 	
-	
-
 	// Method for getting List of Pools from status flag
 	@GetMapping(CommonRequestMappigs.GET_POOL_LIST)
-	public GateWayResponse<?> getListOfPools(@RequestParam String isActive, Long domainId) {
+	public GateWayResponse<?> getListOfPools(@RequestParam String isActive,Long domainId, 
+		   Long clientId) {
 		log.info("Recieved request to getListOfPools():" + isActive);
-		PoolVo poolvo = poolService.getListOfPools(isActive,domainId);
-		return new GateWayResponse<>("fetching list of pools successfully", poolvo);
+		PoolVo poolvo = poolService.getListOfPools(isActive,domainId,clientId);
+		return new GateWayResponse<>(AppConstants.GET_POOL, poolvo);
 
 	}
 
@@ -68,7 +68,7 @@ public class PoolController {
 	public GateWayResponse<?> modifyPool(@RequestBody PromotionPoolVo vo) {
 		log.info("Recieved request to modifyPool():" + vo);
 		String message = poolService.modifyPool(vo);
-		return new GateWayResponse<>("updated pool successfully", message);
+		return new GateWayResponse<>(AppConstants.MODIFY_POOL, message);
 
 	}
 
@@ -77,7 +77,7 @@ public class PoolController {
 	public GateWayResponse<?> deletePool(@RequestParam Long poolId) {
 		log.info("Recieved request to modifyPool():" + poolId);
 		String message = poolService.deletePool(poolId);
-		return new GateWayResponse<>("deleted pool successfully", message);
+		return new GateWayResponse<>(AppConstants.DELETE_POOL, message);
 
 	}
 

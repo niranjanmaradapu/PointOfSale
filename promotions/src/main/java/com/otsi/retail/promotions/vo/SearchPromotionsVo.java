@@ -2,9 +2,10 @@ package com.otsi.retail.promotions.vo;
 
 import java.time.LocalDate;
 
-import javax.persistence.Id;
-
 import org.springframework.stereotype.Component;
+
+import com.otsi.retail.promotions.common.Applicability;
+import com.otsi.retail.promotions.common.PromoApplyType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +19,16 @@ public class SearchPromotionsVo {
 	
 	private Long promoId;
 	
+	//primary key of promoStoreMapping table
+	private Long id;
+	
+	private Long storeId;
+	
+	private Long clientId;
+	
 	private String promotionName;
+	
+	private String storeName;
 	
 	private String description;
 	
@@ -26,10 +36,16 @@ public class SearchPromotionsVo {
 	
 	private Long promotionsCount;
 	
-	private LocalDate promotionStartDate;
+	private LocalDate startDate;
 	
-	private LocalDate promotionEndDate;
+	private LocalDate endDate;
 	
-	private Boolean isActive;
+	private Boolean promotionStatus;
+	
+	private Applicability applicability;
+	
+	private PromoApplyType promoApplyType;
+	
+	private String printNameOnBill;
 	
 }
