@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +28,7 @@ import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ColumnNameAndOperatorsVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
 import com.otsi.retail.promotions.vo.LineItemVo;
-import com.otsi.retail.promotions.vo.ProductTextileVo;
+import com.otsi.retail.promotions.vo.ProductVO;
 import com.otsi.retail.promotions.vo.PromotionToStoreVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
@@ -121,9 +123,9 @@ public class PromotionController {
 	}
 
 	@PostMapping(CommonRequestMappigs.STORE_LEVEL_PROMOTIONS_SEARCHING)
-	public GateWayResponse<?> storeLevelPromoSearching(@RequestBody SearchPromotionsVo vo) {
+	public GateWayResponse<?> storeLevelPromoSearching(@RequestBody SearchPromotionsVo vo,Pageable pageable) {
 		log.info("Recieved request to searchPromotion():" + vo);
-		List<SearchPromotionsVo> result = promoService.storeLevelPromoSearching(vo);
+		Page<SearchPromotionsVo> result = promoService.storeLevelPromoSearching(vo,pageable);
 		return new GateWayResponse<>("successfully getting promotions", result);
 
 	}
@@ -146,9 +148,9 @@ public class PromotionController {
 
 	// this api wrote for reports
 	@PostMapping(CommonRequestMappigs.LIST_OF_PROMOTIONS_BY_SEARCH_CRITERIA)
-	public GateWayResponse<?> listOfPromotions(@RequestBody SearchPromotionsVo vo) {
+	public GateWayResponse<?> listOfPromotions(@RequestBody SearchPromotionsVo vo, Pageable pageable) {
 
-		List<SearchPromotionsVo> result = promoService.listOfPromotionsBySearch(vo);
+		Page<SearchPromotionsVo> result = promoService.listOfPromotionsBySearch(vo,pageable);
 		return new GateWayResponse<>("successfully getting promotions", result);
 
 	}
@@ -170,14 +172,14 @@ public class PromotionController {
 	}
 
 	@PostMapping("/checkPromtionTextile")
-	public GateWayResponse<?> checkPromtionTextile(@RequestBody List<ProductTextileVo> listofInvTxt,
+	public GateWayResponse<?> checkPromtionTextile(@RequestBody List<ProductVO> listofInvTxt,
 			@RequestParam Long storeId, @RequestParam Long domainId) {
 		return new GateWayResponse<>("", promoService.checkPromtion(listofInvTxt, storeId, domainId));
 	}
 
 	// check the flags for the both promos
 	@PostMapping("/checkPromtion")
-	public GateWayResponse<?> checkPromotion(@RequestBody List<ProductTextileVo> listofInvTxt,
+	public GateWayResponse<?> checkPromotion(@RequestBody List<ProductVO> listofInvTxt,
 			@RequestParam Long storeId, @RequestParam Long domainId, boolean checkPromoSwitch) {
 		
 		
@@ -222,9 +224,9 @@ public class PromotionController {
 	}
 
 	@PostMapping(CommonRequestMappigs.PROMOTIONS_SEARCHING)
-	public GateWayResponse<?> promotionSearching(@RequestBody PromotionsVo vo) {
+	public GateWayResponse<?> promotionSearching(@RequestBody PromotionsVo vo, Pageable pageable) {
 		log.info("Recieved request to searchPromotion():" + vo);
-		List<PromotionsVo> result = promoService.promotionSearching(vo);
+		Page<PromotionsVo> result = promoService.promotionSearching(vo,pageable);
 		return new GateWayResponse<>("successfully getting promotions", result);
 
 	}

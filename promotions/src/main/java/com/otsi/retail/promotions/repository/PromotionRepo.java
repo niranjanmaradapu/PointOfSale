@@ -3,9 +3,9 @@ package com.otsi.retail.promotions.repository;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.otsi.retail.promotions.common.Applicability;
@@ -65,12 +65,12 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	List<PromotionsEntity> findByIsActiveAndDomainIdAndClientId(Boolean status, Long domainId, Long clientId);
 
-	List<PromotionsEntity> findByIsActiveAndApplicabilityAndClientId(Boolean isActive,
-			Applicability promotionforeachbarcode, Long clientId);
+	Page<PromotionsEntity> findByIsActiveAndApplicabilityAndClientId(Boolean isActive,
+			Applicability promotionforeachbarcode, Long clientId, Pageable pageable);
 
-	List<PromotionsEntity> findByApplicabilityAndClientId(Applicability promotionforeachbarcode, Long clientId);
+	Page<PromotionsEntity> findByApplicabilityAndClientId(Applicability promotionforeachbarcode, Long clientId, Pageable pageable);
 
-	List<PromotionsEntity> findByIsActiveAndClientId(Boolean isActive, Long clientId);
+	Page<PromotionsEntity> findByIsActiveAndClientId(Boolean isActive, Long clientId, Pageable pageable);
 
 	
 }

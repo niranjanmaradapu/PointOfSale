@@ -9,12 +9,12 @@ import com.otsi.retail.promotions.common.Operator;
 import com.otsi.retail.promotions.entity.Condition;
 import com.otsi.retail.promotions.entity.PoolEntity;
 import com.otsi.retail.promotions.entity.Pool_Rule;
-import com.otsi.retail.promotions.vo.ProductTextileVo;
+import com.otsi.retail.promotions.vo.ProductVO;
 
 @Component
 public class CheckPoolRules {
 
-	private boolean checkCondition(Condition condition, ProductTextileVo productTextileVo) {
+	private boolean checkCondition(Condition condition, ProductVO productTextileVo) {
 
 		Operator operatorSymbol = condition.getOperatorSymbol();
 
@@ -45,7 +45,7 @@ public class CheckPoolRules {
 
 	}
 
-	private boolean checkLessThanAndEquals(Condition condition, ProductTextileVo productTextileVo) {
+	private boolean checkLessThanAndEquals(Condition condition, ProductVO productTextileVo) {
 
 		switch (condition.getColumnName()) {
 
@@ -191,7 +191,7 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkGreaterThanOrEquals(Condition condition, ProductTextileVo productTextileVo) {
+	private boolean checkGreaterThanOrEquals(Condition condition, ProductVO productTextileVo) {
 		switch (condition.getColumnName()) {
 
 		case Mrp:
@@ -330,7 +330,7 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkLessThan(Condition condition, ProductTextileVo productTextileVo) {
+	private boolean checkLessThan(Condition condition, ProductVO productTextileVo) {
 
 		switch (condition.getColumnName()) {
 
@@ -472,7 +472,7 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkGreaterThan(Condition condition, ProductTextileVo productTextileVo) {
+	private boolean checkGreaterThan(Condition condition, ProductVO productTextileVo) {
 
 		switch (condition.getColumnName()) {
 
@@ -614,7 +614,7 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkNotEquals(Condition condition, ProductTextileVo productTextileVo) {
+	private boolean checkNotEquals(Condition condition, ProductVO productTextileVo) {
 
 		switch (condition.getColumnName()) {
 
@@ -756,7 +756,7 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkEquals(Condition condition, ProductTextileVo productTextileVo) {
+	private boolean checkEquals(Condition condition, ProductVO productTextileVo) {
 
 		switch (condition.getColumnName()) {
 
@@ -902,7 +902,7 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	private boolean checkRule(List<Pool_Rule> poolRules, ProductTextileVo productTextileVo) {
+	private boolean checkRule(List<Pool_Rule> poolRules, ProductVO productTextileVo) {
 
 		for (Pool_Rule rule : poolRules) {
 
@@ -930,7 +930,7 @@ public class CheckPoolRules {
 		return false;
 	}
 
-	public boolean checkPools(List<PoolEntity> poolEntities, ProductTextileVo productTextileVo) {
+	public boolean checkPools(List<PoolEntity> poolEntities, ProductVO productTextileVo) {
 
 		for (PoolEntity poolEntity : poolEntities) {
 			return checkRule(poolEntity.getPool_Rule(), productTextileVo);

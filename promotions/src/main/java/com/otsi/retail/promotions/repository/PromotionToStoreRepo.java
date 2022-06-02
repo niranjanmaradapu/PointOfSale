@@ -3,6 +3,8 @@ package com.otsi.retail.promotions.repository;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -36,17 +38,29 @@ public interface PromotionToStoreRepo  extends JpaRepository<PromotionToStoreEnt
 
 	List<PromotionToStoreEntity> findByPromotionStatusAndClientId(Boolean promotionStatus, Long clientId);
 
-	List<PromotionToStoreEntity> findByStartDateAndEndDateAndPromoId(LocalDate startDate, LocalDate endDate,
-			Long promoId);
+	Page<PromotionToStoreEntity> findByStartDateAndEndDateAndPromoId(LocalDate startDate, LocalDate endDate,
+			Long promoId, Pageable pageable);
 
-	List<PromotionToStoreEntity> findByStartDateAndEndDate(LocalDate startDate, LocalDate endDate);
+	Page<PromotionToStoreEntity> findByStartDateAndEndDate(LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-	List<PromotionToStoreEntity> findByPromoIdIs(Long promoId);
+	Page<PromotionToStoreEntity> findByPromoIdIs(Long promoId, Pageable pageable);
 
-	List<PromotionToStoreEntity> findByStartDateAndEndDateAndStoreName(LocalDate startDate, LocalDate endDate, String storeName);
+	Page<PromotionToStoreEntity> findByStartDateAndEndDateAndStoreName(LocalDate startDate, LocalDate endDate, String storeName, Pageable pageable);
 
-	List<PromotionToStoreEntity> findByStartDateAndEndDateAndPromoIdAndStoreName(LocalDate startDate, LocalDate endDate,
-			Long promoId, String storeName);
+	Page<PromotionToStoreEntity> findByStartDateAndEndDateAndPromoIdAndStoreName(LocalDate startDate, LocalDate endDate,
+			Long promoId, String storeName, Pageable pageable);
+
+	Page<PromotionToStoreEntity> findByStartDateAndEndDateAndPromotionStatusAndClientId(LocalDate startDate,
+			LocalDate endDate, Boolean promotionStatus, Long clientId, Pageable pageable);
+
+	Page<PromotionToStoreEntity> findByPromotionNameAndClientId(String promotionName, Long clientId, Pageable pageable);
+
+	Page<PromotionToStoreEntity> findByPromotionStatusAndClientId(Boolean promotionStatus, Long clientId,
+			Pageable pageable);
+
+	Page<PromotionToStoreEntity> findByStoreNameAndClientId(String storeName, Long clientId, Pageable pageable);
+
+	Page<PromotionToStoreEntity> findByStoreName(String storeName, Pageable pageable);
 
 	
 }

@@ -218,11 +218,13 @@ public class PromotionMapper {
 
 	}
 
-	public PromotionsVo convertPromoEntityToVo(PromotionsEntity promotions) {
+	public PromotionsVo convertPromotionEntityToVo(PromotionsEntity promotions) {
 		
 		
 		PromotionsVo promo = new PromotionsVo();
-
+		
+		promo.setPromoId(promotions.getPromoId());
+		promo.setClientId(promotions.getClientId());
 		promo.setPromotionName(promotions.getPromotionName());
 		promo.setDomainId(promotions.getDomainId());
 		promo.setStoreId(promotions.getStoreId());

@@ -6,8 +6,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import com.otsi.retail.promotions.check.pools.CheckPoolRules;
 import com.otsi.retail.promotions.common.BenfitType;
 import com.otsi.retail.promotions.common.DiscountSubTypes;
@@ -19,7 +21,7 @@ import com.otsi.retail.promotions.entity.PromotionsEntity;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.CalculatedDiscountsVo;
 import com.otsi.retail.promotions.vo.LineItemVo;
-import com.otsi.retail.promotions.vo.ProductTextileVo;
+import com.otsi.retail.promotions.vo.ProductVO;
 
 @Component
 public class CalculateBenifits {
@@ -27,7 +29,7 @@ public class CalculateBenifits {
 	@Autowired
 	private CheckPoolRules checkPoolRules;
 
-	public CalculatedDiscountsVo calculate(List<BenefitVo> benifitVos, ProductTextileVo productTextileVo) {
+	public CalculatedDiscountsVo calculate(List<BenefitVo> benifitVos, ProductVO productTextileVo) {
 
 		// Loop through benifitVos
 		CalculatedDiscountsVo calculatedDiscountsVo = new CalculatedDiscountsVo();
@@ -51,7 +53,7 @@ public class CalculateBenifits {
 		return calculatedDiscountsVo;
 	}
 
-	private String calculateBeniftForFlatDIscount(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
+	private String calculateBeniftForFlatDIscount(BenefitVo benifitVo, ProductVO productTextileVo) {
 
 		String calculatedDiscountAmount = "";
 
@@ -66,7 +68,7 @@ public class CalculateBenifits {
 		return calculatedDiscountAmount;
 	}
 
-	private String calculateBeniftForPercentageDiscountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
+	private String calculateBeniftForPercentageDiscountOn(BenefitVo benifitVo, ProductVO productTextileVo) {
 
 		String calculatedDiscountAmount = "";
 //		if(benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP)){
@@ -92,7 +94,7 @@ public class CalculateBenifits {
 
 	}
 
-	private String calculateBeniftForRupeesDiscountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
+	private String calculateBeniftForRupeesDiscountOn(BenefitVo benifitVo, ProductVO productTextileVo) {
 		String calculatedDiscountAmount = "";
 		if (/* benifitVo.getDiscountSubType().equals(DiscountSubTypes.ItemRSP) || */ benifitVo.getDiscountSubType()
 				.equals(DiscountSubTypes.ItemMRP)) {
@@ -125,7 +127,7 @@ public class CalculateBenifits {
 	 * return calculatedDiscountAmount; }
 	 */
 
-	private String calculateBenifitsForXUnitsFromBuyPool(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
+	private String calculateBenifitsForXUnitsFromBuyPool(BenefitVo benifitVo, ProductVO productTextileVo) {
 
 		String discountDetails = new String();
 
@@ -147,7 +149,7 @@ public class CalculateBenifits {
 	}
 
 	private String calculateBenifitsForXUBAndPercentageDiscountOn(BenefitVo benifitVo,
-			ProductTextileVo productTextileVo) {
+			ProductVO productTextileVo) {
 
 		StringBuilder discountDiscription = new StringBuilder();
 		discountDiscription.append(
@@ -165,7 +167,7 @@ public class CalculateBenifits {
 
 	}
 
-	private String calculateBenifitsForXUBAndRupeesDiscountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
+	private String calculateBenifitsForXUBAndRupeesDiscountOn(BenefitVo benifitVo, ProductVO productTextileVo) {
 
 		StringBuilder discountDiscription = new StringBuilder();
 		discountDiscription.append("Discount will be given on probucts of the related Buy pools.");
@@ -181,7 +183,7 @@ public class CalculateBenifits {
 
 	}
 
-	private String calculateBenifitsForXUBAndFixedAmountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
+	private String calculateBenifitsForXUBAndFixedAmountOn(BenefitVo benifitVo, ProductVO productTextileVo) {
 
 		StringBuilder discountDiscription = new StringBuilder();
 		discountDiscription.append("Discount will be given on probucts of the related Buy pools.");
@@ -197,7 +199,7 @@ public class CalculateBenifits {
 		return discountDiscription.toString();
 	}
 
-	private String calculateBenifitsForXUnitsFromGetPool(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
+	private String calculateBenifitsForXUnitsFromGetPool(BenefitVo benifitVo, ProductVO productTextileVo) {
 		String discountDetails = new String();
 
 		if (benifitVo.getDiscountType().equals(DiscountType.PercentageDiscountOn)) {
@@ -217,7 +219,7 @@ public class CalculateBenifits {
 	}
 
 	private String calculateBenifitsForXUGAndPercentageDiscountOn(BenefitVo benifitVo,
-			ProductTextileVo productTextileVo) {
+			ProductVO productTextileVo) {
 		StringBuilder discountDiscription = new StringBuilder();
 		discountDiscription.append(
 				"Discount will be given on probucts of the related Get pools. Quantity should be greater than or equal to ");
@@ -234,7 +236,7 @@ public class CalculateBenifits {
 
 	}
 
-	private String calculateBenifitsForXUGAndRupeesDiscountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
+	private String calculateBenifitsForXUGAndRupeesDiscountOn(BenefitVo benifitVo, ProductVO productTextileVo) {
 		StringBuilder discountDiscription = new StringBuilder();
 		discountDiscription.append("Discount will be given on probucts of the related Get pools.");
 		discountDiscription.append("The Amount of discount is " + benifitVo.getDiscount() + ".");
@@ -249,7 +251,7 @@ public class CalculateBenifits {
 		return discountDiscription.toString();
 	}
 
-	private String calculateBenifitsForXUGAndFixedAmountOn(BenefitVo benifitVo, ProductTextileVo productTextileVo) {
+	private String calculateBenifitsForXUGAndFixedAmountOn(BenefitVo benifitVo, ProductVO productTextileVo) {
 		StringBuilder discountDiscription = new StringBuilder();
 
 		discountDiscription.append("Discount will be given on probucts of the related Get pools.");
@@ -870,7 +872,7 @@ public class CalculateBenifits {
 
 		for (LineItemVo lineItemVo : lineItems) {
 
-			ProductTextileVo productTextile = convertLineItemsIntoProductTextile(lineItemVo);
+			ProductVO productTextile = convertLineItemsIntoProductTextile(lineItemVo);
 
 			if (checkPoolRules.checkPools(promotion.getPoolEntity(), productTextile)) {
 
@@ -890,7 +892,7 @@ public class CalculateBenifits {
 
 		for (LineItemVo lineItemVo : allLineItems) {
 
-			ProductTextileVo productTextile = convertLineItemsIntoProductTextile(lineItemVo);
+			ProductVO productTextile = convertLineItemsIntoProductTextile(lineItemVo);
 
 			if (checkPoolRules.checkPools(listOfGetPools, productTextile)) {
 
@@ -905,9 +907,9 @@ public class CalculateBenifits {
 	}
 
 	// converting listOfLineItemsToProductTextile
-	public ProductTextileVo convertLineItemsIntoProductTextile(LineItemVo lineItem) {
+	public ProductVO convertLineItemsIntoProductTextile(LineItemVo lineItem) {
 
-		ProductTextileVo productTextile = new ProductTextileVo();
+		ProductVO productTextile = new ProductVO();
 
 		productTextile.setQty(lineItem.getQuantity());
 		productTextile.setItemMrp(lineItem.getItemPrice());
@@ -929,7 +931,7 @@ public class CalculateBenifits {
 
 	// converting listOfProductTextileToLineItems
 
-	public List<LineItemVo> convertProductTextileIntoLineItems(List<ProductTextileVo> pvos) {
+	public List<LineItemVo> convertProductTextileIntoLineItems(List<ProductVO> pvos) {
 
 		List<LineItemVo> lineItemsList = new ArrayList<>();
 

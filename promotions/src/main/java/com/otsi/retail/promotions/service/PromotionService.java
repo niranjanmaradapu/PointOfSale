@@ -2,13 +2,15 @@ package com.otsi.retail.promotions.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
 import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
 import com.otsi.retail.promotions.vo.LineItemVo;
-import com.otsi.retail.promotions.vo.ProductTextileVo;
+import com.otsi.retail.promotions.vo.ProductVO;
 import com.otsi.retail.promotions.vo.PromotionToStoreVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
@@ -30,19 +32,19 @@ public interface PromotionService {
 
 	String addPromotionToStore(PromotionToStoreVo vo);
 
-	List<SearchPromotionsVo> storeLevelPromoSearching(SearchPromotionsVo vo);
+	Page<SearchPromotionsVo> storeLevelPromoSearching(SearchPromotionsVo vo,Pageable pageable);
 
 	String updatePromotionDates(SearchPromotionsVo vo);
 	
 	String clonePromotionByStore(SearchPromotionsVo vo);
 	
-	List<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo);
+	Page<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo, Pageable pageable);
 	
 	String saveBenfit(BenefitVo vo);
 	
 	List<ReportVo> activeVSinactivePromos();
 
-	List<ProductTextileVo> checkPromtion(List<ProductTextileVo> listofInvTxt, Long storeId, Long domainId);
+	List<ProductVO> checkPromtion(List<ProductVO> listofInvTxt, Long storeId, Long domainId);
 
 	String updatePriority(SearchPromotionsVo vo);
 	
@@ -52,7 +54,7 @@ public interface PromotionService {
 	
 	List<LineItemVo> checkInvoiceLevelPromtion(List<LineItemVo> listofInvTxt, Long storeId, Long domainId);
 
-	List<PromotionsVo> promotionSearching(PromotionsVo svo);
+	Page<PromotionsVo> promotionSearching(PromotionsVo svo,Pageable pageable);
 	
 	String updatePromotionStatus(Long id, Boolean isActive);
 	
