@@ -435,7 +435,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@RabbitListener(queues = "newsale_queue")
 	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
 
-		NewSaleEntity entity = newSaleRepository.findByOrderNumber(paymentDetails.getNewsaleOrder());
+		NewSaleEntity entity = newSaleRepository.findByOrderNumber(paymentDetails.getReferenceNumber());
 
 		/*
 		 * NewSaleEntity orderRecord = null;

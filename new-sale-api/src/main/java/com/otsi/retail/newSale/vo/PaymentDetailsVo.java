@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 public class PaymentDetailsVo {
 
-	private String newsaleOrder;
+	private String ReferenceNumber;
 
 	private String razorPayId;
 
