@@ -9,5 +9,7 @@ public interface PaymentAmountTypeRepository extends JpaRepository<PaymentAmount
 
 	PaymentAmountType findByPaymentId(String paymentId);
 
+	PaymentAmountType findByReturnReferenceAndStoreId(String returnReferenceNumber, Long storeId);
+
 }
 

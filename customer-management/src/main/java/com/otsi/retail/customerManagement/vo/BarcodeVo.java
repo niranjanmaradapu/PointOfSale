@@ -2,12 +2,8 @@ package com.otsi.retail.customerManagement.vo;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.stereotype.Component;
-
-
-
 import lombok.Data;
 
 @Component
@@ -21,8 +17,7 @@ public class BarcodeVo {
 	
 	private String section;
 
-
-	private int qty;
+    private int qty;
 
 	private Long mrp;
 

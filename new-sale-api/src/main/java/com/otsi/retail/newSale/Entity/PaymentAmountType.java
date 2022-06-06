@@ -42,6 +42,12 @@ public class PaymentAmountType {
 	@ManyToOne
 	@JoinColumn(name = "order_id")
 	private NewSaleEntity orderId;
+	
+	private Long storeId;
+	private String returnReference;
+	private Boolean isreturned;
+	private String barcode;
+	
 
 	// private Long orderId;
 

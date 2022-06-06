@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.otsi.retail.newSale.Entity.TaggedItems;
+
 import lombok.Data;
 
 /**
@@ -16,7 +18,7 @@ import lombok.Data;
 @Data
 public class ListOfReturnSlipsVo {
 	
-	private int rsId;
+	private Long rsId;
 
 	private LocalDate dateFrom;
 
@@ -33,7 +35,7 @@ public class ListOfReturnSlipsVo {
 	private String rtNumber;
 
 	private String creditNote;
-	private String createdBy;
+	private Long createdBy;
 	private Boolean rtReviewStatus;
 
 	// private List<Barcode> barcode;
@@ -47,7 +49,8 @@ public class ListOfReturnSlipsVo {
 	private String settelmentInfo;
 
 	private Long totalAmount;
-
 	private List<TaggedItems> barcodes;
+
+
 
 }
