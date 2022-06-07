@@ -210,7 +210,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			}
 		}
 
-		if (newsaleVo.getDomainId() == DomainData.TE.getId()) {
+		//if (newsaleVo.getDomainId() == DomainData.TE.getId()) {
 
 			List<DeliverySlipVo> dlSlips = newsaleVo.getDlSlip();
 
@@ -292,7 +292,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				}
 				// }
 
-			} else {
+			/*} else {
 				log.error("Delivery slips are not valid" + newsaleVo);
 				throw new InvalidInputException("Please provide Valid delivery slips..");
 			}
@@ -347,7 +347,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				log.error("LineItems are not valid : " + newsaleVo);
 				throw new InvalidInputException("Please provide Valid delivery slips..");
 
-			}
+			}*/
 		}
 		log.info("Order generated with number : " + entity.getOrderNumber());
 		return entity.getOrderNumber();
@@ -490,7 +490,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	// Method for update order item into inventory
 	private void updateOrderItemsInInventory(NewSaleEntity orderRecord) {
 
-		if (orderRecord.getDomainId() == DomainData.TE.getId()) {
+	//	if (orderRecord.getDomainId() == DomainData.TE.getId()) {
 
 			List<LineItemsEntity> lineItems = orderRecord.getDlSlip().stream().flatMap(x -> x.getLineItems().stream())
 					.collect(Collectors.toList());
@@ -511,7 +511,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			});
 			log.info("Update request to Textile: " + updateVo);
 			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(), config.getUpdateInventoryRK(), updateVo);
-		} else {
+		/*} else {
 
 			List<InventoryUpdateVo> updateVo = new ArrayList<>();
 
@@ -530,7 +530,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			log.info("Update request to Retail : " + updateVo);
 			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(), config.getUpdateInventoryRK(), updateVo);
-		}
+		}*/
 	}
 
 	@Override
@@ -1431,17 +1431,17 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public List<LineItemVo> getBarcodes(List<String> barCode, Long domainId) throws RecordNotFoundException {
+	public List<LineItemVo> getBarcodes(List<String> barCode/*, Long domainId*/) throws RecordNotFoundException {
 		log.debug("deugging getBarcodeDetails" + barCode);
 		List<LineItemVo> vo = new ArrayList<LineItemVo>();
 
-		if (domainId == 1) {
+		//if (domainId == 1) {
 			List<LineItemsEntity> barcodeDetails = lineItemRepo.findByBarCodeIn(barCode);
 			vo = newSaleMapper.convertBarcodesEntityToVo(barcodeDetails);
-		} else {
+		/*} else {
 			List<LineItemsReEntity> barcodeDetails1 = lineItemReRepo.findByBarCodeIn(barCode);
 			vo = newSaleMapper.convertBarcodesReEntityToVo(barcodeDetails1);
-		}
+		}*/
 		return vo;
 	}
 
@@ -1518,7 +1518,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				List<String> barcodes = tgItems.stream().map(x -> x.getBarCode()).collect(Collectors.toList());
 
 				try {
-					List<LineItemVo> barVo = getBarcodes(barcodes, b.getDomainId());
+					List<LineItemVo> barVo = getBarcodes(barcodes/*, b.getDomainId() */);
 					barVo.stream().forEach(r -> {
 
 						barVoList.add(r);
@@ -1572,9 +1572,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// Method for saving Line items
 	@Override
-	public List<Long> saveLineItems(List<LineItemVo> lineItems, Long domainId) throws InvalidInputException {
+	public List<Long> saveLineItems(List<LineItemVo> lineItems/*, Long domainId*/) throws InvalidInputException {
 		try {
-			if (domainId == DomainData.TE.getId()) {
+			//if (domainId == DomainData.TE.getId()) {
 
 				List<LineItemsEntity> list = new ArrayList<>();
 
@@ -1609,7 +1609,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				log.info("successfully saved line items " + saved);
 				return saved.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
 
-			} else {
+			/*} else {
 
 				List<LineItemsReEntity> list = new ArrayList<>();
 
@@ -1644,7 +1644,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				log.info("successfully saved line items " + saved);
 				return saved.stream().map(x -> x.getLineItemReId()).collect(Collectors.toList());
-			}
+			}*/
+				
 		} catch (InvalidInputException e) {
 			log.error("Getting exception while saving Line item.." + lineItems.toString());
 			throw new InvalidInputException(e.getMsg());
@@ -1684,7 +1685,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public String editLineItem(LineItemVo lineItem) throws RecordNotFoundException {
 
-		if (lineItem.getDomainId() == DomainData.TE.getId()) {
+		//if (lineItem.getDomainId() == DomainData.TE.getId()) {
 
 			LineItemsEntity line = lineItemRepo.findByLineItemId(lineItem.getLineItemId());
 
@@ -1709,7 +1710,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				LineItemsEntity saved = lineItemRepo.save(line);
 				log.info("Successfully modified line item : " + line);
 
-			} else {
+			/*} else {
 				log.error("Passing invalid line item " + line);
 				throw new RecordNotFoundException("provide valid line item",
 						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
@@ -1742,15 +1743,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 				log.error("Passing invalid line items " + line);
 				throw new RecordNotFoundException("provide valid line item",
 						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
-			}
+			}*/
 		}
 		return "Successfully modified Line Item.";
 	}
 
 	// Method for getting line item by using Bar code
-	public List<LineItemVo> getLineItemByBarcode(String barCode, Long domainId) throws RecordNotFoundException {
+	public List<LineItemVo> getLineItemByBarcode(String barCode/*, Long domainId */) throws RecordNotFoundException {
 
-		if (domainId == DomainData.TE.getId()) {
+		//if (domainId == DomainData.TE.getId()) {
 			List<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
 			List<LineItemVo> lvo = new ArrayList<>();
 			if (lineItem != null) {
@@ -1769,7 +1770,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 
-		} else {
+		//}
+	/*else {
 			List<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode);
 			if (lineItem != null) {
 				List<LineItemVo> lvo = new ArrayList<>();
@@ -1787,15 +1789,15 @@ public class NewSaleServiceImpl implements NewSaleService {
 						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
 
-		}
+		}*/
 
 	}
 
 	// Method for deleting existing line item by using barcode
 	@Override
-	public String deleteLineItem(String barCode, Long domainId) throws RecordNotFoundException {
+	public String deleteLineItem(String barCode/*, Long domainId */) throws RecordNotFoundException {
 
-		if (domainId == DomainData.TE.getId()) {
+		//if (domainId == DomainData.TE.getId()) {
 			List<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
 			if (lineItem != null) {
 
@@ -1809,7 +1811,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 				throw new RecordNotFoundException("provide valid barcode",
 						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
-		} else {
+	//	} 
+	/*else {
 
 			List<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode);
 			if (lineItem != null) {
@@ -1826,7 +1829,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				throw new RecordNotFoundException("provide valid barcode",
 						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 			}
-		}
+		}*/
 
 	}
 
