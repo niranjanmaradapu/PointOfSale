@@ -322,11 +322,9 @@ public class PromotionServiceImpl implements PromotionService {
 
 		Optional<PromotionToStoreEntity> dto = promostoreRepo.findById(vo.getId());
 
-		if (Objects.nonNull(vo.getStartDate()) && Objects.nonNull(vo.getEndDate())
-				&& Objects.nonNull(vo.getPromotionStatus())) {
+		if (Objects.nonNull(vo.getStartDate()) && Objects.nonNull(vo.getEndDate())) {
 			dto.get().setStartDate(vo.getStartDate());
 			dto.get().setEndDate(vo.getEndDate());
-			dto.get().setPromotionStatus(vo.getPromotionStatus());
 		}
 		PromotionToStoreEntity promotionToStoreEntity = dto.get();
 		promostoreRepo.save(promotionToStoreEntity);
