@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 public class UserDetailsVo {
-	private Long userId;
+	private Long id;
 	private String userName;
 	private String phoneNumber;
 	@JsonIgnore

@@ -2,6 +2,7 @@ package com.otsi.retail.newSale.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import com.otsi.retail.newSale.Entity.NewSaleEntity;
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.Entity.ReturnSlip;
 import com.otsi.retail.newSale.Entity.TaggedItems;
+import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
 import com.otsi.retail.newSale.Exceptions.InvalidInputException;
 import com.otsi.retail.newSale.common.ReturnSlipStatus;
@@ -30,6 +32,7 @@ import com.otsi.retail.newSale.repository.NewSaleRepository;
 import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.repository.ReturnSlipRepo;
 import com.otsi.retail.newSale.vo.InventoryUpdateVo;
+import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipRequestVo;
 
 @Service
@@ -188,5 +191,142 @@ if(returnslip==null) {
 
 		
 	}
+	@Override
+	public List<ListOfReturnSlipsVo> getListOfReturnSlips(ListOfReturnSlipsVo vo) {
+		log.debug("debugging getListOfReturnSlips():" + vo);
+		List<ReturnSlip> retunSlipdetails = new ArrayList<>();
+		/**
+		 * getting the record using dates combination
+		 *
+		 */
+		/*LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(vo.getDateFrom());
+		LocalDateTime createdDateTo = DateConverters.convertToLocalDateTimeMax(vo.getDateTo());*/
+		if (vo.getDateFrom() != null && vo.getDateTo() != null && vo.getStoreId() != 0L ) {
+			/**
+			 * getting the record using dates and RtNumber
+			 *
+			 */
+			
+			if (vo.getRtStatus() == ReturnSlipStatus.ALL) {
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(
+						vo.getDateFrom(),vo.getDateTo(), vo.getStoreId());
+			}
+
+			if (vo.getRtNumber() != null && vo.getBarcode() == null && vo.getCreatedBy() == null
+					&& vo.getRtStatus() == null) {
+				retunSlipdetails = returnSlipRepo
+						.findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(vo.getDateFrom(), vo.getDateTo(),
+								vo.getRtNumber(), vo.getStoreId());
+			}
+
+			/**
+			 * getting the record using dates and barcode
+			 *
+			 */
+			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null && vo.getBarcode() != null
+					&& vo.getRtStatus() == null) {
+
+				retunSlipdetails = returnSlipRepo
+						.findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(
+								vo.getDateFrom(), vo.getDateTo(), vo.getBarcode(), vo.getStoreId());
+
+			}
+			/**
+			 * getting the record using dates and CreatedBy
+			 *
+			 */
+			else if (vo.getRtNumber() == null && vo.getCreatedBy() != null && vo.getBarcode() == null
+					&& vo.getRtStatus() == null) {
+
+				retunSlipdetails = returnSlipRepo
+						.findByCreatedDateBetweenAndCreatedByAndStoreIdOrderByCreatedDateAsc(
+								vo.getDateFrom(), vo.getDateTo(), vo.getCreatedBy(), vo.getStoreId());
+
+			}
+			/**
+			 * getting the record using dates and status
+			 *
+			 */
+			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null && vo.getBarcode() == null
+					&& vo.getRtStatus() != null) {
+
+				retunSlipdetails = returnSlipRepo
+						.findByCreatedDateBetweenAndRtStatusAndStoreIdOrderByCreatedDateAsc(
+								vo.getDateFrom(), vo.getDateTo(),vo.getRtStatus() ,vo.getStoreId());
+
+			}
+
+			/**
+			 * getting the record using dates only
+			 *
+			 */
+			else
+				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(
+						vo.getDateFrom(), vo.getDateTo(), vo.getStoreId());
+			/**
+			 * getting the records without dates
+			 *
+			 */
+		} else if (vo.getDateFrom() == null && vo.getDateTo() == null && vo.getStoreId() != 0L) {
+			/**
+			 * getting the record using RtNumber
+			 *
+			 */
+			if (vo.getRtNumber() != null && vo.getCreatedBy() == null && vo.getBarcode() == null) {
+				retunSlipdetails = returnSlipRepo.findByRtNoAndStoreIdOrderByCreatedDateAsc(vo.getRtNumber(),
+						vo.getStoreId());
+			} else if (vo.getRtStatus() == ReturnSlipStatus.ALL) {
+
+				retunSlipdetails = returnSlipRepo.findByStoreIdOrderByCreatedDateAsc(vo.getStoreId());
+
+			}
+
+			/**
+			 * getting the record using barcode
+			 *
+			 */
+
+			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null && vo.getBarcode() != null) {
+
+				retunSlipdetails = returnSlipRepo.findByTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(
+						vo.getBarcode(), vo.getStoreId());
+
+			}
+			/**
+			 * getting the record using RtStatus
+			 *
+			 */
+
+			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null && vo.getBarcode() == null
+					&& vo.getRtStatus() != null) {
+
+				retunSlipdetails = returnSlipRepo.findByRtStatusAndStoreIdOrderByCreatedDateAsc(
+						vo.getRtStatus(), vo.getStoreId());
+
+			}
+
+			/**
+			 * getting the record using RtReviewStatus
+			 *
+			 */
+			else if (vo.getRtNumber() == null && vo.getCreatedBy() != null && vo.getBarcode() == null) {
+				retunSlipdetails = returnSlipRepo.findByCreatedByAndStoreIdOrderByCreatedDateAsc(
+						vo.getCreatedBy(), vo.getStoreId());
+			}
+
+		}
+
+		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapReturnEntityToVo(retunSlipdetails);
+
+		if (rvo != null) {
+			log.warn("we are checking if list of return slips is fetching...");
+			log.info("fetching list of return slips successfully:" + rvo);
+			return rvo;
+		} else
+			log.error("No return slips are found");
+		// throw new RuntimeException("no record found with the giveninformation");
+		throw new DataNotFoundException("No return slips are found");
+	}
+
 
 }

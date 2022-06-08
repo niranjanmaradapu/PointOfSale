@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.Entity.TaggedItems;
+import com.otsi.retail.newSale.common.ReturnSlipStatus;
 
 import lombok.Data;
 
@@ -30,7 +31,7 @@ public class ListOfReturnSlipsVo {
 
 	private String barcode;
 
-	private String rtStatus;
+	private ReturnSlipStatus rtStatus;
 
 	private String rtNumber;
 

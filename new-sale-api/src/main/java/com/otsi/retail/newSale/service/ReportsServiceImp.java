@@ -418,7 +418,7 @@ public class ReportsServiceImp implements ReportService {
 
 					lRvos.stream().forEach(r -> {
 
-						if (s.getUserId().equals(r.getUserId())) {
+						if (s.getId().equals(r.getUserId())) {
 
 							r.setName(s.getUserName());
 
@@ -493,7 +493,7 @@ public class ReportsServiceImp implements ReportService {
 
 					lRvos.stream().forEach(r -> {
 
-						if (s.getUserId().equals(r.getUserId())) {
+						if (s.getId().equals(r.getUserId())) {
 
 							r.setName(s.getUserName());
 

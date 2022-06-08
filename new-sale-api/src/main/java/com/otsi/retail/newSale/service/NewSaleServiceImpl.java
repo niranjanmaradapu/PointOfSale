@@ -672,7 +672,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 //						
 //					});
 
-					List<Long> userIds = uvo.stream().map(x -> x.getUserId()).collect(Collectors.toList());
+					List<Long> userIds = uvo.stream().map(x -> x.getId()).collect(Collectors.toList());
 
 					saleDetails = newSaleRepository.findByUserIdInAndStoreIdAndDomainIdAndCreationDateBetween(userIds,
 							svo.getStoreId(), svo.getDomainId(), svo.getDateFrom(), svo.getDateTo());
@@ -739,7 +739,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 //						
 //					});
 
-					List<Long> userIds = uvo.stream().map(x -> x.getUserId()).collect(Collectors.toList());
+					List<Long> userIds = uvo.stream().map(x -> x.getId()).collect(Collectors.toList());
 
 					saleDetails = newSaleRepository.findByUserIdInAndStoreIdAndDomainId(userIds, svo.getStoreId(),
 							svo.getDomainId());
@@ -1221,7 +1221,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			if (customer.isPresent()) {
 				List<ReturnSlipVo> rtSlipVoList = new ArrayList<>();
 
-				List<NewSaleEntity> newSaleEntity = newSaleRepository.findByUserId(customer.get().getUserId());
+				List<NewSaleEntity> newSaleEntity = newSaleRepository.findByUserId(customer.get().getId());
 				/*
 				 * newSaleList = newSaleEntity.stream().map(dto ->
 				 * newSaleMapper.convertNewSaleDtoToVo(dto)) .collect(Collectors.toList());

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
+import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipRequestVo;
 
 @Component
@@ -22,6 +23,8 @@ public interface ReturnslipService {
 	ReturnSlipRequestVo getReturnSlip(String mobileNumber, Long storeId);
 
 	ReturnSlipRequestVo createReturnSlip(ReturnSlipRequestVo returnSlipRequestVo) throws JsonProcessingException, DuplicateRecordException;
+
+	List<ListOfReturnSlipsVo> getListOfReturnSlips(ListOfReturnSlipsVo vo);
 
 	//List<ReturnSlipRequestVo> generateReturnSlip(ReturnSlipRequestVo returnSlipRequestVo);
 
