@@ -1,26 +1,29 @@
 package com.otsi.retail.promotions.service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.otsi.retail.promotions.common.AppConstants;
 import com.otsi.retail.promotions.entity.PoolEntity;
 import com.otsi.retail.promotions.entity.Pool_Rule;
 import com.otsi.retail.promotions.exceptions.DuplicateRecordException;
 import com.otsi.retail.promotions.exceptions.InvalidDataException;
 import com.otsi.retail.promotions.exceptions.RecordNotFoundException;
 import com.otsi.retail.promotions.mapper.PoolMapper;
+import com.otsi.retail.promotions.repository.ConditionRepo;
 import com.otsi.retail.promotions.repository.PoolRepo;
 import com.otsi.retail.promotions.repository.RuleRepo;
-import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.PoolVo;
-import com.otsi.retail.promotions.vo.Pool_RuleVo;
+import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.SearchPoolVo;
 
 /**
@@ -30,6 +33,7 @@ import com.otsi.retail.promotions.vo.SearchPoolVo;
  *
  */
 @Service
+@Transactional
 public class PoolServiceImpl implements PoolService {
 
 	private Logger log = LogManager.getLogger(PoolServiceImpl.class);
@@ -42,6 +46,9 @@ public class PoolServiceImpl implements PoolService {
 
 	@Autowired
 	private RuleRepo ruleRepo;
+
+	@Autowired
+	private ConditionRepo conditionRepo;
 
 	// Method for saving pools from PromotionPoolVO
 	@Override
@@ -74,9 +81,10 @@ public class PoolServiceImpl implements PoolService {
 		});
 		log.warn("we are checking if pool is saved...");
 		log.info("pool saved Successfully");
-		return "Pool saved Successfully with id: " + savedPool.getPoolId();
+		return AppConstants.POOL_SAVE + savedPool.getPoolId();
 
 	}
+
 	// Method for create rules if pool exists from PromotionPoolVO
 	@Override
 	public String poolExistsCreateRules(PromotionPoolVo vo) {
@@ -104,7 +112,7 @@ public class PoolServiceImpl implements PoolService {
 
 		return "Rules Created If Pool Exists: " + pool.get().getPoolId();
 	}
-   
+
 	// Method for modifying/edit existing pools and rules from PromotionPoolVO
 	@Override
 	public String modifyPool(PromotionPoolVo vo) {
@@ -120,7 +128,6 @@ public class PoolServiceImpl implements PoolService {
 			PoolEntity poolEntity = poolMapper.convertPoolVoToEntity(vo);
 
 			poolEntity.setPoolId(vo.getPoolId());
-			poolEntity.setLastModified(LocalDate.now());
 
 			PoolEntity savedPool = poolRepo.save(poolEntity);
 
@@ -142,13 +149,13 @@ public class PoolServiceImpl implements PoolService {
 		}
 		log.warn("we are checking if pool is modify...");
 		log.info("Pool Modified Successfully...");
-		return "Pool Modified Successfully...";
+		return AppConstants.MODIFY_POOL;
 
 	}
 
 	// Method for getting list of pools based on the status flag
 	@Override
-	public PoolVo getListOfPools(String isActive, Long domainId) {
+	public PoolVo getListOfPools(String isActive, Long domainId, Long clientId) {
 		log.debug("debugging savePool():" + isActive);
 		List<PoolEntity> poolEntity = new ArrayList<>();
 		Boolean flag = null;
@@ -160,7 +167,7 @@ public class PoolServiceImpl implements PoolService {
 			flag = Boolean.FALSE;
 		}
 
-		if (isActive.equalsIgnoreCase("ALL") && domainId == null) {
+		if (isActive.equalsIgnoreCase("ALL") && domainId == null && clientId == null) {
 			poolEntity = poolRepo.findAll();
 
 		} else if (!(isActive.isEmpty()) && domainId == null) {
@@ -168,22 +175,30 @@ public class PoolServiceImpl implements PoolService {
 		} else if (isActive.isEmpty() && domainId != null) {
 
 			poolEntity = poolRepo.findByDomainId(domainId);
-			poolEntity.stream().forEach(p -> {
-
-				p.setDomainId(null);
-			});
+//			poolEntity.stream().forEach(p -> {
+//
+//				p.setDomainId(null);
+//			});
+		}
+		else if(!(isActive.isEmpty()) && clientId == null)
+		{
+			poolEntity = poolRepo.findByIsActive(flag);
+		}else if(isActive.isEmpty() && clientId !=null)
+		{
+			poolEntity = poolRepo.findByClientId(clientId);
 		}
 
 		else {
-			poolEntity = poolRepo.findByIsActiveAndDomainId(flag, domainId);
-			poolEntity.stream().forEach(p -> {
-
-				p.setDomainId(null);
-			});
+			poolEntity = poolRepo.findByIsActiveAndDomainIdAndClientId(flag, domainId,clientId);
+//			poolEntity.stream().forEach(p -> {
+//
+//				p.setDomainId(null);
+//			});
 
 		}
 		if (!poolEntity.isEmpty()) {
 			PoolVo poolvo = new PoolVo();
+
 			List<PromotionPoolVo> poolVo = poolMapper.convertPoolEntityToVo(poolEntity);
 			log.warn("we are checking if pool is fetching...");
 			log.info("fetching list of pools");
@@ -196,8 +211,8 @@ public class PoolServiceImpl implements PoolService {
 			log.error("record not found");
 			throw new RecordNotFoundException("record not found");
 		}
-	} 
-	
+	}
+
 	// Method for delete the existing pool details
 	@Override
 	public String deletePool(Long poolId) {
@@ -211,9 +226,9 @@ public class PoolServiceImpl implements PoolService {
 
 		}
 		// TODO Auto-generated method stub
-		return "pool deleted sucessfully";
+		return AppConstants.DELETE_POOL;
 	}
-	
+
 	// Method for searchPools from SearchPoolVo
 	@Override
 	public List<PromotionPoolVo> searchPool(SearchPoolVo pvo) {
@@ -223,32 +238,32 @@ public class PoolServiceImpl implements PoolService {
 		if (pvo.getIsActive() != null) {
 			if (pvo.getCreatedBy() != null && pvo.getPoolType() != null) {
 
-				pools = poolRepo.findByCreatedByAndPoolTypeAndIsActive(pvo.getCreatedBy(), pvo.getPoolType(),
-						pvo.getIsActive());
+				pools = poolRepo.findByCreatedByAndPoolTypeAndIsActiveAndClientId(pvo.getCreatedBy(), pvo.getPoolType(),
+						pvo.getIsActive(), pvo.getClientId());
 
 			} else if (pvo.getCreatedBy() != null && pvo.getPoolType() == null) {
 
-				pools = poolRepo.findByCreatedByAndIsActive(pvo.getCreatedBy(), pvo.getIsActive());
+				pools = poolRepo.findByCreatedByAndIsActiveAndClientId(pvo.getCreatedBy(), pvo.getIsActive(), pvo.getClientId());
 			} else if (pvo.getPoolType() != null && pvo.getCreatedBy() == null) {
-				pools = poolRepo.findByPoolTypeAndIsActive(pvo.getPoolType(), pvo.getIsActive());
+				pools = poolRepo.findByPoolTypeAndIsActiveAndClientId(pvo.getPoolType(), pvo.getIsActive(),pvo.getClientId());
 			} else {
 
-				pools = poolRepo.findByIsActive(pvo.getIsActive());
+				pools = poolRepo.findByIsActiveAndClientId(pvo.getIsActive(),pvo.getClientId());
 			}
 
 		} else if (pvo.getIsActive() == null) {
 
 			if (pvo.getCreatedBy() != null && pvo.getPoolType() == null) {
 
-				pools = poolRepo.findByCreatedBy(pvo.getCreatedBy());
+				pools = poolRepo.findByCreatedByAndClientId(pvo.getCreatedBy(),pvo.getClientId());
 
 			} else if (pvo.getCreatedBy() == null && pvo.getPoolType() != null) {
 
-				pools = poolRepo.findByPoolType(pvo.getPoolType());
+				pools = poolRepo.findByPoolTypeAndClientId(pvo.getPoolType(),pvo.getClientId());
 
 			} else {
 
-				pools = poolRepo.findByCreatedByAndPoolType(pvo.getCreatedBy(), pvo.getPoolType());
+				pools = poolRepo.findByCreatedByAndPoolTypeAndClientId(pvo.getCreatedBy(), pvo.getPoolType(),pvo.getClientId());
 			}
 
 		}

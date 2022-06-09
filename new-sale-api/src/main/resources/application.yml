@@ -8,7 +8,7 @@ spring:
     platform: postgres
     url: jdbc:postgresql://localhost:5432/newSale
     username: postgres
-    password: Vasavi
+    password: Otsi@123
  jpa:
    hibernate:
     ddl-auto: update
@@ -24,15 +24,15 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8762/eureka/
+      defaultZone: http://localhost:8761/eureka/
   instance:
     instance-id: ${spring.application.name}:${random.int}
     hostname: localhost
 logging:
     file:
-      name: C:/Users/ADMIN/Desktop/logs/newsale.log    
+      name: C:/logs/newsale.log    
     level:
-      com.otsi.retail.newSale.serviceimpl: DEBUG   
+      com.otsi.retail.newSale.serviceimpl: DEBUG  
 springdoc:
   packagesToScan: com.otsi.retail.newSale
   

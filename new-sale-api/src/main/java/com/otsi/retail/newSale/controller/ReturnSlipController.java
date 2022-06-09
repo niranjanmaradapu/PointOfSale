@@ -4,6 +4,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.otsi.retail.newSale.gatewayresponse.GateWayResponse;
 import com.otsi.retail.newSale.service.ReturnslipService;
+import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipRequestVo;
 
 @RestController
@@ -79,6 +81,15 @@ public class ReturnSlipController {
 		ReturnSlipRequestVo returnSlip = returnSlipService.getReturnSlip(returnReferenceNumber, storeId);
 		return new GateWayResponse<>("Return Slip Details getting Successfully", returnSlip);
 
+	}
+	
+	@PostMapping("/getListOfReturnSlips")
+	public GateWayResponse<?> getListOfReturnSlips(@RequestBody ListOfReturnSlipsVo vo) {
+		log.info("Received request to getListOfReturnSlips:" + vo);
+		List<ListOfReturnSlipsVo> listVo = null;
+
+		listVo = returnSlipService.getListOfReturnSlips(vo);
+		return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
 	}
 
 }

@@ -187,11 +187,11 @@ public class NewSaleController {
 
 	// Method for creating Line Items
 	@PostMapping("/savelineitems/{domainId}")
-	public GateWayResponse<?> saveLineItems(@PathVariable Long domainId, @RequestBody List<LineItemVo> lineItems)
+	public GateWayResponse<?> saveLineItems(/*@PathVariable Long domainId,*/ @RequestBody List<LineItemVo> lineItems)
 			throws InvalidInputException {
 		log.info("Save Line items with values " + lineItems.toString());
 		try {
-			List<Long> result = newSaleService.saveLineItems(lineItems, domainId);
+			List<Long> result = newSaleService.saveLineItems(lineItems/*, domainId*/);
 
 			return new GateWayResponse<>("Successfully saved Line item..", result.toString());
 		} catch (InvalidInputException e) {
@@ -226,11 +226,11 @@ public class NewSaleController {
 
 	// Method getting line item by using Bar code based on their domain id
 	@GetMapping("/getlineitem")
-	public GateWayResponse<?> getLineItemByBarcode(@RequestParam String barCode, @RequestParam Long domainId)
+	public GateWayResponse<?> getLineItemByBarcode(@RequestParam String barCode /*, @RequestParam Long domainId */)
 			throws RecordNotFoundException {
 
 		log.info("Recieved request for getting line item : " + barCode);
-		List<LineItemVo> result = newSaleService.getLineItemByBarcode(barCode, domainId);
+		List<LineItemVo> result = newSaleService.getLineItemByBarcode(barCode/*, domainId */);
 
 		return new GateWayResponse<>("Success", result);
 
@@ -242,7 +242,7 @@ public class NewSaleController {
 			throws RecordNotFoundException {
 
 		log.info("Recieved request to delete line item : " + barCode);
-		String result = newSaleService.deleteLineItem(barCode, domainId);
+		String result = newSaleService.deleteLineItem(barCode /*, domainId */);
 
 		return new GateWayResponse<>("Success", result);
 	}
@@ -540,7 +540,7 @@ public class NewSaleController {
 		log.info("Received Request to getBarcodeDetails:" + barCode);
 		System.out.println("Received Request to getBarcodeDetails:" + barCode);
 
-		List<LineItemVo> barCodeDetails = newSaleService.getBarcodes(barCode, domainId);
+		List<LineItemVo> barCodeDetails = newSaleService.getBarcodes(barCode/*, domainId*/);
 
 		return new GateWayResponse<>(HttpStatus.OK, barCodeDetails, "");
 

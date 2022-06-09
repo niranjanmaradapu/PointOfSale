@@ -13,6 +13,7 @@ public class ReturnSlipRequestVo {
 	
 	private Long rsId;
 	private Long storeId;
+	private String invoiceNumber;
 	private String reason;
 	private Long customerId;
 	private String returnReference;

@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,18 +17,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.otsi.retail.promotions.calculate.benefits.CalculateBenifits;
 import com.otsi.retail.promotions.common.CommonRequestMappigs;
+import com.otsi.retail.promotions.entity.ColumnNameAndOperators;
+import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
 import com.otsi.retail.promotions.gatewayresponse.GateWayResponse;
+import com.otsi.retail.promotions.service.ColumnNameAndOperatorService;
 import com.otsi.retail.promotions.service.PromotionService;
-import com.otsi.retail.promotions.service.PromotionServiceImpl;
-import com.otsi.retail.promotions.vo.BenfitVo;
+import com.otsi.retail.promotions.vo.BenefitVo;
+import com.otsi.retail.promotions.vo.ColumnNameAndOperatorsVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
 import com.otsi.retail.promotions.vo.LineItemVo;
+import com.otsi.retail.promotions.vo.ProductVO;
+import com.otsi.retail.promotions.vo.PromotionToStoreVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
 import com.otsi.retail.promotions.vo.SearchPromotionsVo;
 import com.otsi.retail.promotions.vo.StoreVo;
 import com.sun.istack.NotNull;
+
+import io.swagger.annotations.ApiOperation;
 
 /**
  * This Controller class contains Promotions related API's
@@ -44,6 +54,12 @@ public class PromotionController {
 
 	@Autowired
 	private PromotionService promoService;
+	
+	@Autowired
+	private CalculateBenifits calculateBenifits;
+
+	@Autowired
+	private ColumnNameAndOperatorService columnNameAndOperatorService;
 
 	// Method for adding promotion to pools
 	@PostMapping(CommonRequestMappigs.ADD_PROMO)
@@ -53,14 +69,13 @@ public class PromotionController {
 		return new GateWayResponse<>("added promotion successfully", savePromo);
 
 	}
-	
-	
 
 	// Method for getting list of all promotions based on their status
 	@GetMapping(CommonRequestMappigs.GET_PROMO_LIST)
-	public GateWayResponse<?> listOfPromotions(@NotNull @RequestParam String flag, Long domainId) {
+	public GateWayResponse<?> listOfPromotions(@NotNull @RequestParam String flag, Long domainId,
+			                                   Long clientId) {
 		log.info("Recieved request to listOfPromotions():" + flag);
-		ConnectionPromoVo promoVo = promoService.getListOfPromotions(flag,domainId);
+		ConnectionPromoVo promoVo = promoService.getListOfPromotions(flag, domainId, clientId);
 		return new GateWayResponse<>("fetching list of promotions successfully", promoVo);
 
 	}
@@ -91,22 +106,29 @@ public class PromotionController {
 
 	}
 
+//	@PostMapping(CommonRequestMappigs.ADD_PROMO_STORE)
+//	public GateWayResponse<?> addPromotionToStore(@RequestBody PromotionsVo vo) {
+//		log.info("Recieved request to addPromotionToStore():" + vo);
+//		String result = promoService.addPromotionToStore(vo);
+//		return new GateWayResponse<>("promotion mapped to store successfully", result);
+//
+//	}
+
 	@PostMapping(CommonRequestMappigs.ADD_PROMO_STORE)
-	public GateWayResponse<?> addPromotionToStore(@RequestBody PromotionsVo vo) {
-		log.info("Recieved request to addPromotionToStore():" + vo);
-		String result = promoService.addPromotionToStore(vo);
+	public GateWayResponse<?> addPromotionToStore(@RequestBody PromotionToStoreVo vos) {
+		log.info("Recieved request to addPromotionToStore():" + vos);
+		String result = promoService.addPromotionToStore(vos);
 		return new GateWayResponse<>("promotion mapped to store successfully", result);
 
 	}
 
-	@PostMapping(CommonRequestMappigs.SEARCH_PROMOTION)
-	public GateWayResponse<?> searchPromotion(@RequestBody SearchPromotionsVo vo) {
+	@PostMapping(CommonRequestMappigs.STORE_LEVEL_PROMOTIONS_SEARCHING)
+	public GateWayResponse<?> storeLevelPromoSearching(@RequestBody SearchPromotionsVo vo,Pageable pageable) {
 		log.info("Recieved request to searchPromotion():" + vo);
-		List<SearchPromotionsVo> result = promoService.searchPromotion(vo);
+		Page<SearchPromotionsVo> result = promoService.storeLevelPromoSearching(vo,pageable);
 		return new GateWayResponse<>("successfully getting promotions", result);
 
 	}
-
 
 	@PutMapping(CommonRequestMappigs.UPDATE_PROMO_DATES)
 	public GateWayResponse<?> updatePromoDates(@RequestBody SearchPromotionsVo vo) {
@@ -124,39 +146,134 @@ public class PromotionController {
 
 	}
 
-	@PostMapping("/addpromotoproduct")
-	public GateWayResponse<?> addPromtionToBarcode(@RequestParam Long promoId, @RequestParam String barcode) {
-
-		String result = promoService.addPromtionToBarcode(promoId, barcode);
-
-		return new GateWayResponse<>("", result);
-
-	}
-
-	
+	// this api wrote for reports
 	@PostMapping(CommonRequestMappigs.LIST_OF_PROMOTIONS_BY_SEARCH_CRITERIA)
-	public GateWayResponse<?> listOfPromotions(@RequestBody SearchPromotionsVo vo) {
-		
-		List<SearchPromotionsVo> result = promoService.listOfPromotionsBySearch(vo);
+	public GateWayResponse<?> listOfPromotions(@RequestBody SearchPromotionsVo vo, Pageable pageable) {
+
+		Page<SearchPromotionsVo> result = promoService.listOfPromotionsBySearch(vo,pageable);
 		return new GateWayResponse<>("successfully getting promotions", result);
 
 	}
-	
+
 	@PostMapping(CommonRequestMappigs.ADD_BENFIT)
-	public GateWayResponse<?> saveBenfit(@RequestBody BenfitVo vo) {
+	public GateWayResponse<?> saveBenfit(@RequestBody BenefitVo vo) {
 		log.info("Recieved request to addBenfit():" + vo);
 		String saveBenfit = promoService.saveBenfit(vo);
 		return new GateWayResponse<>("added benfit successfully", saveBenfit);
 
 	}
-	
+
 	@GetMapping(CommonRequestMappigs.ACTIVEVSINACTIVEPROMOS)
-	public GateWayResponse<?>activeVSinactivePromos(){
+	public GateWayResponse<?> activeVSinactivePromos() {
 		log.info("Recieved request to activeVSinactivePromos()");
 		List<ReportVo> vo = promoService.activeVSinactivePromos();
 		return new GateWayResponse<>("", vo);
+
+	}
+
+	@PostMapping("/checkPromtionTextile")
+	public GateWayResponse<?> checkPromtionTextile(@RequestBody List<ProductVO> listofInvTxt,
+			@RequestParam Long storeId, @RequestParam Long domainId) {
+		return new GateWayResponse<>("", promoService.checkPromtion(listofInvTxt, storeId, domainId));
+	}
+
+	// check the flags for the both promos
+	@PostMapping("/checkPromtion")
+	public GateWayResponse<?> checkPromotion(@RequestBody List<ProductVO> listofInvTxt,
+			@RequestParam Long storeId, @RequestParam Long domainId, boolean checkPromoSwitch) {
 		
+		
+		// barcode level check promotion for textile
+		List<LineItemVo> listOfLineItems = calculateBenifits.convertProductTextileIntoLineItems(listofInvTxt);
+		
+		if (checkPromoSwitch) {
+
+			GateWayResponse<?> barcodeLevelCheckPromoForTxtile = checkPromtionTextile(listofInvTxt, storeId, domainId);
+
+		} else {
+
+			GateWayResponse<?> invoiceLevelCheckPromoForTxtile = invoiceLevelCheckPromtionTextile(listOfLineItems , storeId,
+					domainId);
+		}
+
+		return new GateWayResponse<>();
+	}
+
+	@PostMapping("/invoiceLevelCheckPromtionTextile")
+	public GateWayResponse<?> invoiceLevelCheckPromtionTextile(@RequestBody List<LineItemVo> listofLineItemsTxt,
+			@RequestParam Long storeId, @RequestParam Long domainId) {
+		return new GateWayResponse<>("", promoService.checkInvoiceLevelPromtion(listofLineItemsTxt, storeId, domainId));
+	}
+
+	@PutMapping("/updatePriority")
+	public GateWayResponse<?> updatePriority(@RequestBody SearchPromotionsVo vo) {
+		return new GateWayResponse<>("priority updated successfully", promoService.updatePriority(vo));
+	}
+
+	@PostMapping("/searchPromoByStoreName")
+	public GateWayResponse<?> searchPromoByStoreName(@RequestBody SearchPromotionsVo vo) {
+		return new GateWayResponse<>("", promoService.searchPromotionByStoreName(vo));
+	}
+
+	@GetMapping("/getAllStorePromos")
+	public GateWayResponse<?> getAllPromoStores() {
+		// log.info("Recieved request to getByStoreId():" + storeId);
+		List<PromotionToStoreEntity> getAllStorePromos = promoService.getAllStorePromotions();
+		return new GateWayResponse<>("fetching store promotions successfully", getAllStorePromos);
+
+	}
+
+	@PostMapping(CommonRequestMappigs.PROMOTIONS_SEARCHING)
+	public GateWayResponse<?> promotionSearching(@RequestBody PromotionsVo vo, Pageable pageable) {
+		log.info("Recieved request to searchPromotion():" + vo);
+		Page<PromotionsVo> result = promoService.promotionSearching(vo,pageable);
+		return new GateWayResponse<>("successfully getting promotions", result);
+
+	}
+
+	@PostMapping("/save")
+	public GateWayResponse<?> saveColumnNameAndOperatorsVo(
+			@RequestBody ColumnNameAndOperatorsVo columnNameAndOperatorsVo) {
+		log.info("Recieved request to columnNamesAndOperator():" + columnNameAndOperatorsVo);
+
+		ColumnNameAndOperatorsVo saveColumnNameAndOperator = columnNameAndOperatorService
+				.save(columnNameAndOperatorsVo);
+
+		return new GateWayResponse<>("SuccessFully Added ColumnNames data", saveColumnNameAndOperator);
+
+	}
+
+	// deletebyId .getbyOperation/
+	@ApiOperation(value = "Delete columnNameOperators")
+	@DeleteMapping("/{id}")
+	public GateWayResponse<?> deleteColumnNameId(@RequestParam Long id) {
+		log.info("Recieved request delete ColumnNameById():" + id);
+		String deleteColumnNameId = columnNameAndOperatorService.deleteColumnNameId(id);
+		return new GateWayResponse<>("ColumNameById deleted successfully", deleteColumnNameId);
+
+	}
+
+	@GetMapping("/allcolumnnames")
+	public GateWayResponse<?> getListofColumnNames() {
+		log.info("Reterive All Records");
+		List<ColumnNameAndOperators> listofColumnNames = columnNameAndOperatorService.getListofColumnNames();
+
+		return new GateWayResponse<>("Reterive All Records", listofColumnNames);
+
+	}
+
+	@GetMapping(value = "/anyMatchingData")
+	public GateWayResponse<?> getAnyMatchingData(@RequestParam(required = false) String columnName,
+			@RequestParam(required = false) String operator) {
+		List<ColumnNameAndOperators> anyMatchingData = columnNameAndOperatorService.getAnyMatchingData(columnName,
+				operator);
+		System.out.println("anyMatchingData" + anyMatchingData);
+		return new GateWayResponse<>("Reterived matching data", anyMatchingData);
 	}
 	
+	@PutMapping("/updatePromoStatus")
+	public GateWayResponse<?> updatePromoStatus(@RequestParam Long id,@RequestParam Boolean isActive ) {
+		return new GateWayResponse<>("promotion status updated successfully", promoService.updatePromotionStatus(id,isActive));
+	}
 
 }

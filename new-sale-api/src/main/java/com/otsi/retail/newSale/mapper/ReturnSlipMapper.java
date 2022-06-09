@@ -83,6 +83,8 @@ public class ReturnSlipMapper {
         returnSlipRequestVo.setStoreId(returnSlip.getStoreId());
         returnSlipRequestVo.setTotalAmount(returnSlip.getAmount());
         returnSlipRequestVo.setRtStatus(returnSlip.getRtStatus());
+        returnSlipRequestVo.setReason(returnSlip.getReason());
+        returnSlipRequestVo.setComments(returnSlip.getSettelmentInfo());
 		return returnSlipRequestVo;
 		
 		// TODO Auto-generated method stub

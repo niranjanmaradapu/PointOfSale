@@ -2,10 +2,16 @@ package com.otsi.retail.promotions.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import com.otsi.retail.promotions.vo.BenfitVo;
+import com.otsi.retail.promotions.entity.PromotionToStoreEntity;
+import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.ConnectionPromoVo;
+import com.otsi.retail.promotions.vo.LineItemVo;
+import com.otsi.retail.promotions.vo.ProductVO;
+import com.otsi.retail.promotions.vo.PromotionToStoreVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
 import com.otsi.retail.promotions.vo.SearchPromotionsVo;
@@ -16,7 +22,7 @@ public interface PromotionService {
 
 	String addPromotion(PromotionsVo vo);
 
-	ConnectionPromoVo getListOfPromotions(String flag, Long domainId);
+	ConnectionPromoVo getListOfPromotions(String flag, Long domainId, Long clientId);
 
 	String editPromotion(PromotionsVo vo);
 	
@@ -24,20 +30,33 @@ public interface PromotionService {
 
 	List<StoreVo> getAllStores();
 
-	String addPromotionToStore(PromotionsVo vo);
+	String addPromotionToStore(PromotionToStoreVo vo);
 
-	List<SearchPromotionsVo> searchPromotion(SearchPromotionsVo vo);
+	Page<SearchPromotionsVo> storeLevelPromoSearching(SearchPromotionsVo vo,Pageable pageable);
 
 	String updatePromotionDates(SearchPromotionsVo vo);
 	
 	String clonePromotionByStore(SearchPromotionsVo vo);
-
-	String addPromtionToBarcode(Long promoId, String barcode);
 	
-	List<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo);
+	Page<SearchPromotionsVo> listOfPromotionsBySearch(SearchPromotionsVo svo, Pageable pageable);
 	
-	String saveBenfit(BenfitVo vo);
+	String saveBenfit(BenefitVo vo);
 	
 	List<ReportVo> activeVSinactivePromos();
+
+	List<ProductVO> checkPromtion(List<ProductVO> listofInvTxt, Long storeId, Long domainId);
+
+	String updatePriority(SearchPromotionsVo vo);
 	
+	List<SearchPromotionsVo> searchPromotionByStoreName(SearchPromotionsVo vo);
+	
+	List<PromotionToStoreEntity> getAllStorePromotions();
+	
+	List<LineItemVo> checkInvoiceLevelPromtion(List<LineItemVo> listofInvTxt, Long storeId, Long domainId);
+
+	Page<PromotionsVo> promotionSearching(PromotionsVo svo,Pageable pageable);
+	
+	String updatePromotionStatus(Long id, Boolean isActive);
+	
+		
 }

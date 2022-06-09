@@ -41,6 +41,12 @@ public interface GiftVoucherRepo extends JpaRepository<GiftVoucherEntity, Long> 
 	List<GiftVoucherEntity> findByFromDateAndGvNumber(LocalDate fromDate, String gvNumber);
 
 	List<GiftVoucherEntity> findByIsActivated(Boolean isActivated);
+
+	List<GiftVoucherEntity> findByFromDate(LocalDate fromDate);
+
+	List<GiftVoucherEntity> findByToDate(LocalDate toDate);
+
+	List<GiftVoucherEntity> findByToDateAndGvNumber(LocalDate toDate, String gvNumber);
 	
 	
 }

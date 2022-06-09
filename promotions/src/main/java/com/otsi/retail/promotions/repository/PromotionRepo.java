@@ -2,18 +2,23 @@ package com.otsi.retail.promotions.repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.otsi.retail.promotions.common.PromotionStatus;
+import com.otsi.retail.promotions.common.Applicability;
 import com.otsi.retail.promotions.entity.PromotionsEntity;
 
 @Repository
 public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	List<PromotionsEntity> findByIsActive(Boolean status);
+	
+//	@Query(value = "SELECT * FROM  PromotionsEntity p WHERE p.id IN (:promoIds)")
+//	List<PromotionsEntity> getAllPromotions(@Param("promoIds") List<Long> promoIds);
+	
 
 	void deleteByPromoId(Long id);
 
@@ -24,6 +29,7 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 	PromotionsEntity findByPromotionNameIs(String promoName);
 
 	PromotionsEntity findByPromoId(Long promoId);
+	
 
 	// boolean existsByStoreName(String storeName);
 
@@ -44,6 +50,27 @@ public interface PromotionRepo extends JpaRepository<PromotionsEntity, Long> {
 
 	List<PromotionsEntity> findByPromotionStartDateAndPromotionEndDate(LocalDate promotionStartDate,
 			LocalDate promotionEndDate);
+
+	List<PromotionsEntity> findByPromoIdInAndApplicability(List<Long> promoids, Applicability applicability);
+
+	List<PromotionsEntity> findByPromoIdInAndIsActive(List<Long> promoIds, Boolean true1);
+
+	List<PromotionsEntity> findByApplicability(Applicability promotionforeachbarcode);
+
+	List<PromotionsEntity> findByIsActiveAndApplicability(Boolean promotionStatus, Applicability promotionforeachbarcode);
+
+	List<PromotionsEntity> findByStoreId(Long storeId);
+
+	List<PromotionsEntity> findByClientId(Long clientId);
+
+	List<PromotionsEntity> findByIsActiveAndDomainIdAndClientId(Boolean status, Long domainId, Long clientId);
+
+	Page<PromotionsEntity> findByIsActiveAndApplicabilityAndClientId(Boolean isActive,
+			Applicability promotionforeachbarcode, Long clientId, Pageable pageable);
+
+	Page<PromotionsEntity> findByApplicabilityAndClientId(Applicability promotionforeachbarcode, Long clientId, Pageable pageable);
+
+	Page<PromotionsEntity> findByIsActiveAndClientId(Boolean isActive, Long clientId, Pageable pageable);
 
 	
 }

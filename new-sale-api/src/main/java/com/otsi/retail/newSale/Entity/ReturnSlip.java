@@ -30,6 +30,7 @@ public class ReturnSlip extends BaseEntity {
 	private String rtNo;
 	private Long storeId;
 	private String settelmentInfo;
+	private String invoiceNumber;
 	private Long customerId;
 	private Long amount;
 	private String mobileNumber;

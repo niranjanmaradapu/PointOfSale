@@ -35,7 +35,7 @@ public class CommonRequestMappigs {
 	
 	public static final String DELETE_PROMO = "deletepromo";
 	
-	public static final String SEARCH_PROMOTION = "searchPromotion";
+	public static final String STORE_LEVEL_PROMOTIONS_SEARCHING = "storeLevelPromotionsSearching";
 	
 	public static final String SEARCH_BY_STORE = "searchByStore";
 	
@@ -52,6 +52,8 @@ public class CommonRequestMappigs {
 	public static final String ACTIVEVSINACTIVEPROMOS= "activeVSinactivepromos";
 	
 	public static final String GETDISCOUNT= "getDiscount";
+	
+	public static final String PROMOTIONS_SEARCHING = "promotionsSearching";
 	
 	
 

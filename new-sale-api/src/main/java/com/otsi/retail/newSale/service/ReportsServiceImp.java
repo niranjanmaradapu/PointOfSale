@@ -328,8 +328,9 @@ public class ReportsServiceImp implements ReportService {
 		List<NewSaleEntity> nen = nsen.stream()
 				.filter(a -> a.getCreationDate().getMonthValue() == (Date.getMonthValue()))
 				.collect(Collectors.toList());*/
+		List<NewSaleEntity> newsaleentity = nsentity.stream().filter(nEntity->nEntity.getNetValue()!=null).collect(Collectors.toList());
 
-		Long amount = nsentity.stream().mapToLong(a -> a.getNetValue()).sum();
+		Long amount = newsaleentity.stream().mapToLong(a -> a.getNetValue()).sum();
 		ReportVo rsvo = new ReportVo();
 
 		if (amount != 0L) {
@@ -361,6 +362,7 @@ public class ReportsServiceImp implements ReportService {
 		if (domainId == DomainData.TE.getId()) {
 			List<ReportVo> lRvos = new ArrayList<ReportVo>();
 	
+			
 			LocalDate fromDate;
 			LocalDate toDate;
 			 switch(name){    
@@ -416,7 +418,7 @@ public class ReportsServiceImp implements ReportService {
 
 					lRvos.stream().forEach(r -> {
 
-						if (s.getUserId().equals(r.getUserId())) {
+						if (s.getId().equals(r.getUserId())) {
 
 							r.setName(s.getUserName());
 
@@ -491,7 +493,7 @@ public class ReportsServiceImp implements ReportService {
 
 					lRvos.stream().forEach(r -> {
 
-						if (s.getUserId().equals(r.getUserId())) {
+						if (s.getId().equals(r.getUserId())) {
 
 							r.setName(s.getUserName());
 

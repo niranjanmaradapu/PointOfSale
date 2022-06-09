@@ -1,6 +1,5 @@
 package com.otsi.retail.promotions.mapper;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,10 +7,9 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.retail.promotions.entity.BenfitEntity;
 import com.otsi.retail.promotions.entity.PoolEntity;
-import com.otsi.retail.promotions.entity.PromotionsEntity;
-import com.otsi.retail.promotions.entity.Pool_Rule;
 import com.otsi.retail.promotions.entity.PromotionSlabsEntity;
-import com.otsi.retail.promotions.vo.BenfitVo;
+import com.otsi.retail.promotions.entity.PromotionsEntity;
+import com.otsi.retail.promotions.vo.BenefitVo;
 import com.otsi.retail.promotions.vo.PromotionPoolVo;
 import com.otsi.retail.promotions.vo.PromotionSlabsVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
@@ -43,12 +41,39 @@ public class PromotionMapper {
 		promo.setPromoApplyType(vo.getPromoApplyType());
 		promo.setBuyItemsFromPool(vo.getBuyItemsFromPool());
 		promo.setIsActive(Boolean.TRUE);
-		promo.setCreatedDate(LocalDate.now());
-		promo.setLastModified(LocalDate.now());
-		//promo.setPriority(vo.getPriority());
+		promo.setStoreId(vo.getStoreId());
+		promo.setClientId(vo.getClientId());
+		// promo.setPriority(vo.getPriority());
 		promo.setPromotionStartDate(vo.getPromotionStartDate());
 		promo.setPromotionEndDate(vo.getPromotionEndDate());
 		promo.setPoolEntity(poolList);// Mapping all poolIds to Promotions
+
+		List<PromotionSlabsEntity> slabsEntity = new ArrayList<>();
+		vo.getPromotionSlabVo().stream().forEach(s -> {
+			PromotionSlabsEntity slab = new PromotionSlabsEntity();
+			slab.setId(s.getId());
+			slab.setFromSlab(s.getFromSlab());
+			slab.setToSlab(s.getToSlab());
+
+			BenfitEntity benefit = new BenfitEntity();
+			benefit.setBenfitId(s.getBenfitVo().getBenfitId());
+			benefit.setBenfitType(s.getBenfitVo().getBenfitType());
+			benefit.setDiscount(s.getBenfitVo().getDiscount());
+			benefit.setDiscountType(s.getBenfitVo().getDiscountType());
+			benefit.setItemValue(s.getBenfitVo().getItemValue());
+			benefit.setNumOfItemsFromBuyPool(s.getBenfitVo().getNumOfItemsFromBuyPool());
+			benefit.setNumOfItemsFromGetPool(s.getBenfitVo().getNumOfItemsFromGetPool());
+			benefit.setDiscountSubTypes(s.getBenfitVo().getDiscountSubType());
+			benefit.setPoolId(s.getBenfitVo().getPoolId());
+			benefit.setPoolName(s.getBenfitVo().getPoolName());
+
+			// mapping benefits to slab
+			slab.setBenfitEntity(benefit);
+
+			slabsEntity.add(slab);
+		});
+		// mapping slabs to promotions
+		promo.setPromotionSlabEntity(slabsEntity);
 
 		List<BenfitEntity> benfitEntity = new ArrayList<>();
 		vo.getBenfitVo().stream().forEach(b -> {
@@ -60,16 +85,14 @@ public class PromotionMapper {
 			benfit.setItemValue(b.getItemValue());
 			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromBuyPool());
 			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
-			benfit.setPoolId(b.getPoolId());
-			benfit.setPercentageDiscountOn(b.getPercentageDiscountOn());
-			benfit.setPoolName(b.getPoolName());
+			benfit.setDiscountSubTypes(b.getDiscountSubType());
+
+			// mapping benefits to promotions
+			benfit.setPromotionEntity(promo);
 			
-			//mapping slabs to benfit entity
-			PromotionSlabsEntity slabsEnt = new PromotionSlabsEntity();
-			slabsEnt.setFromSlab(b.getPromoSlabVo().getFromSlab());
-			slabsEnt.setToSlab(b.getPromoSlabVo().getToSlab());
-			slabsEnt.setPromoId(promo.getPromoId());
-			benfit.setPromotionSlabEntity(slabsEnt);
+			// mapping benefits to pools
+			benfit.setPoolEntities(poolList);
+
 			benfitEntity.add(benfit);
 		});
 		promo.setBenfitEntity(benfitEntity);
@@ -84,8 +107,11 @@ public class PromotionMapper {
 		promoList.stream().forEach(x -> {
 			PromotionsVo vo = new PromotionsVo();
 
+			vo.setPromoId(x.getPromoId());
 			vo.setPromotionName(x.getPromotionName());
 			vo.setDomainId(x.getDomainId());
+			vo.setStoreId(x.getStoreId());
+			vo.setClientId(x.getClientId());
 			vo.setDescription(x.getDescription());
 			vo.setPrintNameOnBill(x.getPrintNameOnBill());
 			vo.setApplicability(x.getApplicability());
@@ -93,37 +119,56 @@ public class PromotionMapper {
 			vo.setIsTaxExtra(x.getIsTaxExtra());
 			vo.setIsActive(x.getIsActive());
 			vo.setBuyItemsFromPool(x.getBuyItemsFromPool());
-			vo.setCreatedDate(x.getCreatedDate());
-			vo.setLastModified(x.getLastModified());
-			vo.setPromoId(x.getPromoId());
 			vo.setPromotionStartDate(x.getPromotionStartDate());
 			vo.setPromotionEndDate(x.getPromotionEndDate());
 			vo.setPromoApplyType(x.getPromoApplyType());
+
 			listOfPromoVos.add(vo);
 
-			List<BenfitVo> benfitVos = new ArrayList<>();
-			x.getBenfitEntity().stream().forEach(b -> {
-				BenfitVo bvo = new BenfitVo();
+			List<PromotionSlabsVo> slabVo = new ArrayList<>();
+			x.getPromotionSlabEntity().stream().forEach(s -> {
 				PromotionSlabsVo pslabVo = new PromotionSlabsVo();
-				
+				pslabVo.setId(s.getId());
+				pslabVo.setFromSlab(s.getFromSlab());
+				pslabVo.setToSlab(s.getToSlab());
+
+				BenefitVo bvo = new BenefitVo();
+				bvo.setBenfitId(s.getBenfitEntity().getBenfitId());
+				bvo.setBenfitType(s.getBenfitEntity().getBenfitType());
+				bvo.setDiscount(s.getBenfitEntity().getDiscount());
+				bvo.setDiscountSubType(s.getBenfitEntity().getDiscountSubTypes());
+				bvo.setDiscountType(s.getBenfitEntity().getDiscountType());
+				bvo.setItemValue(s.getBenfitEntity().getItemValue());
+				bvo.setNumOfItemsFromBuyPool(s.getBenfitEntity().getNumOfItemsFromBuyPool());
+				bvo.setNumOfItemsFromGetPool(s.getBenfitEntity().getNumOfItemsFromGetPool());
+                bvo.setPoolId(s.getBenfitEntity().getPoolId());
+                bvo.setPoolName(s.getBenfitEntity().getPoolName());
+				pslabVo.setBenfitVo(bvo);
+				slabVo.add(pslabVo);
+			});
+
+			vo.setPromotionSlabVo(slabVo);
+
+			List<BenefitVo> benfitVos = new ArrayList<>();
+			x.getBenfitEntity().stream().forEach(b -> {
+				BenefitVo bvo = new BenefitVo();
+
 				bvo.setBenfitId(b.getBenfitId());
 				bvo.setBenfitType(b.getBenfitType());
 				bvo.setDiscount(b.getDiscount());
 				bvo.setDiscountType(b.getDiscountType());
 				bvo.setItemValue(b.getItemValue());
-				bvo.setPercentageDiscountOn(b.getPercentageDiscountOn());
+				bvo.setDiscountSubType(b.getDiscountSubTypes());
 				bvo.setNumOfItemsFromBuyPool(b.getNumOfItemsFromBuyPool());
 				bvo.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
-				bvo.setPoolId(b.getPoolId());
-				bvo.setPoolName(b.getPoolName());
 				
-				//setting promoSlabValues to benefits
-				
-				pslabVo.setFromSlab(b.getPromotionSlabEntity().getFromSlab());
-				pslabVo.setToSlab(b.getPromotionSlabEntity().getToSlab());
-				pslabVo.setPromoId(b.getPromotionEntity().getPromoId());
-				bvo.setPromoSlabVo(pslabVo);
 				benfitVos.add(bvo);
+				// setting promoSlabValues to benefits
+
+//				pslabVo.setFromSlab(b.getPromotionSlabEntity().getFromSlab());
+//				pslabVo.setToSlab(b.getPromotionSlabEntity().getToSlab());
+//				bvo.setPromoSlabVo(pslabVo);
+//				benfitVos.add(bvo);
 			});
 
 			List<PromotionPoolVo> poolList = new ArrayList<>();
@@ -133,10 +178,12 @@ public class PromotionMapper {
 				PromotionPoolVo pool = new PromotionPoolVo();
 				pool.setPoolId(a.getPoolId());
 				pool.setDomainId(a.getDomainId());
+				pool.setStoreId(a.getStoreId());
+				pool.setClientId(a.getClientId());
 				pool.setPoolName(a.getPoolName());
 				pool.setPoolType(a.getPoolType());
 				pool.setIsActive(a.getIsActive());
-				pool.setCreatedDate(a.getCreatedDate());
+				
 				poolList.add(pool);
 			});
 			vo.setPoolVo(poolList);
@@ -146,5 +193,98 @@ public class PromotionMapper {
 		return listOfPromoVos;
 	}
 
+	public List<BenefitVo> convertBenfitEntityToVo(List<BenfitEntity> benefitEntities) {
+
+		List<BenefitVo> list = new ArrayList<>();
+
+		for (BenfitEntity benfitEntity : benefitEntities) {
+
+			BenefitVo bvo = new BenefitVo();
+
+			bvo.setBenfitId(benfitEntity.getBenfitId());
+			bvo.setBenfitType(benfitEntity.getBenfitType());
+			bvo.setDiscount(benfitEntity.getDiscount());
+			bvo.setDiscountType(benfitEntity.getDiscountType());
+			bvo.setDiscountSubType(benfitEntity.getDiscountSubTypes());
+			bvo.setItemValue(benfitEntity.getItemValue());
+			bvo.setNumOfItemsFromBuyPool(benfitEntity.getNumOfItemsFromBuyPool());
+			bvo.setNumOfItemsFromGetPool(benfitEntity.getNumOfItemsFromGetPool());
+
+			list.add(bvo);
+
+		}
+
+		return list;
+
+	}
+
+	public PromotionsVo convertPromotionEntityToVo(PromotionsEntity promotions) {
+		
+		
+		PromotionsVo promo = new PromotionsVo();
+		
+		promo.setPromoId(promotions.getPromoId());
+		promo.setClientId(promotions.getClientId());
+		promo.setPromotionName(promotions.getPromotionName());
+		promo.setDomainId(promotions.getDomainId());
+		promo.setStoreId(promotions.getStoreId());
+		promo.setClientId(promotions.getClientId());
+		promo.setDescription(promotions.getDescription());
+		promo.setPrintNameOnBill(promotions.getPrintNameOnBill());
+		promo.setIsTaxExtra(promotions.getIsTaxExtra());
+		promo.setApplicability(promotions.getApplicability());
+		promo.setCreatedBy(promotions.getCreatedBy());
+		promo.setPromoApplyType(promotions.getPromoApplyType());
+		promo.setBuyItemsFromPool(promotions.getBuyItemsFromPool());
+		promo.setIsActive(Boolean.TRUE);
+		promo.setStoreId(promotions.getStoreId());
+		promo.setClientId(promotions.getClientId());
+		// promo.setPriority(vo.getPriority());
+		promo.setPromotionStartDate(promotions.getPromotionStartDate());
+		promo.setPromotionEndDate(promotions.getPromotionEndDate());
+
+		List<PromotionSlabsVo> slabsVo = new ArrayList<>();
+		promotions.getPromotionSlabEntity().stream().forEach(s -> {
+			PromotionSlabsVo slab = new PromotionSlabsVo();
+			slab.setId(s.getId());
+			slab.setFromSlab(s.getFromSlab());
+			slab.setToSlab(s.getToSlab());
+
+			BenefitVo benefit = new BenefitVo();
+			benefit.setBenfitId(s.getBenfitEntity().getBenfitId());
+			benefit.setBenfitType(s.getBenfitEntity().getBenfitType());
+			benefit.setDiscount(s.getBenfitEntity().getDiscount());
+			benefit.setDiscountType(s.getBenfitEntity().getDiscountType());
+			benefit.setItemValue(s.getBenfitEntity().getItemValue());
+			benefit.setNumOfItemsFromBuyPool(s.getBenfitEntity().getNumOfItemsFromBuyPool());
+			benefit.setNumOfItemsFromGetPool(s.getBenfitEntity().getNumOfItemsFromGetPool());
+			benefit.setDiscountSubType(s.getBenfitEntity().getDiscountSubTypes());
+
+			// mapping benefits to slab
+			slab.setBenfitVo(benefit);
+
+			slabsVo.add(slab);
+		});
+		// mapping slabs to promotions
+		promo.setPromotionSlabVo(slabsVo);
+
+		List<BenefitVo> benfitVo = new ArrayList<>();
+		promotions.getBenfitEntity().stream().forEach(b -> {
+			BenefitVo benfit = new BenefitVo();
+			benfit.setBenfitId(b.getBenfitId());
+			benfit.setBenfitType(b.getBenfitType());
+			benfit.setDiscountType(b.getDiscountType());
+			benfit.setDiscount(b.getDiscount());
+			benfit.setItemValue(b.getItemValue());
+			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromBuyPool());
+			benfit.setNumOfItemsFromGetPool(b.getNumOfItemsFromGetPool());
+			benfit.setDiscountSubType(b.getDiscountSubTypes());
+
+			benfitVo.add(benfit);
+		});
+		promo.setBenfitVo(benfitVo);
+
+		return promo;
+	}
 
 }
