@@ -567,7 +567,18 @@ public class NewSaleServiceImpl implements NewSaleService {
 			return vo;
 		}
 	}
+	public static String getSaltString() {
+		String SALTCHARS = "1234567890";
+		StringBuilder salt = new StringBuilder();
+		Random rnd = new Random();
+		while (salt.length() < 5) { // length of the random string.
+			int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+			salt.append(SALTCHARS.charAt(index));
+		}
+		String saltStr = salt.toString();
+		return saltStr;
 
+	}
 	// Method for saving delivery slip
 	@Override
 	public String saveDeliverySlip(DeliverySlipVo vo) throws RecordNotFoundException {
@@ -576,7 +587,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		DeliverySlipEntity entity = new DeliverySlipEntity();
 
 		Random ran = new Random();
-		entity.setDsNumber("DS/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
+		entity.setDsNumber("ES" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() +getSaltString());
 		entity.setStatus(DSStatus.Pending);
 		entity.setCreationDate(LocalDate.now());
 		entity.setLastModified(LocalDate.now());
