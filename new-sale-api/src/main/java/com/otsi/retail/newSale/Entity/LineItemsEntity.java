@@ -52,6 +52,8 @@ public class LineItemsEntity {
 	private Long discount;
 
 	private Long netValue;
+	
+	private Long salesManId;
 
 	private LocalDate creationDate;
 

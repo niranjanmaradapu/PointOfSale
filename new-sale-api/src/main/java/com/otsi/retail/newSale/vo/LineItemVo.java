@@ -50,6 +50,8 @@ public class LineItemVo {
 	private Long sgst;
 
 	private Long discount;
+	
+	private Long salesManId;
 
 	private Long netValue;
 

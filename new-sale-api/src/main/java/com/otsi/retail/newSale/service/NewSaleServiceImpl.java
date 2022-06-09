@@ -1607,6 +1607,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					lineEntity.setCgst(lineItem.getCgst());
 					lineEntity.setSgst(lineItem.getSgst());
 					lineEntity.setStoreId(lineItem.getStoreId());
+					lineEntity.setSalesManId(lineItem.getSalesManId());
 
 					// GrossValue is multiple of net value of product and quantity
 					lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
@@ -2067,7 +2068,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			giftVoucherEntities = gvRepo.findByFromDateAndGvNumber(searchVo.getFromDate(), searchVo.getGvNumber());
 			
-		}else if (searchVo.getFromDate() == null && searchVo.getToDate() != null && searchVo.getGvNumber() != null) {
+		} else if (searchVo.getFromDate() == null && searchVo.getToDate() != null && searchVo.getGvNumber() != null) {
 
 				giftVoucherEntities = gvRepo.findByToDateAndGvNumber(searchVo.getToDate(), searchVo.getGvNumber());
 
