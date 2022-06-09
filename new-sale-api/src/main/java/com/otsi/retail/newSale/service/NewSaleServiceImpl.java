@@ -2066,6 +2066,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 		} else if (searchVo.getFromDate() != null && searchVo.getToDate() == null && searchVo.getGvNumber() != null) {
 
 			giftVoucherEntities = gvRepo.findByFromDateAndGvNumber(searchVo.getFromDate(), searchVo.getGvNumber());
+			
+		}else if (searchVo.getFromDate() == null && searchVo.getToDate() != null && searchVo.getGvNumber() != null) {
+
+				giftVoucherEntities = gvRepo.findByToDateAndGvNumber(searchVo.getToDate(), searchVo.getGvNumber());
 
 		} else if (searchVo.getFromDate() == null && searchVo.getToDate() == null && searchVo.getGvNumber() != null) {
 			Optional<GiftVoucherEntity> gv = gvRepo.findByGvNumber(searchVo.getGvNumber());
