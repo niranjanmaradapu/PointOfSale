@@ -581,7 +581,7 @@ public class CalculateBenifits {
 		case MaxValue: {
 
 			results = getXugPercentageDiscountForMaximumValue(benfitEntity, promoEligibleLineItems, totalQuantityAndMrp,
-					listofAllLineItems);
+					listofAllLineItems,promo);
 
 			break;
 		}
@@ -596,12 +596,12 @@ public class CalculateBenifits {
 
 	private List<LineItemVo> getXugPercentageDiscountForMaximumValue(BenfitEntity benfitEntity,
 			List<LineItemVo> promoEligibleLineItems, List<Double> totalQuantityAndMrp,
-			List<LineItemVo> listofAllLineItems) {
+			List<LineItemVo> listofAllLineItems,PromotionsEntity promo) {
 
 		double calculatedInvoiceLevelDiscount = 0.0;
 
 		// get the getPools from the benefits
-		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
+		List<PoolEntity> poolEntities = promo.getPoolEntity();
 
 		// LineItemVo maxValueMRP = orderedLineItems.get(orderedLineItems.size());
 
@@ -811,18 +811,35 @@ public class CalculateBenifits {
 		// LineItemVo maxValueMRP = orderedLineItems.get(orderedLineItems.size());
 
 		double calculatedInvoiceLevelDiscount = 0.0;
-
+		
 		Long numOfItemsFromBuyPool = benfitEntity.getNumOfItemsFromBuyPool();
-
-		for (int i = numOfItemsFromBuyPool.intValue(); i > 0; i--) {
-
-			LineItemVo maxValueMRP = orderedLineItems.get(i + 1);
-
+		
+		int qty =0;
+		
+		
+		
+		if(orderedLineItems.size() >= numOfItemsFromBuyPool)
+		{
+		for (int i =  numOfItemsFromBuyPool.intValue()-1; i > -1; i--) {
+			LineItemVo maxValueMRP = orderedLineItems.get(i);
+			
 			double individualLineItemTotalPrice = maxValueMRP.getItemPrice().doubleValue() * maxValueMRP.getQuantity();
 
 			calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount
 					+ (percentageDiscount * individualLineItemTotalPrice) / 100;
+			
+			if(i < numOfItemsFromBuyPool)
+				break;
+			
 
+		}
+		}else {
+			
+			for (LineItemVo lineItemVo : orderedLineItems) {
+				lineItemVo.setDescription("If you select a more items from buy pool then you will get a discount");
+				
+			}
+			
 		}
 
 		return calculatedInvoiceLevelDiscount;
@@ -849,10 +866,8 @@ public class CalculateBenifits {
 			calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount
 					+ (percentageDiscount * individualLineItemTotalPrice) / 100;
 			
-//			if(i<numOfItemsFromBuyPool)
-//			{
-//				break;
-//			}
+		     if(i < numOfItemsFromBuyPool)
+				break;
 		}
 
 		return calculatedInvoiceLevelDiscount;
