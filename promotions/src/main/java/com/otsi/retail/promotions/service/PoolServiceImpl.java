@@ -155,7 +155,7 @@ public class PoolServiceImpl implements PoolService {
 
 	// Method for getting list of pools based on the status flag
 	@Override
-	public PoolVo getListOfPools(String isActive, Long domainId, Long clientId) {
+	public PoolVo getListOfPools(String isActive, Long clientId) {
 		log.debug("debugging savePool():" + isActive);
 		List<PoolEntity> poolEntity = new ArrayList<>();
 		Boolean flag = null;
@@ -167,11 +167,9 @@ public class PoolServiceImpl implements PoolService {
 			flag = Boolean.FALSE;
 		}
 
-		if (isActive.equalsIgnoreCase("ALL") && domainId == null && clientId == null) {
+		if (isActive.equalsIgnoreCase("ALL")&& clientId == null) {
 			poolEntity = poolRepo.findAll();
 
-		} else if (!(isActive.isEmpty()) && domainId == null) {
-			poolEntity = poolRepo.findByIsActive(flag);
 		}
 
 		else if(!(isActive.isEmpty()) && clientId == null)
@@ -194,7 +192,6 @@ public class PoolServiceImpl implements PoolService {
 			log.info("fetching list of pools");
 
 			poolvo.setPoolvo(poolVo);
-			poolvo.setDomainId(domainId);
 			return poolvo;
 
 		} else {

@@ -126,7 +126,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 	// Method for getting list of Promotions by using flag(Status)
 	@Override
-	public ConnectionPromoVo getListOfPromotions(String flag, Long domainId, Long clientId) {
+	public ConnectionPromoVo getListOfPromotions(String flag, Long clientId) {
 		log.debug("debugging getListOfPromotions:" + flag);
 		List<PromotionsEntity> promoList = new ArrayList<>();
 
@@ -137,12 +137,10 @@ public class PromotionServiceImpl implements PromotionService {
 		if (flag.equalsIgnoreCase("false")) {
 			status = Boolean.FALSE;
 		}
-		if (flag.equalsIgnoreCase("ALL") && domainId == null && clientId == null) {
+		if (flag.equalsIgnoreCase("ALL") && clientId == null) {
 			promoList = promoRepo.findAll();
-		} else if (!(flag.isEmpty()) && domainId == null) {
-
-			promoList = promoRepo.findByIsActive(status);
-		} else if (!(flag.isEmpty()) && clientId == null) {
+		} 
+		else if (!(flag.isEmpty()) && clientId == null) {
 
 			promoList = promoRepo.findByIsActive(status);
 		} else if ((flag.isEmpty()) && clientId != null) {
@@ -158,7 +156,6 @@ public class PromotionServiceImpl implements PromotionService {
 			log.warn("we are checking if list of promotions is fetching...");
 			log.info("list of promotions is fetching...");
 			promoVo.setPromovo(listOfPromo);
-			promoVo.setDomainId(domainId);
 			return promoVo;
 		} else {
 			log.error("record not found");
