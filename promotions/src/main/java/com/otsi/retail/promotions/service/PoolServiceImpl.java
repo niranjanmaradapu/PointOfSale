@@ -172,14 +172,8 @@ public class PoolServiceImpl implements PoolService {
 
 		} else if (!(isActive.isEmpty()) && domainId == null) {
 			poolEntity = poolRepo.findByIsActive(flag);
-		} else if (isActive.isEmpty() && domainId != null) {
-
-			poolEntity = poolRepo.findByDomainId(domainId);
-//			poolEntity.stream().forEach(p -> {
-//
-//				p.setDomainId(null);
-//			});
 		}
+
 		else if(!(isActive.isEmpty()) && clientId == null)
 		{
 			poolEntity = poolRepo.findByIsActive(flag);
@@ -189,11 +183,7 @@ public class PoolServiceImpl implements PoolService {
 		}
 
 		else {
-			poolEntity = poolRepo.findByIsActiveAndDomainIdAndClientId(flag, domainId,clientId);
-//			poolEntity.stream().forEach(p -> {
-//
-//				p.setDomainId(null);
-//			});
+			poolEntity = poolRepo.findByIsActiveAndClientId(flag,clientId);
 
 		}
 		if (!poolEntity.isEmpty()) {

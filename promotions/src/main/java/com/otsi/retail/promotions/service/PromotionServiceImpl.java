@@ -142,9 +142,6 @@ public class PromotionServiceImpl implements PromotionService {
 		} else if (!(flag.isEmpty()) && domainId == null) {
 
 			promoList = promoRepo.findByIsActive(status);
-		} else if (flag.isEmpty() && domainId != null) {
-
-			promoList = promoRepo.findByDomainId(domainId);
 		} else if (!(flag.isEmpty()) && clientId == null) {
 
 			promoList = promoRepo.findByIsActive(status);
@@ -152,7 +149,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 			promoList = promoRepo.findByClientId(clientId);
 		} else {
-			promoList = promoRepo.findByIsActiveAndDomainIdAndClientId(status, domainId, clientId);
+			promoList = promoRepo.findByIsActiveAndClientId(status, clientId);
 		}
 
 		if (!promoList.isEmpty()) {
