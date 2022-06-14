@@ -1,6 +1,5 @@
 package com.otsi.retail.newSale.mapper;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,8 +28,6 @@ public class DeliverySlipMapper {
 		entity.setUserId(vo.getSalesMan());
 		entity.setQty(vo.getQty());
 		entity.setType(vo.getType());
-		entity.setCreationDate(LocalDate.now());
-		entity.setLastModified(LocalDate.now());
 		entity.setStatus(DSStatus.Pending);
 
 		return entity;
@@ -80,8 +77,8 @@ public class DeliverySlipMapper {
 
 		vo.setDsNumber(dsEntity.getDsNumber());
 		vo.setSalesMan(dsEntity.getUserId());
-		vo.setCreatedDate(dsEntity.getCreationDate());
-		vo.setLastModified(dsEntity.getLastModified());
+		vo.setCreatedDate(dsEntity.getCreatedDate());
+		vo.setLastModifiedDate(dsEntity.getLastModifiedDate());
 		vo.setStoreId(dsEntity.getStoreId());
 
 		List<LineItemVo> lineItems = new ArrayList<>();

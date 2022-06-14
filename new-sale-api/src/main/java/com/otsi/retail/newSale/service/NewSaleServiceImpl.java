@@ -210,144 +210,137 @@ public class NewSaleServiceImpl implements NewSaleService {
 			}
 		}
 
-		//if (newsaleVo.getDomainId() == DomainData.TE.getId()) {
+		// if (newsaleVo.getDomainId() == DomainData.TE.getId()) {
 
-			List<DeliverySlipVo> dlSlips = newsaleVo.getDlSlip();
+		List<DeliverySlipVo> dlSlips = newsaleVo.getDlSlip();
 
-			List<String> dlsList = dlSlips.stream().map(x -> x.getDsNumber()).collect(Collectors.toList());
+		List<String> dlsList = dlSlips.stream().map(x -> x.getDsNumber()).collect(Collectors.toList());
 
-			List<DeliverySlipEntity> dsList = dsRepo.findByDsNumberInAndOrderIsNull(dlsList);
+		List<DeliverySlipEntity> dsList = dsRepo.findByDsNumberInAndOrderIsNull(dlsList);
 
-			if (dsList.size() == newsaleVo.getDlSlip().size()) {
+		if (dsList.size() == newsaleVo.getDlSlip().size()) {
 
-				NewSaleEntity saveEntity = newSaleRepository.save(entity);
+			NewSaleEntity saveEntity = newSaleRepository.save(entity);
 
-				List<DeliverySlipEntity> dsLists = new ArrayList<>();
-				log.info("Saved order :" + saveEntity);
+			List<DeliverySlipEntity> dsLists = new ArrayList<>();
+			log.info("Saved order :" + saveEntity);
 
-				dsList.stream().forEach(a -> {
+			dsList.stream().forEach(a -> {
 
-					a.setOrder(saveEntity);
-					a.setStatus(DSStatus.Completed);
-					a.setLastModified(LocalDate.now());
-					DeliverySlipEntity ds = dsRepo.save(a);
-					dsLists.add(ds);
+				a.setOrder(saveEntity);
+				a.setStatus(DSStatus.Completed);
+				DeliverySlipEntity ds = dsRepo.save(a);
+				dsLists.add(ds);
 
-					a.getLineItems().stream().forEach(x -> {
-
-						x.setLastModified(LocalDate.now());
-						x.setDsEntity(a);
-						lineItemRepo.save(x);
-
-					});
-
-				});
-				saveEntity.setDlSlip(dsLists);
-				// Saving order details in order_transaction
-
-				if (newsaleVo.getPaymentAmountType() != null) {
-					newsaleVo.getPaymentAmountType().stream().forEach(x -> {
-
-						// Checking the payment type condition
-						if ((x.getPaymentType().equals(PaymentType.PKTADVANCE))
-								|| (x.getPaymentType().equals(PaymentType.PKTPENDING))) {
-							// Calling the accounting(either debit/credit)
-							updateAccounting(newsaleVo);
-						}
-						if ((x.getPaymentType().equals(PaymentType.RTSlip))) {
-							try {
-								if (newsaleVo.getNetPayableAmount() >= x.getPaymentAmount()) {
-
-									// update returnSlipStatus
-									returnSlipServiceImp.updateReturnSlip(newsaleVo.getStoreId(), newsaleVo.getReturnSlipNumber());
-
-								} else if (newsaleVo.getNetPayableAmount() < x.getPaymentAmount()) {
-									Long creditAmount =0l;
-									returnSlipServiceImp.updateReturnSlip(newsaleVo.getStoreId(), newsaleVo.getReturnSlipNumber());
-									 creditAmount = x.getPaymentAmount() - newsaleVo.getNetPayableAmount();
-									saveCreditNotes(creditAmount, newsaleVo.getMobileNumber(), newsaleVo.getStoreId(),newsaleVo.getReturnSlipNumber(),newsaleVo.getUserId());
-									
-
-								}
-
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-
-						PaymentAmountType type = new PaymentAmountType();
-						type.setOrderId(saveEntity);
-						type.setPaymentAmount(x.getPaymentAmount());
-						type.setPaymentType(x.getPaymentType().getType());
-
-						paymentAmountTypeRepository.save(type);
-					});
-					log.info("payment is done for order : " + saveEntity.getOrderNumber());
-				}
-				// Condition to update inventory
-				// if (vo.getReturnAmount() != null) {
-				// Condition to update inventory
-				if (paymentValue.equals(newsaleVo.getNetPayableAmount())) {
-					updateOrderItemsInInventory(saveEntity);
-				}
-				// }
-
-			/*} else {
-				log.error("Delivery slips are not valid" + newsaleVo);
-				throw new InvalidInputException("Please provide Valid delivery slips..");
-			}
-		}
-		if (newsaleVo.getDomainId() != DomainData.TE.getId()) {
-
-			Map<String, Integer> map = new HashMap<>();
-
-			List<LineItemVo> lineItems = newsaleVo.getLineItemsReVo();
-
-			List<Long> lineItemIds = lineItems.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
-
-			List<LineItemsReEntity> lineItemsList = lineItemReRepo.findByLineItemReIdInAndOrderIdIsNull(lineItemIds);
-
-			if (lineItems.size() == lineItemsList.size()) {
-
-				NewSaleEntity saveEntity = newSaleRepository.save(entity);
-				List<LineItemsReEntity> lineItemsForUpdate = new ArrayList<>();
-
-				lineItemsList.stream().forEach(x -> {
-
-					map.put(x.getBarCode(), x.getQuantity());
+				a.getLineItems().stream().forEach(x -> {
 
 					x.setLastModified(LocalDate.now());
-					x.setOrderId(saveEntity);
-					lineItemReRepo.save(x);
-					lineItemsForUpdate.add(x);
+					x.setDsEntity(a);
+					lineItemRepo.save(x);
 
 				});
-				saveEntity.setLineItemsRe(lineItemsForUpdate);
-				// Saving order details in order_transaction table
-				if (newsaleVo.getPaymentAmountType() != null) {
 
-					newsaleVo.getPaymentAmountType().stream().forEach(x -> {
+			});
+			saveEntity.setDlSlip(dsLists);
+			// Saving order details in order_transaction
 
-						PaymentAmountType type = new PaymentAmountType();
-						type.setOrderId(saveEntity);
-						type.setPaymentAmount(x.getPaymentAmount());
-						type.setPaymentType(x.getPaymentType().getType());
+			if (newsaleVo.getPaymentAmountType() != null) {
+				newsaleVo.getPaymentAmountType().stream().forEach(x -> {
 
-						paymentAmountTypeRepository.save(type);
-					});
-					log.info("payment is done for order : " + saveEntity.getOrderNumber());
-				}
+					// Checking the payment type condition
+					if ((x.getPaymentType().equals(PaymentType.PKTADVANCE))
+							|| (x.getPaymentType().equals(PaymentType.PKTPENDING))) {
+						// Calling the accounting(either debit/credit)
+						updateAccounting(newsaleVo);
+					}
+					if ((x.getPaymentType().equals(PaymentType.RTSlip))) {
+						try {
+							if (newsaleVo.getNetPayableAmount() >= x.getPaymentAmount()) {
 
-				// Condition to update inventory
-				if (paymentValue.equals(newsaleVo.getNetPayableAmount())) {
-					updateOrderItemsInInventory(saveEntity);
-				}
+								// update returnSlipStatus
+								returnSlipServiceImp.updateReturnSlip(newsaleVo.getStoreId(),
+										newsaleVo.getReturnSlipNumber());
 
-			} else {
-				log.error("LineItems are not valid : " + newsaleVo);
-				throw new InvalidInputException("Please provide Valid delivery slips..");
+							} else if (newsaleVo.getNetPayableAmount() < x.getPaymentAmount()) {
+								Long creditAmount = 0l;
+								returnSlipServiceImp.updateReturnSlip(newsaleVo.getStoreId(),
+										newsaleVo.getReturnSlipNumber());
+								creditAmount = x.getPaymentAmount() - newsaleVo.getNetPayableAmount();
+								saveCreditNotes(creditAmount, newsaleVo.getMobileNumber(), newsaleVo.getStoreId(),
+										newsaleVo.getReturnSlipNumber(), newsaleVo.getUserId());
 
-			}*/
+							}
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+
+					PaymentAmountType type = new PaymentAmountType();
+					type.setOrderId(saveEntity);
+					type.setPaymentAmount(x.getPaymentAmount());
+					type.setPaymentType(x.getPaymentType().getType());
+
+					paymentAmountTypeRepository.save(type);
+				});
+				log.info("payment is done for order : " + saveEntity.getOrderNumber());
+			}
+			// Condition to update inventory
+			// if (vo.getReturnAmount() != null) {
+			// Condition to update inventory
+			if (paymentValue.equals(newsaleVo.getNetPayableAmount())) {
+				updateOrderItemsInInventory(saveEntity);
+			}
+			// }
+
+			/*
+			 * } else { log.error("Delivery slips are not valid" + newsaleVo); throw new
+			 * InvalidInputException("Please provide Valid delivery slips.."); } } if
+			 * (newsaleVo.getDomainId() != DomainData.TE.getId()) {
+			 * 
+			 * Map<String, Integer> map = new HashMap<>();
+			 * 
+			 * List<LineItemVo> lineItems = newsaleVo.getLineItemsReVo();
+			 * 
+			 * List<Long> lineItemIds = lineItems.stream().map(x ->
+			 * x.getLineItemId()).collect(Collectors.toList());
+			 * 
+			 * List<LineItemsReEntity> lineItemsList =
+			 * lineItemReRepo.findByLineItemReIdInAndOrderIdIsNull(lineItemIds);
+			 * 
+			 * if (lineItems.size() == lineItemsList.size()) {
+			 * 
+			 * NewSaleEntity saveEntity = newSaleRepository.save(entity);
+			 * List<LineItemsReEntity> lineItemsForUpdate = new ArrayList<>();
+			 * 
+			 * lineItemsList.stream().forEach(x -> {
+			 * 
+			 * map.put(x.getBarCode(), x.getQuantity());
+			 * 
+			 * x.setLastModified(LocalDate.now()); x.setOrderId(saveEntity);
+			 * lineItemReRepo.save(x); lineItemsForUpdate.add(x);
+			 * 
+			 * }); saveEntity.setLineItemsRe(lineItemsForUpdate); // Saving order details in
+			 * order_transaction table if (newsaleVo.getPaymentAmountType() != null) {
+			 * 
+			 * newsaleVo.getPaymentAmountType().stream().forEach(x -> {
+			 * 
+			 * PaymentAmountType type = new PaymentAmountType();
+			 * type.setOrderId(saveEntity); type.setPaymentAmount(x.getPaymentAmount());
+			 * type.setPaymentType(x.getPaymentType().getType());
+			 * 
+			 * paymentAmountTypeRepository.save(type); });
+			 * log.info("payment is done for order : " + saveEntity.getOrderNumber()); }
+			 * 
+			 * // Condition to update inventory if
+			 * (paymentValue.equals(newsaleVo.getNetPayableAmount())) {
+			 * updateOrderItemsInInventory(saveEntity); }
+			 * 
+			 * } else { log.error("LineItems are not valid : " + newsaleVo); throw new
+			 * InvalidInputException("Please provide Valid delivery slips..");
+			 * 
+			 * }
+			 */
 		}
 		log.info("Order generated with number : " + entity.getOrderNumber());
 		return entity.getOrderNumber();
@@ -355,32 +348,32 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// UPDATE ACCOUNTING
 
-		private void updateAccounting(NewSaleVo newsaleVo) {
+	private void updateAccounting(NewSaleVo newsaleVo) {
 
-				if (newsaleVo.getDomainId() == DomainData.TE.getId()) {
-					LedgerLogBookVo ledgerLogBookVo = new LedgerLogBookVo();
-					ledgerLogBookVo.setStoreId(newsaleVo.getStoreId());
-					ledgerLogBookVo.setMobileNumber(newsaleVo.getMobileNumber());
-					ledgerLogBookVo.setAmount(newsaleVo.getNetPayableAmount());
-					newsaleVo.getPaymentAmountType().stream().forEach(paymentAmountType -> {
+		if (newsaleVo.getDomainId() == DomainData.TE.getId()) {
+			LedgerLogBookVo ledgerLogBookVo = new LedgerLogBookVo();
+			ledgerLogBookVo.setStoreId(newsaleVo.getStoreId());
+			ledgerLogBookVo.setMobileNumber(newsaleVo.getMobileNumber());
+			ledgerLogBookVo.setAmount(newsaleVo.getNetPayableAmount());
+			newsaleVo.getPaymentAmountType().stream().forEach(paymentAmountType -> {
 
-						// Checking the payment type condition
-						if (paymentAmountType.getPaymentType().equals(PaymentType.PKTADVANCE)) {
-							ledgerLogBookVo.setAccountType(AccountType.CREDIT);
-						} else if (paymentAmountType.getPaymentType().equals(PaymentType.PKTPENDING)) {
-							ledgerLogBookVo.setAccountType(AccountType.DEBIT);
-						} else if (paymentAmountType.getPaymentType().equals(PaymentType.Cash)) {
-							ledgerLogBookVo.setPaymentType(PaymentType.Cash);
-						} else if (paymentAmountType.getPaymentType().equals(PaymentType.Card)) {
-							ledgerLogBookVo.setPaymentType(PaymentType.Card);
-						}
-					});
-
-					log.info("Update request to accounting: " + ledgerLogBookVo);
-					rabbitTemplate.convertAndSend(config.getAccountingExchange(), config.getAccountingRK(), ledgerLogBookVo);
-
+				// Checking the payment type condition
+				if (paymentAmountType.getPaymentType().equals(PaymentType.PKTADVANCE)) {
+					ledgerLogBookVo.setAccountType(AccountType.CREDIT);
+				} else if (paymentAmountType.getPaymentType().equals(PaymentType.PKTPENDING)) {
+					ledgerLogBookVo.setAccountType(AccountType.DEBIT);
+				} else if (paymentAmountType.getPaymentType().equals(PaymentType.Cash)) {
+					ledgerLogBookVo.setPaymentType(PaymentType.Cash);
+				} else if (paymentAmountType.getPaymentType().equals(PaymentType.Card)) {
+					ledgerLogBookVo.setPaymentType(PaymentType.Card);
 				}
-			}
+			});
+
+			log.info("Update request to accounting: " + ledgerLogBookVo);
+			rabbitTemplate.convertAndSend(config.getAccountingExchange(), config.getAccountingRK(), ledgerLogBookVo);
+
+		}
+	}
 
 	private String updateCreditNotes(Long amount, String mobileNumber, Long storeId, String type) {
 
@@ -412,7 +405,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// save creditnotes
 
-	private void saveCreditNotes(Long amount, String mobileNumber, Long storeId,String returnSlipNumber,Long customerId) {
+	private void saveCreditNotes(Long amount, String mobileNumber, Long storeId, String returnSlipNumber,
+			Long customerId) {
 
 		LedgerLogBookVo ledgerLogBookRequest = new LedgerLogBookVo();
 
@@ -424,7 +418,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 		ledgerLogBookRequest.setReturnSlipNumber(returnSlipNumber);
 		ledgerLogBookRequest.setIsReturned(Boolean.TRUE);
 		ledgerLogBookRequest.setCustomerId(customerId);
-		
 
 		// Pass object to Rabbit queue
 		rabbitTemplate.convertAndSend(config.getCreditNotesExchange(), config.getCreditnotesRK(), ledgerLogBookRequest);
@@ -490,47 +483,45 @@ public class NewSaleServiceImpl implements NewSaleService {
 	// Method for update order item into inventory
 	private void updateOrderItemsInInventory(NewSaleEntity orderRecord) {
 
-	//	if (orderRecord.getDomainId() == DomainData.TE.getId()) {
+		// if (orderRecord.getDomainId() == DomainData.TE.getId()) {
 
-			List<LineItemsEntity> lineItems = orderRecord.getDlSlip().stream().flatMap(x -> x.getLineItems().stream())
-					.collect(Collectors.toList());
+		List<LineItemsEntity> lineItems = orderRecord.getDlSlip().stream().flatMap(x -> x.getLineItems().stream())
+				.collect(Collectors.toList());
 
-			// System.out.println("Line items : " +lineItems.toString());
+		// System.out.println("Line items : " +lineItems.toString());
 
-			List<InventoryUpdateVo> updateVo = new ArrayList<>();
+		List<InventoryUpdateVo> updateVo = new ArrayList<>();
 
-			lineItems.stream().forEach(x -> {
+		lineItems.stream().forEach(x -> {
 
-				InventoryUpdateVo vo = new InventoryUpdateVo();
-				vo.setBarCode(x.getBarCode());
-				vo.setLineItemId(x.getLineItemId());
-				vo.setQuantity(x.getQuantity());
-				vo.setStoreId(orderRecord.getStoreId());
-				vo.setDomainId(orderRecord.getDomainId());
-				updateVo.add(vo);
-			});
-			log.info("Update request to Textile: " + updateVo);
-			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(), config.getUpdateInventoryRK(), updateVo);
-		/*} else {
-
-			List<InventoryUpdateVo> updateVo = new ArrayList<>();
-
-			List<LineItemsReEntity> lineItemRes = orderRecord.getLineItemsRe();
-
-			lineItemRes.stream().forEach(x -> {
-
-				InventoryUpdateVo vo = new InventoryUpdateVo();
-				vo.setBarCode(x.getBarCode());
-				vo.setLineItemId(x.getLineItemReId());
-				vo.setQuantity(x.getQuantity());
-				vo.setStoreId(orderRecord.getStoreId());
-				vo.setDomainId(orderRecord.getDomainId());
-				updateVo.add(vo);
-			});
-
-			log.info("Update request to Retail : " + updateVo);
-			rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(), config.getUpdateInventoryRK(), updateVo);
-		}*/
+			InventoryUpdateVo vo = new InventoryUpdateVo();
+			vo.setBarCode(x.getBarCode());
+			vo.setLineItemId(x.getLineItemId());
+			vo.setQuantity(x.getQuantity());
+			vo.setStoreId(orderRecord.getStoreId());
+			vo.setDomainId(orderRecord.getDomainId());
+			updateVo.add(vo);
+		});
+		log.info("Update request to Textile: " + updateVo);
+		rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(), config.getUpdateInventoryRK(), updateVo);
+		/*
+		 * } else {
+		 * 
+		 * List<InventoryUpdateVo> updateVo = new ArrayList<>();
+		 * 
+		 * List<LineItemsReEntity> lineItemRes = orderRecord.getLineItemsRe();
+		 * 
+		 * lineItemRes.stream().forEach(x -> {
+		 * 
+		 * InventoryUpdateVo vo = new InventoryUpdateVo();
+		 * vo.setBarCode(x.getBarCode()); vo.setLineItemId(x.getLineItemReId());
+		 * vo.setQuantity(x.getQuantity()); vo.setStoreId(orderRecord.getStoreId());
+		 * vo.setDomainId(orderRecord.getDomainId()); updateVo.add(vo); });
+		 * 
+		 * log.info("Update request to Retail : " + updateVo);
+		 * rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(),
+		 * config.getUpdateInventoryRK(), updateVo); }
+		 */
 	}
 
 	@Override
@@ -567,6 +558,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			return vo;
 		}
 	}
+
 	public static String getSaltString() {
 		String SALTCHARS = "1234567890";
 		StringBuilder salt = new StringBuilder();
@@ -579,6 +571,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		return saltStr;
 
 	}
+
 	// Method for saving delivery slip
 	@Override
 	public String saveDeliverySlip(DeliverySlipVo vo) throws RecordNotFoundException {
@@ -587,10 +580,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 		DeliverySlipEntity entity = new DeliverySlipEntity();
 
 		Random ran = new Random();
-		entity.setDsNumber("ES" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() +getSaltString());
+		entity.setDsNumber("ES" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + getSaltString());
 		entity.setStatus(DSStatus.Pending);
-		entity.setCreationDate(LocalDate.now());
-		entity.setLastModified(LocalDate.now());
 		entity.setUserId(vo.getSalesMan());
 		entity.setStoreId(vo.getStoreId());
 
@@ -1083,8 +1074,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 				DeliverySlipVo dVo = new DeliverySlipVo();
 				dVo.setDsNumber(d.getDsNumber());
 				dVo.setDsId(d.getDsId());
-				dVo.setLastModified(d.getLastModified());
-				dVo.setCreatedDate(d.getCreationDate());
+				dVo.setLastModifiedDate(d.getLastModifiedDate());
+				dVo.setCreatedDate(d.getCreatedDate());
 				dVo.setStatus(d.getStatus());
 				dVo.setSalesMan(d.getUserId());
 				dsVo.add(dVo);
@@ -1442,17 +1433,18 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public List<LineItemVo> getBarcodes(List<String> barCode/*, Long domainId*/) throws RecordNotFoundException {
+	public List<LineItemVo> getBarcodes(List<String> barCode/* , Long domainId */) throws RecordNotFoundException {
 		log.debug("deugging getBarcodeDetails" + barCode);
 		List<LineItemVo> vo = new ArrayList<LineItemVo>();
 
-		//if (domainId == 1) {
-			List<LineItemsEntity> barcodeDetails = lineItemRepo.findByBarCodeIn(barCode);
-			vo = newSaleMapper.convertBarcodesEntityToVo(barcodeDetails);
-		/*} else {
-			List<LineItemsReEntity> barcodeDetails1 = lineItemReRepo.findByBarCodeIn(barCode);
-			vo = newSaleMapper.convertBarcodesReEntityToVo(barcodeDetails1);
-		}*/
+		// if (domainId == 1) {
+		List<LineItemsEntity> barcodeDetails = lineItemRepo.findByBarCodeIn(barCode);
+		vo = newSaleMapper.convertBarcodesEntityToVo(barcodeDetails);
+		/*
+		 * } else { List<LineItemsReEntity> barcodeDetails1 =
+		 * lineItemReRepo.findByBarCodeIn(barCode); vo =
+		 * newSaleMapper.convertBarcodesReEntityToVo(barcodeDetails1); }
+		 */
 		return vo;
 	}
 
@@ -1529,7 +1521,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				List<String> barcodes = tgItems.stream().map(x -> x.getBarCode()).collect(Collectors.toList());
 
 				try {
-					List<LineItemVo> barVo = getBarcodes(barcodes/*, b.getDomainId() */);
+					List<LineItemVo> barVo = getBarcodes(barcodes/* , b.getDomainId() */);
 					barVo.stream().forEach(r -> {
 
 						barVoList.add(r);
@@ -1583,81 +1575,81 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	// Method for saving Line items
 	@Override
-	public List<Long> saveLineItems(List<LineItemVo> lineItems/*, Long domainId*/) throws InvalidInputException {
+	public List<Long> saveLineItems(List<LineItemVo> lineItems/* , Long domainId */) throws InvalidInputException {
 		try {
-			//if (domainId == DomainData.TE.getId()) {
+			// if (domainId == DomainData.TE.getId()) {
 
-				List<LineItemsEntity> list = new ArrayList<>();
+			List<LineItemsEntity> list = new ArrayList<>();
 
-				lineItems.stream().forEach(lineItem -> {
+			lineItems.stream().forEach(lineItem -> {
 
-					LineItemsEntity lineEntity = new LineItemsEntity();
+				LineItemsEntity lineEntity = new LineItemsEntity();
 
-					lineEntity.setBarCode(lineItem.getBarCode());
-					lineEntity.setQuantity(lineItem.getQuantity());
-					lineEntity.setDiscount(lineItem.getDiscount());
-					lineEntity.setNetValue(lineItem.getNetValue());
-					lineEntity.setItemPrice(lineItem.getItemPrice());
-					lineEntity.setSection(lineItem.getSection());
-					lineEntity.setSubSection(lineItem.getSubSection());
-					lineEntity.setDivision(lineItem.getDivision());
-					lineEntity.setHsnCode(lineItem.getHsnCode());
-					lineEntity.setActualValue(lineItem.getActualValue());
-					lineEntity.setTaxValue(lineItem.getTaxValue());
-					lineEntity.setCgst(lineItem.getCgst());
-					lineEntity.setSgst(lineItem.getSgst());
-					lineEntity.setStoreId(lineItem.getStoreId());
-					lineEntity.setSalesManId(lineItem.getSalesManId());
+				lineEntity.setBarCode(lineItem.getBarCode());
+				lineEntity.setQuantity(lineItem.getQuantity());
+				lineEntity.setDiscount(lineItem.getDiscount());
+				lineEntity.setNetValue(lineItem.getNetValue());
+				lineEntity.setItemPrice(lineItem.getItemPrice());
+				lineEntity.setSection(lineItem.getSection());
+				lineEntity.setSubSection(lineItem.getSubSection());
+				lineEntity.setDivision(lineItem.getDivision());
+				lineEntity.setHsnCode(lineItem.getHsnCode());
+				lineEntity.setActualValue(lineItem.getActualValue());
+				lineEntity.setTaxValue(lineItem.getTaxValue());
+				lineEntity.setCgst(lineItem.getCgst());
+				lineEntity.setSgst(lineItem.getSgst());
+				lineEntity.setStoreId(lineItem.getStoreId());
+				lineEntity.setSalesManId(lineItem.getSalesManId());
 
-					// GrossValue is multiple of net value of product and quantity
-					lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
+				// GrossValue is multiple of net value of product and quantity
+				lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
 
-					lineEntity.setCreationDate(LocalDate.now());
-					lineEntity.setLastModified(LocalDate.now());
+				lineEntity.setCreationDate(LocalDate.now());
+				lineEntity.setLastModified(LocalDate.now());
 
-					list.add(lineEntity);
-				});
-				List<LineItemsEntity> saved = lineItemRepo.saveAll(list);
-				log.info("successfully saved line items " + saved);
-				return saved.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
+				list.add(lineEntity);
+			});
+			List<LineItemsEntity> saved = lineItemRepo.saveAll(list);
+			log.info("successfully saved line items " + saved);
+			return saved.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
 
-			/*} else {
+			/*
+			 * } else {
+			 * 
+			 * List<LineItemsReEntity> list = new ArrayList<>();
+			 * 
+			 * lineItems.stream().forEach(lineItem -> {
+			 * 
+			 * LineItemsReEntity lineReEntity = new LineItemsReEntity();
+			 * 
+			 * lineReEntity.setBarCode(lineItem.getBarCode());
+			 * lineReEntity.setQuantity(lineItem.getQuantity());
+			 * lineReEntity.setDiscount(lineItem.getDiscount());
+			 * lineReEntity.setNetValue(lineItem.getNetValue());
+			 * lineReEntity.setItemPrice(lineItem.getItemPrice());
+			 * lineReEntity.setSection(lineItem.getSection());
+			 * lineReEntity.setSubSection(lineItem.getSubSection());
+			 * lineReEntity.setDivision(lineItem.getDivision());
+			 * lineReEntity.setUserId(lineItem.getUserId());
+			 * lineReEntity.setTaxValue(lineItem.getTaxValue());
+			 * lineReEntity.setCgst(lineItem.getCgst());
+			 * lineReEntity.setSgst(lineItem.getSgst());
+			 * lineReEntity.setStoreId(lineItem.getStoreId());
+			 * 
+			 * // GrossValue is multiple of net value of product and quantity
+			 * lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
+			 * 
+			 * lineReEntity.setCreationDate(LocalDate.now());
+			 * lineReEntity.setLastModified(LocalDate.now()); list.add(lineReEntity);
+			 * 
+			 * });
+			 * 
+			 * List<LineItemsReEntity> saved = lineItemReRepo.saveAll(list);
+			 * 
+			 * log.info("successfully saved line items " + saved); return
+			 * saved.stream().map(x -> x.getLineItemReId()).collect(Collectors.toList()); }
+			 */
 
-				List<LineItemsReEntity> list = new ArrayList<>();
-
-				lineItems.stream().forEach(lineItem -> {
-
-					LineItemsReEntity lineReEntity = new LineItemsReEntity();
-
-					lineReEntity.setBarCode(lineItem.getBarCode());
-					lineReEntity.setQuantity(lineItem.getQuantity());
-					lineReEntity.setDiscount(lineItem.getDiscount());
-					lineReEntity.setNetValue(lineItem.getNetValue());
-					lineReEntity.setItemPrice(lineItem.getItemPrice());
-					lineReEntity.setSection(lineItem.getSection());
-					lineReEntity.setSubSection(lineItem.getSubSection());
-					lineReEntity.setDivision(lineItem.getDivision());
-					lineReEntity.setUserId(lineItem.getUserId());
-					lineReEntity.setTaxValue(lineItem.getTaxValue());
-					lineReEntity.setCgst(lineItem.getCgst());
-					lineReEntity.setSgst(lineItem.getSgst());
-					lineReEntity.setStoreId(lineItem.getStoreId());
-
-					// GrossValue is multiple of net value of product and quantity
-					lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
-
-					lineReEntity.setCreationDate(LocalDate.now());
-					lineReEntity.setLastModified(LocalDate.now());
-					list.add(lineReEntity);
-
-				});
-
-				List<LineItemsReEntity> saved = lineItemReRepo.saveAll(list);
-
-				log.info("successfully saved line items " + saved);
-				return saved.stream().map(x -> x.getLineItemReId()).collect(Collectors.toList());
-			}*/
-				
 		} catch (InvalidInputException e) {
 			log.error("Getting exception while saving Line item.." + lineItems.toString());
 			throw new InvalidInputException(e.getMsg());
@@ -1697,151 +1689,139 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public String editLineItem(LineItemVo lineItem) throws RecordNotFoundException {
 
-		//if (lineItem.getDomainId() == DomainData.TE.getId()) {
+		// if (lineItem.getDomainId() == DomainData.TE.getId()) {
 
-			LineItemsEntity line = lineItemRepo.findByLineItemId(lineItem.getLineItemId());
+		LineItemsEntity line = lineItemRepo.findByLineItemId(lineItem.getLineItemId());
 
-			if (line != null && line.getDsEntity() == null) {
+		if (line != null && line.getDsEntity() == null) {
 
-				line.setLineItemId(lineItem.getLineItemId());
-				line.setBarCode(lineItem.getBarCode());
-				line.setQuantity(lineItem.getQuantity());
-				line.setDiscount(lineItem.getDiscount());
-				line.setNetValue(lineItem.getNetValue());
-				line.setItemPrice(lineItem.getItemPrice());
-				line.setTaxValue(lineItem.getTaxValue());
-				line.setCgst(lineItem.getCgst());
-				line.setSgst(lineItem.getSgst());
-				line.setStoreId(lineItem.getStoreId());
+			line.setLineItemId(lineItem.getLineItemId());
+			line.setBarCode(lineItem.getBarCode());
+			line.setQuantity(lineItem.getQuantity());
+			line.setDiscount(lineItem.getDiscount());
+			line.setNetValue(lineItem.getNetValue());
+			line.setItemPrice(lineItem.getItemPrice());
+			line.setTaxValue(lineItem.getTaxValue());
+			line.setCgst(lineItem.getCgst());
+			line.setSgst(lineItem.getSgst());
+			line.setStoreId(lineItem.getStoreId());
 
-				// GrossValue is multiple of net value of product and quantity
-				line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
+			// GrossValue is multiple of net value of product and quantity
+			line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
 
-				line.setCreationDate(LocalDate.now());
-				line.setLastModified(LocalDate.now());
-				LineItemsEntity saved = lineItemRepo.save(line);
-				log.info("Successfully modified line item : " + line);
+			line.setCreationDate(LocalDate.now());
+			line.setLastModified(LocalDate.now());
+			LineItemsEntity saved = lineItemRepo.save(line);
+			log.info("Successfully modified line item : " + line);
 
-			/*} else {
-				log.error("Passing invalid line item " + line);
-				throw new RecordNotFoundException("provide valid line item",
-						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
-			}
-
-		} else {
-
-			LineItemsReEntity line = lineItemReRepo.findByLineItemReId(lineItem.getLineItemId());
-			if (line != null && line.getOrderId() == null) {
-				line.setLineItemReId(lineItem.getLineItemId());
-				line.setBarCode(lineItem.getBarCode());
-				line.setQuantity(lineItem.getQuantity());
-				line.setDiscount(lineItem.getDiscount());
-				line.setNetValue(lineItem.getNetValue());
-				line.setItemPrice(lineItem.getItemPrice());
-				line.setUserId(lineItem.getUserId());
-				line.setTaxValue(lineItem.getTaxValue());
-				line.setCgst(lineItem.getCgst());
-				line.setSgst(lineItem.getSgst());
-				line.setStoreId(lineItem.getStoreId());
-
-				// GrossValue is multiple of net value of product and quantity
-				line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
-
-				line.setCreationDate(LocalDate.now());
-				line.setLastModified(LocalDate.now());
-				LineItemsReEntity saved = lineItemReRepo.save(line);
-				log.info("Successfully modified line item " + line);
-			} else {
-				log.error("Passing invalid line items " + line);
-				throw new RecordNotFoundException("provide valid line item",
-						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
-			}*/
+			/*
+			 * } else { log.error("Passing invalid line item " + line); throw new
+			 * RecordNotFoundException("provide valid line item",
+			 * BusinessException.RECORD_NOT_FOUND_STATUSCODE); }
+			 * 
+			 * } else {
+			 * 
+			 * LineItemsReEntity line =
+			 * lineItemReRepo.findByLineItemReId(lineItem.getLineItemId()); if (line != null
+			 * && line.getOrderId() == null) {
+			 * line.setLineItemReId(lineItem.getLineItemId());
+			 * line.setBarCode(lineItem.getBarCode());
+			 * line.setQuantity(lineItem.getQuantity());
+			 * line.setDiscount(lineItem.getDiscount());
+			 * line.setNetValue(lineItem.getNetValue());
+			 * line.setItemPrice(lineItem.getItemPrice());
+			 * line.setUserId(lineItem.getUserId());
+			 * line.setTaxValue(lineItem.getTaxValue()); line.setCgst(lineItem.getCgst());
+			 * line.setSgst(lineItem.getSgst()); line.setStoreId(lineItem.getStoreId());
+			 * 
+			 * // GrossValue is multiple of net value of product and quantity
+			 * line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
+			 * 
+			 * line.setCreationDate(LocalDate.now()); line.setLastModified(LocalDate.now());
+			 * LineItemsReEntity saved = lineItemReRepo.save(line);
+			 * log.info("Successfully modified line item " + line); } else {
+			 * log.error("Passing invalid line items " + line); throw new
+			 * RecordNotFoundException("provide valid line item",
+			 * BusinessException.RECORD_NOT_FOUND_STATUSCODE); }
+			 */
 		}
 		return "Successfully modified Line Item.";
 	}
 
 	// Method for getting line item by using Bar code
-	public List<LineItemVo> getLineItemByBarcode(String barCode/*, Long domainId */) throws RecordNotFoundException {
+	public List<LineItemVo> getLineItemByBarcode(String barCode/* , Long domainId */) throws RecordNotFoundException {
 
-		//if (domainId == DomainData.TE.getId()) {
-			List<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
-			List<LineItemVo> lvo = new ArrayList<>();
-			if (lineItem != null) {
-				lineItem.stream().forEach(b -> {
+		// if (domainId == DomainData.TE.getId()) {
+		List<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
+		List<LineItemVo> lvo = new ArrayList<>();
+		if (lineItem != null) {
+			lineItem.stream().forEach(b -> {
 
-					LineItemVo vo = new LineItemVo();
-					BeanUtils.copyProperties(b, vo);
-					lvo.add(vo);
+				LineItemVo vo = new LineItemVo();
+				BeanUtils.copyProperties(b, vo);
+				lvo.add(vo);
 
-				});
-				return lvo;
+			});
+			return lvo;
 
-			} else {
-				log.info("Provide valid barcode for getting line item : " + barCode);
-				throw new RecordNotFoundException("provide valide barcode",
-						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
-			}
+		} else {
+			log.info("Provide valid barcode for getting line item : " + barCode);
+			throw new RecordNotFoundException("provide valide barcode", BusinessException.RECORD_NOT_FOUND_STATUSCODE);
+		}
 
-		//}
-	/*else {
-			List<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode);
-			if (lineItem != null) {
-				List<LineItemVo> lvo = new ArrayList<>();
-				lineItem.stream().forEach(b -> {
-
-					LineItemVo vo = new LineItemVo();
-					BeanUtils.copyProperties(b, vo);
-					lvo.add(vo);
-
-				});
-				return lvo;
-			} else {
-				log.info("Provide valid barcode for getting line item : " + barCode);
-				throw new RecordNotFoundException("provide valide barcode",
-						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
-			}
-
-		}*/
+		// }
+		/*
+		 * else { List<LineItemsReEntity> lineItem =
+		 * lineItemReRepo.findByBarCode(barCode); if (lineItem != null) {
+		 * List<LineItemVo> lvo = new ArrayList<>(); lineItem.stream().forEach(b -> {
+		 * 
+		 * LineItemVo vo = new LineItemVo(); BeanUtils.copyProperties(b, vo);
+		 * lvo.add(vo);
+		 * 
+		 * }); return lvo; } else {
+		 * log.info("Provide valid barcode for getting line item : " + barCode); throw
+		 * new RecordNotFoundException("provide valide barcode",
+		 * BusinessException.RECORD_NOT_FOUND_STATUSCODE); }
+		 * 
+		 * }
+		 */
 
 	}
 
 	// Method for deleting existing line item by using barcode
 	@Override
-	public String deleteLineItem(String barCode/*, Long domainId */) throws RecordNotFoundException {
+	public String deleteLineItem(String barCode/* , Long domainId */) throws RecordNotFoundException {
 
-		//if (domainId == DomainData.TE.getId()) {
-			List<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
-			if (lineItem != null) {
+		// if (domainId == DomainData.TE.getId()) {
+		List<LineItemsEntity> lineItem = lineItemRepo.findByBarCode(barCode);
+		if (lineItem != null) {
 
-				lineItem.stream().forEach(a -> {
-					lineItemRepo.delete(a);
+			lineItem.stream().forEach(a -> {
+				lineItemRepo.delete(a);
 
-				});
-				return "Successfully deleted";
+			});
+			return "Successfully deleted";
 
-			} else {
-				throw new RecordNotFoundException("provide valid barcode",
-						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
-			}
-	//	} 
-	/*else {
-
-			List<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode);
-			if (lineItem != null) {
-				lineItem.stream().forEach(a -> {
-					lineItemReRepo.delete(a);
-
-				});
-
-				log.info("Successfully deleted line item : " + lineItem);
-				return "Successfully deleted";
-
-			} else {
-				log.error("Entered Invalid barcode for delete line item : " + barCode);
-				throw new RecordNotFoundException("provide valid barcode",
-						BusinessException.RECORD_NOT_FOUND_STATUSCODE);
-			}
-		}*/
+		} else {
+			throw new RecordNotFoundException("provide valid barcode", BusinessException.RECORD_NOT_FOUND_STATUSCODE);
+		}
+		// }
+		/*
+		 * else {
+		 * 
+		 * List<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode); if
+		 * (lineItem != null) { lineItem.stream().forEach(a -> {
+		 * lineItemReRepo.delete(a);
+		 * 
+		 * });
+		 * 
+		 * log.info("Successfully deleted line item : " + lineItem); return
+		 * "Successfully deleted";
+		 * 
+		 * } else { log.error("Entered Invalid barcode for delete line item : " +
+		 * barCode); throw new RecordNotFoundException("provide valid barcode",
+		 * BusinessException.RECORD_NOT_FOUND_STATUSCODE); } }
+		 */
 
 	}
 
@@ -1865,19 +1845,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public String deleteDeliverySlipDetails(String dsNumber) {
-
+	public void deleteDeliverySlipDetails(String dsNumber) {
 		DeliverySlipEntity dsEntity = dsRepo.findByDsNumber(dsNumber);
-
 		if (dsEntity != null && dsEntity.getOrder() == null) {
-
 			dsEntity.setStatus(DSStatus.Cancelled);
 			dsRepo.save(dsEntity);
-
 		}
-
-		// TODO Auto-generated method stub
-		return " estimation slip sucessfully deleted ";
 	}
 
 	// Method for fetching list of Gift vouchers
@@ -2067,27 +2040,25 @@ public class NewSaleServiceImpl implements NewSaleService {
 		} else if (searchVo.getFromDate() != null && searchVo.getToDate() == null && searchVo.getGvNumber() != null) {
 
 			giftVoucherEntities = gvRepo.findByFromDateAndGvNumber(searchVo.getFromDate(), searchVo.getGvNumber());
-			
+
 		} else if (searchVo.getFromDate() == null && searchVo.getToDate() != null && searchVo.getGvNumber() != null) {
 
-				giftVoucherEntities = gvRepo.findByToDateAndGvNumber(searchVo.getToDate(), searchVo.getGvNumber());
+			giftVoucherEntities = gvRepo.findByToDateAndGvNumber(searchVo.getToDate(), searchVo.getGvNumber());
 
 		} else if (searchVo.getFromDate() == null && searchVo.getToDate() == null && searchVo.getGvNumber() != null) {
 			Optional<GiftVoucherEntity> gv = gvRepo.findByGvNumber(searchVo.getGvNumber());
 			giftVoucherEntities.add(gv.get());
-		}
-		else if (searchVo.getFromDate() != null && searchVo.getToDate() == null && searchVo.getGvNumber() == null) {
+		} else if (searchVo.getFromDate() != null && searchVo.getToDate() == null && searchVo.getGvNumber() == null) {
 
 			giftVoucherEntities = gvRepo.findByFromDate(searchVo.getFromDate());
 
-		} 
-		
+		}
+
 		else if (searchVo.getFromDate() == null && searchVo.getToDate() != null && searchVo.getGvNumber() == null) {
 
 			giftVoucherEntities = gvRepo.findByToDate(searchVo.getToDate());
 
-		} 
-		
+		}
 
 		if (CollectionUtils.isEmpty(giftVoucherEntities)) {
 

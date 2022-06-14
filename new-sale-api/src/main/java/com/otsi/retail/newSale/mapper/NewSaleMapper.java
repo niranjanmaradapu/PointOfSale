@@ -1,6 +1,5 @@
 package com.otsi.retail.newSale.mapper;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -215,7 +214,7 @@ public class NewSaleMapper {
 		Long grossAmount = x.getLineItems().stream().mapToLong(a->a.getGrossValue()).sum();
 
 			BeanUtils.copyProperties(x, dsvo);
-			dsvo.setCreatedDate(x.getCreationDate());
+			dsvo.setCreatedDate(x.getCreatedDate());
 			dsvo.setLineItems(listBarVo);
              dsvo.setNetAmount(amount);
              dsvo.setMrp(grossAmount);

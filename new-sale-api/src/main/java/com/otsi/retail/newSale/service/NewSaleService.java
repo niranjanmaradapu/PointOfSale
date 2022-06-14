@@ -85,7 +85,7 @@ public interface NewSaleService {
 
 	String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo);
 
-	String deleteDeliverySlipDetails(String dsNumber);
+	void deleteDeliverySlipDetails(String dsNumber);
 
 	List<LineItemVo> getBarcodes(List<String> barCode/*, Long domainId */) throws RecordNotFoundException;
 
