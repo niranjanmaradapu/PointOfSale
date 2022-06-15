@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.AmqpConnectException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,11 +45,11 @@ import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
-import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.LoyalityPointsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
+import com.otsi.retail.newSale.vo.SaleBillsVO;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
@@ -258,11 +259,11 @@ public class NewSaleController {
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
 	@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleBillsFallBackMethod")
 
-	public GateWayResponse<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo)
+	public GateWayResponse<?> getListOfSaleBills(@RequestBody SaleBillsVO svo,Pageable pageable)
 			throws RecordNotFoundException, JsonMappingException, JsonProcessingException {
 		log.info("Received Request to getListOfSaleBills :" + svo.toString());
 
-		ListOfSaleBillsVo listOfSaleBills = newSaleService.getListOfSaleBills(svo);
+		SaleBillsVO listOfSaleBills = newSaleService.getListOfSaleBills(svo,pageable);
 		return new GateWayResponse<>(HttpStatus.OK, listOfSaleBills, "");
 
 	}
@@ -280,12 +281,12 @@ public class NewSaleController {
 	// Method for getting list of delivery slips
 
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_DS)
-	public GateWayResponse<?> getlistofDeliverySlips(@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo)
+	public GateWayResponse<?> getlistofDeliverySlips(Pageable pageable,@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo)
 			throws RecordNotFoundException {
 		log.info("Received Request to get estimation slip :" + listOfDeliverySlipVo.toString());
 		// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-		ListOfDeliverySlipVo getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo);
+		ListOfDeliverySlipVo getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo,pageable);
 
 		return new GateWayResponse<>(HttpStatus.OK, getDs, "");
 
@@ -503,7 +504,7 @@ public class NewSaleController {
 
 	// Method for getting list of sale report
 	@PostMapping(CommonRequestMappigs.GET_SALE_REPORT)
-	@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleReportFallBackMethod")
+	//@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleReportFallBackMethod")
 	public GateWayResponse<?> getSaleReport(@RequestBody SaleReportVo srvo) throws RecordNotFoundException {
 
 		SaleReportVo saleReport = newSaleService.getSaleReport(srvo);

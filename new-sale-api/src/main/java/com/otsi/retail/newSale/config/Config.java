@@ -29,7 +29,11 @@ import lombok.NoArgsConstructor;
 public class Config {
 
 	public List<HsnDetailsVo> vo;
-
+	@Value("${getUserDetailIds_url}")
+	private String userIdsUrl;
+	
+	@Value("${getCustomerDetailsMobileNumber_url}")
+	private String mobileNumberUrl;
 	
 
 	@Value("${getNewSaleWithHsn_url}")

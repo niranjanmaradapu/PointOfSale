@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
@@ -20,11 +21,11 @@ import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
-import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.LoyalityPointsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
+import com.otsi.retail.newSale.vo.SaleBillsVO;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 
 @Component
@@ -78,96 +79,58 @@ public class NewSaleMapper {
 		return null;
 	}
 
-	public ListOfSaleBillsVo convertlistSalesEntityToVo(List<NewSaleEntity> saleDetails) {
-
-		ListOfSaleBillsVo lsvo = new ListOfSaleBillsVo();
-		List<NewSaleVo> sVoList = new ArrayList<>();
-
-		saleDetails.stream().forEach(x -> {
-
-			NewSaleVo nsvo = new NewSaleVo();
-			List<LineItemVo> listBarVo = new ArrayList<>();
-			if (x.getDomainId() == DomainData.RE.getId()) {
-				if (x.getLineItemsRe() != null) {
-					x.getLineItemsRe().stream().forEach(a -> {
-
-						LineItemVo barvo = new LineItemVo();
-
-						barvo.setCreationDate(a.getCreationDate());
-						barvo.setBarCode(a.getBarCode());
-						barvo.setSection(a.getSection());
-						barvo.setItemPrice(a.getItemPrice());
-						barvo.setGrossValue(a.getGrossValue());
-						barvo.setNetValue(a.getNetValue());
-						barvo.setQuantity(a.getQuantity());
-						barvo.setDiscount(a.getDiscount());
-						barvo.setSection(a.getSection());
-						barvo.setHsnCode(a.getHsnCode());
-						barvo.setSgst(a.getSgst());
-						barvo.setCgst(a.getCgst());
-						barvo.setTaxValue(a.getTaxValue());
-						barvo.setUserId(a.getUserId());
-						listBarVo.add(barvo);
-						nsvo.setLineItemsReVo(listBarVo);
-					});
-				}
-			} else if (x.getDomainId() != DomainData.RE.getId()) {
-
-				if (x.getDlSlip() != null) {
-					x.getDlSlip().stream().forEach(a -> {
-						a.getLineItems().stream().forEach(b -> {
-
-							LineItemVo linevo = new LineItemVo();
-
-							linevo.setCreationDate(b.getCreationDate());
-							linevo.setBarCode(b.getBarCode());
-							linevo.setItemPrice(b.getItemPrice());
-							linevo.setGrossValue(b.getGrossValue());
-							linevo.setNetValue(b.getNetValue());
-							linevo.setQuantity(b.getQuantity());
-							linevo.setDiscount(b.getDiscount());
-							linevo.setSection(b.getSection());
-							linevo.setSection(b.getSection());
-							linevo.setHsnCode(b.getHsnCode());
-							linevo.setSgst(b.getSgst());
-							linevo.setCgst(b.getCgst());
-							linevo.setUserId(a.getUserId());
-							linevo.setTaxValue(b.getTaxValue());
-
-							listBarVo.add(linevo);
-							nsvo.setLineItemsReVo(listBarVo);
-						});
-					});
-				}
-
-			}
-			nsvo.setInvoiceNumber(x.getOrderNumber());
-			nsvo.setBiller(x.getCreatedBy());
-			nsvo.setCreatedDate(x.getCreationDate());
-			nsvo.setTotalManualDisc(x.getManualDisc());
-			nsvo.setApprovedBy(x.getCreatedBy());
-			nsvo.setReason(x.getDiscType());
-			nsvo.setOfflineNumber(x.getOfflineNumber());
-			nsvo.setNetPayableAmount(x.getNetValue());
-			nsvo.setUserId(x.getUserId());
-			nsvo.setEmpId(x.getCreatedBy());
-			nsvo.setStatus(x.getStatus());
-			nsvo.setNewsaleId(x.getOrderId());
-
-			sVoList.add(nsvo);
-
-			lsvo.setNewSaleVo(sVoList);
-
+	public SaleBillsVO converEntityToVo(Page<NewSaleEntity> saleDetails) {
+		SaleBillsVO saleBillsVO = new SaleBillsVO();
+		Page<NewSaleVo> newSaleVOPage = saleDetails.map(sale -> {
+			return mapToNewSaleVO(sale);
 		});
+		saleBillsVO.setNewSale(newSaleVOPage);
+		saleBillsVO.setTotalAmount(saleDetails.stream().mapToLong(saleDetail -> saleDetail.getNetValue()).sum());
+		return saleBillsVO;
+	}
 
-		lsvo.setTotalAmount(saleDetails.stream().mapToLong(i -> i.getNetValue()).sum());
-	
-		
-		//lsvo.setTotalDiscount(saleDetails.stream().mapToLong(d -> d.getManualDisc()).sum());
-	
+	private NewSaleVo mapToNewSaleVO(NewSaleEntity sale) {
+		NewSaleVo newSaleVO = new NewSaleVo();
+		List<LineItemVo> lineItemsList = new ArrayList<>();
 
-		return lsvo;
+		if (sale.getDlSlip() != null) {
+			sale.getDlSlip().stream().forEach(dlSlip -> {
+				dlSlip.getLineItems().stream().forEach(lineItem -> {
 
+					LineItemVo linevo = new LineItemVo();
+					linevo.setCreationDate(lineItem.getCreationDate());
+					linevo.setBarCode(lineItem.getBarCode());
+					linevo.setItemPrice(lineItem.getItemPrice());
+					linevo.setGrossValue(lineItem.getGrossValue());
+					linevo.setNetValue(lineItem.getNetValue());
+					linevo.setQuantity(lineItem.getQuantity());
+					linevo.setDiscount(lineItem.getDiscount());
+					linevo.setSection(lineItem.getSection());
+					linevo.setSection(lineItem.getSection());
+					linevo.setHsnCode(lineItem.getHsnCode());
+					linevo.setSgst(lineItem.getSgst());
+					linevo.setCgst(lineItem.getCgst());
+					linevo.setUserId(dlSlip.getUserId());
+					linevo.setTaxValue(lineItem.getTaxValue());
+					lineItemsList.add(linevo);
+					newSaleVO.setLineItemsReVo(lineItemsList);
+				});
+			});
+		}
+
+		newSaleVO.setInvoiceNumber(sale.getOrderNumber());
+		newSaleVO.setBiller(sale.getCreatedBy());
+		newSaleVO.setCreatedDate(sale.getCreatedDate());
+		newSaleVO.setTotalManualDisc(sale.getManualDisc());
+		newSaleVO.setApprovedBy(sale.getCreatedBy());
+		newSaleVO.setReason(sale.getDiscType());
+		newSaleVO.setOfflineNumber(sale.getOfflineNumber());
+		newSaleVO.setNetPayableAmount(sale.getNetValue());
+		newSaleVO.setUserId(sale.getUserId());
+		newSaleVO.setEmpId(sale.getCreatedBy());
+		newSaleVO.setStatus(sale.getStatus());
+		newSaleVO.setNewsaleId(sale.getOrderId());
+		return newSaleVO;
 	}
 
 	public SaleReportVo convertlistSaleReportEntityToVo(List<NewSaleEntity> saleDetails) {
@@ -176,70 +139,87 @@ public class NewSaleMapper {
 
 		srvo.setBillValue(saleDetails.stream().mapToLong(b -> b.getNetValue()).sum());
 		srvo.setTotalMrp(saleDetails.stream().mapToLong(m -> m.getGrossValue()).sum());
-		
-		List<Long> result = saleDetails.stream()
-				.map(num -> num.getPromoDisc()) 
-				.filter(n -> n!=null)
+
+		List<Long> result = saleDetails.stream().map(num -> num.getPromoDisc()).filter(n -> n != null)
 				.collect(Collectors.toList());
-		
-		srvo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());		
+
+		srvo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());
 		return srvo;
 
 	}
 
-	public ListOfDeliverySlipVo convertListDSToVo(List<DeliverySlipEntity> dsDetails) {
+	public ListOfDeliverySlipVo convertListDSToVo(Page<DeliverySlipEntity> dsDetails) {
 
 		ListOfDeliverySlipVo vo = new ListOfDeliverySlipVo();
 
+		Page<DeliverySlipVo> dspageVo = dsDetails.map(dsDetail -> dsentityToVo(dsDetail));
+
+		vo.setDeliverySlip(dspageVo);
+		/*vo.setToatalPromoDisc(dsDetails.stream().filter(promo->promo.getPromoDisc()!=null).mapToLong(promo->promo.getPromoDisc()).sum());
+		dsDetails.stream().forEach(a -> {
+	        vo.setBartoatalPromoDisc(a.getLineItems().stream().filter(i->i.getDiscount()!=null).mapToLong(i ->i.getDiscount()).sum());
+			vo.setBartotalNetAmount(a.getLineItems().stream().mapToLong(i -> i.getNetValue()).sum());
+			vo.setBartotalGrossAmount(a.getLineItems().stream().mapToLong(i -> i.getGrossValue()).sum());
+			vo.setBarTotalQty(a.getLineItems().stream().mapToInt(q -> q.getQuantity()).sum());
+
+		});*/
+
+		return vo;
+	}
+
+	private DeliverySlipVo dsentityToVo(DeliverySlipEntity dsEntity) {
+
 		List<DeliverySlipVo> dsVoList = new ArrayList<>();
-		List<LineItemsEntity> barEnt = new ArrayList<>();
 
-		dsDetails.stream().forEach(x -> {
+		List<LineItemVo> listBarVo = new ArrayList<>();
 
-			List<LineItemVo> listBarVo = new ArrayList<>();
+		dsEntity.getLineItems().stream().forEach(b -> {
 
-			x.getLineItems().stream().forEach(b -> {
+			LineItemVo barvo = new LineItemVo();
 
-				LineItemVo barvo = new LineItemVo();
-				
+			BeanUtils.copyProperties(b, barvo);
+			barvo.setUserId(dsEntity.getUserId());
 
-				BeanUtils.copyProperties(b, barvo);
-				barvo.setUserId(x.getUserId());
-
-				listBarVo.add(barvo);
-			});
-
-			DeliverySlipVo dsvo = new DeliverySlipVo();
-		Long amount=	x.getLineItems().stream().mapToLong(a->a.getNetValue()).sum();
-		Long grossAmount = x.getLineItems().stream().mapToLong(a->a.getGrossValue()).sum();
-
-			BeanUtils.copyProperties(x, dsvo);
-			dsvo.setCreatedDate(x.getCreatedDate());
-			dsvo.setLineItems(listBarVo);
-             dsvo.setNetAmount(amount);
-             dsvo.setMrp(grossAmount);
-
-            dsVoList.add(dsvo);
+			listBarVo.add(barvo);
 		});
+
+		DeliverySlipVo dsvo = new DeliverySlipVo();
+		Long amount = dsEntity.getLineItems().stream().mapToLong(a -> a.getNetValue()).sum();
+		Long grossAmount = dsEntity.getLineItems().stream().mapToLong(a -> a.getGrossValue()).sum();
+
+		BeanUtils.copyProperties(dsEntity, dsvo);
+		dsvo.setCreatedDate(dsEntity.getCreatedDate());
+		dsvo.setLineItems(listBarVo);
+		dsvo.setNetAmount(amount);
+		dsvo.setMrp(grossAmount);
+
+		// dsVoList.add(dsvo);
 
 		// vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i ->
 		// i.getPromoDisc()).sum());
 		// vo.setTotalNetAmount(dsDetails.stream().mapToLong(i ->
 		// i.getNetAmount()).sum());
 		// vo.setTotalGrossAmount(dsDetails.stream().mapToLong(i -> i.getMrp()).sum());
-		vo.setDeliverySlipVo(dsVoList);
+		/*
+		 * vo.setDeliverySlipVo(dsVoList);
+		 * 
+		 * dsDetails.stream().forEach(a -> {
+		 * 
+		 * 
+		 * //vo.setBartoatalPromoDisc(a.getLineItems().stream().mapToLong(i ->
+		 * i.getDiscount()).sum());
+		 * vo.setBartotalNetAmount(a.getLineItems().stream().mapToLong(i ->
+		 * i.getNetValue()).sum());
+		 * vo.setBartotalGrossAmount(a.getLineItems().stream().mapToLong(i ->
+		 * i.getGrossValue()).sum());
+		 * vo.setBarTotalQty(a.getLineItems().stream().mapToInt(q ->
+		 * q.getQuantity()).sum());
+		 * 
+		 * });
+		 */
 
-		dsDetails.stream().forEach(a -> {
-			
+		return dsvo;
 
-			//vo.setBartoatalPromoDisc(a.getLineItems().stream().mapToLong(i -> i.getDiscount()).sum());
-			vo.setBartotalNetAmount(a.getLineItems().stream().mapToLong(i -> i.getNetValue()).sum());
-			vo.setBartotalGrossAmount(a.getLineItems().stream().mapToLong(i -> i.getGrossValue()).sum());
-			vo.setBarTotalQty(a.getLineItems().stream().mapToInt(q -> q.getQuantity()).sum());
-
-		});
-
-		return vo;
 	}
 
 	public NewSaleVo entityToVo(NewSaleEntity dto) {
@@ -290,7 +270,7 @@ public class NewSaleMapper {
 		NewSaleVo vo = new NewSaleVo();
 		vo.setApprovedBy(dto.getCreatedBy());
 		// vo.setBiller(dto.getBiller());
-		vo.setCreatedDate(dto.getCreationDate());
+		vo.setCreatedDate(dto.getCreatedDate());
 //		if (dto.getDlSlip() != null) {
 //			vo.setDlSlip(deliverySlipMapper.convertDsEntityListToVoList(dto.getDlSlip()));
 //		}

@@ -1,6 +1,7 @@
 package com.otsi.retail.newSale.vo;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.otsi.retail.newSale.common.NoteType;
@@ -60,15 +61,15 @@ public class NewSaleVo {
 
 	private Long netPayableAmount;
 
-	private LocalDate createdDate;
+	private LocalDateTime createdDate;
 
 	private Long taxAmount;
 
 	private Long offlineNumber;
 
-	private String approvedBy;
+	private Long approvedBy;
 
-	private String biller;
+	private Long biller;
 
 	private String reason;
 
@@ -86,7 +87,7 @@ public class NewSaleVo {
 
 	private Long totalNetAmount;
 	
-	private String empId;
+	private Long empId;
 
 	private List<DeliverySlipVo> dlSlip;
 

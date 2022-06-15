@@ -29,7 +29,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @NoArgsConstructor
-public class NewSaleEntity {
+public class NewSaleEntity  extends BaseEntity{
 
 	@Id
 	@GeneratedValue
@@ -65,7 +65,7 @@ public class NewSaleEntity {
 
 	private Long taxValue;
 
-	private String createdBy;// Application User(Cashier)
+	//private String createdBy;// Application User(Cashier)
 
 	private OrderStatus status;
 
@@ -73,9 +73,9 @@ public class NewSaleEntity {
 
 	private Long offlineNumber;
 
-	private LocalDate creationDate;
+	//private LocalDate creationDate;
 
-	private LocalDate lastModified;
+	//private LocalDate lastModified;
 
 	@OneToMany(targetEntity = DeliverySlipEntity.class, mappedBy = "order", cascade = CascadeType.ALL)
 	private List<DeliverySlipEntity> dlSlip;
