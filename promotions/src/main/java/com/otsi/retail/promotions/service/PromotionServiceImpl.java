@@ -1,5 +1,6 @@
 package com.otsi.retail.promotions.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -139,8 +140,7 @@ public class PromotionServiceImpl implements PromotionService {
 		}
 		if (flag.equalsIgnoreCase("ALL") && clientId == null) {
 			promoList = promoRepo.findAll();
-		} 
-		else if (!(flag.isEmpty()) && clientId == null) {
+		} else if (!(flag.isEmpty()) && clientId == null) {
 
 			promoList = promoRepo.findByIsActive(status);
 		} else if ((flag.isEmpty()) && clientId != null) {
@@ -321,6 +321,11 @@ public class PromotionServiceImpl implements PromotionService {
 			dto.get().setEndDate(vo.getEndDate());
 		}
 		PromotionToStoreEntity promotionToStoreEntity = dto.get();
+
+			if (LocalDate.now().isAfter(vo.getEndDate())) {
+				promotionToStoreEntity.setPromotionStatus(true);
+			}
+
 		promostoreRepo.save(promotionToStoreEntity);
 
 		return "Promotion Dates Updated Successfully";
@@ -626,6 +631,7 @@ public class PromotionServiceImpl implements PromotionService {
 			throw new RecordNotFoundException("Store data not exists");
 
 		}
+
 
 		return promoStoreList;
 	}
