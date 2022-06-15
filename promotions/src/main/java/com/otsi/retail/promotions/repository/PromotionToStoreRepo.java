@@ -18,7 +18,7 @@ public interface PromotionToStoreRepo  extends JpaRepository<PromotionToStoreEnt
 	
 	//List<Long> findPromosByStore(Long storeId);
     
-	@Query(value="select * from pos_promotion_store_mappings as p where p.store_id=:storeId and p.promotion_status=:promoStatus order by p.priority asc",nativeQuery=true)
+	@Query(value="select * from pos_promotion_store_mappings as p where p.store_id=:storeId and p.promotion_status=:promoStatus order by p.priority asc limit 1",nativeQuery=true)
 	List<PromotionToStoreEntity> findByStoreIdAndPromotionStatus(Long storeId, Boolean promoStatus);
 
 	List<PromotionToStoreEntity> findByPromotionStatus(Boolean isActive);
