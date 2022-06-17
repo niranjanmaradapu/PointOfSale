@@ -714,6 +714,7 @@ public class PromotionServiceImpl implements PromotionService {
 					System.out.println("Quantity Slab");
 
 					slabBenefit = getSlabBenefit(promo, totalQuantityAndMrp.get(0));
+					
 
 					// call benefits calculation engine with required fields
 
@@ -750,6 +751,11 @@ public class PromotionServiceImpl implements PromotionService {
 
 			if (value >= promotionSlabsEntity.getFromSlab() && value <= promotionSlabsEntity.getToSlab())
 				benefitEntity = promotionSlabsEntity.getBenfitEntity();
+			
+			if(benefitEntity == null)
+			{
+				throw new InvalidDataException("Please provide the valid data");
+			}
 
 		}
 
