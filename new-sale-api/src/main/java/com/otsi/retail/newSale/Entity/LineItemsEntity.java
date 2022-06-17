@@ -1,15 +1,16 @@
 package com.otsi.retail.newSale.Entity;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import javax.naming.Name;
-import javax.persistence.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class LineItemsEntity {
+public class LineItemsEntity extends BaseEntity {
 
 	@Id
 	@GeneratedValue
@@ -45,19 +46,19 @@ public class LineItemsEntity {
 
 	private Long taxValue;
 
-	private Long cgst;
+	private Float cgst;
 
-	private Long sgst;
+	private Float sgst;
+	
+	private Float igst;
+	
+	private Float cess;
 
 	private Long discount;
 
 	private Long netValue;
 	
 	private Long salesManId;
-
-	private LocalDate creationDate;
-
-	private LocalDate lastModified;
 
 //    @ManyToOne
 //    @JoinColumn(name = "order_id")

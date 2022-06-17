@@ -45,9 +45,13 @@ public class LineItemVo {
 
 	private Long taxValue;
 
-	private Long cgst;
+	private Float cgst;
 
-	private Long sgst;
+	private Float sgst;
+	
+	private Float igst;
+	
+	private Float cess;
 
 	private Long discount;
 	
@@ -55,9 +59,9 @@ public class LineItemVo {
 
 	private Long netValue;
 
-	private LocalDate creationDate;
+	private LocalDateTime createdDate;
 
-	private LocalDate lastModified;
+	private LocalDateTime lastModifiedDate;
 
 	private HsnDetailsVo HsnDetailsVo;
 

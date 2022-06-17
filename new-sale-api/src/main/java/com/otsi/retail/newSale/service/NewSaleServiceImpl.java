@@ -241,11 +241,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 				dsLists.add(ds);
 
 				a.getLineItems().stream().forEach(x -> {
-
-					x.setLastModified(LocalDate.now());
 					x.setDsEntity(a);
 					lineItemRepo.save(x);
-
 				});
 
 			});
@@ -610,8 +607,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 			DeliverySlipEntity savedEntity = dsRepo.save(entity);
 
 			listLineItems.stream().forEach(x -> {
-
-				x.setLastModified(LocalDate.now());
 				x.setDsEntity(savedEntity);
 				lineItemRepo.save(x);
 			});
@@ -1560,15 +1555,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 				lineEntity.setTaxValue(lineItem.getTaxValue());
 				lineEntity.setCgst(lineItem.getCgst());
 				lineEntity.setSgst(lineItem.getSgst());
+				lineEntity.setIgst(lineItem.getIgst());
+				lineEntity.setCess(lineItem.getCess());
 				lineEntity.setStoreId(lineItem.getStoreId());
 				lineEntity.setSalesManId(lineItem.getSalesManId());
 
 				// GrossValue is multiple of net value of product and quantity
 				lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
-
-				lineEntity.setCreationDate(LocalDate.now());
-				lineEntity.setLastModified(LocalDate.now());
-
 				list.add(lineEntity);
 			});
 			List<LineItemsEntity> saved = lineItemRepo.saveAll(list);
@@ -1665,13 +1658,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 			line.setTaxValue(lineItem.getTaxValue());
 			line.setCgst(lineItem.getCgst());
 			line.setSgst(lineItem.getSgst());
+			line.setIgst(lineItem.getIgst());
+			line.setCess(lineItem.getCess());
 			line.setStoreId(lineItem.getStoreId());
 
 			// GrossValue is multiple of net value of product and quantity
 			line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
-
-			line.setCreationDate(LocalDate.now());
-			line.setLastModified(LocalDate.now());
 			LineItemsEntity saved = lineItemRepo.save(line);
 			log.info("Successfully modified line item : " + line);
 

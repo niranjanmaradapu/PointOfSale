@@ -98,7 +98,7 @@ public class NewSaleMapper {
 				dlSlip.getLineItems().stream().forEach(lineItem -> {
 
 					LineItemVo linevo = new LineItemVo();
-					linevo.setCreationDate(lineItem.getCreationDate());
+					linevo.setCreatedDate(lineItem.getCreatedDate());
 					linevo.setBarCode(lineItem.getBarCode());
 					linevo.setItemPrice(lineItem.getItemPrice());
 					linevo.setGrossValue(lineItem.getGrossValue());
