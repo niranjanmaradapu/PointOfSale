@@ -33,6 +33,8 @@ public class DeliverySlipVo {
 	private String type;
 
 	private Long mrp;
+	
+	private Long grossAmount;
 
 	private Long promoDisc;
 

@@ -11,19 +11,21 @@ private Long TotalMrp;
 	
 	private Long totalDiscount;
 	
-	/*
-	 * private float totalTaxableAmount;
-	 * 
-	 * private float totalTaxAmount;
-	 * 
-	 * private float totalSgst;
-	 * 
-	 * private float totalCgst;
-	 * 
-	 * private float totalIgst;
-	 * 
-	 * private String taxDescription;
-	 */
+	
+	  private Long totalTaxableAmount;
+	  
+	  private Long totalTaxAmount;
+	  
+	  private Float totalSgst;
+	  
+	  private Float totalCgst;
+	  
+	  private Float totalIgst;
+	  private Float totalCess;
+	  
+	  private String taxDescription;
+	  
+	 private Long storeId;
 	
 
 }
