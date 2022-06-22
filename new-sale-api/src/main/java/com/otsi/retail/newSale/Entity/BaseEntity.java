@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.Entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;

@@ -1,13 +1,14 @@
 package com.otsi.retail.newSale.mapper;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
@@ -16,17 +17,17 @@ import com.otsi.retail.newSale.Entity.LineItemsEntity;
 import com.otsi.retail.newSale.Entity.LineItemsReEntity;
 import com.otsi.retail.newSale.Entity.LoyalityPointsEntity;
 import com.otsi.retail.newSale.Entity.NewSaleEntity;
-import com.otsi.retail.newSale.common.DomainData;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
-import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.LoyalityPointsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.PaymentAmountTypeVo;
-import com.otsi.retail.newSale.vo.SaleReportVo;
+import com.otsi.retail.newSale.vo.SaleBillsVO;
+import com.otsi.retail.newSale.vo.SalesSummeryVo;
+import com.otsi.retail.newSale.vo.TaxVo;
 
 @Component
 public class NewSaleMapper {
@@ -47,12 +48,6 @@ public class NewSaleMapper {
 
 		BeanUtils.copyProperties(vo, entity);
 
-		/*
-		 * entity.setBarcode(vo.getBarcode()); entity.setItemDesc(vo.getItemDesc());
-		 * entity.setMrp(vo.getMrp()); entity.setNetAmount(vo.getNetAmount());
-		 * entity.setPromoDisc(vo.getPromoDisc()); entity.setQty(vo.getQty());
-		 * entity.setSalesMan(vo.getSalesMan());
-		 */
 		entity.setCreatedDate(LocalDateTime.now());
 
 		return entity;
@@ -64,13 +59,6 @@ public class NewSaleMapper {
 
 		BeanUtils.copyProperties(entity, vo);
 
-		/*
-		 * vo.setBarcode(entity.getBarcode()); vo.setItemDesc(entity.getItemDesc());
-		 * vo.setMrp(entity.getMrp()); vo.setNetAmount(entity.getNetAmount());
-		 * vo.setPromoDisc(entity.getPromoDisc()); vo.setQty(entity.getQty());
-		 * vo.setSalesMan(entity.getSalesMan());
-		 */
-
 		return vo;
 	}
 
@@ -79,168 +67,151 @@ public class NewSaleMapper {
 		return null;
 	}
 
-	public ListOfSaleBillsVo convertlistSalesEntityToVo(List<NewSaleEntity> saleDetails) {
-
-		ListOfSaleBillsVo lsvo = new ListOfSaleBillsVo();
-		List<NewSaleVo> sVoList = new ArrayList<>();
-
-		saleDetails.stream().forEach(x -> {
-
-			NewSaleVo nsvo = new NewSaleVo();
-			List<LineItemVo> listBarVo = new ArrayList<>();
-			if (x.getDomainId() == DomainData.RE.getId()) {
-				if (x.getLineItemsRe() != null) {
-					x.getLineItemsRe().stream().forEach(a -> {
-
-						LineItemVo barvo = new LineItemVo();
-
-						barvo.setCreationDate(a.getCreationDate());
-						barvo.setBarCode(a.getBarCode());
-						barvo.setSection(a.getSection());
-						barvo.setItemPrice(a.getItemPrice());
-						barvo.setGrossValue(a.getGrossValue());
-						barvo.setNetValue(a.getNetValue());
-						barvo.setQuantity(a.getQuantity());
-						barvo.setDiscount(a.getDiscount());
-						barvo.setSection(a.getSection());
-						barvo.setHsnCode(a.getHsnCode());
-						barvo.setSgst(a.getSgst());
-						barvo.setCgst(a.getCgst());
-						barvo.setTaxValue(a.getTaxValue());
-						barvo.setUserId(a.getUserId());
-						listBarVo.add(barvo);
-						nsvo.setLineItemsReVo(listBarVo);
-					});
-				}
-			} else if (x.getDomainId() != DomainData.RE.getId()) {
-
-				if (x.getDlSlip() != null) {
-					x.getDlSlip().stream().forEach(a -> {
-						a.getLineItems().stream().forEach(b -> {
-
-							LineItemVo linevo = new LineItemVo();
-
-							linevo.setCreationDate(b.getCreationDate());
-							linevo.setBarCode(b.getBarCode());
-							linevo.setItemPrice(b.getItemPrice());
-							linevo.setGrossValue(b.getGrossValue());
-							linevo.setNetValue(b.getNetValue());
-							linevo.setQuantity(b.getQuantity());
-							linevo.setDiscount(b.getDiscount());
-							linevo.setSection(b.getSection());
-							linevo.setSection(b.getSection());
-							linevo.setHsnCode(b.getHsnCode());
-							linevo.setSgst(b.getSgst());
-							linevo.setCgst(b.getCgst());
-							linevo.setUserId(a.getUserId());
-							linevo.setTaxValue(b.getTaxValue());
-
-							listBarVo.add(linevo);
-							nsvo.setLineItemsReVo(listBarVo);
-						});
-					});
-				}
-
-			}
-			nsvo.setInvoiceNumber(x.getOrderNumber());
-			nsvo.setBiller(x.getCreatedBy());
-			nsvo.setCreatedDate(x.getCreationDate());
-			nsvo.setTotalManualDisc(x.getManualDisc());
-			nsvo.setApprovedBy(x.getCreatedBy());
-			nsvo.setReason(x.getDiscType());
-			nsvo.setOfflineNumber(x.getOfflineNumber());
-			nsvo.setNetPayableAmount(x.getNetValue());
-			nsvo.setUserId(x.getUserId());
-			nsvo.setEmpId(x.getCreatedBy());
-			nsvo.setStatus(x.getStatus());
-			nsvo.setNewsaleId(x.getOrderId());
-
-			sVoList.add(nsvo);
-
-			lsvo.setNewSaleVo(sVoList);
-
+	public SaleBillsVO converEntityToVo(Page<NewSaleEntity> saleDetails) {
+		SaleBillsVO saleBillsVO = new SaleBillsVO();
+		Page<NewSaleVo> newSaleVOPage = saleDetails.map(sale -> {
+			return mapToNewSaleVO(sale);
 		});
-
-		lsvo.setTotalAmount(saleDetails.stream().mapToLong(i -> i.getNetValue()).sum());
-	
-		
-		//lsvo.setTotalDiscount(saleDetails.stream().mapToLong(d -> d.getManualDisc()).sum());
-	
-
-		return lsvo;
-
+		saleBillsVO.setNewSale(newSaleVOPage);
+		saleBillsVO.setTotalAmount(saleDetails.stream().mapToLong(saleDetail -> saleDetail.getNetValue()).sum());
+		return saleBillsVO;
 	}
 
-	public SaleReportVo convertlistSaleReportEntityToVo(List<NewSaleEntity> saleDetails) {
+	private NewSaleVo mapToNewSaleVO(NewSaleEntity sale) {
+		NewSaleVo newSaleVO = new NewSaleVo();
+		List<LineItemVo> lineItemsList = new ArrayList<>();
 
-		SaleReportVo srvo = new SaleReportVo();
+		if (sale.getDlSlip() != null) {
+			sale.getDlSlip().stream().forEach(dlSlip -> {
+				dlSlip.getLineItems().stream().forEach(lineItem -> {
 
+					LineItemVo linevo = new LineItemVo();
+					linevo.setCreatedDate(lineItem.getCreatedDate());
+					linevo.setBarCode(lineItem.getBarCode());
+					linevo.setItemPrice(lineItem.getItemPrice());
+					linevo.setGrossValue(lineItem.getGrossValue());
+					linevo.setNetValue(lineItem.getNetValue());
+					linevo.setQuantity(lineItem.getQuantity());
+					linevo.setDiscount(lineItem.getDiscount());
+					linevo.setSection(lineItem.getSection());
+					linevo.setSection(lineItem.getSection());
+					linevo.setHsnCode(lineItem.getHsnCode());
+					linevo.setSgst(lineItem.getSgst());
+					linevo.setCgst(lineItem.getCgst());
+					linevo.setIgst(lineItem.getIgst());
+					linevo.setCess(lineItem.getCess());
+					linevo.setUserId(dlSlip.getUserId());
+					linevo.setTaxValue(lineItem.getTaxValue());
+					lineItemsList.add(linevo);
+					newSaleVO.setLineItemsReVo(lineItemsList);
+				});
+			});
+		}
+
+		newSaleVO.setInvoiceNumber(sale.getOrderNumber());
+		newSaleVO.setBiller(sale.getCreatedBy());
+		newSaleVO.setCreatedDate(sale.getCreatedDate());
+		newSaleVO.setTotalManualDisc(sale.getManualDisc());
+		newSaleVO.setApprovedBy(sale.getCreatedBy());
+		newSaleVO.setReason(sale.getDiscType());
+		newSaleVO.setOfflineNumber(sale.getOfflineNumber());
+		newSaleVO.setNetPayableAmount(sale.getNetValue());
+		newSaleVO.setUserId(sale.getUserId());
+		newSaleVO.setEmpId(sale.getCreatedBy());
+		newSaleVO.setStatus(sale.getStatus());
+		newSaleVO.setNewsaleId(sale.getOrderId());
+		return newSaleVO;
+	}
+
+	public SalesSummeryVo convertlistSaleReportEntityToVo(List<NewSaleEntity> saleDetails) {
+		List<SalesSummeryVo> listSummeryVo = new ArrayList<>();
+
+		SalesSummeryVo srvo = new SalesSummeryVo();
 		srvo.setBillValue(saleDetails.stream().mapToLong(b -> b.getNetValue()).sum());
 		srvo.setTotalMrp(saleDetails.stream().mapToLong(m -> m.getGrossValue()).sum());
 		
-		List<Long> result = saleDetails.stream()
-				.map(num -> num.getPromoDisc()) 
-				.filter(n -> n!=null)
+
+		List<Long> result = saleDetails.stream().map(num -> num.getPromoDisc()).filter(n -> n != null)
 				.collect(Collectors.toList());
+
+		srvo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());
+		saleDetails.stream().forEach(saleDetail->{
+			
+			saleDetail.getDlSlip().stream().forEach(deliverySlp->{
+				SalesSummeryVo summeryvo = new SalesSummeryVo();
+				
+				Double totalCgst = deliverySlp.getLineItems().stream().mapToDouble(lineItem->lineItem.getCgst()).sum();
+				Double totalSgst= deliverySlp.getLineItems().stream().mapToDouble(lineItem->lineItem.getSgst()).sum();
+				Double totalIgst= deliverySlp.getLineItems().stream().mapToDouble(lineItem->lineItem.getIgst()).filter(n -> n != 0.0).sum();
+				Double totalCess= deliverySlp.getLineItems().stream().mapToDouble(lineItem->lineItem.getCess()).filter(n -> n != 0.0).sum();
+
+				summeryvo.setTotalCgst(totalCgst.floatValue());
+				summeryvo.setTotalSgst(totalSgst.floatValue());
+				summeryvo.setTotalIgst(totalIgst.floatValue());
+				summeryvo.setTotalCess(totalCess.floatValue());
+				summeryvo.setTotalTaxAmount(deliverySlp.getLineItems().stream().mapToLong(lineItem->lineItem.getTaxValue()).sum());
+				
+				listSummeryVo.add(summeryvo);
+			});
+			
+		});
+		Double totalSgst= listSummeryVo.stream().mapToDouble(summeryVo->summeryVo.getTotalSgst()).sum();
+		Double totalCgst= listSummeryVo.stream().mapToDouble(summeryVo->summeryVo.getTotalCgst()).sum();
+		Double totalIgst= listSummeryVo.stream().mapToDouble(summeryVo->summeryVo.getTotalIgst()).filter(n -> n != 0.0).sum();
+		Double totalCess= listSummeryVo.stream().mapToDouble(summeryVo->summeryVo.getTotalCess()).filter(n -> n != 0.0).sum();
+		srvo.setTotalSgst(totalSgst.floatValue());
+		srvo.setTotalCgst(totalCgst.floatValue());
+		srvo.setTotalIgst(totalIgst.floatValue());
+		srvo.setTotalCess(totalCess.floatValue());
 		
-		srvo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());		
+		srvo.setTotalTaxAmount(listSummeryVo.stream().mapToLong(summeryVo->summeryVo.getTotalTaxAmount()).sum());
+
+
+		
 		return srvo;
 
 	}
 
-	public ListOfDeliverySlipVo convertListDSToVo(List<DeliverySlipEntity> dsDetails) {
+	public ListOfDeliverySlipVo convertListDSToVo(Page<DeliverySlipEntity> dsDetails) {
 
 		ListOfDeliverySlipVo vo = new ListOfDeliverySlipVo();
 
-		List<DeliverySlipVo> dsVoList = new ArrayList<>();
-		List<LineItemsEntity> barEnt = new ArrayList<>();
+		Page<DeliverySlipVo> dspageVo = dsDetails.map(dsDetail -> dsentityToVo(dsDetail));
 
-		dsDetails.stream().forEach(x -> {
-
-			List<LineItemVo> listBarVo = new ArrayList<>();
-
-			x.getLineItems().stream().forEach(b -> {
-
-				LineItemVo barvo = new LineItemVo();
-				
-
-				BeanUtils.copyProperties(b, barvo);
-				barvo.setUserId(x.getUserId());
-
-				listBarVo.add(barvo);
-			});
-
-			DeliverySlipVo dsvo = new DeliverySlipVo();
-		Long amount=	x.getLineItems().stream().mapToLong(a->a.getNetValue()).sum();
-		Long grossAmount = x.getLineItems().stream().mapToLong(a->a.getGrossValue()).sum();
-
-			BeanUtils.copyProperties(x, dsvo);
-			dsvo.setCreatedDate(x.getCreationDate());
-			dsvo.setLineItems(listBarVo);
-             dsvo.setNetAmount(amount);
-             dsvo.setMrp(grossAmount);
-
-            dsVoList.add(dsvo);
-		});
-
-		// vo.setToatalPromoDisc(dsDetails.stream().mapToLong(i ->
-		// i.getPromoDisc()).sum());
-		// vo.setTotalNetAmount(dsDetails.stream().mapToLong(i ->
-		// i.getNetAmount()).sum());
-		// vo.setTotalGrossAmount(dsDetails.stream().mapToLong(i -> i.getMrp()).sum());
-		vo.setDeliverySlipVo(dsVoList);
-
-		dsDetails.stream().forEach(a -> {
-			
-
-			//vo.setBartoatalPromoDisc(a.getLineItems().stream().mapToLong(i -> i.getDiscount()).sum());
-			vo.setBartotalNetAmount(a.getLineItems().stream().mapToLong(i -> i.getNetValue()).sum());
-			vo.setBartotalGrossAmount(a.getLineItems().stream().mapToLong(i -> i.getGrossValue()).sum());
-			vo.setBarTotalQty(a.getLineItems().stream().mapToInt(q -> q.getQuantity()).sum());
-
-		});
+		vo.setDeliverySlip(dspageVo);
 
 		return vo;
+	}
+
+	private DeliverySlipVo dsentityToVo(DeliverySlipEntity dsEntity) {
+
+		List<DeliverySlipVo> dsVoList = new ArrayList<>();
+
+		List<LineItemVo> listBarVo = new ArrayList<>();
+
+		dsEntity.getLineItems().stream().forEach(b -> {
+
+			LineItemVo barvo = new LineItemVo();
+
+			BeanUtils.copyProperties(b, barvo);
+			barvo.setUserId(dsEntity.getUserId());
+
+			listBarVo.add(barvo);
+		});
+
+		DeliverySlipVo dsvo = new DeliverySlipVo();
+		Long amount = dsEntity.getLineItems().stream().mapToLong(a -> a.getNetValue()).sum();
+		Long grossAmount = dsEntity.getLineItems().stream().mapToLong(a -> a.getGrossValue()).sum();
+
+		BeanUtils.copyProperties(dsEntity, dsvo);
+		dsvo.setCreatedDate(dsEntity.getCreatedDate());
+		dsvo.setLineItems(listBarVo);
+		dsvo.setNetAmount(amount);
+		dsvo.setGrossAmount(grossAmount);
+
+		
+		return dsvo;
+
 	}
 
 	public NewSaleVo entityToVo(NewSaleEntity dto) {
@@ -274,13 +245,7 @@ public class NewSaleMapper {
 		// vo.setCustomerName(dto.getCustomerDetails().getName());
 		// vo.setMobileNumber(dto.getCustomerDetails().getMobileNumber());
 		vo.setNewsaleId(dto.getOrderId());
-//		dto.getPaymentType().forEach(p -> {
-//			PaymentAmountTypeVo payVo = new PaymentAmountTypeVo();
-//			payVo.setId(p.getId());
-//			payVo.setPaymentAmount(p.getPaymentAmount());
-//			payVo.setPaymentType(p.getPaymentType());
-//			payVos.add(payVo);
-//		});
+
 		vo.setPaymentAmountTypeId(payVos);
 		vo.setAmount(dto.getNetValue() - dto.getNetValue());
 		vo.setInvoiceNumber(dto.getOrderNumber());
@@ -291,28 +256,17 @@ public class NewSaleMapper {
 		NewSaleVo vo = new NewSaleVo();
 		vo.setApprovedBy(dto.getCreatedBy());
 		// vo.setBiller(dto.getBiller());
-		vo.setCreatedDate(dto.getCreationDate());
-//		if (dto.getDlSlip() != null) {
-//			vo.setDlSlip(deliverySlipMapper.convertDsEntityListToVoList(dto.getDlSlip()));
-//		}
+		vo.setCreatedDate(dto.getCreatedDate());
 		vo.setGrossAmount(dto.getGrossValue());
 		vo.setInvoiceNumber(dto.getOrderNumber());
 		vo.setNatureOfSale(dto.getNatureOfSale());
 		vo.setNetPayableAmount(dto.getNetValue());
 		vo.setOfflineNumber(dto.getOfflineNumber());
-//		if (dto.getPaymentType() != null) {
-//			vo.setPaymentAmountType(paymentAmountTypeMapper.EntityToVo(dto.getPaymentType()));
-//
-//		}
-		// vo.setRoundOff(dto.getRoundOff());
 		vo.setTaxAmount(dto.getTaxValue());
 		vo.setTotalManualDisc(dto.getManualDisc());
 		vo.setTotalPromoDisc(dto.getPromoDisc());
 		vo.setUserId(dto.getUserId());
 		vo.setApprovedBy(dto.getCreatedBy());
-//		if (dto.getCustomerDetails() != null) {
-//			vo.setCustomerDetails(customerMapper.convertEntityToVo(dto.getCustomerDetails()));
-//		}
 
 		return vo;
 		// TODO Auto-generated method stub

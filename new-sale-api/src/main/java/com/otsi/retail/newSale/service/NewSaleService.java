@@ -3,6 +3,7 @@ package com.otsi.retail.newSale.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,11 +23,11 @@ import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
-import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.LoyalityPointsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
+import com.otsi.retail.newSale.vo.SaleBillsVO;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 
@@ -41,10 +42,10 @@ public interface NewSaleService {
 
 	DeliverySlipVo getDeliverySlipDetails(String dsNumber) throws RecordNotFoundException;
 
-	ListOfSaleBillsVo getListOfSaleBills(ListOfSaleBillsVo svo)
+	SaleBillsVO getListOfSaleBills(SaleBillsVO saleBillsVO, Pageable pageable)
 			throws RecordNotFoundException, JsonMappingException, JsonProcessingException;
 
-	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo)
+	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo, Pageable pageable)
 			throws RecordNotFoundException;
 
 	List<DeliverySlipVo> posDayClose(Long storeId);
@@ -85,7 +86,7 @@ public interface NewSaleService {
 
 	String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo);
 
-	String deleteDeliverySlipDetails(String dsNumber);
+	void deleteDeliverySlipDetails(String dsNumber);
 
 	List<LineItemVo> getBarcodes(List<String> barCode/*, Long domainId */) throws RecordNotFoundException;
 

@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,6 +38,7 @@ public class ReturnSlip extends BaseEntity {
 	private String mobileNumber;
 	private String reason;
 	private Boolean isReviewed;
+	@Enumerated(EnumType.STRING)	
 	private ReturnSlipStatus rtStatus;
 	private String reviewedBy;
 	@OneToMany(cascade = CascadeType.ALL)

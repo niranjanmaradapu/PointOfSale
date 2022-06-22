@@ -22,7 +22,7 @@ public interface PromotionService {
 
 	String addPromotion(PromotionsVo vo);
 
-	ConnectionPromoVo getListOfPromotions(String flag, Long domainId, Long clientId);
+	ConnectionPromoVo getListOfPromotions(String flag, Long clientId);
 
 	String editPromotion(PromotionsVo vo);
 	
