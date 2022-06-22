@@ -23,7 +23,7 @@ import com.otsi.retail.promotions.vo.PromotionsVo;
 @Component
 public class PromotionMapper {
 
-	public PromotionsEntity convertPromoVoToEntity(PromotionsVo vo, List<PoolEntity> poolList) {
+	public PromotionsEntity convertPromoVoToEntity(PromotionsVo vo, List<PoolEntity> poolList, List<PoolEntity> poolList1) {
 
 		PromotionsEntity promo = new PromotionsEntity();
 
@@ -66,6 +66,10 @@ public class PromotionMapper {
 			benefit.setDiscountSubTypes(s.getBenfitVo().getDiscountSubType());
 			benefit.setPoolId(s.getBenfitVo().getPoolId());
 			benefit.setPoolName(s.getBenfitVo().getPoolName());
+			
+			//newly added
+			
+			benefit.setPoolEntities(poolList1);
 
 			// mapping benefits to slab
 			slab.setBenfitEntity(benefit);
@@ -91,7 +95,7 @@ public class PromotionMapper {
 			benfit.setPromotionEntity(promo);
 			
 			// mapping benefits to pools
-			benfit.setPoolEntities(poolList);
+			benfit.setPoolEntities(poolList1);
 
 			benfitEntity.add(benfit);
 		});

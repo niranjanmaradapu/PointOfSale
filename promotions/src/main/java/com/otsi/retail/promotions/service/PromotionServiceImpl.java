@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -47,6 +48,7 @@ import com.otsi.retail.promotions.vo.ConnectionPromoVo;
 import com.otsi.retail.promotions.vo.LineItemVo;
 import com.otsi.retail.promotions.vo.ProductVO;
 import com.otsi.retail.promotions.vo.PromotionPoolVo;
+import com.otsi.retail.promotions.vo.PromotionSlabsVo;
 import com.otsi.retail.promotions.vo.PromotionToStoreVo;
 import com.otsi.retail.promotions.vo.PromotionsVo;
 import com.otsi.retail.promotions.vo.ReportVo;
@@ -102,14 +104,28 @@ public class PromotionServiceImpl implements PromotionService {
 			throw new InvalidDataException("please give valid data");
 		}
 		List<PromotionPoolVo> poolVo = vo.getPoolVo();
+		List<PromotionSlabsVo> promotionSlabVo = vo.getPromotionSlabVo();
+		List<PoolEntity> poolList1 = null;
+		List<PromotionPoolVo> poolVo2 = null;
+		
+		for (PromotionSlabsVo promotionSlabsVo : promotionSlabVo) {
 
+			poolVo2 = promotionSlabsVo.getBenfitVo().getPoolVo();
+
+		}
+		
+		if (!(CollectionUtils.isEmpty(poolVo2))) {
+			List<Long> poolIds2 = poolVo2.stream().map(x -> x.getPoolId()).collect(Collectors.toList());
+
+			poolList1 = poolRepo.findByPoolIdInAndIsActive(poolIds2, Boolean.TRUE);
+		}
+		
 		List<Long> poolIds = poolVo.stream().map(x -> x.getPoolId()).collect(Collectors.toList());
 
 		List<PoolEntity> poolList = poolRepo.findByPoolIdInAndIsActive(poolIds, Boolean.TRUE);
+		
 
-		// BenfitVo bvo = vo.getBenfitVo();
-
-		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList);
+		PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList, poolList1);
 
 		PromotionsEntity promoList = null;
 		if (poolVo.size() == poolList.size()) {
@@ -176,6 +192,19 @@ public class PromotionServiceImpl implements PromotionService {
 
 		if (promotion.isPresent()) {
 			List<PromotionPoolVo> poolVo = vo.getPoolVo();
+			List<PromotionSlabsVo> promotionSlabVo = vo.getPromotionSlabVo();
+			List<PoolEntity> poolList1 = null;
+			List<PromotionPoolVo> poolVo2 = null;
+
+			for (PromotionSlabsVo promotionSlabsVo : promotionSlabVo) {
+
+				poolVo2 = promotionSlabsVo.getBenfitVo().getPoolVo();
+
+			}
+			if (!(CollectionUtils.isEmpty(poolVo2))) {
+				List<Long> poolIds2 = poolVo2.stream().map(x -> x.getPoolId()).collect(Collectors.toList());
+				poolList1 = poolRepo.findByPoolIdInAndIsActive(poolIds2, Boolean.TRUE);
+			}
 
 			List<Long> poolIds = poolVo.stream().map(x -> x.getPoolId()).collect(Collectors.toList());
 
@@ -183,7 +212,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 			if ((poolVo.size() == poolList.size())) {
 
-				PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList);
+				PromotionsEntity entity = promoMapper.convertPromoVoToEntity(vo, poolList, poolList1);
 				PromotionsEntity savedPromo = promoRepo.save(entity);
 
 			} else {
@@ -322,9 +351,9 @@ public class PromotionServiceImpl implements PromotionService {
 		}
 		PromotionToStoreEntity promotionToStoreEntity = dto.get();
 
-			if (LocalDate.now().isAfter(vo.getEndDate())) {
-				promotionToStoreEntity.setPromotionStatus(true);
-			}
+		if (LocalDate.now().isAfter(vo.getEndDate())) {
+			promotionToStoreEntity.setPromotionStatus(true);
+		}
 
 		promostoreRepo.save(promotionToStoreEntity);
 
@@ -632,7 +661,6 @@ public class PromotionServiceImpl implements PromotionService {
 
 		}
 
-
 		return promoStoreList;
 	}
 
@@ -714,7 +742,6 @@ public class PromotionServiceImpl implements PromotionService {
 					System.out.println("Quantity Slab");
 
 					slabBenefit = getSlabBenefit(promo, totalQuantityAndMrp.get(0));
-					
 
 					// call benefits calculation engine with required fields
 
@@ -751,9 +778,8 @@ public class PromotionServiceImpl implements PromotionService {
 
 			if (value >= promotionSlabsEntity.getFromSlab() && value <= promotionSlabsEntity.getToSlab())
 				benefitEntity = promotionSlabsEntity.getBenfitEntity();
-			
-			if(benefitEntity == null)
-			{
+
+			if (benefitEntity == null) {
 				throw new InvalidDataException("Please provide the valid data");
 			}
 

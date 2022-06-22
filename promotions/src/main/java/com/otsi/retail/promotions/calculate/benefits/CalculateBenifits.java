@@ -531,7 +531,15 @@ public class CalculateBenifits {
 		double calculatedInvoiceLevelDiscount = 0.0;
 
 		// get the getPools from the benefits
-		List<PoolEntity> poolEntities = promo.getPoolEntity();
+		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
+		
+		PoolType poolType = null;
+
+		for (PoolEntity poolEntity : poolEntities) {
+
+			poolType = poolEntity.getPoolType();
+		}
+		if (poolType.equals(PoolType.Get)) {
 
 		// get the eligible line items from get pool
 		List<LineItemVo> eligibleLineItemsFromGetPools = fetchBenefitEligibleLineItems(listofAllLineItems,
@@ -539,8 +547,13 @@ public class CalculateBenifits {
 
 		// get the number of items from get pool
 		int numOfItemsFromGetPool = Integer.valueOf(benfitEntity.getNumOfItemsFromGetPool().intValue());
+		long qty = 0l;
+		for (LineItemVo lineItemVo : eligibleLineItemsFromGetPools) {
 
-		if (eligibleLineItemsFromGetPools.size() >= numOfItemsFromGetPool) {
+			qty = lineItemVo.getQuantity();
+		}
+
+		if (eligibleLineItemsFromGetPools.size() >= numOfItemsFromGetPool || qty >= numOfItemsFromGetPool) {
 
 			calculatedInvoiceLevelDiscount = Double.valueOf(benfitEntity.getDiscount()).doubleValue();
 
@@ -556,6 +569,7 @@ public class CalculateBenifits {
 						+ " more products from get pools, he will get the discount.");
 
 			}
+		}
 
 		}
 
@@ -602,9 +616,8 @@ public class CalculateBenifits {
 		double calculatedInvoiceLevelDiscount = 0.0;
 
 		// get the getPools from the benefits
-		List<PoolEntity> poolEntities = promo.getPoolEntity();
+		List<PoolEntity> poolEntities= benfitEntity.getPoolEntities();
 
-		// LineItemVo maxValueMRP = orderedLineItems.get(orderedLineItems.size());
 		PoolType poolType = null;
 		for (PoolEntity poolEntity : poolEntities) {
 
@@ -673,7 +686,9 @@ public class CalculateBenifits {
 		double calculateInvoiceLevelDiscount = 0.0;
 
 		// get the getPools from the benefits
-		List<PoolEntity> poolEntities = promo.getPoolEntity();
+		
+		List<PoolEntity> poolEntities= benfitEntity.getPoolEntities();
+		
 		PoolType poolType = null;
 
 		for (PoolEntity poolEntity : poolEntities) {

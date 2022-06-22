@@ -27,6 +27,6 @@ public class BenefitVo {
 	private DiscountSubTypes discountSubType;
 	private Long poolId;
 	private String poolName;
-	private List<PoolEntity> poolEntities;
+	private List<PromotionPoolVo> poolVo;
 
 }

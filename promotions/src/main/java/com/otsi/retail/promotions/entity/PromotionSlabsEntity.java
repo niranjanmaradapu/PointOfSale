@@ -28,7 +28,7 @@ public class PromotionSlabsEntity extends BaseEntity {
 	
 	private float fromSlab;
 	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "benfitId", referencedColumnName = "benfitId")
 	private BenfitEntity benfitEntity;
 	
