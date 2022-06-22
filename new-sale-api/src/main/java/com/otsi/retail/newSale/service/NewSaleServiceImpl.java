@@ -11,7 +11,9 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -241,8 +243,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 				dsLists.add(ds);
 
 				a.getLineItems().stream().forEach(x -> {
+
+					x.setLastModifiedDate(LocalDateTime.now());
 					x.setDsEntity(a);
 					lineItemRepo.save(x);
+
 				});
 
 			});
@@ -429,7 +434,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	}
 
-/////////////
+
 	@RabbitListener(queues = "newsale_queue")
 	public void paymentConfirmation(PaymentDetailsVo paymentDetails) {
 
@@ -509,24 +514,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		});
 		log.info("Update request to Textile: " + updateVo);
 		rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(), config.getUpdateInventoryRK(), updateVo);
-		/*
-		 * } else {
-		 * 
-		 * List<InventoryUpdateVo> updateVo = new ArrayList<>();
-		 * 
-		 * List<LineItemsReEntity> lineItemRes = orderRecord.getLineItemsRe();
-		 * 
-		 * lineItemRes.stream().forEach(x -> {
-		 * 
-		 * InventoryUpdateVo vo = new InventoryUpdateVo();
-		 * vo.setBarCode(x.getBarCode()); vo.setLineItemId(x.getLineItemReId());
-		 * vo.setQuantity(x.getQuantity()); vo.setStoreId(orderRecord.getStoreId());
-		 * vo.setDomainId(orderRecord.getDomainId()); updateVo.add(vo); });
-		 * 
-		 * log.info("Update request to Retail : " + updateVo);
-		 * rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(),
-		 * config.getUpdateInventoryRK(), updateVo); }
-		 */
+		
 	}
 
 	@Override
@@ -607,6 +595,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			DeliverySlipEntity savedEntity = dsRepo.save(entity);
 
 			listLineItems.stream().forEach(x -> {
+
+				x.setLastModifiedDate(LocalDateTime.now());
 				x.setDsEntity(savedEntity);
 				lineItemRepo.save(x);
 			});
@@ -806,17 +796,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				if (a.getPriceFrom() <= netAmt && netAmt <= a.getPriceTo()) {
 
-					// tvo.setGst((float) ((a.getTaxVo().getCess() * netAmt) / 100));
+					
 					tvo.setTaxableAmount((float) netAmt / (1 + (a.getTaxVo().getCess() / 100)));
-					// tvo.setGst((tvo.getTaxableAmount()*a.getTaxVo().getGst())/100);
-					// tvo.setSgst((float) ((a.getTaxVo().getSgst() * netAmt) / 100));
 					tvo.setGst(a.getTaxVo().getCess());
 					tvo.setTaxLabel(a.getTaxVo().getTaxLabel());
 					tvo.setSgst((float) ((netAmt - tvo.getTaxableAmount()) / 2));
-					tvo.setCgst((float) ((netAmt - tvo.getTaxableAmount()) / 2)); // tvo.setIgst((float)
-																					// ((a.getTaxVo().getIgst() *
-																					// netAmt) / 100));
-					// tvo.setCgst((float) ((a.getTaxVo().getCgst() * netAmt) / 100));
+					tvo.setCgst((float) ((netAmt - tvo.getTaxableAmount()) / 2)); 
 					if (a.getTaxVo().getIgst() != 0.00) {
 						tvo.setIgst(tvo.getCgst() + tvo.getSgst());
 
@@ -855,8 +840,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 * getting the record using all fields
 			 */
 			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
-					&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() != null
-					&& listOfDeliverySlipVo.getBarcode() != null && listOfDeliverySlipVo.getStoreId() != 0L) {
+					&& StringUtils.isNotEmpty(listOfDeliverySlipVo.getDsNumber()) && listOfDeliverySlipVo.getStatus() != null
+					&& StringUtils.isNotEmpty(listOfDeliverySlipVo.getBarcode()) && ObjectUtils.isNotEmpty(listOfDeliverySlipVo.getStoreId()) ){
 
 				List<LineItemsEntity> bar = lineItemRepo.findByBarCodeAndStoreId(listOfDeliverySlipVo.getBarcode(),
 						listOfDeliverySlipVo.getStoreId());
@@ -879,8 +864,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 
 			if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
-					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
-					&& listOfDeliverySlipVo.getBarcode() != null && listOfDeliverySlipVo.getStoreId() != 0L) {
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getDsNumber())&& listOfDeliverySlipVo.getStatus() == null
+					&& StringUtils.isNotEmpty(listOfDeliverySlipVo.getBarcode()) && ObjectUtils.isNotEmpty(listOfDeliverySlipVo.getStoreId())) {
 
 				List<LineItemsEntity> bar = lineItemRepo.findByBarCodeAndStoreId(listOfDeliverySlipVo.getBarcode(),
 						listOfDeliverySlipVo.getStoreId());
@@ -903,13 +888,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 
 			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
-					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
-					&& listOfDeliverySlipVo.getBarcode() != null && listOfDeliverySlipVo.getStoreId() != 0L) {
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getDsNumber())&& listOfDeliverySlipVo.getStatus() == null
+					&& StringUtils.isNotEmpty(listOfDeliverySlipVo.getBarcode()) && ObjectUtils.isNotEmpty(listOfDeliverySlipVo.getStoreId())) {
 
 				List<LineItemsEntity> bar = lineItemRepo.findByBarCodeAndStoreId(listOfDeliverySlipVo.getBarcode(),
 						listOfDeliverySlipVo.getStoreId());
 
-				if (bar != null) {
+				if (!CollectionUtils.isEmpty(bar)) {
 					List<DeliverySlipEntity> den = bar.stream().map(d -> d.getDsEntity()).filter(n -> n != null)
 							.collect(Collectors.toList());
 					
@@ -931,8 +916,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 * getting the record using dsNumber and dates
 			 */
 			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
-					&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() == null
-					&& listOfDeliverySlipVo.getBarcode() == null && listOfDeliverySlipVo.getStoreId() != 0L) {
+					&& StringUtils.isNotEmpty(listOfDeliverySlipVo.getDsNumber()) && listOfDeliverySlipVo.getStatus() == null
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getBarcode()) && ObjectUtils.isNotEmpty(listOfDeliverySlipVo.getStoreId())) {
 
 				dsDetails = dsRepo.findByCreatedDateBetweenAndDsNumberAndStoreIdOrderByCreatedDateDesc(
 						createdDatefrom, createdDateTo,
@@ -943,8 +928,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 * getting the record using status and dates
 			 */
 			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
-					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
-					&& listOfDeliverySlipVo.getBarcode() == null && listOfDeliverySlipVo.getStoreId() != 0L) {
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getDsNumber()) && listOfDeliverySlipVo.getStatus() != null
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getBarcode()) && ObjectUtils.isNotEmpty(listOfDeliverySlipVo.getStoreId())) {
 
 				dsDetails = dsRepo.findByCreatedDateBetweenAndStatusAndStoreIdOrderByCreatedDateDesc(
 						createdDatefrom, createdDateTo,
@@ -957,8 +942,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 
 			if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
-					&& listOfDeliverySlipVo.getDsNumber() != null && listOfDeliverySlipVo.getStatus() == null
-					&& listOfDeliverySlipVo.getBarcode() == null && listOfDeliverySlipVo.getStoreId() != 0L) {
+					&& StringUtils.isNotEmpty(listOfDeliverySlipVo.getDsNumber()) && listOfDeliverySlipVo.getStatus() == null
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getBarcode()) && ObjectUtils.isNotEmpty(listOfDeliverySlipVo.getStoreId())) {
 
 				// List<String> dlsList = listOfDeliverySlipVo.stream().map(x ->
 				// x.getDsNumber()).collect(Collectors.toList());
@@ -974,8 +959,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 */
 
 			if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
-					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() != null
-					&& listOfDeliverySlipVo.getBarcode() == null && listOfDeliverySlipVo.getStoreId() != 0L) {
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getDsNumber()) && listOfDeliverySlipVo.getStatus() != null
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getBarcode()) && ObjectUtils.isNotEmpty(listOfDeliverySlipVo.getStoreId())) {
 
 				dsDetails = dsRepo.findByStatusAndStoreIdOrderByCreatedDateDesc(listOfDeliverySlipVo.getStatus(),
 						listOfDeliverySlipVo.getStoreId(),pageable);
@@ -985,8 +970,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 			 * getting the record using dates
 			 */
 			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() != null
-					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
-					&& listOfDeliverySlipVo.getBarcode() == null && listOfDeliverySlipVo.getStoreId() != 0L) {
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getDsNumber()) && listOfDeliverySlipVo.getStatus() == null
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getBarcode()) && ObjectUtils.isNotEmpty(listOfDeliverySlipVo.getStoreId())) {
+ 
 
 				dsDetails = dsRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateDesc(
 						createdDatefrom, createdDateTo,
@@ -994,8 +980,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			}
 			if (listOfDeliverySlipVo.getDateFrom() != null && listOfDeliverySlipVo.getDateTo() == null
-					&& listOfDeliverySlipVo.getDsNumber() == null && listOfDeliverySlipVo.getStatus() == null
-					&& listOfDeliverySlipVo.getBarcode() == null && listOfDeliverySlipVo.getStoreId() != 0L) {
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getDsNumber()) && listOfDeliverySlipVo.getStatus() == null
+					&& StringUtils.isEmpty(listOfDeliverySlipVo.getBarcode()) && ObjectUtils.isNotEmpty(listOfDeliverySlipVo.getStoreId())) {
 
 				dsDetails = dsRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateDesc(
 						createdDatefrom, createdDateTo,
@@ -1003,7 +989,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			}
 			ListOfDeliverySlipVo lvo = null;
-			if (!dsDetails.isEmpty()) {
+			if (dsDetails.hasContent()) {
 				lvo=	newSaleMapper.convertListDSToVo(dsDetails);
 				
 				log.warn("we are testing is fetching list of deivery slips");
@@ -1187,12 +1173,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				List<ReturnSlipVo> rtSlipVoList = new ArrayList<>();
 
 				List<NewSaleEntity> newSaleEntity = newSaleRepository.findByUserId(customer.getId());
-				/*
-				 * newSaleList = newSaleEntity.stream().map(dto ->
-				 * newSaleMapper.convertNewSaleDtoToVo(dto)) .collect(Collectors.toList());
-				 * newSaleList1.setNewSaleVo(newSaleList);
-				 * 
-				 */
+				
 				if (!CollectionUtils.isEmpty(newSaleEntity)) {
 
 					newSaleEntity.stream().forEach(a -> {
@@ -1366,16 +1347,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 		Optional<GiftVoucherEntity> gv = gvRepo.findById(gvId);
 
-		// Gift voucher should not be tagged and expiry date should greater than today
-//		if (gv.isPresent() && gv.get().getExpiryDate().isAfter(LocalDate.now()) && !gv.get().getIsTagged()) {
-//			gv.get().setUserId(userId);
-//			gv.get().setIsTagged(Boolean.TRUE);
-//			gvRepo.save(gv.get());
-//			log.info("Tagged giftvoucher " + gvId + "to user " + userId);
-//		} else {
-//			log.error("Entered Gift voucher is not valid : " + gvId);
-//			throw new InvalidInputException("Gift voucher is not valid");
-//		}
+		
 		return "Gift vocher tagged successfully  " + gv.get().getGvNumber();
 	}
 
@@ -1415,7 +1387,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Override
 	public SaleReportVo getSaleReport(SaleReportVo srvo) throws RecordNotFoundException {
-
+		SaleReportVo slr = new SaleReportVo();
 		List<NewSaleEntity> saleDetails = new ArrayList<>();
 		LocalDateTime createdDateTo;
 		LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(srvo.getDateFrom());
@@ -1425,10 +1397,10 @@ public class NewSaleServiceImpl implements NewSaleService {
             createdDateTo = DateConverters.convertToLocalDateTimeMax(srvo.getDateFrom());
 
 		}
-		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && srvo.getStoreId() != null) {
+		if (srvo.getDateFrom() != null && srvo.getDateTo() != null && ObjectUtils.isNotEmpty(srvo.getStoreId())) {
 			saleDetails = newSaleRepository.findByCreatedDateBetweenAndStoreId(createdDatefrom,
 					createdDateTo, srvo.getStoreId());
-		} else if (srvo.getDateFrom() != null && srvo.getDateTo() == null && srvo.getStoreId()!=null) {
+		} else if (srvo.getDateFrom() != null && srvo.getDateTo() == null && ObjectUtils.isNotEmpty(srvo.getStoreId())) {
 
 			saleDetails = newSaleRepository.findByCreatedDateBetweenAndStoreId(createdDatefrom,
 					createdDateTo,  srvo.getStoreId());
@@ -1439,12 +1411,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 					BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		} else {
 
-			SaleReportVo slr = newSaleMapper.convertlistSaleReportEntityToVo(saleDetails);
-			SalesSummeryVo salesSummery = new SalesSummeryVo();
-			salesSummery.setBillValue(slr.getBillValue());
-			salesSummery.setTotalMrp(slr.getTotalMrp());
-			salesSummery.setTotalDiscount(slr.getTotalDiscount());
-
+			SalesSummeryVo salesSummery = newSaleMapper.convertlistSaleReportEntityToVo(saleDetails);
+			
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			ListOfReturnSlipsVo rvo = new ListOfReturnSlipsVo();
@@ -1454,20 +1422,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			
 			List<ListOfReturnSlipsVo> vo =	returnSlipServiceImpl.getListOfReturnSlips(rvo);
 
-			/*HttpEntity<ListOfReturnSlipsVo> entity = new HttpEntity<>(rvo, headers);
-
-			ResponseEntity<?> returnSlipListResponse = template.exchange(config.getGetListOfReturnSlips(),
-					HttpMethod.POST, entity, GateWayResponse.class);
-
-			ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
-					.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-			GateWayResponse<?> gatewayResponse = mapper.convertValue(returnSlipListResponse.getBody(),
-					GateWayResponse.class);
-
-			List<ListOfReturnSlipsVo> vo = mapper.convertValue(gatewayResponse.getResult(),
-					new TypeReference<List<ListOfReturnSlipsVo>>() {
-					});*/
+			
 			Long rAmount = vo.stream().mapToLong(a -> a.getAmount()).sum();
 			ReturnSummeryVo retunVo = new ReturnSummeryVo();
 
@@ -1498,33 +1453,29 @@ public class NewSaleServiceImpl implements NewSaleService {
 			List<Long> result = barVoList.stream().map(num -> num.getDiscount()).filter(n -> n != null)
 					.collect(Collectors.toList());
 			retunVo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());
-			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getGrossValue()).sum());
+			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getItemPrice()*a.getQuantity()).sum());
 			retunVo.setBillValue(rAmount);
-			// retunVo.setTotalTaxableAmount(hsnDetails1.getTaxVo().getTaxableAmount());
-			// retunVo.setTotalSgst(hsnDetails1.getTaxVo().getSgst());
-			// retunVo.setTotalCgst(hsnDetails1.getTaxVo().getCgst());
-			// retunVo.setTotalIgst(hsnDetails1.getTaxVo().getIgst());
-			// retunVo.setTotalTaxAmount(hsnDetails1.getTaxVo().getSgst() +
-			// hsnDetails1.getTaxVo().getCgst());
-
+			retunVo.setTotalTaxAmount(barVoList.stream().mapToLong(a -> a.getTaxValue()).sum());
+			
+			Double TotalSgst = barVoList.stream().mapToDouble(a -> a.getSgst()).sum();
+			Double TotalCgst = barVoList.stream().mapToDouble(a -> a.getCgst()).sum();
+			Double TotalIgst = barVoList.stream().mapToDouble(a -> a.getIgst()).filter(n -> n != 0.0).sum();
+			Double TotalCess = barVoList.stream().mapToDouble(a -> a.getCess()).filter(n -> n != 0.0).sum();
+			
+			retunVo.setTotalSgst(TotalSgst.floatValue());
+			 retunVo.setTotalCgst(TotalCgst.floatValue());
+			retunVo.setTotalIgst(TotalIgst.floatValue());
+			retunVo.setTotalCess(TotalCess.floatValue());
+			retunVo.setStoreId(srvo.getStoreId());
+			
+			salesSummery.setStoreId(srvo.getStoreId());
 			slr.setRetunSummery(retunVo);
 			slr.setSalesSummery(salesSummery);
 			slr.setBillValue(slr.getSalesSummery().getBillValue() - slr.getRetunSummery().getBillValue());
-			// slr.setTotalCgst(slr.getSalesSummery().getTotalCgst() -
-			// slr.getRetunSummery().getTotalCgst());
-			// slr.setTotalSgst(slr.getSalesSummery().getTotalSgst() -
-			// slr.getRetunSummery().getTotalSgst());
-			// slr.setTotalIgst(slr.getSalesSummery().getTotalIgst() -
-			// slr.getRetunSummery().getTotalIgst());
-			// slr.setTotalTaxableAmount(
-			// slr.getSalesSummery().getTotalTaxableAmount() -
-			// slr.getRetunSummery().getTotalTaxableAmount());
+			
 			slr.setTotalDiscount(slr.getSalesSummery().getTotalDiscount() - slr.getRetunSummery().getTotalDiscount());
 			slr.setTotalMrp(slr.getSalesSummery().getTotalMrp() - slr.getRetunSummery().getTotalMrp());
-			// slr.setTotalTaxAmount(
-			// slr.getSalesSummery().getTotalTaxAmount() -
-			// slr.getRetunSummery().getTotalTaxAmount());
-
+			
 			return slr;
 		}
 
@@ -1545,7 +1496,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				lineEntity.setBarCode(lineItem.getBarCode());
 				lineEntity.setQuantity(lineItem.getQuantity());
 				lineEntity.setDiscount(lineItem.getDiscount());
-				lineEntity.setNetValue(lineItem.getNetValue());
+				lineEntity.setGrossValue(lineItem.getNetValue());
 				lineEntity.setItemPrice(lineItem.getItemPrice());
 				lineEntity.setSection(lineItem.getSection());
 				lineEntity.setSubSection(lineItem.getSubSection());
@@ -1561,49 +1512,18 @@ public class NewSaleServiceImpl implements NewSaleService {
 				lineEntity.setSalesManId(lineItem.getSalesManId());
 
 				// GrossValue is multiple of net value of product and quantity
-				lineEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
+				lineEntity.setNetValue(lineItem.getGrossValue() -lineItem.getDiscount());
+
+				lineEntity.setCreatedDate(LocalDateTime.now());
+				lineEntity.setLastModifiedDate(LocalDateTime.now());
+
 				list.add(lineEntity);
 			});
 			List<LineItemsEntity> saved = lineItemRepo.saveAll(list);
 			log.info("successfully saved line items " + saved);
 			return saved.stream().map(x -> x.getLineItemId()).collect(Collectors.toList());
 
-			/*
-			 * } else {
-			 * 
-			 * List<LineItemsReEntity> list = new ArrayList<>();
-			 * 
-			 * lineItems.stream().forEach(lineItem -> {
-			 * 
-			 * LineItemsReEntity lineReEntity = new LineItemsReEntity();
-			 * 
-			 * lineReEntity.setBarCode(lineItem.getBarCode());
-			 * lineReEntity.setQuantity(lineItem.getQuantity());
-			 * lineReEntity.setDiscount(lineItem.getDiscount());
-			 * lineReEntity.setNetValue(lineItem.getNetValue());
-			 * lineReEntity.setItemPrice(lineItem.getItemPrice());
-			 * lineReEntity.setSection(lineItem.getSection());
-			 * lineReEntity.setSubSection(lineItem.getSubSection());
-			 * lineReEntity.setDivision(lineItem.getDivision());
-			 * lineReEntity.setUserId(lineItem.getUserId());
-			 * lineReEntity.setTaxValue(lineItem.getTaxValue());
-			 * lineReEntity.setCgst(lineItem.getCgst());
-			 * lineReEntity.setSgst(lineItem.getSgst());
-			 * lineReEntity.setStoreId(lineItem.getStoreId());
-			 * 
-			 * // GrossValue is multiple of net value of product and quantity
-			 * lineReEntity.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
-			 * 
-			 * lineReEntity.setCreationDate(LocalDate.now());
-			 * lineReEntity.setLastModified(LocalDate.now()); list.add(lineReEntity);
-			 * 
-			 * });
-			 * 
-			 * List<LineItemsReEntity> saved = lineItemReRepo.saveAll(list);
-			 * 
-			 * log.info("successfully saved line items " + saved); return
-			 * saved.stream().map(x -> x.getLineItemReId()).collect(Collectors.toList()); }
-			 */
+			
 
 		} catch (InvalidInputException e) {
 			log.error("Getting exception while saving Line item.." + lineItems.toString());
@@ -1658,45 +1578,16 @@ public class NewSaleServiceImpl implements NewSaleService {
 			line.setTaxValue(lineItem.getTaxValue());
 			line.setCgst(lineItem.getCgst());
 			line.setSgst(lineItem.getSgst());
-			line.setIgst(lineItem.getIgst());
-			line.setCess(lineItem.getCess());
 			line.setStoreId(lineItem.getStoreId());
 
 			// GrossValue is multiple of net value of product and quantity
 			line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
+
+			line.setCreatedDate(LocalDateTime.now());
+			line.setLastModifiedDate(LocalDateTime.now());
 			LineItemsEntity saved = lineItemRepo.save(line);
 			log.info("Successfully modified line item : " + line);
 
-			/*
-			 * } else { log.error("Passing invalid line item " + line); throw new
-			 * RecordNotFoundException("provide valid line item",
-			 * BusinessException.RECORD_NOT_FOUND_STATUSCODE); }
-			 * 
-			 * } else {
-			 * 
-			 * LineItemsReEntity line =
-			 * lineItemReRepo.findByLineItemReId(lineItem.getLineItemId()); if (line != null
-			 * && line.getOrderId() == null) {
-			 * line.setLineItemReId(lineItem.getLineItemId());
-			 * line.setBarCode(lineItem.getBarCode());
-			 * line.setQuantity(lineItem.getQuantity());
-			 * line.setDiscount(lineItem.getDiscount());
-			 * line.setNetValue(lineItem.getNetValue());
-			 * line.setItemPrice(lineItem.getItemPrice());
-			 * line.setUserId(lineItem.getUserId());
-			 * line.setTaxValue(lineItem.getTaxValue()); line.setCgst(lineItem.getCgst());
-			 * line.setSgst(lineItem.getSgst()); line.setStoreId(lineItem.getStoreId());
-			 * 
-			 * // GrossValue is multiple of net value of product and quantity
-			 * line.setGrossValue(lineItem.getNetValue() * lineItem.getQuantity());
-			 * 
-			 * line.setCreationDate(LocalDate.now()); line.setLastModified(LocalDate.now());
-			 * LineItemsReEntity saved = lineItemReRepo.save(line);
-			 * log.info("Successfully modified line item " + line); } else {
-			 * log.error("Passing invalid line items " + line); throw new
-			 * RecordNotFoundException("provide valid line item",
-			 * BusinessException.RECORD_NOT_FOUND_STATUSCODE); }
-			 */
 		}
 		return "Successfully modified Line Item.";
 	}
@@ -1722,22 +1613,6 @@ public class NewSaleServiceImpl implements NewSaleService {
 			throw new RecordNotFoundException("provide valide barcode", BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
 
-		// }
-		/*
-		 * else { List<LineItemsReEntity> lineItem =
-		 * lineItemReRepo.findByBarCode(barCode); if (lineItem != null) {
-		 * List<LineItemVo> lvo = new ArrayList<>(); lineItem.stream().forEach(b -> {
-		 * 
-		 * LineItemVo vo = new LineItemVo(); BeanUtils.copyProperties(b, vo);
-		 * lvo.add(vo);
-		 * 
-		 * }); return lvo; } else {
-		 * log.info("Provide valid barcode for getting line item : " + barCode); throw
-		 * new RecordNotFoundException("provide valide barcode",
-		 * BusinessException.RECORD_NOT_FOUND_STATUSCODE); }
-		 * 
-		 * }
-		 */
 
 	}
 
@@ -1758,41 +1633,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 		} else {
 			throw new RecordNotFoundException("provide valid barcode", BusinessException.RECORD_NOT_FOUND_STATUSCODE);
 		}
-		// }
-		/*
-		 * else {
-		 * 
-		 * List<LineItemsReEntity> lineItem = lineItemReRepo.findByBarCode(barCode); if
-		 * (lineItem != null) { lineItem.stream().forEach(a -> {
-		 * lineItemReRepo.delete(a);
-		 * 
-		 * });
-		 * 
-		 * log.info("Successfully deleted line item : " + lineItem); return
-		 * "Successfully deleted";
-		 * 
-		 * } else { log.error("Entered Invalid barcode for delete line item : " +
-		 * barCode); throw new RecordNotFoundException("provide valid barcode",
-		 * BusinessException.RECORD_NOT_FOUND_STATUSCODE); } }
-		 */
 
 	}
 
 	@Override
 	public String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo) {
 
-		/*
-		 * List<UserDetailsVo> userVo=getUserDetailsFromURM(mobileNo, 0L);
-		 * if(!CollectionUtils.isEmpty(userVo)) { Optional<UserDetailsVo>
-		 * userFromUrm=userVo.stream().findFirst();
-		 * 
-		 * List<NewSaleEntity> newSale=newSaleRepository.findByOrderNumber(invoiceNo);
-		 * if(!CollectionUtils.isEmpty(newSale)) { Optional<NewSaleEntity>
-		 * newSaleEntity= newSale.stream().findFirst();
-		 * if(newSaleEntity.get().getUserId()==userFromUrm.get().getUserId()) {
-		 * 
-		 * } } }
-		 */
 
 		return null;
 	}
