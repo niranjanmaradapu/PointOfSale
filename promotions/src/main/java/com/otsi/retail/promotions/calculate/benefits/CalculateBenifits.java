@@ -482,40 +482,53 @@ public class CalculateBenifits {
 		double invoiceLevelDiscount = 0.0;
 
 		// get the getPools from the benefits
-		List<PoolEntity> poolEntities = promo.getPoolEntity();
+		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
 
-		// get the eligible line items from get pool
-		List<LineItemVo> eligibleLineItemsFromGetPools = fetchBenefitEligibleLineItems(listofAllLineItems,
-				poolEntities);
+		PoolType poolType = null;
 
-		// get the number of items from get pool
-		int numOfItemsFromGetPool = Integer.valueOf(benfitEntity.getNumOfItemsFromGetPool().intValue());
+		for (PoolEntity poolEntity : poolEntities) {
 
-		// checking the get pools line items size
-		if (eligibleLineItemsFromGetPools.size() >= numOfItemsFromGetPool) {
+			poolType = poolEntity.getPoolType();
+		}
+		if (poolType.equals(PoolType.Get)) {
 
-			if (benfitEntity.getDiscountSubTypes().equals(DiscountSubTypes.EachItem)) {
+			// get the eligible line items from get pool
+			List<LineItemVo> eligibleLineItemsFromGetPools = fetchBenefitEligibleLineItems(listofAllLineItems,
+					poolEntities);
 
-				invoiceLevelDiscount = (benfitEntity.getNumOfItemsFromGetPool()
-						* Long.parseLong(benfitEntity.getDiscount()));
-
-			} else if (benfitEntity.getDiscountSubTypes().equals(DiscountSubTypes.AllItems)) {
-
-				invoiceLevelDiscount = Long.parseLong(benfitEntity.getDiscount());
-
-			}
-
-		} else {
-
-			for (LineItemVo lineItemVo : promoEligibleLineItems)
-				lineItemVo.setDescription(
-						"The customer will get discount if he buys products from get pools beacuase the customer is buying products from the respective buy pools");
-
+			// get the number of items from get pool
+			int numOfItemsFromGetPool = Integer.valueOf(benfitEntity.getNumOfItemsFromGetPool().intValue());
+			long qty = 0l;
 			for (LineItemVo lineItemVo : eligibleLineItemsFromGetPools) {
-				int noOfProductsYetToBeBought = numOfItemsFromGetPool - eligibleLineItemsFromGetPools.size();
-				lineItemVo.setDescription("If the customer buys " + noOfProductsYetToBeBought
-						+ " more products from get pools, he will get the discount.");
 
+				qty = lineItemVo.getQuantity();
+			}
+			// checking the get pools line items size
+			if (eligibleLineItemsFromGetPools.size() >= numOfItemsFromGetPool || qty >= numOfItemsFromGetPool) {
+
+				if (benfitEntity.getDiscountSubTypes().equals(DiscountSubTypes.EachItem)) {
+
+					invoiceLevelDiscount = (benfitEntity.getNumOfItemsFromGetPool()
+							* Long.parseLong(benfitEntity.getDiscount()));
+
+				} else if (benfitEntity.getDiscountSubTypes().equals(DiscountSubTypes.AllItems)) {
+
+					invoiceLevelDiscount = Long.parseLong(benfitEntity.getDiscount());
+
+				}
+
+			} else {
+
+				for (LineItemVo lineItemVo : promoEligibleLineItems)
+					lineItemVo.setDescription(
+							"The customer will get discount if he buys products from get pools beacuase the customer is buying products from the respective buy pools");
+
+				for (LineItemVo lineItemVo : eligibleLineItemsFromGetPools) {
+					int noOfProductsYetToBeBought = numOfItemsFromGetPool - eligibleLineItemsFromGetPools.size();
+					lineItemVo.setDescription("If the customer buys " + noOfProductsYetToBeBought
+							+ " more products from get pools, he will get the discount.");
+
+				}
 			}
 
 		}
@@ -532,7 +545,7 @@ public class CalculateBenifits {
 
 		// get the getPools from the benefits
 		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
-		
+
 		PoolType poolType = null;
 
 		for (PoolEntity poolEntity : poolEntities) {
@@ -541,35 +554,35 @@ public class CalculateBenifits {
 		}
 		if (poolType.equals(PoolType.Get)) {
 
-		// get the eligible line items from get pool
-		List<LineItemVo> eligibleLineItemsFromGetPools = fetchBenefitEligibleLineItems(listofAllLineItems,
-				poolEntities);
+			// get the eligible line items from get pool
+			List<LineItemVo> eligibleLineItemsFromGetPools = fetchBenefitEligibleLineItems(listofAllLineItems,
+					poolEntities);
 
-		// get the number of items from get pool
-		int numOfItemsFromGetPool = Integer.valueOf(benfitEntity.getNumOfItemsFromGetPool().intValue());
-		long qty = 0l;
-		for (LineItemVo lineItemVo : eligibleLineItemsFromGetPools) {
-
-			qty = lineItemVo.getQuantity();
-		}
-
-		if (eligibleLineItemsFromGetPools.size() >= numOfItemsFromGetPool || qty >= numOfItemsFromGetPool) {
-
-			calculatedInvoiceLevelDiscount = Double.valueOf(benfitEntity.getDiscount()).doubleValue();
-
-		} else {
-
-			for (LineItemVo lineItemVo : promoEligibleLineItems)
-				lineItemVo.setDescription(
-						"The customer will get discount if he buys products from get pools beacuase the customer is buying products from the respective buy pools");
-
+			// get the number of items from get pool
+			int numOfItemsFromGetPool = Integer.valueOf(benfitEntity.getNumOfItemsFromGetPool().intValue());
+			long qty = 0l;
 			for (LineItemVo lineItemVo : eligibleLineItemsFromGetPools) {
-				int noOfProductsYetToBeBought = numOfItemsFromGetPool - eligibleLineItemsFromGetPools.size();
-				lineItemVo.setDescription("If the customer buys " + noOfProductsYetToBeBought
-						+ " more products from get pools, he will get the discount.");
 
+				qty = lineItemVo.getQuantity();
 			}
-		}
+
+			if (eligibleLineItemsFromGetPools.size() >= numOfItemsFromGetPool || qty >= numOfItemsFromGetPool) {
+
+				calculatedInvoiceLevelDiscount = Double.valueOf(benfitEntity.getDiscount()).doubleValue();
+
+			} else {
+
+				for (LineItemVo lineItemVo : promoEligibleLineItems)
+					lineItemVo.setDescription(
+							"The customer will get discount if he buys products from get pools beacuase the customer is buying products from the respective buy pools");
+
+				for (LineItemVo lineItemVo : eligibleLineItemsFromGetPools) {
+					int noOfProductsYetToBeBought = numOfItemsFromGetPool - eligibleLineItemsFromGetPools.size();
+					lineItemVo.setDescription("If the customer buys " + noOfProductsYetToBeBought
+							+ " more products from get pools, he will get the discount.");
+
+				}
+			}
 
 		}
 
@@ -616,7 +629,7 @@ public class CalculateBenifits {
 		double calculatedInvoiceLevelDiscount = 0.0;
 
 		// get the getPools from the benefits
-		List<PoolEntity> poolEntities= benfitEntity.getPoolEntities();
+		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
 
 		PoolType poolType = null;
 		for (PoolEntity poolEntity : poolEntities) {
@@ -686,9 +699,9 @@ public class CalculateBenifits {
 		double calculateInvoiceLevelDiscount = 0.0;
 
 		// get the getPools from the benefits
-		
-		List<PoolEntity> poolEntities= benfitEntity.getPoolEntities();
-		
+
+		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
+
 		PoolType poolType = null;
 
 		for (PoolEntity poolEntity : poolEntities) {
