@@ -257,7 +257,7 @@ public class NewSaleController {
 
 	// Method for getting list of sale bills
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
-	@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleBillsFallBackMethod")
+	//@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleBillsFallBackMethod")
 
 	public GateWayResponse<?> getListOfSaleBills(@RequestBody SaleBillsVO svo,Pageable pageable)
 			throws RecordNotFoundException, JsonMappingException, JsonProcessingException {

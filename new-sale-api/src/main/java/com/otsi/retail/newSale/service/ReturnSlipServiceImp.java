@@ -128,11 +128,11 @@ if(returnslip==null) {
 				tg.setBarCode(b.getBarCode());
 				tg.setQty(b.getQty());
 				tg.setAmount(b.getAmount());
-				Long amount = b.getAmount()*b.getQty();
-				returnTotalAmount.add(amount);
+				//Long amount = b.getAmount();
+			//	returnTotalAmount.add(amount);
 				barcodes.add(tg);
 			});
-	Long totalreturnAmount = returnTotalAmount.stream().mapToLong(a->a)	.sum();
+	Long totalreturnAmount =barcodes.stream().mapToLong(a->a.getAmount())	.sum();
 	if(totalreturnAmount.equals(returnSlipRequestVo.getTotalAmount())) {
 	returnSlipDto.setAmount(returnSlipRequestVo.getTotalAmount());
 	}else {

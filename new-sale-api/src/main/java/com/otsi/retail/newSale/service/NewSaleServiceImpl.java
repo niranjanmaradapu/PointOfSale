@@ -1512,7 +1512,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				lineEntity.setSalesManId(lineItem.getSalesManId());
 
 				// GrossValue is multiple of net value of product and quantity
-				lineEntity.setNetValue(lineItem.getGrossValue() -lineItem.getDiscount());
+				lineEntity.setNetValue(lineEntity.getGrossValue() - lineItem.getDiscount());
 
 				lineEntity.setCreatedDate(LocalDateTime.now());
 				lineEntity.setLastModifiedDate(LocalDateTime.now());
