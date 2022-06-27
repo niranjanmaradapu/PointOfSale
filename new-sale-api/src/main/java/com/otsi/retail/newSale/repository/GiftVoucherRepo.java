@@ -47,6 +47,21 @@ public interface GiftVoucherRepo extends JpaRepository<GiftVoucherEntity, Long> 
 	List<GiftVoucherEntity> findByToDate(LocalDate toDate);
 
 	List<GiftVoucherEntity> findByToDateAndGvNumber(LocalDate toDate, String gvNumber);
+
+	List<GiftVoucherEntity> findByFromDateAndToDateAndGvNumberAndClientId(LocalDate fromDate, LocalDate toDate,
+			String gvNumber, Long clientId);
+
+	List<GiftVoucherEntity> findByFromDateAndToDateAndClientId(LocalDate fromDate, LocalDate toDate, Long clientId);
+
+	List<GiftVoucherEntity> findByFromDateAndGvNumberAndClientId(LocalDate fromDate, String gvNumber, Long clientId);
+
+	List<GiftVoucherEntity> findByToDateAndGvNumberAndClientId(LocalDate toDate, String gvNumber, Long clientId);
+
+	List<GiftVoucherEntity> findByFromDateAndClientId(LocalDate fromDate, Long clientId);
+
+	List<GiftVoucherEntity> findByToDateAndClientId(LocalDate toDate, Long clientId);
+
+	List<GiftVoucherEntity> findByClientId(Long clientId);
 	
 	
 }

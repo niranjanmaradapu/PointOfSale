@@ -14,6 +14,8 @@ import lombok.Data;
 @Data
 public class GiftVoucherSearchVo {
 	
+	private Long clientId;
+	
 	private String gvNumber;
 	
 	private LocalDate fromDate;
