@@ -4,35 +4,47 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.Entity.ReturnSlip;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
+import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.ReturnSlipRequestVo;
 
 @Component
 public class ReturnSlipMapper {
 
-	public List<ListOfReturnSlipsVo> mapReturnEntityToVo(List<ReturnSlip> dtos) {
-		List<ListOfReturnSlipsVo> lvo = new ArrayList<>();
-
-		dtos.stream().forEach(dto -> {
-			ListOfReturnSlipsVo vo = new ListOfReturnSlipsVo();
-
-			vo.setRtNumber(dto.getRtNo());
-			vo.setAmount(dto.getAmount());
-			vo.setBarcodes(dto.getTaggedItems());
-			vo.setRsId(dto.getRsId());
-			vo.setStoreId(dto.getStoreId());
-			// vo.setCreatedInfo(dto.getCreatedDate());
-			vo.setCreatedBy(dto.getCreatedBy());
-			lvo.add(vo);
+	public Page<ListOfReturnSlipsVo> mapReturnEntityToVo(Page<ReturnSlip> dtos) {
+		Page<ListOfReturnSlipsVo> lvo = null;
+		
+		Page<ListOfReturnSlipsVo> ListOfReturnSlipsVoPage = dtos.map(returnSlip -> {
+			return mapToReturnSlipVO(returnSlip);
 		});
 		Long totalAmount = dtos.stream().mapToLong(a -> a.getAmount()).sum();
-		lvo.stream().forEach(x -> x.setTotalAmount(totalAmount));
+		ListOfReturnSlipsVoPage.stream().forEach(x -> x.setTotalAmount(totalAmount));
+		return ListOfReturnSlipsVoPage;
+		
+	}
 
-		return lvo;
+	private ListOfReturnSlipsVo mapToReturnSlipVO(ReturnSlip returnSlip) {
+		
+		
+		
+			ListOfReturnSlipsVo vo = new ListOfReturnSlipsVo();
+
+			vo.setRtNumber(returnSlip.getRtNo());
+			vo.setAmount(returnSlip.getAmount());
+			vo.setBarcodes(returnSlip.getTaggedItems());
+			vo.setRsId(returnSlip.getRsId());
+			vo.setStoreId(returnSlip.getStoreId());
+			// vo.setCreatedInfo(dto.getCreatedDate());
+			vo.setCreatedBy(returnSlip.getCreatedBy());
+			
+		
+		
+		return vo;
 	}
 
 	/*public ReturnSlipRequestVo convertDtoToVo(PaymentAmountType returnslip) {

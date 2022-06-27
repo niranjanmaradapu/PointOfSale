@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -22,30 +24,30 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 
 	ReturnSlip findByInvoiceNumberAndTaggedItems_BarCodeIn(String invoiceNumber, List<String> barcodesIn);
 
-	List<ReturnSlip> findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom, LocalDateTime createdDateTo,
-			Long storeId);
+	Page<ReturnSlip> findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom, LocalDateTime createdDateTo,
+			Long storeId, Pageable pageable);
 
-	List<ReturnSlip> findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDateTo,
-			LocalDateTime createdDateTo2, String rtNumber, Long storeId);
+	Page<ReturnSlip> findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDateTo,
+			LocalDateTime createdDateTo2, String rtNumber, Long storeId, Pageable pageable);
 
-	List<ReturnSlip> findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
-			LocalDateTime createdDateTo, String barcode, Long storeId);
+	Page<ReturnSlip> findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
+			LocalDateTime createdDateTo, String barcode, Long storeId, Pageable pageable);
 
-	List<ReturnSlip> findByCreatedDateBetweenAndCreatedByAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
-			LocalDateTime createdDateTo, Long createdBy, Long storeId);
+	Page<ReturnSlip> findByCreatedDateBetweenAndCreatedByAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
+			LocalDateTime createdDateTo, Long createdBy, Long storeId, Pageable pageable);
 
-	List<ReturnSlip> findByCreatedDateBetweenAndRtStatusAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
-			LocalDateTime createdDateTo, ReturnSlipStatus rtStatus, Long storeId);
+	Page<ReturnSlip> findByCreatedDateBetweenAndRtStatusAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
+			LocalDateTime createdDateTo, ReturnSlipStatus rtStatus, Long storeId, Pageable pageable);
 
-	List<ReturnSlip> findByRtNoAndStoreIdOrderByCreatedDateAsc(String rtNumber, Long storeId);
+	Page<ReturnSlip> findByRtNoAndStoreIdOrderByCreatedDateAsc(String rtNumber, Long storeId, Pageable pageable);
 
-	List<ReturnSlip> findByStoreIdOrderByCreatedDateAsc(Long storeId);
+	Page<ReturnSlip> findByStoreIdOrderByCreatedDateAsc(Long storeId, Pageable pageable);
 
-	List<ReturnSlip> findByTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(String barcode, Long storeId);
+	Page<ReturnSlip> findByTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(String barcode, Long storeId, Pageable pageable);
 
-	List<ReturnSlip> findByRtStatusAndStoreIdOrderByCreatedDateAsc(ReturnSlipStatus rtStatus, Long storeId);
+	Page<ReturnSlip> findByRtStatusAndStoreIdOrderByCreatedDateAsc(ReturnSlipStatus rtStatus, Long storeId, Pageable pageable);
 
-	List<ReturnSlip> findByCreatedByAndStoreIdOrderByCreatedDateAsc(Long createdBy, Long storeId);
+	Page<ReturnSlip> findByCreatedByAndStoreIdOrderByCreatedDateAsc(Long createdBy, Long storeId, Pageable pageable);
 
 
 

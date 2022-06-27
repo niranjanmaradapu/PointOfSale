@@ -4,6 +4,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -84,11 +86,11 @@ public class ReturnSlipController {
 	}
 	
 	@PostMapping("/getListOfReturnSlips")
-	public GateWayResponse<?> getListOfReturnSlips(@RequestBody ListOfReturnSlipsVo vo) {
+	public GateWayResponse<?> getListOfReturnSlips(@RequestBody ListOfReturnSlipsVo vo,Pageable pageable) {
 		log.info("Received request to getListOfReturnSlips:" + vo);
-		List<ListOfReturnSlipsVo> listVo = null;
+		Page<ListOfReturnSlipsVo> listVo = null;	
 
-		listVo = returnSlipService.getListOfReturnSlips(vo);
+		listVo = returnSlipService.getListOfReturnSlips(vo,pageable);
 		return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
 	}
 

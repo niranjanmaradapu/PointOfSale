@@ -11,6 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -193,12 +195,12 @@ if(returnslip==null) {
 		
 	}
 	@Override
-	public List<ListOfReturnSlipsVo> getListOfReturnSlips(ListOfReturnSlipsVo vo) {
+	public Page<ListOfReturnSlipsVo> getListOfReturnSlips(ListOfReturnSlipsVo vo,Pageable pageable) {
 		log.debug("debugging getListOfReturnSlips():" + vo);
-		List<ReturnSlip> retunSlipdetails = new ArrayList<>();
+		Page<ReturnSlip> retunSlipdetails = null;
 		/**
 		 * getting the record using dates combination
-		 *
+		 *	
 		 */
 		LocalDateTime createdDateTo;
 		LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(vo.getDateFrom());
@@ -216,14 +218,14 @@ if(returnslip==null) {
 			
 			if (vo.getRtStatus() == ReturnSlipStatus.ALL) {
 				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(
-						createdDatefrom,createdDateTo, vo.getStoreId());
+						createdDatefrom,createdDateTo, vo.getStoreId(),pageable);
 			}
 
 			if (vo.getRtNumber() != null && vo.getBarcode() == null && vo.getCreatedBy() == null
 					&& vo.getRtStatus() == null) {
 				retunSlipdetails = returnSlipRepo
 						.findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(createdDateTo, createdDateTo,
-								vo.getRtNumber(), vo.getStoreId());
+								vo.getRtNumber(), vo.getStoreId(),pageable);
 			}
 
 			/**
@@ -235,7 +237,7 @@ if(returnslip==null) {
 
 				retunSlipdetails = returnSlipRepo
 						.findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(
-								createdDatefrom,createdDateTo, vo.getBarcode(), vo.getStoreId());
+								createdDatefrom,createdDateTo, vo.getBarcode(), vo.getStoreId(),pageable);
 
 			}
 			/**
@@ -247,7 +249,7 @@ if(returnslip==null) {
 
 				retunSlipdetails = returnSlipRepo
 						.findByCreatedDateBetweenAndCreatedByAndStoreIdOrderByCreatedDateAsc(
-								createdDatefrom,createdDateTo, vo.getCreatedBy(), vo.getStoreId());
+								createdDatefrom,createdDateTo, vo.getCreatedBy(), vo.getStoreId(),pageable);
 
 			}
 			/**
@@ -259,7 +261,7 @@ if(returnslip==null) {
 
 				retunSlipdetails = returnSlipRepo
 						.findByCreatedDateBetweenAndRtStatusAndStoreIdOrderByCreatedDateAsc(
-								createdDatefrom,createdDateTo,vo.getRtStatus() ,vo.getStoreId());
+								createdDatefrom,createdDateTo,vo.getRtStatus() ,vo.getStoreId(),pageable);
 
 			}
 
@@ -269,7 +271,7 @@ if(returnslip==null) {
 			 */
 			else
 				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(
-						createdDatefrom,createdDateTo, vo.getStoreId());
+						createdDatefrom,createdDateTo, vo.getStoreId(),pageable);
 			/**
 			 * getting the records without dates
 			 *
@@ -281,10 +283,10 @@ if(returnslip==null) {
 			 */
 			if (vo.getRtNumber() != null && vo.getCreatedBy() == null && vo.getBarcode() == null) {
 				retunSlipdetails = returnSlipRepo.findByRtNoAndStoreIdOrderByCreatedDateAsc(vo.getRtNumber(),
-						vo.getStoreId());
+						vo.getStoreId(),pageable);
 			} else if (vo.getRtStatus() == ReturnSlipStatus.ALL) {
 
-				retunSlipdetails = returnSlipRepo.findByStoreIdOrderByCreatedDateAsc(vo.getStoreId());
+				retunSlipdetails = returnSlipRepo.findByStoreIdOrderByCreatedDateAsc(vo.getStoreId(),pageable);
 
 			}
 
@@ -296,7 +298,7 @@ if(returnslip==null) {
 			else if (vo.getRtNumber() == null && vo.getCreatedBy() == null && vo.getBarcode() != null) {
 
 				retunSlipdetails = returnSlipRepo.findByTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(
-						vo.getBarcode(), vo.getStoreId());
+						vo.getBarcode(), vo.getStoreId(),pageable);
 
 			}
 			/**
@@ -308,7 +310,7 @@ if(returnslip==null) {
 					&& vo.getRtStatus() != null) {
 
 				retunSlipdetails = returnSlipRepo.findByRtStatusAndStoreIdOrderByCreatedDateAsc(
-						vo.getRtStatus(), vo.getStoreId());
+						vo.getRtStatus(), vo.getStoreId(),pageable);
 
 			}
 
@@ -318,14 +320,14 @@ if(returnslip==null) {
 			 */
 			else if (vo.getRtNumber() == null && vo.getCreatedBy() != null && vo.getBarcode() == null) {
 				retunSlipdetails = returnSlipRepo.findByCreatedByAndStoreIdOrderByCreatedDateAsc(
-						vo.getCreatedBy(), vo.getStoreId());
+						vo.getCreatedBy(), vo.getStoreId(),pageable);
 			}
 
 		}
 
-		List<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapReturnEntityToVo(retunSlipdetails);
+		Page<ListOfReturnSlipsVo> rvo = returnSlipMapper.mapReturnEntityToVo(retunSlipdetails);
 
-		if (rvo != null) {
+		if (rvo.hasContent()) {
 			log.warn("we are checking if list of return slips is fetching...");
 			log.info("fetching list of return slips successfully:" + rvo);
 			return rvo;
@@ -334,6 +336,5 @@ if(returnslip==null) {
 		// throw new RuntimeException("no record found with the giveninformation");
 		throw new DataNotFoundException("No return slips are found");
 	}
-
 
 }

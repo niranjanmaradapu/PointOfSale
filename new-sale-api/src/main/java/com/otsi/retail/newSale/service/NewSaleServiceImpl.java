@@ -1420,7 +1420,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 			rvo.setDateTo(srvo.getDateTo());
 			rvo.setStoreId(srvo.getStoreId());
 			
-			List<ListOfReturnSlipsVo> vo =	returnSlipServiceImpl.getListOfReturnSlips(rvo);
+			Pageable pageable = null;
+			
+			Page<ListOfReturnSlipsVo> vo =	returnSlipServiceImpl.getListOfReturnSlips(rvo,pageable);
 
 			
 			Long rAmount = vo.stream().mapToLong(a -> a.getAmount()).sum();
