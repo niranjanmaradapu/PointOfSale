@@ -16,9 +16,9 @@ public class SaleBillsVO {
 	private LocalDate dateFrom;
 
 	private LocalDate dateTo;
-	
+
 	private Long storeId;
-	
+
 	private Long domainId;
 
 	private LocalDate createdDate;
@@ -36,6 +36,10 @@ public class SaleBillsVO {
 	private Long totalDiscount;
 
 	private Page<NewSaleVo> newSale;
+
+	private String barcode;
+
+	private String dsNumber;
 
 	// private List<BarcodeVo> barcodeVo;
 

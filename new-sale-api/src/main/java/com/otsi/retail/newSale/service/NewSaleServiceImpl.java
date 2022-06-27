@@ -699,6 +699,25 @@ public class NewSaleServiceImpl implements NewSaleService {
 						saleBillsVO.getStoreId(), pageable);
 			}
 			/*
+			 * using barcode
+			 */
+			else if (saleBillsVO.getBillStatus() == null && StringUtils.isEmpty(saleBillsVO.getCustMobileNumber())
+					&& saleBillsVO.getInvoiceNumber() == null && saleBillsVO.getEmpId() == null
+					&& StringUtils.isNotEmpty(saleBillsVO.getBarcode())
+					&& StringUtils.isEmpty(saleBillsVO.getDsNumber())) {
+				saleDetails = newSaleRepository.findByDlSlipLineItemsBarCode(saleBillsVO.getBarcode(), pageable);
+			}
+			/*
+			 * using ds number
+			 */
+			else if (saleBillsVO.getBillStatus() == null && StringUtils.isEmpty(saleBillsVO.getCustMobileNumber())
+					&& saleBillsVO.getInvoiceNumber() == null && saleBillsVO.getEmpId() == null
+					&& StringUtils.isEmpty(saleBillsVO.getBarcode())
+					&& StringUtils.isNotEmpty(saleBillsVO.getDsNumber())) {
+				saleDetails = newSaleRepository.findByDlSlipDsNumber(saleBillsVO.getDsNumber(), pageable);
+
+			}
+			/*
 			 * getting the record using empId
 			 */
 			else if (saleBillsVO.getBillStatus() == null && saleBillsVO.getCustMobileNumber() == null
@@ -725,6 +744,25 @@ public class NewSaleServiceImpl implements NewSaleService {
 					&& saleBillsVO.getInvoiceNumber() == null && saleBillsVO.getEmpId() != null) {
 				saleDetails = newSaleRepository.findByCreatedByAndStoreId(saleBillsVO.getEmpId(),
 						saleBillsVO.getStoreId(), pageable);
+
+			}
+			/*
+			 * using barcode
+			 */
+			else if (saleBillsVO.getBillStatus() == null && StringUtils.isEmpty(saleBillsVO.getCustMobileNumber())
+					&& saleBillsVO.getInvoiceNumber() == null && saleBillsVO.getEmpId() == null
+					&& StringUtils.isNotEmpty(saleBillsVO.getBarcode())
+					&& StringUtils.isEmpty(saleBillsVO.getDsNumber())) {
+				saleDetails = newSaleRepository.findByDlSlipLineItemsBarCode(saleBillsVO.getBarcode(), pageable);
+			}
+			/*
+			 * using ds number
+			 */
+			else if (saleBillsVO.getBillStatus() == null && StringUtils.isEmpty(saleBillsVO.getCustMobileNumber())
+					&& saleBillsVO.getInvoiceNumber() == null && saleBillsVO.getEmpId() == null
+					&& StringUtils.isEmpty(saleBillsVO.getBarcode())
+					&& StringUtils.isNotEmpty(saleBillsVO.getDsNumber())) {
+				saleDetails = newSaleRepository.findByDlSlipDsNumber(saleBillsVO.getDsNumber(), pageable);
 
 			}
 		}
