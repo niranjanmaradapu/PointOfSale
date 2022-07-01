@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.service;
 
+import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,6 +39,7 @@ import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipRequestVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
+import com.otsi.retail.newSale.vo.UserDetailsVo;
 
 @Service
 public class ReturnSlipServiceImp implements ReturnslipService {
@@ -346,7 +348,7 @@ if(returnslip==null) {
 	}
 
 	@Override
-	public ReturnSlipVo ReturnSlipsDeatils(String rtNumber) {
+	public ReturnSlipVo ReturnSlipsDeatils(String rtNumber) throws URISyntaxException {
 		ReturnSlip rts = returnSlipRepo.findByRtNo(rtNumber);
 		if (rts == null) {
 			log.error("given RT number is not exists");
@@ -362,10 +364,17 @@ if(returnslip==null) {
 			returnSlipVo.setTaggedItems(tgItems);
 			
 			returnSlipVo.setMobileNumber(rts.getMobileNumber());
-			
-		
+		if(	rts.getCustomerId()!=null) {
+			Long customerId = rts.getCustomerId();
+			List<Long> customerIds = new ArrayList<>();
+			customerIds.add(customerId);
+			List<UserDetailsVo> userDetailsVo = newsaleserviceImp.getUsersForGivenId(customerIds);
+			userDetailsVo.stream().forEach(customer->{
+				
+				returnSlipVo.setCustomerName(customer.getUserName());
+			});
 	
-		
+		}
 
 		/*List<String> barcodes = tgItems.stream().map(x -> x.getBarCode()).collect(Collectors.toList());
 		

@@ -802,7 +802,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		return x;
 	}
 
-	private List<UserDetailsVo> getUsersForGivenId(List<Long> userIds) throws URISyntaxException {
+	public List<UserDetailsVo> getUsersForGivenId(List<Long> userIds) throws URISyntaxException {
 		HttpHeaders headers = new HttpHeaders();
 		URI uri = UriComponentsBuilder.fromUri(new URI(config.getUserIdsUrl())).build().encode().toUri();
 		HttpEntity<List<Long>> request = new HttpEntity<List<Long>>(userIds, headers);
@@ -1065,9 +1065,14 @@ public class NewSaleServiceImpl implements NewSaleService {
 	public List<DeliverySlipVo> posDayClose(Long storeId) {
 		log.debug(" debugging posDayClose");
 		List<DeliverySlipVo> dvo = new ArrayList<>();
+		LocalDate createdDate = LocalDate.now();
+		LocalDateTime createdDatefrom = DateConverters
+				.convertLocalDateToLocalDateTime(createdDate);
+		
+		LocalDateTime	createdDateTo = DateConverters.convertToLocalDateTimeMax(createdDate);
 
-		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDateAndStoreId(DSStatus.Pending,
-				LocalDateTime.now(), storeId);
+		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(DSStatus.Pending,
+				createdDatefrom,createdDateTo, storeId);
 		if (!DsList.isEmpty()) {
 
 			List<DeliverySlipVo> dsVo = new ArrayList<>();
@@ -1091,9 +1096,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Override
 	public String posClose(Long storeId) {
-
-		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDateAndStoreId(DSStatus.Pending,
-				LocalDateTime.now(), storeId);
+		LocalDate createdDate = LocalDate.now();
+		LocalDateTime createdDatefrom = DateConverters
+				.convertLocalDateToLocalDateTime(createdDate);
+		
+		LocalDateTime	createdDateTo = DateConverters.convertToLocalDateTimeMax(createdDate);
+		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(DSStatus.Pending,
+				createdDatefrom,createdDateTo, storeId);
 		if (DsList != null && !DsList.isEmpty()) {
 			DsList.stream().forEach(d -> {
 

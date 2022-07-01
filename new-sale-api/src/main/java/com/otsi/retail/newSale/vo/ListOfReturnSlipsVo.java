@@ -1,6 +1,7 @@
 package com.otsi.retail.newSale.vo;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class ListOfReturnSlipsVo {
 
 	private Long recievedAmount;
 
-	private LocalDate createdInfo;
+	private LocalDateTime createdInfo;
 
 	private String settelmentInfo;
 

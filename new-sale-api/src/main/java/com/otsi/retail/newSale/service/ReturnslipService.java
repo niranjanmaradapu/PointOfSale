@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.service;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -29,7 +30,7 @@ public interface ReturnslipService {
 
 	Page<ListOfReturnSlipsVo> getListOfReturnSlips(ListOfReturnSlipsVo vo, Pageable pageable);
 
-	ReturnSlipVo ReturnSlipsDeatils(String rtNumber);
+	ReturnSlipVo ReturnSlipsDeatils(String rtNumber) throws URISyntaxException;
 
 	//List<ReturnSlipRequestVo> generateReturnSlip(ReturnSlipRequestVo returnSlipRequestVo);
 

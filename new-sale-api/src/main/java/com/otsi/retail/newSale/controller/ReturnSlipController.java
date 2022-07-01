@@ -102,7 +102,6 @@ public class ReturnSlipController {
 	}
 	
 	@GetMapping("/getReturnSlipsDetails")
-	
 	public GateWayResponse<?> ReturnSlipsDeatils(@RequestParam String rtNumber)
 			throws JsonMappingException, JsonProcessingException, URISyntaxException {
 		log.info("Received request to ReturnSlipsDeatils():" + rtNumber);

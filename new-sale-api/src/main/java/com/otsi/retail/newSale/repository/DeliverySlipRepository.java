@@ -94,6 +94,9 @@ public interface DeliverySlipRepository extends JpaRepository<DeliverySlipEntity
 
 	Page<DeliverySlipEntity> findByCreatedDateBetweenAndDsIdInAndStoreIdOrderByCreatedDateDesc(
 			LocalDateTime createdDatefrom, LocalDateTime createdDateTo, List<Long> dsIds, Long storeId, Pageable pageable);
+
+	List<DeliverySlipEntity> findByStatusAndCreatedDateBetweenAndStoreId(DSStatus pending,
+			LocalDateTime createdDatefrom, LocalDateTime createdDateTo, Long storeId);
 	
 //	List<DeliverySlipEntity> getByYearAndMonthAndStoreId(int year, int month, Long storeId);
 	

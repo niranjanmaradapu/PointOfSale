@@ -39,8 +39,9 @@ public class ReturnSlipMapper {
 			vo.setBarcodes(returnSlip.getTaggedItems());
 			vo.setRsId(returnSlip.getRsId());
 			vo.setStoreId(returnSlip.getStoreId());
-			// vo.setCreatedInfo(dto.getCreatedDate());
 			vo.setCreatedBy(returnSlip.getCreatedBy());
+			vo.setCreatedInfo(returnSlip.getCreatedDate());
+			
 			
 		
 		
