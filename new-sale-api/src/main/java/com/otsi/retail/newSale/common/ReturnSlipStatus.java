@@ -2,7 +2,7 @@ package com.otsi.retail.newSale.common;
 
 public enum ReturnSlipStatus {
 	
-	PENDING(1, "pending"), SETTELED(2, "settled"), CANCLED(3, "cancled"),ALL(4,"all");
+	PENDING(1, "pending"), COMPLETED(2, "completed");
 
 	private int id;
 	private String value;

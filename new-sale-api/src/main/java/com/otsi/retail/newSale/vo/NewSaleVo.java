@@ -38,6 +38,8 @@ public class NewSaleVo {
 	private NoteType note;
 
 	private OrderStatus status;
+	
+	private Long discount;
 
 	private String invoiceNumber;
 

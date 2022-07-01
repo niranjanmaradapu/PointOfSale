@@ -186,7 +186,7 @@ if(returnslip==null) {
 		ReturnSlip returnSlip = returnSlipRepo.findByRtNoAndStoreId(returnSlipNumber,storeId);
 		if(returnSlip!=null) {
 			
-			returnSlip.setRtStatus(ReturnSlipStatus.SETTELED);
+			returnSlip.setRtStatus(ReturnSlipStatus.COMPLETED);
 			
 			returnSlipRepo.save(returnSlip);
 			
@@ -216,10 +216,11 @@ if(returnslip==null) {
 			 *
 			 */
 			
-			if (vo.getRtStatus() == ReturnSlipStatus.ALL) {
-				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(
-						createdDatefrom,createdDateTo, vo.getStoreId(),pageable);
-			}
+			/*
+			 * if (vo.getRtStatus() == ReturnSlipStatus.ALL) { retunSlipdetails =
+			 * returnSlipRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(
+			 * createdDatefrom,createdDateTo, vo.getStoreId(),pageable); }
+			 */
 
 			if (vo.getRtNumber() != null && vo.getBarcode() == null && vo.getCreatedBy() == null
 					&& vo.getRtStatus() == null) {
@@ -284,11 +285,14 @@ if(returnslip==null) {
 			if (vo.getRtNumber() != null && vo.getCreatedBy() == null && vo.getBarcode() == null) {
 				retunSlipdetails = returnSlipRepo.findByRtNoAndStoreIdOrderByCreatedDateAsc(vo.getRtNumber(),
 						vo.getStoreId(),pageable);
-			} else if (vo.getRtStatus() == ReturnSlipStatus.ALL) {
-
-				retunSlipdetails = returnSlipRepo.findByStoreIdOrderByCreatedDateAsc(vo.getStoreId(),pageable);
-
-			}
+			} /*
+				 * else if (vo.getRtStatus() == ReturnSlipStatus.ALL) {
+				 * 
+				 * retunSlipdetails =
+				 * returnSlipRepo.findByStoreIdOrderByCreatedDateAsc(vo.getStoreId(),pageable);
+				 * 
+				 * }
+				 */
 
 			/**
 			 * getting the record using barcode

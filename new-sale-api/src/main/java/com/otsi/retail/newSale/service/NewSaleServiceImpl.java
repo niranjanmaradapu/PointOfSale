@@ -212,11 +212,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 		if (newsaleVo.getReturnAmount() != null) {
 			paymentValue = newsaleVo.getRecievedAmount() - newsaleVo.getReturnAmount();
 			if (paymentValue.equals(newsaleVo.getNetPayableAmount())) {
-				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
+				entity.setStatus(OrderStatus.Completed);// Status should override once it is cash only
 			}
 		} else if (newsaleVo.getReturnAmount() == null || newsaleVo.getReturnAmount() == 0) {
 			if (paymentValue.equals(newsaleVo.getNetPayableAmount())) {
-				entity.setStatus(OrderStatus.success);// Status should override once it is cash only
+				entity.setStatus(OrderStatus.Completed);// Status should override once it is cash only
 			}
 		}
 
@@ -475,7 +475,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			Optional<NewSaleEntity> order = newSaleRepository.findById(payment.getOrderId().getOrderId());
 
 			// Call method to update order items into inventory
-			order.get().setStatus(OrderStatus.success);
+			order.get().setStatus(OrderStatus.Completed);
 			// Update order status once payment is done
 			NewSaleEntity save = newSaleRepository.save(order.get());
 
@@ -1508,12 +1508,18 @@ public class NewSaleServiceImpl implements NewSaleService {
 			retunVo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());
 			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getItemPrice() * a.getQuantity()).sum());
 			retunVo.setBillValue(rAmount);
-			retunVo.setTotalTaxAmount(barVoList.stream().mapToLong(a -> a.getTaxValue()).sum());
+		List<LineItemVo> taxValue =	barVoList.stream().filter(lineitem->lineitem.getTaxValue()!=null).collect(Collectors.toList());
+			retunVo.setTotalTaxAmount(taxValue.stream().mapToLong(a -> a.getTaxValue()).sum());
+			
+			List<LineItemVo> lineitemVo1=	barVoList.stream().filter(lineitem->lineitem.getCgst()!=null).collect(Collectors.toList());
+			List<LineItemVo> lineitemVo2=	barVoList.stream().filter(lineitem->lineitem.getSgst()!=null).collect(Collectors.toList());
+			List<LineItemVo> lineitemVo3=	barVoList.stream().filter(lineitem->lineitem.getIgst()!=null).collect(Collectors.toList());
+			List<LineItemVo> lineitemVo4=	barVoList.stream().filter(lineitem->lineitem.getCess()!=null).collect(Collectors.toList());
 
-			Double TotalSgst = barVoList.stream().mapToDouble(a -> a.getSgst()).sum();
-			Double TotalCgst = barVoList.stream().mapToDouble(a -> a.getCgst()).sum();
-			Double TotalIgst = barVoList.stream().mapToDouble(a -> a.getIgst()).filter(n -> n != 0.0).sum();
-			Double TotalCess = barVoList.stream().mapToDouble(a -> a.getCess()).filter(n -> n != 0.0).sum();
+			Double TotalSgst = lineitemVo1.stream().mapToDouble(a -> a.getSgst()).sum();
+			Double TotalCgst = lineitemVo2.stream().mapToDouble(a -> a.getCgst()).sum();
+			Double TotalIgst = lineitemVo3.stream().mapToDouble(a -> a.getIgst()).sum();
+			Double TotalCess = lineitemVo4.stream().mapToDouble(a -> a.getCess()).sum();
 
 			retunVo.setTotalSgst(TotalSgst.floatValue());
 			retunVo.setTotalCgst(TotalCgst.floatValue());

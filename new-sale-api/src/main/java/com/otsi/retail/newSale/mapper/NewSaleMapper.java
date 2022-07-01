@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -118,6 +119,7 @@ public class NewSaleMapper {
 		newSaleVO.setNetPayableAmount(sale.getNetValue());
 		newSaleVO.setUserId(sale.getUserId());
 		newSaleVO.setEmpId(sale.getCreatedBy());
+		newSaleVO.setDiscount(sale.getManualDisc() + sale.getPromoDisc());
 		newSaleVO.setStatus(sale.getStatus());
 		newSaleVO.setNewsaleId(sale.getOrderId());
 		return newSaleVO;
@@ -129,45 +131,57 @@ public class NewSaleMapper {
 		SalesSummeryVo srvo = new SalesSummeryVo();
 		srvo.setBillValue(saleDetails.stream().mapToLong(b -> b.getNetValue()).sum());
 		srvo.setTotalMrp(saleDetails.stream().mapToLong(m -> m.getGrossValue()).sum());
-		
 
 		List<Long> result = saleDetails.stream().map(num -> num.getPromoDisc()).filter(n -> n != null)
 				.collect(Collectors.toList());
 
 		srvo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());
-		saleDetails.stream().forEach(saleDetail->{
-			
-			saleDetail.getDlSlip().stream().forEach(deliverySlp->{
+		saleDetails.stream().forEach(saleDetail -> {
+
+			saleDetail.getDlSlip().stream().forEach(deliverySlp -> {
 				SalesSummeryVo summeryvo = new SalesSummeryVo();
-				
-				Double totalCgst = deliverySlp.getLineItems().stream().mapToDouble(lineItem->lineItem.getCgst()).sum();
-				Double totalSgst= deliverySlp.getLineItems().stream().mapToDouble(lineItem->lineItem.getSgst()).sum();
-				Double totalIgst= deliverySlp.getLineItems().stream().mapToDouble(lineItem->lineItem.getIgst()).filter(n -> n != 0.0).sum();
-				Double totalCess= deliverySlp.getLineItems().stream().mapToDouble(lineItem->lineItem.getCess()).filter(n -> n != 0.0).sum();
+				List<LineItemsEntity> lineitems1 = deliverySlp.getLineItems().stream()
+						.filter(lineItem -> lineItem.getCgst() != null).collect(Collectors.toList());
+				List<LineItemsEntity> lineitems2 = deliverySlp.getLineItems().stream()
+						.filter(lineItem -> lineItem.getSgst() != null).collect(Collectors.toList());
+				List<LineItemsEntity> lineitems3 = deliverySlp.getLineItems().stream()
+						.filter(lineItem -> lineItem.getIgst() != null).collect(Collectors.toList());
+
+				List<LineItemsEntity> lineitems4 = deliverySlp.getLineItems().stream()
+						.filter(lineItem -> lineItem.getCess() != null).collect(Collectors.toList());
+				List<LineItemsEntity> lineitems5 = deliverySlp.getLineItems().stream()
+						.filter(lineItem -> lineItem.getTaxValue() != null).collect(Collectors.toList());
+
+				Double totalCgst = lineitems1.stream().mapToDouble(lineItem -> lineItem.getCgst()).sum();
+				Double totalSgst = lineitems2.stream().mapToDouble(lineItem -> lineItem.getSgst()).sum();
+				Double totalIgst = lineitems3.stream().mapToDouble(lineItem -> lineItem.getIgst()).sum();
+				Double totalCess = lineitems4.stream().mapToDouble(lineItem -> lineItem.getCess()).sum();
 
 				summeryvo.setTotalCgst(totalCgst.floatValue());
+
 				summeryvo.setTotalSgst(totalSgst.floatValue());
 				summeryvo.setTotalIgst(totalIgst.floatValue());
 				summeryvo.setTotalCess(totalCess.floatValue());
-				summeryvo.setTotalTaxAmount(deliverySlp.getLineItems().stream().mapToLong(lineItem->lineItem.getTaxValue()).sum());
-				
+
+				summeryvo.setTotalTaxAmount(lineitems5.stream().mapToLong(lineItem -> lineItem.getTaxValue()).sum());
+
 				listSummeryVo.add(summeryvo);
 			});
-			
+
 		});
-		Double totalSgst= listSummeryVo.stream().mapToDouble(summeryVo->summeryVo.getTotalSgst()).sum();
-		Double totalCgst= listSummeryVo.stream().mapToDouble(summeryVo->summeryVo.getTotalCgst()).sum();
-		Double totalIgst= listSummeryVo.stream().mapToDouble(summeryVo->summeryVo.getTotalIgst()).filter(n -> n != 0.0).sum();
-		Double totalCess= listSummeryVo.stream().mapToDouble(summeryVo->summeryVo.getTotalCess()).filter(n -> n != 0.0).sum();
+
+		Double totalSgst = listSummeryVo.stream().mapToDouble(summeryVo -> summeryVo.getTotalSgst()).sum();
+		Double totalCgst = listSummeryVo.stream().mapToDouble(summeryVo -> summeryVo.getTotalCgst()).sum();
+		Double totalIgst = listSummeryVo.stream().mapToDouble(summeryVo -> summeryVo.getTotalIgst()).sum();
+		Double totalCess = listSummeryVo.stream().mapToDouble(summeryVo -> summeryVo.getTotalCess()).sum();
 		srvo.setTotalSgst(totalSgst.floatValue());
 		srvo.setTotalCgst(totalCgst.floatValue());
 		srvo.setTotalIgst(totalIgst.floatValue());
 		srvo.setTotalCess(totalCess.floatValue());
-		
-		srvo.setTotalTaxAmount(listSummeryVo.stream().mapToLong(summeryVo->summeryVo.getTotalTaxAmount()).sum());
 
+		// srvo.setTotalTaxAmount(listSummeryVo.stream().mapToLong(summeryVo ->
+		// summeryVo.getTotalTaxAmount()).sum());
 
-		
 		return srvo;
 
 	}
@@ -209,7 +223,6 @@ public class NewSaleMapper {
 		dsvo.setNetAmount(amount);
 		dsvo.setGrossAmount(grossAmount);
 
-		
 		return dsvo;
 
 	}
