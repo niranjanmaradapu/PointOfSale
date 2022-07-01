@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipRequestVo;
+import com.otsi.retail.newSale.vo.ReturnSlipVo;
 
 @Component
 public interface ReturnslipService {
@@ -27,6 +28,8 @@ public interface ReturnslipService {
 	ReturnSlipRequestVo createReturnSlip(ReturnSlipRequestVo returnSlipRequestVo) throws JsonProcessingException, DuplicateRecordException;
 
 	Page<ListOfReturnSlipsVo> getListOfReturnSlips(ListOfReturnSlipsVo vo, Pageable pageable);
+
+	ReturnSlipVo ReturnSlipsDeatils(String rtNumber);
 
 	//List<ReturnSlipRequestVo> generateReturnSlip(ReturnSlipRequestVo returnSlipRequestVo);
 

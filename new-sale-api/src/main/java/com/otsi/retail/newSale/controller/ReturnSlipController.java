@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.controller;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,10 +14,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.otsi.retail.newSale.gatewayresponse.GateWayResponse;
 import com.otsi.retail.newSale.service.ReturnslipService;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipRequestVo;
+import com.otsi.retail.newSale.vo.ReturnSlipVo;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @RestController
 @RequestMapping("/return_slip")
@@ -92,6 +99,19 @@ public class ReturnSlipController {
 
 		listVo = returnSlipService.getListOfReturnSlips(vo,pageable);
 		return new GateWayResponse<>(HttpStatus.OK, listVo, "Success");
+	}
+	
+	@GetMapping("/getReturnSlipsDetails")
+	
+	public GateWayResponse<?> ReturnSlipsDeatils(@RequestParam String rtNumber)
+			throws JsonMappingException, JsonProcessingException, URISyntaxException {
+		log.info("Received request to ReturnSlipsDeatils():" + rtNumber);
+		
+
+		ReturnSlipVo returnVo = returnSlipService.ReturnSlipsDeatils(rtNumber);
+
+		return new GateWayResponse<>(HttpStatus.OK, returnVo, "Success");
+
 	}
 
 }

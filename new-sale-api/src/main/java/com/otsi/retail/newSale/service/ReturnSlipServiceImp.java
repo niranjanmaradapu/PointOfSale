@@ -20,13 +20,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.otsi.retail.newSale.Entity.NewSaleEntity;
-import com.otsi.retail.newSale.Entity.PaymentAmountType;
 import com.otsi.retail.newSale.Entity.ReturnSlip;
 import com.otsi.retail.newSale.Entity.TaggedItems;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
 import com.otsi.retail.newSale.Exceptions.InvalidInputException;
+import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
 import com.otsi.retail.newSale.common.ReturnSlipStatus;
 import com.otsi.retail.newSale.config.Config;
 import com.otsi.retail.newSale.mapper.ReturnSlipMapper;
@@ -35,8 +34,10 @@ import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.repository.ReturnSlipRepo;
 import com.otsi.retail.newSale.utils.DateConverters;
 import com.otsi.retail.newSale.vo.InventoryUpdateVo;
+import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipRequestVo;
+import com.otsi.retail.newSale.vo.ReturnSlipVo;
 
 @Service
 public class ReturnSlipServiceImp implements ReturnslipService {
@@ -59,6 +60,9 @@ public class ReturnSlipServiceImp implements ReturnslipService {
 
 	@Autowired
 	private PaymentAmountTypeRepository orderTransactionRepo;
+	
+	@Autowired
+	private NewSaleServiceImpl newsaleserviceImp;
 
 	@Autowired
 	Config config;
@@ -339,6 +343,55 @@ if(returnslip==null) {
 			log.error("No return slips are found");
 		// throw new RuntimeException("no record found with the giveninformation");
 		throw new DataNotFoundException("No return slips are found");
+	}
+
+	@Override
+	public ReturnSlipVo ReturnSlipsDeatils(String rtNumber) {
+		ReturnSlip rts = returnSlipRepo.findByRtNo(rtNumber);
+		if (rts == null) {
+			log.error("given RT number is not exists");
+			throw new RecordNotFoundException("given RT number is not exists", 0);
+		}
+		List<TaggedItems> tgItems = rts.getTaggedItems();
+		
+	
+		
+			ReturnSlipVo returnSlipVo =  new ReturnSlipVo();
+			returnSlipVo.setRtNo(rts.getRtNo());
+			returnSlipVo.setCreatedDate(rts.getCreatedDate());
+			returnSlipVo.setTaggedItems(tgItems);
+			
+			returnSlipVo.setMobileNumber(rts.getMobileNumber());
+			
+		
+	
+		
+
+		/*List<String> barcodes = tgItems.stream().map(x -> x.getBarCode()).collect(Collectors.toList());
+		
+		List<LineItemVo> bvo = newsaleserviceImp.getBarcodes(barcodes);
+		bvo.stream().forEach(x -> {
+
+		
+				
+				LineItemVo iVo = new LineItemVo();
+				iVo.setBarCode(x.getBarCode());
+				iVo.setCreatedDate(x.getCreatedDate());
+				iVo.setDiscount(x.getDiscount());
+				iVo.setDomainId(x.getDomainId());
+				iVo.setGrossValue(x.getGrossValue());
+				iVo.setItemPrice(x.getItemPrice());
+				iVo.setNetValue(x.getNetValue());
+				
+				iVo.setQuantity(x.getQuantity());
+				iVo.setSection(x.getSection());
+			
+				
+				liVo.add(iVo);
+
+			
+		});*/
+		return returnSlipVo;
 	}
 
 }
