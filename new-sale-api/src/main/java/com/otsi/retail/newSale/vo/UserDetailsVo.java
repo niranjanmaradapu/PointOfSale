@@ -27,6 +27,8 @@ public class UserDetailsVo {
 	@JsonIgnore
 	private Role role;
 	@JsonIgnore
+	private ClientDetails client;
+	@JsonIgnore
 	private List<ClientDomains> clientDomians;
 	@JsonIgnore
 	private List<UserAv> userAv;

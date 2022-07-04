@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -101,6 +100,8 @@ import com.otsi.retail.newSale.vo.SalesSummeryVo;
 import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 import com.otsi.retail.newSale.vo.TaxVo;
 import com.otsi.retail.newSale.vo.UserDetailsVo;
+
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 /**
  * Service class contains all bussiness logics related to new sale , create
@@ -356,6 +357,32 @@ public class NewSaleServiceImpl implements NewSaleService {
 		return entity.getOrderNumber();
 	}
 
+	public LedgerLogBookVo saveDebit(@RequestBody LedgerLogBookVo ledgerLogBookVO) {
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<LedgerLogBookVo> entity = new HttpEntity<>(ledgerLogBookVO, headers);
+
+		ResponseEntity<?> listResponse = template.exchange(config.getSaveDebit_url(), HttpMethod.POST, entity,
+				GateWayResponse.class);
+
+		ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
+				.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+		GateWayResponse<?> gatewayResponse = mapper.convertValue(listResponse.getBody(), GateWayResponse.class);
+
+		/*
+		 * LedgerLogBookVo ledgerLogBookVo =
+		 * mapper.convertValue(gatewayResponse.getResult(), new
+		 * TypeReference<LedgerLogBookVO>() { });
+		 * 
+		 */
+		UserDetailsVo userDetails = getUserDetailsFromURM(ledgerLogBookVO.getMobileNumber());
+		ledgerLogBookVO.setCustomerId(userDetails.getId());
+		return ledgerLogBookVO;
+
+	}
+
 	// UPDATE ACCOUNTING
 
 	private void updateAccounting(NewSaleVo newsaleVo) {
@@ -372,6 +399,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 					ledgerLogBookVo.setAccountType(AccountType.CREDIT);
 				} else if (paymentAmountType.getPaymentType().equals(PaymentType.PKTPENDING)) {
 					ledgerLogBookVo.setAccountType(AccountType.DEBIT);
+					UserDetailsVo userDetails = getUserDetailsFromURM(ledgerLogBookVo.getMobileNumber());
+					ledgerLogBookVo.setCustomerId(userDetails.getId());
+					saveDebit(ledgerLogBookVo);
+
 				} else if (paymentAmountType.getPaymentType().equals(PaymentType.Cash)) {
 					ledgerLogBookVo.setPaymentType(PaymentType.Cash);
 				} else if (paymentAmountType.getPaymentType().equals(PaymentType.Card)) {
@@ -1066,13 +1097,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 		log.debug(" debugging posDayClose");
 		List<DeliverySlipVo> dvo = new ArrayList<>();
 		LocalDate createdDate = LocalDate.now();
-		LocalDateTime createdDatefrom = DateConverters
-				.convertLocalDateToLocalDateTime(createdDate);
-		
-		LocalDateTime	createdDateTo = DateConverters.convertToLocalDateTimeMax(createdDate);
+		LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(createdDate);
+
+		LocalDateTime createdDateTo = DateConverters.convertToLocalDateTimeMax(createdDate);
 
 		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(DSStatus.Pending,
-				createdDatefrom,createdDateTo, storeId);
+				createdDatefrom, createdDateTo, storeId);
 		if (!DsList.isEmpty()) {
 
 			List<DeliverySlipVo> dsVo = new ArrayList<>();
@@ -1097,12 +1127,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public String posClose(Long storeId) {
 		LocalDate createdDate = LocalDate.now();
-		LocalDateTime createdDatefrom = DateConverters
-				.convertLocalDateToLocalDateTime(createdDate);
-		
-		LocalDateTime	createdDateTo = DateConverters.convertToLocalDateTimeMax(createdDate);
+		LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(createdDate);
+
+		LocalDateTime createdDateTo = DateConverters.convertToLocalDateTimeMax(createdDate);
 		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(DSStatus.Pending,
-				createdDatefrom,createdDateTo, storeId);
+				createdDatefrom, createdDateTo, storeId);
 		if (DsList != null && !DsList.isEmpty()) {
 			DsList.stream().forEach(d -> {
 
@@ -1517,13 +1546,18 @@ public class NewSaleServiceImpl implements NewSaleService {
 			retunVo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());
 			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getItemPrice() * a.getQuantity()).sum());
 			retunVo.setBillValue(rAmount);
-		List<LineItemVo> taxValue =	barVoList.stream().filter(lineitem->lineitem.getTaxValue()!=null).collect(Collectors.toList());
+			List<LineItemVo> taxValue = barVoList.stream().filter(lineitem -> lineitem.getTaxValue() != null)
+					.collect(Collectors.toList());
 			retunVo.setTotalTaxAmount(taxValue.stream().mapToLong(a -> a.getTaxValue()).sum());
-			
-			List<LineItemVo> lineitemVo1=	barVoList.stream().filter(lineitem->lineitem.getCgst()!=null).collect(Collectors.toList());
-			List<LineItemVo> lineitemVo2=	barVoList.stream().filter(lineitem->lineitem.getSgst()!=null).collect(Collectors.toList());
-			List<LineItemVo> lineitemVo3=	barVoList.stream().filter(lineitem->lineitem.getIgst()!=null).collect(Collectors.toList());
-			List<LineItemVo> lineitemVo4=	barVoList.stream().filter(lineitem->lineitem.getCess()!=null).collect(Collectors.toList());
+
+			List<LineItemVo> lineitemVo1 = barVoList.stream().filter(lineitem -> lineitem.getCgst() != null)
+					.collect(Collectors.toList());
+			List<LineItemVo> lineitemVo2 = barVoList.stream().filter(lineitem -> lineitem.getSgst() != null)
+					.collect(Collectors.toList());
+			List<LineItemVo> lineitemVo3 = barVoList.stream().filter(lineitem -> lineitem.getIgst() != null)
+					.collect(Collectors.toList());
+			List<LineItemVo> lineitemVo4 = barVoList.stream().filter(lineitem -> lineitem.getCess() != null)
+					.collect(Collectors.toList());
 
 			Double TotalSgst = lineitemVo2.stream().mapToDouble(a -> a.getSgst()).sum();
 			Double TotalCgst = lineitemVo1.stream().mapToDouble(a -> a.getCgst()).sum();

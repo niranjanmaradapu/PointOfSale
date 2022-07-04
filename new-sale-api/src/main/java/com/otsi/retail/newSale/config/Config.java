@@ -35,6 +35,10 @@ public class Config {
 	@Value("${getCustomerDetailsMobileNumber_url}")
 	private String mobileNumberUrl;
 	
+	@Value("${saveDebit_url}")
+	private String saveDebit_url;
+
+	
 
 	@Value("${getNewSaleWithHsn_url}")
 	private String HsnUrl;
