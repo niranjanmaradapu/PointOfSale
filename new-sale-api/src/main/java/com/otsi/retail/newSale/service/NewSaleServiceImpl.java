@@ -1525,8 +1525,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			List<LineItemVo> lineitemVo3=	barVoList.stream().filter(lineitem->lineitem.getIgst()!=null).collect(Collectors.toList());
 			List<LineItemVo> lineitemVo4=	barVoList.stream().filter(lineitem->lineitem.getCess()!=null).collect(Collectors.toList());
 
-			Double TotalSgst = lineitemVo1.stream().mapToDouble(a -> a.getSgst()).sum();
-			Double TotalCgst = lineitemVo2.stream().mapToDouble(a -> a.getCgst()).sum();
+			Double TotalSgst = lineitemVo2.stream().mapToDouble(a -> a.getSgst()).sum();
+			Double TotalCgst = lineitemVo1.stream().mapToDouble(a -> a.getCgst()).sum();
 			Double TotalIgst = lineitemVo3.stream().mapToDouble(a -> a.getIgst()).sum();
 			Double TotalCess = lineitemVo4.stream().mapToDouble(a -> a.getCess()).sum();
 
@@ -1580,7 +1580,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				lineEntity.setSalesManId(lineItem.getSalesManId());
 
 				// GrossValue is multiple of net value of product and quantity
-				lineEntity.setNetValue(lineEntity.getGrossValue() - lineItem.getDiscount());
+				lineEntity.setNetValue(lineEntity.getGrossValue());
 
 				lineEntity.setCreatedDate(LocalDateTime.now());
 				lineEntity.setLastModifiedDate(LocalDateTime.now());
