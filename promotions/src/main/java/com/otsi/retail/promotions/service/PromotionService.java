@@ -50,7 +50,7 @@ public interface PromotionService {
 	
 	List<SearchPromotionsVo> searchPromotionByStoreName(SearchPromotionsVo vo);
 	
-	List<PromotionToStoreEntity> getAllStorePromotions();
+	List<PromotionToStoreEntity> getAllStorePromotions(Long clientId);
 	
 	List<LineItemVo> checkInvoiceLevelPromtion(List<LineItemVo> listofInvTxt, Long storeId, Long domainId);
 

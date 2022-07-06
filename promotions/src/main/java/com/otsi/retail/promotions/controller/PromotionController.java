@@ -216,9 +216,9 @@ public class PromotionController {
 	}
 
 	@GetMapping("/getAllStorePromos")
-	public GateWayResponse<?> getAllPromoStores() {
+	public GateWayResponse<?> getAllPromoStores(@RequestParam Long clientId) {
 		// log.info("Recieved request to getByStoreId():" + storeId);
-		List<PromotionToStoreEntity> getAllStorePromos = promoService.getAllStorePromotions();
+		List<PromotionToStoreEntity> getAllStorePromos = promoService.getAllStorePromotions(clientId);
 		return new GateWayResponse<>("fetching store promotions successfully", getAllStorePromos);
 
 	}

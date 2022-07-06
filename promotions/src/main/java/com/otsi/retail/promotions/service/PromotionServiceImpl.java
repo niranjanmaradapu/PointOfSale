@@ -652,9 +652,9 @@ public class PromotionServiceImpl implements PromotionService {
 	}
 
 	@Override
-	public List<PromotionToStoreEntity> getAllStorePromotions() {
+	public List<PromotionToStoreEntity> getAllStorePromotions(Long clientId) {
 
-		List<PromotionToStoreEntity> promoStoreList = promostoreRepo.findAll();
+		List<PromotionToStoreEntity> promoStoreList = promostoreRepo.findAllByClientId(clientId);
 		if (promoStoreList == null) {
 
 			throw new RecordNotFoundException("Store data not exists");

@@ -62,5 +62,7 @@ public interface PromotionToStoreRepo  extends JpaRepository<PromotionToStoreEnt
 
 	Page<PromotionToStoreEntity> findByStoreName(String storeName, Pageable pageable);
 
+	List<PromotionToStoreEntity> findAllByClientId(Long clientId);
+
 	
 }
