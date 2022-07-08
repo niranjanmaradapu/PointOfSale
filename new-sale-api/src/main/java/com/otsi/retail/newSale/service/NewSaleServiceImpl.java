@@ -54,10 +54,12 @@ import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
 import com.otsi.retail.newSale.Exceptions.DuplicateRecordException;
 import com.otsi.retail.newSale.Exceptions.InvalidInputException;
 import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
+import com.otsi.retail.newSale.common.AccountStatus;
 import com.otsi.retail.newSale.common.AccountType;
 import com.otsi.retail.newSale.common.DSStatus;
 import com.otsi.retail.newSale.common.DomainData;
 import com.otsi.retail.newSale.common.OrderStatus;
+import com.otsi.retail.newSale.common.PaymentStatus;
 import com.otsi.retail.newSale.common.PaymentType;
 import com.otsi.retail.newSale.config.Config;
 import com.otsi.retail.newSale.gatewayresponse.GateWayResponse;
@@ -202,8 +204,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setStoreId(newsaleVo.getStoreId());
 		entity.setOfflineNumber(newsaleVo.getOfflineNumber());
 		Random ran = new Random();
-		entity.setOrderNumber(
-				"KLM/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + ran.nextInt());
+		entity.setOrderNumber("EAS" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + getSaltString());
 
 		// Check for payment type
 		Long paymentValue = 0l;
@@ -259,10 +260,13 @@ public class NewSaleServiceImpl implements NewSaleService {
 				newsaleVo.getPaymentAmountType().stream().forEach(x -> {
 
 					// Checking the payment type condition
-					if ((x.getPaymentType().equals(PaymentType.PKTADVANCE))
-							|| (x.getPaymentType().equals(PaymentType.PKTPENDING))) {
-						// Calling the accounting(either debit/credit)
-						updateAccounting(newsaleVo);
+					if ((x.getPaymentType().equals(PaymentType.PKTADVANCE))) {
+						// claiming the credit note
+						creditUpdate(newsaleVo);
+					}
+					if ((x.getPaymentType().equals(PaymentType.PKTPENDING))) {
+						// saving debit notes
+						saveDebitNotesFromNewsale(newsaleVo);
 					}
 					if ((x.getPaymentType().equals(PaymentType.RTSlip))) {
 						try {
@@ -362,30 +366,58 @@ public class NewSaleServiceImpl implements NewSaleService {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<LedgerLogBookVo> entity = new HttpEntity<>(ledgerLogBookVO, headers);
-
-		ResponseEntity<?> listResponse = template.exchange(config.getSaveDebit_url(), HttpMethod.POST, entity,
-				GateWayResponse.class);
-
-		ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
-				.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-		GateWayResponse<?> gatewayResponse = mapper.convertValue(listResponse.getBody(), GateWayResponse.class);
-
-		/*
-		 * LedgerLogBookVo ledgerLogBookVo =
-		 * mapper.convertValue(gatewayResponse.getResult(), new
-		 * TypeReference<LedgerLogBookVO>() { });
-		 * 
-		 */
 		UserDetailsVo userDetails = getUserDetailsFromURM(ledgerLogBookVO.getMobileNumber());
 		ledgerLogBookVO.setCustomerId(userDetails.getId());
+		ledgerLogBookVO.setStatus(AccountStatus.ACTIVE);
+		ledgerLogBookVO.setPaymentStatus(PaymentStatus.DEBIT);
+		ledgerLogBookVO.setTransactionType(AccountType.DEBIT);
+		ledgerLogBookVO.setPaymentType(PaymentType.DEBIT);
+		ResponseEntity<?> listResponse = template.postForEntity(config.getSaveDebit_url(), entity,
+				LedgerLogBookVo.class);
+
+		/*
+		 * ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
+		 * .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+		 * 
+		 * GateWayResponse<?> gatewayResponse =
+		 * mapper.convertValue(listResponse.getBody(), GateWayResponse.class);
+		 * 
+		 * LedgerLogBookVo ledgerLogBookVo =
+		 * mapper.readValue(gatewayResponse.getResult(), new
+		 * TypeReference<LedgerLogBookVo>() { });
+		 */
+
 		return ledgerLogBookVO;
 
 	}
 
-	// UPDATE ACCOUNTING
+	// saving debit notes
+	private void saveDebitNotesFromNewsale(NewSaleVo newsaleVo) {
 
-	private void updateAccounting(NewSaleVo newsaleVo) {
+		if (newsaleVo.getDomainId() == DomainData.TE.getId()) {
+			LedgerLogBookVo ledgerLogBookVo = new LedgerLogBookVo();
+			ledgerLogBookVo.setStoreId(newsaleVo.getStoreId());
+			ledgerLogBookVo.setMobileNumber(newsaleVo.getMobileNumber());
+			ledgerLogBookVo.setAmount(newsaleVo.getNetPayableAmount());
+			newsaleVo.getPaymentAmountType().stream().forEach(paymentAmountType -> {
+
+				// Checking the payment type condition
+				if (paymentAmountType.getPaymentType().equals(PaymentType.PKTPENDING)) {
+					ledgerLogBookVo.setAccountType(AccountType.DEBIT);
+					UserDetailsVo userDetails = getUserDetailsFromURM(ledgerLogBookVo.getMobileNumber());
+					ledgerLogBookVo.setCustomerId(userDetails.getId());
+					saveDebit(ledgerLogBookVo);
+
+				}
+			});
+
+			log.info("received request to debit notes: " + ledgerLogBookVo);
+
+		}
+	}
+	// credit claiming
+
+	private void creditUpdate(NewSaleVo newsaleVo) {
 
 		if (newsaleVo.getDomainId() == DomainData.TE.getId()) {
 			LedgerLogBookVo ledgerLogBookVo = new LedgerLogBookVo();
@@ -399,6 +431,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 					ledgerLogBookVo.setAccountType(AccountType.CREDIT);
 				} else if (paymentAmountType.getPaymentType().equals(PaymentType.PKTPENDING)) {
 					ledgerLogBookVo.setAccountType(AccountType.DEBIT);
+					ledgerLogBookVo.setPaymentType(PaymentType.DEBIT);
 					UserDetailsVo userDetails = getUserDetailsFromURM(ledgerLogBookVo.getMobileNumber());
 					ledgerLogBookVo.setCustomerId(userDetails.getId());
 					saveDebit(ledgerLogBookVo);
@@ -410,7 +443,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				}
 			});
 
-			log.info("Update request to accounting: " + ledgerLogBookVo);
+			log.info("Update request to credit notes: " + ledgerLogBookVo);
 			rabbitTemplate.convertAndSend(config.getAccountingExchange(), config.getAccountingRK(), ledgerLogBookVo);
 
 		}
@@ -1544,7 +1577,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			List<Long> result = barVoList.stream().map(num -> num.getDiscount()).filter(n -> n != null)
 					.collect(Collectors.toList());
 			retunVo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());
-			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getItemPrice() * a.getQuantity()).sum());
+			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getNetValue()).sum());
 			retunVo.setBillValue(rAmount);
 			List<LineItemVo> taxValue = barVoList.stream().filter(lineitem -> lineitem.getTaxValue() != null)
 					.collect(Collectors.toList());
