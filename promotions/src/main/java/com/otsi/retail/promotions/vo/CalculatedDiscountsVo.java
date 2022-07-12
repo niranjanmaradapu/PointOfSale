@@ -14,6 +14,7 @@ public class CalculatedDiscountsVo {
 	private String calculatedDiscount;
 	private String calculatedDiscountDetails;
 	private boolean isDiscountAvailable;
+	private boolean isThisFixedAmountDiscount;
 	
 
 }

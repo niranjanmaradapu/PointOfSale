@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,7 +40,7 @@ public class CalculateBenifits {
 
 			if (benifitVo.getBenfitType().equals(BenfitType.FlatDiscount)) {
 				calculatedDiscountsVo
-						.setCalculatedDiscount(calculateBeniftForFlatDIscount(benifitVo, productTextileVo));
+						.setCalculatedDiscount(calculateBeniftForFlatDIscount(benifitVo, productTextileVo,calculatedDiscountsVo));
 			} else if (benifitVo.getBenfitType().equals(BenfitType.XunitsFromBuyPool)) {
 				calculatedDiscountsVo.setCalculatedDiscountDetails(
 						calculateBenifitsForXUnitsFromBuyPool(benifitVo, productTextileVo));
@@ -56,7 +54,7 @@ public class CalculateBenifits {
 		return calculatedDiscountsVo;
 	}
 
-	private String calculateBeniftForFlatDIscount(BenefitVo benifitVo, ProductVO productTextileVo) {
+	private String calculateBeniftForFlatDIscount(BenefitVo benifitVo, ProductVO productTextileVo, CalculatedDiscountsVo calculatedDiscountsVo) {
 
 		String calculatedDiscountAmount = "";
 
@@ -67,6 +65,7 @@ public class CalculateBenifits {
 		} else if (benifitVo.getDiscountType().equals(DiscountType.FixedAmountOn)) {
 			// calculateBeniftForFixedAmountOn(benifitVo,barcodeTextileVo);
 			calculatedDiscountAmount = benifitVo.getDiscount().toString();
+			calculatedDiscountsVo.setThisFixedAmountDiscount(true);
 		}
 		return calculatedDiscountAmount;
 	}
@@ -510,10 +509,12 @@ public class CalculateBenifits {
 
 					invoiceLevelDiscount = (benfitEntity.getNumOfItemsFromGetPool()
 							* Long.parseLong(benfitEntity.getDiscount()));
+					eligibleLineItemsFromGetPools.stream().forEach(l->l.setThisFixedAmountOnDiscount(true));
 
 				} else if (benfitEntity.getDiscountSubTypes().equals(DiscountSubTypes.AllItems)) {
 
 					invoiceLevelDiscount = Long.parseLong(benfitEntity.getDiscount());
+					eligibleLineItemsFromGetPools.stream().forEach(l->l.setThisFixedAmountOnDiscount(true));
 
 				}
 
@@ -817,10 +818,12 @@ public class CalculateBenifits {
 
 			invoiceLevelDiscount = (benfitEntity.getNumOfItemsFromBuyPool()
 					* Long.parseLong(benfitEntity.getDiscount()));
+			promoEligibleLineItems.stream().forEach(l->l.setThisFixedAmountOnDiscount(true));
 
 		} else if (benfitEntity.getDiscountSubTypes().equals(DiscountSubTypes.AllItems)) {
 
 			invoiceLevelDiscount = Long.parseLong(benfitEntity.getDiscount());
+			promoEligibleLineItems.stream().forEach(l->l.setThisFixedAmountOnDiscount(true));
 
 		}
 
@@ -1117,13 +1120,13 @@ public class CalculateBenifits {
 			List<LineItemVo> promoEligibleLineItems) {
 
 		double calculatedInvoiceLevelDiscount = 0.0;
-
+        promoEligibleLineItems.stream().forEach(l->l.setThisFixedAmountOnDiscount(true));
 		for (LineItemVo lineItemVo : promoEligibleLineItems) {
 			int quantity = lineItemVo.getQuantity();
 			String discount = benfitEntity.getDiscount();
 			calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount + (quantity * (Double.valueOf(discount)));
-
 		}
+		
 
 		return distributeDiscountToAllProducts(listofLineItems, calculatedInvoiceLevelDiscount);
 
@@ -1137,6 +1140,7 @@ public class CalculateBenifits {
 		// Double totalMrp = totalQuantityAndMrp.get(1);
 		List<LineItemVo> results = distributeDiscountToAllProducts(listofLineItems,
 				Double.valueOf(benfitEntity.getDiscount()).doubleValue());
+		promoEligibleLineItems.stream().forEach(l->l.setThisFixedAmountOnDiscount(true));
 
 		return results;
 	}

@@ -55,5 +55,7 @@ public class LineItemVo {
 	private LocalDate creationDate;
 
 	private LocalDate lastModified;
+	
+	private boolean isThisFixedAmountOnDiscount;
 
 }
