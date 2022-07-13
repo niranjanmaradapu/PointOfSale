@@ -181,9 +181,11 @@ if(returnslip==null) {
 			vo.setStoreId(returnSlipDto.getStoreId());
 			updateVo.add(vo);
 		});
-		ObjectMapper objectMapper = new ObjectMapper();
-		String result = objectMapper.writeValueAsString(updateVo);
-		rabbitTemplate.convertAndSend(config.getReturnSlipupdateInventoryExchange(), config.getReturnSlipupdateInventoryRK(), result);
+		/*
+		 * ObjectMapper objectMapper = new ObjectMapper(); String result =
+		 * objectMapper.writeValueAsString(updateVo);
+		 */
+		rabbitTemplate.convertAndSend(config.getReturnSlipupdateInventoryExchange(), config.getReturnSlipupdateInventoryRK(), updateVo);
 
 	}
 
