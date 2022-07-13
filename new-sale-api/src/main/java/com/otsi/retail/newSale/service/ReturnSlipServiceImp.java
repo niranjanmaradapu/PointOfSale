@@ -183,7 +183,7 @@ if(returnslip==null) {
 		});
 		ObjectMapper objectMapper = new ObjectMapper();
 		String result = objectMapper.writeValueAsString(updateVo);
-		rabbitTemplate.convertAndSend(config.getUpdateInventoryExchange(), config.getUpdateInventoryRK(), result);
+		rabbitTemplate.convertAndSend(config.getReturnSlipupdateInventoryExchange(), config.getReturnSlipupdateInventoryRK(), result);
 
 	}
 
