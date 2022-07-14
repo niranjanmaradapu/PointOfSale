@@ -54,12 +54,14 @@ public class LineItemsEntity extends BaseEntity {
 	
 	private Float cess;
 
-	private Long discount;
+	private Long manualDiscount;
+	
+	private Long promoDiscount;
 
 	private Long netValue;
 	
 	private Long salesManId;
-
+	
 //    @ManyToOne
 //    @JoinColumn(name = "order_id")
 //    private NewSaleEntity orderId;

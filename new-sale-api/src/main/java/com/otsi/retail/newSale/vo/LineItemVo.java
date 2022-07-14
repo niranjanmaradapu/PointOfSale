@@ -53,7 +53,9 @@ public class LineItemVo {
 	
 	private Float cess;
 
-	private Long discount;
+	private Long manualDiscount;
+	
+	private Long promoDiscount;
 	
 	private Long salesManId;
 

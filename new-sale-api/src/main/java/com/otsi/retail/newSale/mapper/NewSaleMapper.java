@@ -93,7 +93,7 @@ public class NewSaleMapper {
 					linevo.setGrossValue(lineItem.getGrossValue());
 					linevo.setNetValue(lineItem.getNetValue());
 					linevo.setQuantity(lineItem.getQuantity());
-					linevo.setDiscount(lineItem.getDiscount());
+					linevo.setManualDiscount(lineItem.getManualDiscount());
 					linevo.setSection(lineItem.getSection());
 					linevo.setSection(lineItem.getSection());
 					linevo.setHsnCode(lineItem.getHsnCode());

@@ -200,9 +200,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 		 */
 		entity.setStatus(OrderStatus.New);// Initial Order status should be new
 		entity.setStatus(newsaleVo.getStatus());
-		entity.setNetValue(newsaleVo.getNetPayableAmount());
 		entity.setStoreId(newsaleVo.getStoreId());
 		entity.setOfflineNumber(newsaleVo.getOfflineNumber());
+		//NetValue is subtraction of grossValue and Promo, Manual Discount
+		entity.setNetValue(entity.getGrossValue()-(entity.getPromoDisc() + entity.getManualDisc()));
+		
 		Random ran = new Random();
 		entity.setOrderNumber("EAS" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + getSaltString());
 
@@ -1574,7 +1576,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 			System.out.println(vo);
 
 			// HsnDetailsVo hsnDetails1 = getHsnDetails(rAmount);
-			List<Long> result = barVoList.stream().map(num -> num.getDiscount()).filter(n -> n != null)
+			List<Long> result = barVoList.stream().map(num -> num.getManualDiscount()).filter(n -> n != null)
 					.collect(Collectors.toList());
 			retunVo.setTotalDiscount(result.stream().mapToLong(d -> d).sum());
 			retunVo.setTotalMrp(barVoList.stream().mapToLong(a -> a.getNetValue()).sum());
@@ -1630,8 +1632,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				lineEntity.setBarCode(lineItem.getBarCode());
 				lineEntity.setQuantity(lineItem.getQuantity());
-				lineEntity.setDiscount(lineItem.getDiscount());
-				lineEntity.setGrossValue(lineItem.getNetValue());
+				lineEntity.setManualDiscount(lineItem.getManualDiscount());
+				lineEntity.setPromoDiscount(lineItem.getPromoDiscount());
 				lineEntity.setItemPrice(lineItem.getItemPrice());
 				lineEntity.setSection(lineItem.getSection());
 				lineEntity.setSubSection(lineItem.getSubSection());
@@ -1646,9 +1648,11 @@ public class NewSaleServiceImpl implements NewSaleService {
 				lineEntity.setStoreId(lineItem.getStoreId());
 				lineEntity.setSalesManId(lineItem.getSalesManId());
 
-				// GrossValue is multiple of net value of product and quantity
-				lineEntity.setNetValue(lineEntity.getGrossValue());
-
+				// GrossValue is multiple of quantity and item price
+				lineEntity.setGrossValue(lineItem.getItemPrice() * lineItem.getQuantity());
+				// Net Value is subtraction of gross value and promo, manual discount
+				lineEntity.setNetValue(lineEntity.getGrossValue()-(lineEntity.getPromoDiscount() + lineEntity.getManualDiscount()));
+				
 				lineEntity.setCreatedDate(LocalDateTime.now());
 				lineEntity.setLastModifiedDate(LocalDateTime.now());
 
@@ -1705,8 +1709,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 			line.setLineItemId(lineItem.getLineItemId());
 			line.setBarCode(lineItem.getBarCode());
 			line.setQuantity(lineItem.getQuantity());
-			line.setDiscount(lineItem.getDiscount());
-			line.setNetValue(lineItem.getNetValue());
+			line.setManualDiscount(lineItem.getManualDiscount());            line.setPromoDiscount(lineItem.getPromoDiscount());			
+            line.setNetValue(lineItem.getNetValue());
 			line.setItemPrice(lineItem.getItemPrice());
 			line.setTaxValue(lineItem.getTaxValue());
 			line.setCgst(lineItem.getCgst());
