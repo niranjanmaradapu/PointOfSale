@@ -203,7 +203,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setStoreId(newsaleVo.getStoreId());
 		entity.setOfflineNumber(newsaleVo.getOfflineNumber());
 		//NetValue is subtraction of grossValue and Promo, Manual Discount
-		entity.setNetValue(entity.getGrossValue()-(entity.getPromoDisc() + entity.getManualDisc()));
+		entity.setNetValue(entity.getGrossValue()-(newsaleVo.getTotalPromoDisc() + newsaleVo.getTotalManualDisc()));
 		
 		Random ran = new Random();
 		entity.setOrderNumber("EAS" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + getSaltString());
@@ -1651,7 +1651,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 				// GrossValue is multiple of quantity and item price
 				lineEntity.setGrossValue(lineItem.getItemPrice() * lineItem.getQuantity());
 				// Net Value is subtraction of gross value and promo, manual discount
-				lineEntity.setNetValue(lineEntity.getGrossValue()-(lineEntity.getPromoDiscount() + lineEntity.getManualDiscount()));
+				lineEntity.setNetValue(lineEntity.getGrossValue()-(lineItem.getPromoDiscount() + lineItem.getManualDiscount()));
 				
 				lineEntity.setCreatedDate(LocalDateTime.now());
 				lineEntity.setLastModifiedDate(LocalDateTime.now());
