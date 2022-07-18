@@ -8,7 +8,7 @@ spring:
     platform: postgres
     url: jdbc:postgresql://localhost:5432/newSale
     username: postgres
-    password: Otsi@123
+    password: Vasavi
  jpa:
    hibernate:
     ddl-auto: update

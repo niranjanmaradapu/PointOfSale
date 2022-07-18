@@ -49,6 +49,7 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 
 	Page<ReturnSlip> findByCreatedByAndStoreIdOrderByCreatedDateAsc(Long createdBy, Long storeId, Pageable pageable);
 
-
+	Page<ReturnSlip> findByTaggedItems_barCodeAndRtNoAndStoreIdOrderByCreatedDateAsc(String barcode, String rtNumber,
+			Long storeId, Pageable pageable);
 
 }

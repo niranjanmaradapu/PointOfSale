@@ -202,9 +202,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 		entity.setStatus(newsaleVo.getStatus());
 		entity.setStoreId(newsaleVo.getStoreId());
 		entity.setOfflineNumber(newsaleVo.getOfflineNumber());
-		//NetValue is subtraction of grossValue and Promo, Manual Discount
-		entity.setNetValue(entity.getGrossValue()-(newsaleVo.getTotalPromoDisc() + newsaleVo.getTotalManualDisc()));
-		
+		// NetValue is subtraction of grossValue and Promo, Manual Discount
+		entity.setNetValue(entity.getGrossValue() - (newsaleVo.getTotalPromoDisc() + newsaleVo.getTotalManualDisc()));
+
 		Random ran = new Random();
 		entity.setOrderNumber("EAS" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + getSaltString());
 
@@ -927,14 +927,17 @@ public class NewSaleServiceImpl implements NewSaleService {
 		log.debug("deugging getlistofDeliverySlips:" + listOfDeliverySlipVo);
 
 		Page<DeliverySlipEntity> dsDetails = null;
-		LocalDateTime createdDateTo;
-		LocalDateTime createdDatefrom = DateConverters
-				.convertLocalDateToLocalDateTime(listOfDeliverySlipVo.getDateFrom());
-		if (listOfDeliverySlipVo.getDateTo() != null) {
-			createdDateTo = DateConverters.convertToLocalDateTimeMax(listOfDeliverySlipVo.getDateTo());
-		} else {
-			createdDateTo = DateConverters.convertToLocalDateTimeMax(listOfDeliverySlipVo.getDateFrom());
+		LocalDateTime createdDateTo = null;
+		LocalDateTime createdDatefrom = null;
+		if (listOfDeliverySlipVo.getDateFrom() != null) {
+			createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(listOfDeliverySlipVo.getDateFrom());
 
+			if (listOfDeliverySlipVo.getDateTo() != null) {
+				createdDateTo = DateConverters.convertToLocalDateTimeMax(listOfDeliverySlipVo.getDateTo());
+			} else {
+				createdDateTo = DateConverters.convertToLocalDateTimeMax(listOfDeliverySlipVo.getDateFrom());
+
+			}
 		}
 		try {
 
@@ -966,6 +969,29 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 				}
 
+			}
+			/*
+			 * getting the record using dsNumber and barcode
+			 */
+
+			if (listOfDeliverySlipVo.getDateFrom() == null && listOfDeliverySlipVo.getDateTo() == null
+					&& StringUtils.isNotEmpty(listOfDeliverySlipVo.getDsNumber())
+					&& listOfDeliverySlipVo.getStatus() == null
+					&& StringUtils.isNotEmpty(listOfDeliverySlipVo.getBarcode())
+					&& ObjectUtils.isNotEmpty(listOfDeliverySlipVo.getStoreId())) {
+				List<LineItemsEntity> bar = lineItemRepo.findByBarCodeAndStoreId(listOfDeliverySlipVo.getBarcode(),
+						listOfDeliverySlipVo.getStoreId());
+
+				if (bar != null) {
+					List<Long> dsIds = bar.stream().map(barcode -> barcode.getDsEntity().getDsId())
+							.collect(Collectors.toList());
+
+					List<String> dsList = new ArrayList<>();
+					dsList.add(listOfDeliverySlipVo.getDsNumber());
+					dsDetails = dsRepo.findByDsIdInAndDsNumberInAndStoreIdOrderByCreatedDateDesc(dsIds, dsList,
+							listOfDeliverySlipVo.getStoreId(), pageable);
+
+				}
 			}
 			/*
 			 * getting the record using barcode
@@ -1651,8 +1677,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 				// GrossValue is multiple of quantity and item price
 				lineEntity.setGrossValue(lineItem.getItemPrice() * lineItem.getQuantity());
 				// Net Value is subtraction of gross value and promo, manual discount
-				lineEntity.setNetValue(lineEntity.getGrossValue()-(lineItem.getPromoDiscount() + lineItem.getManualDiscount()));
-				
+				lineEntity.setNetValue(
+						lineEntity.getGrossValue() - (lineItem.getPromoDiscount() + lineItem.getManualDiscount()));
+
 				lineEntity.setCreatedDate(LocalDateTime.now());
 				lineEntity.setLastModifiedDate(LocalDateTime.now());
 
@@ -1709,8 +1736,9 @@ public class NewSaleServiceImpl implements NewSaleService {
 			line.setLineItemId(lineItem.getLineItemId());
 			line.setBarCode(lineItem.getBarCode());
 			line.setQuantity(lineItem.getQuantity());
-			line.setManualDiscount(lineItem.getManualDiscount());            line.setPromoDiscount(lineItem.getPromoDiscount());			
-            line.setNetValue(lineItem.getNetValue());
+			line.setManualDiscount(lineItem.getManualDiscount());
+			line.setPromoDiscount(lineItem.getPromoDiscount());
+			line.setNetValue(lineItem.getNetValue());
 			line.setItemPrice(lineItem.getItemPrice());
 			line.setTaxValue(lineItem.getTaxValue());
 			line.setCgst(lineItem.getCgst());
