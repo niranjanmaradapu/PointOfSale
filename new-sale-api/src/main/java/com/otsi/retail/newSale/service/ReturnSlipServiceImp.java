@@ -69,7 +69,8 @@ public class ReturnSlipServiceImp implements ReturnslipService {
 	@Override
 	public ReturnSlipRequestVo getReturnSlip(String returnReferenceNumber, Long storeId) {
 		ReturnSlipRequestVo returnslipVo = new ReturnSlipRequestVo();
-		ReturnSlip returnSlip = returnSlipRepo.findByRtNoAndStoreId(returnReferenceNumber, storeId);
+		ReturnSlip returnSlip = returnSlipRepo.findByRtNoAndStoreIdAndRtStatus(returnReferenceNumber, storeId,
+				ReturnSlipStatus.PENDING);
 		if (returnSlip != null) {
 
 			ReturnSlipRequestVo returnSlipVo = returnSlipMapper.convertReturnSlipEntityToVo(returnSlip);
@@ -315,7 +316,7 @@ public class ReturnSlipServiceImp implements ReturnslipService {
 			 *
 			 */
 			if (vo.getRtNumber() != null && ObjectUtils.isEmpty(vo.getCreatedBy())
-					&& StringUtils.isEmpty(vo.getBarcode())&&vo.getRtStatus() == null) {
+					&& StringUtils.isEmpty(vo.getBarcode()) && vo.getRtStatus() == null) {
 				retunSlipdetails = returnSlipRepo.findByRtNoAndStoreIdOrderByCreatedDateAsc(vo.getRtNumber(),
 						vo.getStoreId(), pageable);
 			}

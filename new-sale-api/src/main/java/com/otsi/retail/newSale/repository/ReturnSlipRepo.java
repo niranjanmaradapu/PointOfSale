@@ -24,14 +24,15 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 
 	ReturnSlip findByInvoiceNumberAndTaggedItems_BarCodeIn(String invoiceNumber, List<String> barcodesIn);
 
-	Page<ReturnSlip> findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom, LocalDateTime createdDateTo,
-			Long storeId, Pageable pageable);
+	Page<ReturnSlip> findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
+			LocalDateTime createdDateTo, Long storeId, Pageable pageable);
 
 	Page<ReturnSlip> findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDateTo,
 			LocalDateTime createdDateTo2, String rtNumber, Long storeId, Pageable pageable);
 
-	Page<ReturnSlip> findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
-			LocalDateTime createdDateTo, String barcode, Long storeId, Pageable pageable);
+	Page<ReturnSlip> findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(
+			LocalDateTime createdDatefrom, LocalDateTime createdDateTo, String barcode, Long storeId,
+			Pageable pageable);
 
 	Page<ReturnSlip> findByCreatedDateBetweenAndCreatedByAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
 			LocalDateTime createdDateTo, Long createdBy, Long storeId, Pageable pageable);
@@ -43,13 +44,17 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 
 	Page<ReturnSlip> findByStoreIdOrderByCreatedDateAsc(Long storeId, Pageable pageable);
 
-	Page<ReturnSlip> findByTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(String barcode, Long storeId, Pageable pageable);
+	Page<ReturnSlip> findByTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(String barcode, Long storeId,
+			Pageable pageable);
 
-	Page<ReturnSlip> findByRtStatusAndStoreIdOrderByCreatedDateAsc(ReturnSlipStatus rtStatus, Long storeId, Pageable pageable);
+	Page<ReturnSlip> findByRtStatusAndStoreIdOrderByCreatedDateAsc(ReturnSlipStatus rtStatus, Long storeId,
+			Pageable pageable);
 
 	Page<ReturnSlip> findByCreatedByAndStoreIdOrderByCreatedDateAsc(Long createdBy, Long storeId, Pageable pageable);
 
 	Page<ReturnSlip> findByTaggedItems_barCodeAndRtNoAndStoreIdOrderByCreatedDateAsc(String barcode, String rtNumber,
 			Long storeId, Pageable pageable);
+
+	ReturnSlip findByRtNoAndStoreIdAndRtStatus(String returnReferenceNumber, Long storeId, ReturnSlipStatus pending);
 
 }
