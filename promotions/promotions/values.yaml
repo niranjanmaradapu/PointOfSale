@@ -89,11 +89,11 @@ resources:
   #   memory: 128Mi
 
 autoscaling:
-  enabled: false
+  enabled: true
   minReplicas: 1
-  maxReplicas: 100
+  maxReplicas: 3
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 50
 
 nodeSelector: {}
 
@@ -105,4 +105,4 @@ persistence:
   enabled: false
   storageClass: gp2
   accessMode: ReadWriteOnce
-  size: 1Gi
+  size: 2Gi
