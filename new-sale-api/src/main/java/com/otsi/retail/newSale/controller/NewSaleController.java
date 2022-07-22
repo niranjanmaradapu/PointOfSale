@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.otsi.retail.newSale.Entity.DayClosure;
 import com.otsi.retail.newSale.Exceptions.BusinessException;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
@@ -39,6 +40,7 @@ import com.otsi.retail.newSale.utils.CommonUtilities;
 import com.otsi.retail.newSale.utils.Constants;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
+import com.otsi.retail.newSale.vo.DayClosureVO;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.GiftVoucherSearchVo;
 import com.otsi.retail.newSale.vo.GiftVoucherVo;
@@ -55,6 +57,9 @@ import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * Controller class for accepting all the requests which are related to
@@ -257,13 +262,14 @@ public class NewSaleController {
 
 	// Method for getting list of sale bills
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
-	//@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleBillsFallBackMethod")
+	// @CircuitBreaker(name = "NewSaleService", fallbackMethod =
+	// "getSaleBillsFallBackMethod")
 
-	public GateWayResponse<?> getListOfSaleBills(@RequestBody SaleBillsVO svo,Pageable pageable)
+	public GateWayResponse<?> getListOfSaleBills(@RequestBody SaleBillsVO svo, Pageable pageable)
 			throws RecordNotFoundException, JsonMappingException, JsonProcessingException {
 		log.info("Received Request to getListOfSaleBills :" + svo.toString());
 
-		SaleBillsVO listOfSaleBills = newSaleService.getListOfSaleBills(svo,pageable);
+		SaleBillsVO listOfSaleBills = newSaleService.getListOfSaleBills(svo, pageable);
 		return new GateWayResponse<>(HttpStatus.OK, listOfSaleBills, "");
 
 	}
@@ -281,12 +287,12 @@ public class NewSaleController {
 	// Method for getting list of delivery slips
 
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_DS)
-	public GateWayResponse<?> getlistofDeliverySlips(Pageable pageable,@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo)
-			throws RecordNotFoundException {
+	public GateWayResponse<?> getlistofDeliverySlips(Pageable pageable,
+			@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo) throws RecordNotFoundException {
 		log.info("Received Request to get estimation slip :" + listOfDeliverySlipVo.toString());
 		// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-		ListOfDeliverySlipVo getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo,pageable);
+		ListOfDeliverySlipVo getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo, pageable);
 
 		return new GateWayResponse<>(HttpStatus.OK, getDs, "");
 
@@ -504,7 +510,8 @@ public class NewSaleController {
 
 	// Method for getting list of sale report
 	@PostMapping(CommonRequestMappigs.GET_SALE_REPORT)
-	//@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleReportFallBackMethod")
+	// @CircuitBreaker(name = "NewSaleService", fallbackMethod =
+	// "getSaleReportFallBackMethod")
 	public GateWayResponse<?> getSaleReport(@RequestBody SaleReportVo srvo) throws RecordNotFoundException {
 
 		SaleReportVo saleReport = newSaleService.getSaleReport(srvo);
@@ -613,6 +620,28 @@ public class NewSaleController {
 		List<GiftVoucherVo> searchByGvNumberAndFromDateAndToDate = newSaleService.giftVoucherSearching(searchVo);
 
 		return new GateWayResponse<>(HttpStatus.OK, searchByGvNumberAndFromDateAndToDate, "");
+
+	}
+
+	@ApiOperation(value = "/saveDayClosure", notes = "saving day closure activity", response = DayClosure.class)
+	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
+			@ApiResponse(code = 200, message = "Successful retrieval", response = DayClosure.class, responseContainer = "Object") })
+	@PostMapping("/savedayclosure")
+	public ResponseEntity<?> saveDayClosure(@RequestBody DayClosureVO dayClosureVO) {
+		log.info("Recieved request to saveDayClosure:" + dayClosureVO);
+		DayClosureVO dayClosure = newSaleService.saveDayClosure(dayClosureVO);
+		return ResponseEntity.ok(dayClosure);
+
+	}
+
+	@ApiOperation(value = "/getDayClosure", notes = "fetching day closure activity", response = DayClosure.class)
+	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
+			@ApiResponse(code = 200, message = "Successful retrieval", response = DayClosure.class, responseContainer = "Object") })
+	@PostMapping("/getdayclosure")
+	public ResponseEntity<?> getDayClosure(@RequestParam(required = false) Long storeId) {
+		log.info("Recieved request to getDayClosure:" + storeId);
+		Boolean dayClosure = newSaleService.getDayClosure(storeId);
+		return ResponseEntity.ok(dayClosure);
 
 	}
 }

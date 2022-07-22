@@ -41,6 +41,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.otsi.retail.newSale.Entity.BarcodeEntity;
 import com.otsi.retail.newSale.Entity.CustomerDetailsEntity;
+import com.otsi.retail.newSale.Entity.DayClosure;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
 import com.otsi.retail.newSale.Entity.LineItemsEntity;
@@ -64,11 +65,13 @@ import com.otsi.retail.newSale.common.PaymentType;
 import com.otsi.retail.newSale.config.Config;
 import com.otsi.retail.newSale.gatewayresponse.GateWayResponse;
 import com.otsi.retail.newSale.mapper.CustomerMapper;
+import com.otsi.retail.newSale.mapper.DayClosureMapper;
 import com.otsi.retail.newSale.mapper.DeliverySlipMapper;
 import com.otsi.retail.newSale.mapper.NewSaleMapper;
 import com.otsi.retail.newSale.mapper.PaymentAmountTypeMapper;
 import com.otsi.retail.newSale.repository.BarcodeRepository;
 import com.otsi.retail.newSale.repository.CustomerDetailsRepo;
+import com.otsi.retail.newSale.repository.DayClosureRepository;
 import com.otsi.retail.newSale.repository.DeliverySlipRepository;
 import com.otsi.retail.newSale.repository.GiftVoucherRepo;
 import com.otsi.retail.newSale.repository.LineItemReRepo;
@@ -79,6 +82,7 @@ import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.utils.DateConverters;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
+import com.otsi.retail.newSale.vo.DayClosureVO;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.GetUserRequestVo;
 import com.otsi.retail.newSale.vo.GiftVoucherSearchVo;
@@ -176,6 +180,12 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	@Autowired
 	private LoyalityPointsRepo loyalityRepo;
+
+	@Autowired
+	private DayClosureRepository dayClosureRepository;
+
+	@Autowired
+	private DayClosureMapper dayClosureMapper;
 
 	// Method for saving order
 	@Override
@@ -2056,6 +2066,69 @@ public class NewSaleServiceImpl implements NewSaleService {
 		}
 
 		return giftVoucherVoList;
+
+	}
+
+	@Override
+	public DayClosureVO saveDayClosure(DayClosureVO dayClosureVO) {
+		DayClosure dayClosure = dayClosureMapper.voToEntity(dayClosureVO);
+		DayClosureVO dayClose = dayClosureMapper.entityToVO(dayClosureRepository.save(dayClosure));
+		return dayClose;
+	}
+
+	@Override
+	public Boolean getDayClosure(Long storeId) {
+		LocalDateTime createdDate;
+		LocalDateTime createdDatefrom;
+		LocalDateTime createdDateTo;
+		List<DeliverySlipEntity> dsList;
+		createdDate = LocalDateTime.now();
+		DayClosure dayClosure = dayClosureRepository.findByStoreIdAndDayClose(storeId, createdDate);
+
+		// if day was closed it returns true
+		if (dayClosure != null) {
+			return true;
+		} // if day was not closed it returns false
+		else if (dayClosure == null) {
+			// if day was not closed,need to check pending delivery slips.
+			createdDate = LocalDateTime.now();
+			createdDatefrom = createdDate;
+			createdDateTo = createdDate;
+			dsList = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(DSStatus.Pending, createdDatefrom,
+					createdDateTo, storeId);
+			// if pending ds slips was there return false
+			if (!(CollectionUtils.isEmpty(dsList))) {
+
+				return false;
+			}
+			// if pending ds slips was not there need to check before the other day
+			else if (CollectionUtils.isEmpty(dsList)) {
+				LocalDateTime createdDate1 = createdDate.minusDays(1);
+				while (createdDate1 != null) {
+					DayClosure dayClosure1 = dayClosureRepository.findByStoreIdAndDayClose(storeId, createdDate1);
+					if (dayClosure1 != null) {
+						return true;
+					} else if (dayClosure1 == null) {
+
+						LocalDateTime createdDatefrom1 = createdDate1;
+						LocalDateTime createdDateTo1 = createdDate1;
+						List<DeliverySlipEntity> dsList1 = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(
+								DSStatus.Pending, createdDatefrom1, createdDateTo1, storeId);
+						if (!(CollectionUtils.isEmpty(dsList))) {
+
+							return false;
+						}
+						return true;
+					}
+
+				}
+				createdDate1 = createdDate.minusDays(1);
+
+				return true;
+			}
+		}
+
+		return true;
 
 	}
 

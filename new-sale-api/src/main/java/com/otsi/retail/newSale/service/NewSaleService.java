@@ -17,6 +17,7 @@ import com.otsi.retail.newSale.Exceptions.InvalidInputException;
 import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
+import com.otsi.retail.newSale.vo.DayClosureVO;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.GiftVoucherSearchVo;
 import com.otsi.retail.newSale.vo.GiftVoucherVo;
@@ -74,21 +75,21 @@ public interface NewSaleService {
 
 	SaleReportVo getSaleReport(SaleReportVo srvo) throws RecordNotFoundException;
 
-	List<Long> saveLineItems(List<LineItemVo> lineItems/*, Long domainId*/);
+	List<Long> saveLineItems(List<LineItemVo> lineItems/* , Long domainId */);
 
 	String saveDeliverySlip(DeliverySlipVo vo) throws RecordNotFoundException;
 
 	String editLineItem(LineItemVo lineItem) throws RecordNotFoundException;
 
-	List<LineItemVo> getLineItemByBarcode(String barCode/*, Long domainId*/) throws RecordNotFoundException;
+	List<LineItemVo> getLineItemByBarcode(String barCode/* , Long domainId */) throws RecordNotFoundException;
 
-	String deleteLineItem(String barCode/*, Long domainId */) throws RecordNotFoundException;
+	String deleteLineItem(String barCode/* , Long domainId */) throws RecordNotFoundException;
 
 	String getTaggedCustomerForInvoice(String mobileNo, String invoiceNo);
 
 	void deleteDeliverySlipDetails(String dsNumber);
 
-	List<LineItemVo> getBarcodes(List<String> barCode/*, Long domainId */) throws RecordNotFoundException;
+	List<LineItemVo> getBarcodes(List<String> barCode/* , Long domainId */) throws RecordNotFoundException;
 
 	String paymentConfirmationFromRazorpay(String razorPayId, boolean payStatus);
 
@@ -111,6 +112,9 @@ public interface NewSaleService {
 	String activateGiftvoucher(List<String> gvsList, Boolean flag) throws RecordNotFoundException;
 
 	public List<GiftVoucherVo> giftVoucherSearching(GiftVoucherSearchVo searchVo);
-	
+
+	DayClosureVO saveDayClosure(DayClosureVO dayClosureVO);
+
+	Boolean getDayClosure(Long storeId);
 
 }
