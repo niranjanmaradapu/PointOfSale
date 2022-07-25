@@ -72,10 +72,10 @@ public class PromotionController {
 
 	// Method for getting list of all promotions based on their status
 	@GetMapping(CommonRequestMappigs.GET_PROMO_LIST)
-	public GateWayResponse<?> listOfPromotions(@NotNull @RequestParam String flag, Long domainId,
+	public GateWayResponse<?> listOfPromotions(@NotNull @RequestParam String flag,
 			                                   Long clientId) {
 		log.info("Recieved request to listOfPromotions():" + flag);
-		ConnectionPromoVo promoVo = promoService.getListOfPromotions(flag, domainId, clientId);
+		ConnectionPromoVo promoVo = promoService.getListOfPromotions(flag, clientId);
 		return new GateWayResponse<>("fetching list of promotions successfully", promoVo);
 
 	}

@@ -1,7 +1,5 @@
 package com.otsi.retail.newSale.Entity;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -28,7 +26,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "delivery_slip")
 @ToString
-public class DeliverySlipEntity  {
+public class DeliverySlipEntity  extends BaseEntity {
 
 	
 	@Id
@@ -58,12 +56,6 @@ public class DeliverySlipEntity  {
 
 	private DSStatus status;
 	
-	//private Long salesMan;
-
-	private LocalDate creationDate;
-
-	private LocalDate lastModified;
-
 	@Transient
 	@OneToMany( mappedBy  = "deliverySlip", cascade = CascadeType.ALL)
 	private List<BarcodeEntity> barcodes;

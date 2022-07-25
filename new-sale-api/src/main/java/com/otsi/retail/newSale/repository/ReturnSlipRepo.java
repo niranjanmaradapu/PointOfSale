@@ -2,6 +2,7 @@
 package com.otsi.retail.newSale.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,20 +22,20 @@ public interface ReturnSlipRepo extends JpaRepository<ReturnSlip, Long> {
 
 	ReturnSlip findByInvoiceNumberAndTaggedItems_BarCodeIn(String invoiceNumber, List<String> barcodesIn);
 
-	List<ReturnSlip> findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(LocalDate dateFrom, LocalDate dateTo,
+	List<ReturnSlip> findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom, LocalDateTime createdDateTo,
 			Long storeId);
 
-	List<ReturnSlip> findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(LocalDate dateFrom,
-			LocalDate dateTo, String rtNumber, Long storeId);
+	List<ReturnSlip> findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDateTo,
+			LocalDateTime createdDateTo2, String rtNumber, Long storeId);
 
-	List<ReturnSlip> findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(LocalDate dateFrom,
-			LocalDate dateTo, String barcode, Long storeId);
+	List<ReturnSlip> findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
+			LocalDateTime createdDateTo, String barcode, Long storeId);
 
-	List<ReturnSlip> findByCreatedDateBetweenAndCreatedByAndStoreIdOrderByCreatedDateAsc(LocalDate dateFrom,
-			LocalDate dateTo, Long createdBy, Long storeId);
+	List<ReturnSlip> findByCreatedDateBetweenAndCreatedByAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
+			LocalDateTime createdDateTo, Long createdBy, Long storeId);
 
-	List<ReturnSlip> findByCreatedDateBetweenAndRtStatusAndStoreIdOrderByCreatedDateAsc(LocalDate dateFrom,
-			LocalDate dateTo, ReturnSlipStatus rtStatus, Long storeId);
+	List<ReturnSlip> findByCreatedDateBetweenAndRtStatusAndStoreIdOrderByCreatedDateAsc(LocalDateTime createdDatefrom,
+			LocalDateTime createdDateTo, ReturnSlipStatus rtStatus, Long storeId);
 
 	List<ReturnSlip> findByRtNoAndStoreIdOrderByCreatedDateAsc(String rtNumber, Long storeId);
 

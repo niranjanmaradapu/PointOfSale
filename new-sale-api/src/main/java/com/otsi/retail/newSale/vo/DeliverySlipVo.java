@@ -33,6 +33,8 @@ public class DeliverySlipVo {
 	private String type;
 
 	private Long mrp;
+	
+	private Long grossAmount;
 
 	private Long promoDisc;
 
@@ -42,9 +44,9 @@ public class DeliverySlipVo {
 
 	private Long salesMan;
 
-	private LocalDate createdDate;
+	private LocalDateTime createdDate;
 
-	private LocalDate lastModified;
+	private LocalDateTime lastModifiedDate;
 	
 	private List<LineItemVo> lineItems;
 

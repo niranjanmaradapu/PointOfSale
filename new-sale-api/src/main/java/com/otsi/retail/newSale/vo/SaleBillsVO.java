@@ -1,8 +1,8 @@
 package com.otsi.retail.newSale.vo;
 
 import java.time.LocalDate;
-import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.common.OrderStatus;
@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 @Component
-public class ListOfSaleBillsVo {
+public class SaleBillsVO {
 
 	private LocalDate dateFrom;
 
@@ -29,13 +29,13 @@ public class ListOfSaleBillsVo {
 
 	private String invoiceNumber;
 
-	private String EmpId;
+	private Long EmpId;
 
 	private Long totalAmount;
 
 	private Long totalDiscount;
 
-	private List<NewSaleVo> newSaleVo;
+	private Page<NewSaleVo> newSale;
 
 	// private List<BarcodeVo> barcodeVo;
 

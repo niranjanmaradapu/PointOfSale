@@ -1,7 +1,5 @@
 package com.otsi.retail.newSale.controller;
 
-import java.net.ConnectException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,10 +9,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.AmqpConnectException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,12 +22,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.ResourceAccessException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
-import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
 import com.otsi.retail.newSale.Exceptions.BusinessException;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
 import com.otsi.retail.newSale.Exceptions.DataNotFoundException;
@@ -40,6 +35,8 @@ import com.otsi.retail.newSale.common.CommonRequestMappigs;
 import com.otsi.retail.newSale.gatewayresponse.GateWayResponse;
 import com.otsi.retail.newSale.service.CustomerService;
 import com.otsi.retail.newSale.service.NewSaleService;
+import com.otsi.retail.newSale.utils.CommonUtilities;
+import com.otsi.retail.newSale.utils.Constants;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
@@ -48,11 +45,11 @@ import com.otsi.retail.newSale.vo.GiftVoucherVo;
 import com.otsi.retail.newSale.vo.InvoiceRequestVo;
 import com.otsi.retail.newSale.vo.LineItemVo;
 import com.otsi.retail.newSale.vo.ListOfDeliverySlipVo;
-import com.otsi.retail.newSale.vo.ListOfSaleBillsVo;
 import com.otsi.retail.newSale.vo.LoyalityPointsVo;
 import com.otsi.retail.newSale.vo.NewSaleResponseVo;
 import com.otsi.retail.newSale.vo.NewSaleVo;
 import com.otsi.retail.newSale.vo.ReturnSlipVo;
+import com.otsi.retail.newSale.vo.SaleBillsVO;
 import com.otsi.retail.newSale.vo.SaleReportVo;
 import com.otsi.retail.newSale.vo.SearchLoyaltyPointsVo;
 import com.otsi.retail.newSale.vo.UserDataVo;
@@ -187,11 +184,11 @@ public class NewSaleController {
 
 	// Method for creating Line Items
 	@PostMapping("/savelineitems/{domainId}")
-	public GateWayResponse<?> saveLineItems(/*@PathVariable Long domainId,*/ @RequestBody List<LineItemVo> lineItems)
+	public GateWayResponse<?> saveLineItems(/* @PathVariable Long domainId, */ @RequestBody List<LineItemVo> lineItems)
 			throws InvalidInputException {
 		log.info("Save Line items with values " + lineItems.toString());
 		try {
-			List<Long> result = newSaleService.saveLineItems(lineItems/*, domainId*/);
+			List<Long> result = newSaleService.saveLineItems(lineItems/* , domainId */);
 
 			return new GateWayResponse<>("Successfully saved Line item..", result.toString());
 		} catch (InvalidInputException e) {
@@ -212,25 +209,19 @@ public class NewSaleController {
 
 	// Method for creating Delivery slip using List of LineItems
 	@PostMapping(CommonRequestMappigs.CREATE_DS)
-	public GateWayResponse<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo) throws RecordNotFoundException {
+	public ResponseEntity<?> saveDeliverySlip(@RequestBody DeliverySlipVo vo) throws RecordNotFoundException {
 		log.info("Received Request to save estimationslip :" + vo);
-		try {
-
-			String saveDs = newSaleService.saveDeliverySlip(vo);
-			return new GateWayResponse<>("successfully created estimation slip", saveDs);
-		} catch (RecordNotFoundException e) {
-			log.error("Exception occurs while saving estimation slip : " + vo);
-			return new GateWayResponse<>(e.getMessage(), "Exception occurs");
-		}
+		String saveDs = newSaleService.saveDeliverySlip(vo);
+		return ResponseEntity.ok(saveDs);
 	}
 
 	// Method getting line item by using Bar code based on their domain id
 	@GetMapping("/getlineitem")
-	public GateWayResponse<?> getLineItemByBarcode(@RequestParam String barCode /*, @RequestParam Long domainId */)
+	public GateWayResponse<?> getLineItemByBarcode(@RequestParam String barCode /* , @RequestParam Long domainId */)
 			throws RecordNotFoundException {
 
 		log.info("Recieved request for getting line item : " + barCode);
-		List<LineItemVo> result = newSaleService.getLineItemByBarcode(barCode/*, domainId */);
+		List<LineItemVo> result = newSaleService.getLineItemByBarcode(barCode/* , domainId */);
 
 		return new GateWayResponse<>("Success", result);
 
@@ -242,39 +233,37 @@ public class NewSaleController {
 			throws RecordNotFoundException {
 
 		log.info("Recieved request to delete line item : " + barCode);
-		String result = newSaleService.deleteLineItem(barCode /*, domainId */);
+		String result = newSaleService.deleteLineItem(barCode /* , domainId */);
 
 		return new GateWayResponse<>("Success", result);
 	}
 
 	// Method for getting Delivery slip Data using DsNumber
 	@GetMapping(CommonRequestMappigs.GET_DS)
-	public GateWayResponse<?> getDeliverySlipDetails(@RequestParam String dsNumber) throws RecordNotFoundException {
+	public ResponseEntity<?> getDeliverySlipDetails(@RequestParam String dsNumber) throws RecordNotFoundException {
 		log.info("Received Request to get estimation slip Details :" + dsNumber);
-
 		DeliverySlipVo dsDetails = newSaleService.getDeliverySlipDetails(dsNumber);
-		return new GateWayResponse<>(HttpStatus.OK, dsDetails, "");
+		return ResponseEntity.ok(dsDetails);
 
 	}
 
 	// method for deleting pending delivery slip data
 	@DeleteMapping(CommonRequestMappigs.DELETE_DS)
-	public GateWayResponse<?> deleteDeliverySlipDetails(@RequestParam String dsNumber) throws RecordNotFoundException {
+	public ResponseEntity<?> deleteDeliverySlipDetails(@RequestParam String dsNumber) throws RecordNotFoundException {
 		log.info("Received Request to deleted estimation slip details :" + dsNumber);
-
-		String dsDetails = newSaleService.deleteDeliverySlipDetails(dsNumber);
-		return new GateWayResponse<>("Success", dsDetails);
+		newSaleService.deleteDeliverySlipDetails(dsNumber);
+		return ResponseEntity.ok(CommonUtilities.buildSuccessResponse(Constants.SUCCESS, Constants.RESULT));
 	}
 
 	// Method for getting list of sale bills
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_SALEBILLS)
 	@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleBillsFallBackMethod")
 
-	public GateWayResponse<?> getListOfSaleBills(@RequestBody ListOfSaleBillsVo svo)
+	public GateWayResponse<?> getListOfSaleBills(@RequestBody SaleBillsVO svo,Pageable pageable)
 			throws RecordNotFoundException, JsonMappingException, JsonProcessingException {
 		log.info("Received Request to getListOfSaleBills :" + svo.toString());
 
-		ListOfSaleBillsVo listOfSaleBills = newSaleService.getListOfSaleBills(svo);
+		SaleBillsVO listOfSaleBills = newSaleService.getListOfSaleBills(svo,pageable);
 		return new GateWayResponse<>(HttpStatus.OK, listOfSaleBills, "");
 
 	}
@@ -282,8 +271,7 @@ public class NewSaleController {
 	public GateWayResponse<?> getSaleBillsFallBackMethod(Exception ex) throws Exception {
 		if (ex instanceof BusinessException) {
 			throw ex;
-			
-			
+
 		}
 
 		return new GateWayResponse<>("Third Party Service  is Down", null);
@@ -293,12 +281,12 @@ public class NewSaleController {
 	// Method for getting list of delivery slips
 
 	@PostMapping(CommonRequestMappigs.GET_LISTOF_DS)
-	public GateWayResponse<?> getlistofDeliverySlips(@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo)
+	public GateWayResponse<?> getlistofDeliverySlips(Pageable pageable,@RequestBody ListOfDeliverySlipVo listOfDeliverySlipVo)
 			throws RecordNotFoundException {
 		log.info("Received Request to get estimation slip :" + listOfDeliverySlipVo.toString());
 		// DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-		ListOfDeliverySlipVo getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo);
+		ListOfDeliverySlipVo getDs = newSaleService.getlistofDeliverySlips(listOfDeliverySlipVo,pageable);
 
 		return new GateWayResponse<>(HttpStatus.OK, getDs, "");
 
@@ -516,7 +504,7 @@ public class NewSaleController {
 
 	// Method for getting list of sale report
 	@PostMapping(CommonRequestMappigs.GET_SALE_REPORT)
-	@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleReportFallBackMethod")
+	//@CircuitBreaker(name = "NewSaleService", fallbackMethod = "getSaleReportFallBackMethod")
 	public GateWayResponse<?> getSaleReport(@RequestBody SaleReportVo srvo) throws RecordNotFoundException {
 
 		SaleReportVo saleReport = newSaleService.getSaleReport(srvo);
@@ -540,7 +528,7 @@ public class NewSaleController {
 		log.info("Received Request to getBarcodeDetails:" + barCode);
 		System.out.println("Received Request to getBarcodeDetails:" + barCode);
 
-		List<LineItemVo> barCodeDetails = newSaleService.getBarcodes(barCode/*, domainId*/);
+		List<LineItemVo> barCodeDetails = newSaleService.getBarcodes(barCode/* , domainId */);
 
 		return new GateWayResponse<>(HttpStatus.OK, barCodeDetails, "");
 
@@ -614,17 +602,17 @@ public class NewSaleController {
 		return new GateWayResponse<>(HttpStatus.OK, result, "");
 
 	}
-	
-	/**Search Operation GiftVoucher By number and toDate And fromDate
+
+	/**
+	 * Search Operation GiftVoucher By number and toDate And fromDate
 	 * 
 	 */
-     @PostMapping("/gvSearching")
-	public GateWayResponse <?> serchByGv(@RequestBody GiftVoucherSearchVo searchVo){
-    	 
-    	 List<GiftVoucherVo> searchByGvNumberAndFromDateAndToDate = newSaleService.giftVoucherSearching(searchVo);
-		
-		return new GateWayResponse<>(HttpStatus.OK,searchByGvNumberAndFromDateAndToDate,"") ;
-		
+	@PostMapping("/gvSearching")
+	public GateWayResponse<?> serchByGv(@RequestBody GiftVoucherSearchVo searchVo) {
+
+		List<GiftVoucherVo> searchByGvNumberAndFromDateAndToDate = newSaleService.giftVoucherSearching(searchVo);
+
+		return new GateWayResponse<>(HttpStatus.OK, searchByGvNumberAndFromDateAndToDate, "");
+
 	}
 }
-

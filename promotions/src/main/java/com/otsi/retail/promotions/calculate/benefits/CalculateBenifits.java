@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,7 @@ import com.otsi.retail.promotions.common.BenfitType;
 import com.otsi.retail.promotions.common.DiscountSubTypes;
 import com.otsi.retail.promotions.common.DiscountType;
 import com.otsi.retail.promotions.common.ItemValue;
+import com.otsi.retail.promotions.common.PoolType;
 import com.otsi.retail.promotions.entity.BenfitEntity;
 import com.otsi.retail.promotions.entity.PoolEntity;
 import com.otsi.retail.promotions.entity.PromotionsEntity;
@@ -148,8 +151,7 @@ public class CalculateBenifits {
 
 	}
 
-	private String calculateBenifitsForXUBAndPercentageDiscountOn(BenefitVo benifitVo,
-			ProductVO productTextileVo) {
+	private String calculateBenifitsForXUBAndPercentageDiscountOn(BenefitVo benifitVo, ProductVO productTextileVo) {
 
 		StringBuilder discountDiscription = new StringBuilder();
 		discountDiscription.append(
@@ -218,8 +220,7 @@ public class CalculateBenifits {
 		return discountDetails.toString();
 	}
 
-	private String calculateBenifitsForXUGAndPercentageDiscountOn(BenefitVo benifitVo,
-			ProductVO productTextileVo) {
+	private String calculateBenifitsForXUGAndPercentageDiscountOn(BenefitVo benifitVo, ProductVO productTextileVo) {
 		StringBuilder discountDiscription = new StringBuilder();
 		discountDiscription.append(
 				"Discount will be given on probucts of the related Get pools. Quantity should be greater than or equal to ");
@@ -416,29 +417,29 @@ public class CalculateBenifits {
 		List<LineItemVo> resultList = null;
 //		for (LineItemVo itemVo : listofLineItems) {
 
-			switch (benfitEntity.getBenfitType()) {
+		switch (benfitEntity.getBenfitType()) {
 
-			case FlatDiscount:
-				resultList = calcolateFlatDiscountForDiscountType(benfitEntity, totalQuantityAndMrp, listofLineItems,
-						promoEligibleLineItems);
-				break;
+		case FlatDiscount:
+			resultList = calcolateFlatDiscountForDiscountType(benfitEntity, totalQuantityAndMrp, listofLineItems,
+					promoEligibleLineItems);
+			break;
 
-			case XunitsFromBuyPool:
-				resultList = calculateXUBForDiscountType(benfitEntity, totalQuantityAndMrp, listofLineItems, promo,
-						promoEligibleLineItems);
-				break;
+		case XunitsFromBuyPool:
+			resultList = calculateXUBForDiscountType(benfitEntity, totalQuantityAndMrp, listofLineItems, promo,
+					promoEligibleLineItems);
+			break;
 
-			case XunitsFromGetPool:
-				resultList = calculateXUGForDiscountType(benfitEntity, totalQuantityAndMrp, listofLineItems, promo,
-						promoEligibleLineItems);
-				break;
+		case XunitsFromGetPool:
+			resultList = calculateXUGForDiscountType(benfitEntity, totalQuantityAndMrp, listofLineItems, promo,
+					promoEligibleLineItems);
+			break;
 
-			default:
-				resultList = listofLineItems;
-				break;
+		default:
+			resultList = listofLineItems;
+			break;
 
-			}
-	//	}
+		}
+		// }
 		return resultList;
 
 	}
@@ -452,17 +453,17 @@ public class CalculateBenifits {
 
 		case PercentageDiscountOn:
 			resultList = calcolateXUGDiscountForPercentageDiscountOn(benfitEntity, totalQuantityAndMrp,
-					promoEligibleLineItems, listofLineItems,promo);
+					promoEligibleLineItems, listofLineItems, promo);
 			break;
 
 		case RupeesDiscountOn:
 			resultList = calculateXUGDiscountForRupeesDiscountOn(benfitEntity, promoEligibleLineItems,
-					totalQuantityAndMrp, listofLineItems,promo);
+					totalQuantityAndMrp, listofLineItems, promo);
 			break;
 
 		case FixedAmountOn:
 			resultList = calculateXUGDiscountForFixedAmountOn(benfitEntity, totalQuantityAndMrp, promoEligibleLineItems,
-					listofLineItems,promo);
+					listofLineItems, promo);
 			break;
 
 		default:
@@ -572,7 +573,7 @@ public class CalculateBenifits {
 		case MinValue: {
 
 			results = getXugPercentageDiscountForMinimumValue(benfitEntity, promoEligibleLineItems, totalQuantityAndMrp,
-					listofAllLineItems,promo);
+					listofAllLineItems, promo);
 
 			break;
 
@@ -581,7 +582,7 @@ public class CalculateBenifits {
 		case MaxValue: {
 
 			results = getXugPercentageDiscountForMaximumValue(benfitEntity, promoEligibleLineItems, totalQuantityAndMrp,
-					listofAllLineItems);
+					listofAllLineItems, promo);
 
 			break;
 		}
@@ -596,48 +597,68 @@ public class CalculateBenifits {
 
 	private List<LineItemVo> getXugPercentageDiscountForMaximumValue(BenfitEntity benfitEntity,
 			List<LineItemVo> promoEligibleLineItems, List<Double> totalQuantityAndMrp,
-			List<LineItemVo> listofAllLineItems) {
+			List<LineItemVo> listofAllLineItems, PromotionsEntity promo) {
 
 		double calculatedInvoiceLevelDiscount = 0.0;
 
 		// get the getPools from the benefits
-		List<PoolEntity> poolEntities = benfitEntity.getPoolEntities();
+		List<PoolEntity> poolEntities = promo.getPoolEntity();
 
 		// LineItemVo maxValueMRP = orderedLineItems.get(orderedLineItems.size());
+		PoolType poolType = null;
+		for (PoolEntity poolEntity : poolEntities) {
 
-		double percentageDiscount = Double.valueOf(benfitEntity.getDiscount()).doubleValue();
+			poolType = poolEntity.getPoolType();
 
-		List<LineItemVo> orderedLineItems = sortLineItemsByPrice(
-				fetchBenefitEligibleLineItems(listofAllLineItems, poolEntities));
+		}
+		if (poolType.equals(PoolType.Get)) {
+			double percentageDiscount = Double.valueOf(benfitEntity.getDiscount()).doubleValue();
 
-		Long numOfItemsFromGetPool = benfitEntity.getNumOfItemsFromGetPool();
+			List<LineItemVo> orderedLineItems = sortLineItemsByPrice(
+					fetchBenefitEligibleLineItems(listofAllLineItems, poolEntities));
 
-		if (orderedLineItems.size() >= numOfItemsFromGetPool) {
+			Long numOfItemsFromGetPool = benfitEntity.getNumOfItemsFromGetPool();
 
-			for (int i = numOfItemsFromGetPool.intValue() - 1; i > -1; i--) {
+			long qty = 0l;
+			for (LineItemVo lineItemVo : orderedLineItems) {
 
-				LineItemVo maxValueMRP = orderedLineItems.get(i);
+				qty = lineItemVo.getQuantity();
+			}
 
-				Double individualLineItemTotalPrice = maxValueMRP.getItemPrice().doubleValue()
-						* maxValueMRP.getQuantity();
+			if (orderedLineItems.size() >= numOfItemsFromGetPool || qty >= numOfItemsFromGetPool) {
 
-				calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount
-						+ (percentageDiscount * individualLineItemTotalPrice) / 100;
+				for (int i = numOfItemsFromGetPool.intValue() - 1; i > -1; i--) {
+
+					LineItemVo maxValueMRP = orderedLineItems.get(i);
+
+					Double individualLineItemTotalPrice = maxValueMRP.getItemPrice().doubleValue()
+							* maxValueMRP.getQuantity();
+
+					calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount
+							+ (percentageDiscount * individualLineItemTotalPrice) / 100;
+					if (i < numOfItemsFromGetPool)
+						break;
+
+				}
+			} else {
+
+				for (LineItemVo lineItemVo : promoEligibleLineItems)
+					lineItemVo.setDescription(
+							"The customer will get discount if he buys products from get pools beacuase the customer is buying products from the respective buy pools");
+
+				for (LineItemVo lineItemVo : orderedLineItems) {
+					long noOfProductsYetToBeBought = numOfItemsFromGetPool - orderedLineItems.size();
+					lineItemVo.setDescription("If the customer buys " + noOfProductsYetToBeBought
+							+ " more products from get pools, he will get the discount.");
+
+				}
 
 			}
 		} else {
 
-			for (LineItemVo lineItemVo : promoEligibleLineItems)
-				lineItemVo.setDescription(
-						"The customer will get discount if he buys products from get pools beacuase the customer is buying products from the respective buy pools");
-
-			for (LineItemVo lineItemVo : orderedLineItems) {
-				long noOfProductsYetToBeBought = numOfItemsFromGetPool - orderedLineItems.size();
-				lineItemVo.setDescription("If the customer buys " + noOfProductsYetToBeBought
-						+ " more products from get pools, he will get the discount.");
-
+			for (LineItemVo lineItemVo : promoEligibleLineItems) {
+				lineItemVo.setDescription("Please choose the items from respective get pools only!!");
 			}
-
 		}
 
 		return distributeDiscountToAllProducts(listofAllLineItems, calculatedInvoiceLevelDiscount);
@@ -653,49 +674,72 @@ public class CalculateBenifits {
 
 		// get the getPools from the benefits
 		List<PoolEntity> poolEntities = promo.getPoolEntity();
+		PoolType poolType = null;
 
-		// get the eligible line items from get pool
-		List<LineItemVo> benefitEligibleLineItems = fetchBenefitEligibleLineItems(listofAllLineItems, poolEntities);
+		for (PoolEntity poolEntity : poolEntities) {
 
-		// sort the eligibleLineItemsFromGetPools
-		List<LineItemVo> orderedGetItems = sortLineItemsByPrice(benefitEligibleLineItems);
+			poolType = poolEntity.getPoolType();
+		}
+		List<LineItemVo> benefitEligibleLineItems = null;
+		if (poolType.equals(PoolType.Get)) {
+			// get the eligible line items from get pool
+			benefitEligibleLineItems = fetchBenefitEligibleLineItems(listofAllLineItems, poolEntities);
 
-		// get the number of items from get pool
-		int numOfItemsFromGetPool = Integer.valueOf(benfitEntity.getNumOfItemsFromGetPool().intValue());
+			// sort the eligibleLineItemsFromGetPools
+			List<LineItemVo> orderedGetItems = sortLineItemsByPrice(benefitEligibleLineItems);
 
-		// get the discount from benefit
-		double percentageDiscount = Double.valueOf(benfitEntity.getDiscount()).doubleValue();
+			// get the number of items from get pool
+			int numOfItemsFromGetPool = Integer.valueOf(benfitEntity.getNumOfItemsFromGetPool().intValue());
 
-		// checking the eligible line items size
-		if (benefitEligibleLineItems.size() >= numOfItemsFromGetPool) {
+			// get the discount from benefit
+			double percentageDiscount = Double.valueOf(benfitEntity.getDiscount()).doubleValue();
 
-			// loop through, discount calculation
+			long qty = 0l;
 
-			for (int i = 0; i < numOfItemsFromGetPool; i++) {
+			for (LineItemVo lineItemVo : orderedGetItems) {
 
-				LineItemVo minValueMRP = orderedGetItems.get(i);
-
-				Double individualLineItemTotalPrice = minValueMRP.getItemPrice().doubleValue()
-						* minValueMRP.getQuantity();
-
-				calculateInvoiceLevelDiscount = calculateInvoiceLevelDiscount
-						+ (percentageDiscount * individualLineItemTotalPrice) / 100;
+				qty = lineItemVo.getQuantity();
 
 			}
 
+			// checking the eligible line items size
+			if (benefitEligibleLineItems.size() >= numOfItemsFromGetPool || qty >= numOfItemsFromGetPool) {
+
+				// loop through, discount calculation
+
+				for (int i = 0; i < numOfItemsFromGetPool; i++) {
+
+					LineItemVo minValueMRP = orderedGetItems.get(i);
+
+					Double individualLineItemTotalPrice = minValueMRP.getItemPrice().doubleValue()
+							* minValueMRP.getQuantity();
+
+					calculateInvoiceLevelDiscount = calculateInvoiceLevelDiscount
+							+ (percentageDiscount * individualLineItemTotalPrice) / 100;
+					if (i < numOfItemsFromGetPool)
+						break;
+
+				}
+
+			} else {
+
+				for (LineItemVo lineItemVo : promoEligibleLineItems)
+					lineItemVo.setDescription(
+							"The customer will get discount if he buys products from get pools beacuase the customer is buying products from the respective buy pools");
+
+				for (LineItemVo lineItemVo : benefitEligibleLineItems) {
+					int noOfProductsYetToBeBought = numOfItemsFromGetPool - benefitEligibleLineItems.size();
+					lineItemVo.setDescription("If the customer buys " + noOfProductsYetToBeBought
+							+ " more products from get pools, he will get the discount.");
+
+				}
+
+			}
 		} else {
 
-			for (LineItemVo lineItemVo : promoEligibleLineItems)
-				lineItemVo.setDescription(
-						"The customer will get discount if he buys products from get pools beacuase the customer is buying products from the respective buy pools");
-
-			for (LineItemVo lineItemVo : benefitEligibleLineItems) {
-				int noOfProductsYetToBeBought = numOfItemsFromGetPool - benefitEligibleLineItems.size();
-				lineItemVo.setDescription("If the customer buys " + noOfProductsYetToBeBought
-						+ " more products from get pools, he will get the discount.");
-
+			for (LineItemVo lineItemVo : promoEligibleLineItems) {
+				lineItemVo.setDescription("please choose the items from respective get pools only");
 			}
-
 		}
 
 		return distributeDiscountToAllProducts(listofAllLineItems, calculateInvoiceLevelDiscount);
@@ -756,7 +800,6 @@ public class CalculateBenifits {
 
 	}
 
-
 	private List<LineItemVo> calculateXUBDiscountForRupeesDiscountOn(BenfitEntity benfitEntity,
 			List<LineItemVo> promoEligibleLineItems, List<Double> totalQuantityAndMrp) {
 
@@ -764,7 +807,6 @@ public class CalculateBenifits {
 				Double.valueOf(benfitEntity.getDiscount()).doubleValue());
 
 	}
-
 
 	private List<LineItemVo> calcolateXUBDiscountForPercentageDiscountOn(BenfitEntity benfitEntity,
 			List<Double> totalQuantityAndMrp, List<LineItemVo> promoEligibleLineItems,
@@ -814,14 +856,32 @@ public class CalculateBenifits {
 
 		Long numOfItemsFromBuyPool = benfitEntity.getNumOfItemsFromBuyPool();
 
-		for (int i = numOfItemsFromBuyPool.intValue(); i > 0; i--) {
+		long qty = 0l;
+		for (LineItemVo lineItemVo : orderedLineItems) {
 
-			LineItemVo maxValueMRP = orderedLineItems.get(i + 1);
+			qty = lineItemVo.getQuantity();
+		}
 
-			double individualLineItemTotalPrice = maxValueMRP.getItemPrice().doubleValue() * maxValueMRP.getQuantity();
+		if (orderedLineItems.size() >= numOfItemsFromBuyPool || qty >= numOfItemsFromBuyPool) {
+			for (int i = numOfItemsFromBuyPool.intValue() - 1; i > -1; i--) {
+				LineItemVo maxValueMRP = orderedLineItems.get(i);
 
-			calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount
-					+ (percentageDiscount * individualLineItemTotalPrice) / 100;
+				double individualLineItemTotalPrice = maxValueMRP.getItemPrice().doubleValue()
+						* maxValueMRP.getQuantity();
+
+				calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount
+						+ (percentageDiscount * individualLineItemTotalPrice) / 100;
+
+				if (i < numOfItemsFromBuyPool)
+					break;
+
+			}
+		} else {
+
+			for (LineItemVo lineItemVo : orderedLineItems) {
+				lineItemVo.setDescription("If you select a more items from buy pool then you will get a discount");
+
+			}
 
 		}
 
@@ -832,27 +892,42 @@ public class CalculateBenifits {
 	private Double getPercentageDiscountForMinimumValue(BenfitEntity benfitEntity,
 			List<LineItemVo> promoEligibleLineItems, List<Double> totalQuantityAndMrp) {
 
+		double calculatedInvoiceLevelDiscount = 0.0;
+
 		List<LineItemVo> orderedLineItems = sortLineItemsByPrice(promoEligibleLineItems);
 
 		double percentageDiscount = Double.valueOf(benfitEntity.getDiscount()).doubleValue();
 
 		int numOfItemsFromBuyPool = Integer.valueOf(benfitEntity.getNumOfItemsFromBuyPool().intValue());
 
-		double calculatedInvoiceLevelDiscount = 0.0;
+		long qty = 0l;
+		for (LineItemVo lineItemVo : orderedLineItems) {
 
-		for (int i = 0; i < numOfItemsFromBuyPool; i++) {
+			qty = lineItemVo.getQuantity();
+		}
 
-			LineItemVo minValueMRP = orderedLineItems.get(i);
+		if (orderedLineItems.size() >= numOfItemsFromBuyPool || qty >= numOfItemsFromBuyPool) {
 
-			Double individualLineItemTotalPrice = minValueMRP.getItemPrice().doubleValue() * minValueMRP.getQuantity();
+			for (int i = 0; i < numOfItemsFromBuyPool; i++) {
 
-			calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount
-					+ (percentageDiscount * individualLineItemTotalPrice) / 100;
-			
-//			if(i<numOfItemsFromBuyPool)
-//			{
-//				break;
-//			}
+				LineItemVo minValueMRP = orderedLineItems.get(i);
+
+				Double individualLineItemTotalPrice = minValueMRP.getItemPrice().doubleValue()
+						* minValueMRP.getQuantity();
+
+				calculatedInvoiceLevelDiscount = calculatedInvoiceLevelDiscount
+						+ (percentageDiscount * individualLineItemTotalPrice) / 100;
+
+				if (i < numOfItemsFromBuyPool)
+					break;
+			}
+		} else {
+
+			for (LineItemVo lineItemVo : orderedLineItems) {
+
+				lineItemVo.setDescription("If you take more items from buy pool then you will get a discount");
+
+			}
 		}
 
 		return calculatedInvoiceLevelDiscount;
@@ -1038,7 +1113,6 @@ public class CalculateBenifits {
 		return results;
 	}
 
-
 	private List<LineItemVo> calcolateFlatDiscountForPercentageDiscountOn(BenfitEntity benfitEntity,
 			List<Double> totalQuantityAndMrp, List<LineItemVo> listofLineItems,
 			List<LineItemVo> promoEligibleLineItems) {
@@ -1081,5 +1155,4 @@ public class CalculateBenifits {
 		return resultList;
 	}
 
-	
 }

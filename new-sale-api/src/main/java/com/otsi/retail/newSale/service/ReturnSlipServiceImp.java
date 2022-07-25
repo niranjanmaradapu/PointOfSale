@@ -31,6 +31,7 @@ import com.otsi.retail.newSale.mapper.ReturnSlipMapper;
 import com.otsi.retail.newSale.repository.NewSaleRepository;
 import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.repository.ReturnSlipRepo;
+import com.otsi.retail.newSale.utils.DateConverters;
 import com.otsi.retail.newSale.vo.InventoryUpdateVo;
 import com.otsi.retail.newSale.vo.ListOfReturnSlipsVo;
 import com.otsi.retail.newSale.vo.ReturnSlipRequestVo;
@@ -199,9 +200,15 @@ if(returnslip==null) {
 		 * getting the record using dates combination
 		 *
 		 */
-		/*LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(vo.getDateFrom());
-		LocalDateTime createdDateTo = DateConverters.convertToLocalDateTimeMax(vo.getDateTo());*/
-		if (vo.getDateFrom() != null && vo.getDateTo() != null && vo.getStoreId() != 0L ) {
+		LocalDateTime createdDateTo;
+		LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(vo.getDateFrom());
+		if(vo.getDateTo()!=null) {
+		 createdDateTo = DateConverters.convertToLocalDateTimeMax(vo.getDateTo());
+		}else {
+			createdDateTo = DateConverters.convertToLocalDateTimeMax(vo.getDateFrom());
+	}
+				
+		if (createdDatefrom != null && createdDateTo != null && vo.getStoreId() != 0L ) {
 			/**
 			 * getting the record using dates and RtNumber
 			 *
@@ -209,13 +216,13 @@ if(returnslip==null) {
 			
 			if (vo.getRtStatus() == ReturnSlipStatus.ALL) {
 				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(
-						vo.getDateFrom(),vo.getDateTo(), vo.getStoreId());
+						createdDatefrom,createdDateTo, vo.getStoreId());
 			}
 
 			if (vo.getRtNumber() != null && vo.getBarcode() == null && vo.getCreatedBy() == null
 					&& vo.getRtStatus() == null) {
 				retunSlipdetails = returnSlipRepo
-						.findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(vo.getDateFrom(), vo.getDateTo(),
+						.findByCreatedDateBetweenAndRtNoAndStoreIdOrderByCreatedDateAsc(createdDateTo, createdDateTo,
 								vo.getRtNumber(), vo.getStoreId());
 			}
 
@@ -228,7 +235,7 @@ if(returnslip==null) {
 
 				retunSlipdetails = returnSlipRepo
 						.findByCreatedDateBetweenAndTaggedItems_barCodeAndStoreIdOrderByCreatedDateAsc(
-								vo.getDateFrom(), vo.getDateTo(), vo.getBarcode(), vo.getStoreId());
+								createdDatefrom,createdDateTo, vo.getBarcode(), vo.getStoreId());
 
 			}
 			/**
@@ -240,7 +247,7 @@ if(returnslip==null) {
 
 				retunSlipdetails = returnSlipRepo
 						.findByCreatedDateBetweenAndCreatedByAndStoreIdOrderByCreatedDateAsc(
-								vo.getDateFrom(), vo.getDateTo(), vo.getCreatedBy(), vo.getStoreId());
+								createdDatefrom,createdDateTo, vo.getCreatedBy(), vo.getStoreId());
 
 			}
 			/**
@@ -252,7 +259,7 @@ if(returnslip==null) {
 
 				retunSlipdetails = returnSlipRepo
 						.findByCreatedDateBetweenAndRtStatusAndStoreIdOrderByCreatedDateAsc(
-								vo.getDateFrom(), vo.getDateTo(),vo.getRtStatus() ,vo.getStoreId());
+								createdDatefrom,createdDateTo,vo.getRtStatus() ,vo.getStoreId());
 
 			}
 
@@ -262,7 +269,7 @@ if(returnslip==null) {
 			 */
 			else
 				retunSlipdetails = returnSlipRepo.findByCreatedDateBetweenAndStoreIdOrderByCreatedDateAsc(
-						vo.getDateFrom(), vo.getDateTo(), vo.getStoreId());
+						createdDatefrom,createdDateTo, vo.getStoreId());
 			/**
 			 * getting the records without dates
 			 *

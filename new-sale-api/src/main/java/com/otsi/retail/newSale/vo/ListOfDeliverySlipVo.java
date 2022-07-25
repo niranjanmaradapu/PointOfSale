@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.newSale.common.DSStatus;
@@ -35,12 +36,12 @@ public class ListOfDeliverySlipVo {
 	private Long bartoatalPromoDisc;
 
 	private Long bartotalNetAmount;
-
+	
 	private Long bartotalGrossAmount;
 	
 	private int barTotalQty;
 	
-	private List<DeliverySlipVo> deliverySlipVo;
+	private Page<DeliverySlipVo> deliverySlip;
 
 	//private List<BarcodeVo> barcodevo;
 }

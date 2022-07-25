@@ -1,5 +1,6 @@
 package com.otsi.retail.promotions.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -126,7 +127,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 	// Method for getting list of Promotions by using flag(Status)
 	@Override
-	public ConnectionPromoVo getListOfPromotions(String flag, Long domainId, Long clientId) {
+	public ConnectionPromoVo getListOfPromotions(String flag, Long clientId) {
 		log.debug("debugging getListOfPromotions:" + flag);
 		List<PromotionsEntity> promoList = new ArrayList<>();
 
@@ -137,14 +138,8 @@ public class PromotionServiceImpl implements PromotionService {
 		if (flag.equalsIgnoreCase("false")) {
 			status = Boolean.FALSE;
 		}
-		if (flag.equalsIgnoreCase("ALL") && domainId == null && clientId == null) {
+		if (flag.equalsIgnoreCase("ALL") && clientId == null) {
 			promoList = promoRepo.findAll();
-		} else if (!(flag.isEmpty()) && domainId == null) {
-
-			promoList = promoRepo.findByIsActive(status);
-		} else if (flag.isEmpty() && domainId != null) {
-
-			promoList = promoRepo.findByDomainId(domainId);
 		} else if (!(flag.isEmpty()) && clientId == null) {
 
 			promoList = promoRepo.findByIsActive(status);
@@ -152,7 +147,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 			promoList = promoRepo.findByClientId(clientId);
 		} else {
-			promoList = promoRepo.findByIsActiveAndDomainIdAndClientId(status, domainId, clientId);
+			promoList = promoRepo.findByIsActiveAndClientId(status, clientId);
 		}
 
 		if (!promoList.isEmpty()) {
@@ -161,7 +156,6 @@ public class PromotionServiceImpl implements PromotionService {
 			log.warn("we are checking if list of promotions is fetching...");
 			log.info("list of promotions is fetching...");
 			promoVo.setPromovo(listOfPromo);
-			promoVo.setDomainId(domainId);
 			return promoVo;
 		} else {
 			log.error("record not found");
@@ -327,6 +321,11 @@ public class PromotionServiceImpl implements PromotionService {
 			dto.get().setEndDate(vo.getEndDate());
 		}
 		PromotionToStoreEntity promotionToStoreEntity = dto.get();
+
+			if (LocalDate.now().isAfter(vo.getEndDate())) {
+				promotionToStoreEntity.setPromotionStatus(true);
+			}
+
 		promostoreRepo.save(promotionToStoreEntity);
 
 		return "Promotion Dates Updated Successfully";
@@ -633,6 +632,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 		}
 
+
 		return promoStoreList;
 	}
 
@@ -714,6 +714,7 @@ public class PromotionServiceImpl implements PromotionService {
 					System.out.println("Quantity Slab");
 
 					slabBenefit = getSlabBenefit(promo, totalQuantityAndMrp.get(0));
+					
 
 					// call benefits calculation engine with required fields
 
@@ -750,6 +751,11 @@ public class PromotionServiceImpl implements PromotionService {
 
 			if (value >= promotionSlabsEntity.getFromSlab() && value <= promotionSlabsEntity.getToSlab())
 				benefitEntity = promotionSlabsEntity.getBenfitEntity();
+			
+			if(benefitEntity == null)
+			{
+				throw new InvalidDataException("Please provide the valid data");
+			}
 
 		}
 

@@ -120,7 +120,7 @@ public class ReportsServiceImp implements ReportService {
 		LocalDate dateto = LocalDate.now();
 		LocalDate dateFrom = dateto.minusMonths(11);
 
-		List<Object[]> nsentity = newsaleRepo.getByStoreIdAndDomainIdAndCreationDateBetween(storeId, domainId,dateFrom,dateto);
+		List<Object[]> nsentity = newsaleRepo.getByStoreIdAndDomainIdAndCreatedDateBetween(storeId, domainId,dateFrom,dateto);
 		if (nsentity.size() > 0) {
 		    for (int j = 0; j < nsentity.size(); j++) {
 		        Object[] object = nsentity.get(j);
@@ -149,7 +149,7 @@ public class ReportsServiceImp implements ReportService {
 		LocalDate lastYear = Date.minusYears(1);
 
 		List<NewSaleEntity> nsentity = newsaleRepo.findAll();
-		List<NewSaleEntity> nen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
+		List<NewSaleEntity> nen = nsentity.stream().filter(a -> a.getCreatedDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
 		return null;
@@ -163,7 +163,7 @@ public class ReportsServiceImp implements ReportService {
 		LocalDate dateTo = LocalDate.now();
 		LocalDate dateFrom = dateTo.with(TemporalAdjusters.firstDayOfMonth());
 
-		List<Object[]> nsentity = newsaleRepo.findByDomainIdAndCreationDateBetween(domainId,dateFrom,dateTo);
+		List<Object[]> nsentity = newsaleRepo.findByDomainIdAndCreatedDateBetween(domainId,dateFrom,dateTo);
 		/*List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -268,7 +268,7 @@ public class ReportsServiceImp implements ReportService {
 		revo.setAmount(ramount);
 		rvo.add(revo);
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainIdAndCreationDateBetween(storeId, domainId,dateFrom,dateTo);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainIdAndCreatedDateBetween(storeId, domainId,dateFrom,dateTo);
 		
 		Long amount = nsentity.stream().mapToLong(a -> a.getNetValue()).sum();
 		ReportVo rsvo = new ReportVo();
@@ -284,7 +284,7 @@ public class ReportsServiceImp implements ReportService {
 
 		LocalDate Date = LocalDate.now();
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainIdAndCreationDate(storeId, domainId,Date);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainIdAndCreatedDate(storeId, domainId,Date);
 		
 
 		Long amount = nsentity.stream().mapToLong(a -> a.getNetValue()).sum();
@@ -301,7 +301,7 @@ public class ReportsServiceImp implements ReportService {
 		LocalDate dateTo = LocalDate.now();
 		LocalDate dateFrom = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainIdAndCreationDateBetween(storeId, domainId,dateFrom,dateTo);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainIdAndCreatedDateBetween(storeId, domainId,dateFrom,dateTo);
 		
 
 		Long amount = nsentity.stream().mapToLong(a -> a.getNetValue()).sum();
@@ -321,7 +321,7 @@ public class ReportsServiceImp implements ReportService {
 		LocalDate dateFrom = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
 		LocalDate dateTo = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
 
-		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainIdAndCreationDateBetween(storeId, domainId,dateFrom,dateTo);
+		List<NewSaleEntity> nsentity = newsaleRepo.findByStoreIdAndDomainIdAndCreatedDateBetween(storeId, domainId,dateFrom,dateTo);
 		/*List<NewSaleEntity> nsen = nsentity.stream().filter(a -> a.getCreationDate().getYear() == (Date.getYear()))
 				.collect(Collectors.toList());
 
@@ -386,7 +386,7 @@ public class ReportsServiceImp implements ReportService {
 				   	fromDate=LocalDate.now();
 			    }    
 			
-			List<Object[]> ds = dsRepo.getByStoreIdAndCreationDateBetween(storeId,fromDate,toDate);
+			List<Object[]> ds = dsRepo.getByStoreIdAndCreatedDateBetween(storeId,fromDate,toDate);
 			if (ds.size() > 0) {
 			    for (int j = 0; j < ds.size(); j++) {
 			        Object[] object = ds.get(j);
