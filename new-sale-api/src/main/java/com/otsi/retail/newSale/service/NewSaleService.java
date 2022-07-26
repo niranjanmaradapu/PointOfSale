@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.otsi.retail.newSale.Entity.DayClosure;
 import com.otsi.retail.newSale.Entity.DeliverySlipEntity;
 import com.otsi.retail.newSale.Entity.GiftVoucherEntity;
 import com.otsi.retail.newSale.Exceptions.CustomerNotFoundExcecption;
@@ -116,5 +117,7 @@ public interface NewSaleService {
 	DayClosureVO saveDayClosure(DayClosureVO dayClosureVO);
 
 	Boolean getDayClosure(Long storeId);
+
+	List<String> getDates(Long storeId);
 
 }

@@ -39,7 +39,7 @@ public class DayClosureMapper {
 		DayClosure dayClosure = new DayClosure();
 		BeanUtils.copyProperties(dayClosureVO, dayClosure);
 		dayClosure.setCreatedBy(dayClosureVO.getCreatedBy());
-		dayClosure.setDayClose(LocalDateTime.now());
+		dayClosure.setDayClose(dayClosureVO.getDayClose());
 		dayClosure.setCreatedDate(LocalDateTime.now());
 		dayClosure.setLastModifiedDate(LocalDateTime.now());
 		dayClosure.setModifiedBy(dayClosureVO.getModifiedBy());

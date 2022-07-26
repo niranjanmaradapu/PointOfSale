@@ -644,4 +644,16 @@ public class NewSaleController {
 		return ResponseEntity.ok(dayClosure);
 
 	}
+
+	@ApiOperation(value = "/getDates", notes = "fetching day closure activity", response = DayClosure.class)
+	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
+			@ApiResponse(code = 200, message = "Successful retrieval", response = DayClosure.class, responseContainer = "Object") })
+	@GetMapping("/getDates")
+	public ResponseEntity<?> getDates(@RequestParam(required = false) Long storeId) {
+		log.info("Recieved request to getDates:" + storeId);
+		List<String> dayClosures = newSaleService.getDates(storeId);
+		return ResponseEntity.ok(dayClosures);
+
+	}
+	
 }

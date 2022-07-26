@@ -2132,4 +2132,29 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 	}
 
+	@Override
+	public List<String> getDates(Long storeId) {
+		List<String> dayClosures = new ArrayList<>();
+
+		DayClosure dayClosure;
+		LocalDate createdDate = LocalDate.now();
+
+		LocalDate createdDate1 = null;
+
+		dayClosure = dayClosureRepository.findByStoreIdOrderByDayCloseDesc(storeId);
+		createdDate1 = DateConverters.convertLocalDateTimeToLocalDate(dayClosure.getDayClose());
+		Boolean isDayClose = true;
+
+		while (isDayClose == true) {
+			createdDate1 = createdDate1.plusDays(1);
+			dayClosures.add(createdDate1.toString());
+			if (createdDate1.isEqual(createdDate)) {
+				isDayClose = false;
+				break;
+			}
+		}
+
+		return dayClosures;
+	}
+
 }
