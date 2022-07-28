@@ -18,6 +18,7 @@ import com.otsi.retail.newSale.Exceptions.InvalidInputException;
 import com.otsi.retail.newSale.Exceptions.RecordNotFoundException;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
+import com.otsi.retail.newSale.vo.DayCloseVO;
 import com.otsi.retail.newSale.vo.DayClosureVO;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.GiftVoucherSearchVo;
@@ -118,6 +119,6 @@ public interface NewSaleService {
 
 	Boolean getDayClosure(Long storeId);
 
-	List<String> getDates(Long storeId);
+	List<DayCloseVO> getDates(Long storeId);
 
 }

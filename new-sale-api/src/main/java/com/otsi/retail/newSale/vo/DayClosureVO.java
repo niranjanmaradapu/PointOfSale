@@ -3,9 +3,12 @@
  */
 package com.otsi.retail.newSale.vo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
 import lombok.Data;
 
 /**
@@ -20,7 +23,7 @@ public class DayClosureVO {
 	@GeneratedValue
 	private Long id;
 
-	private LocalDateTime dayClose;
+	private LocalDate dayClose;
 
 	private Long storeId;
 

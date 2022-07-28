@@ -40,6 +40,7 @@ import com.otsi.retail.newSale.utils.CommonUtilities;
 import com.otsi.retail.newSale.utils.Constants;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
+import com.otsi.retail.newSale.vo.DayCloseVO;
 import com.otsi.retail.newSale.vo.DayClosureVO;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.GiftVoucherSearchVo;
@@ -637,8 +638,8 @@ public class NewSaleController {
 	@ApiOperation(value = "/getDayClosure", notes = "fetching day closure activity", response = DayClosure.class)
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
 			@ApiResponse(code = 200, message = "Successful retrieval", response = DayClosure.class, responseContainer = "Object") })
-	@PostMapping("/getdayclosure")
-	public ResponseEntity<?> getDayClosure(@RequestParam(required = false) Long storeId) {
+	@GetMapping("/getdayclosure")
+	public ResponseEntity<?> getDayClosure(@RequestParam("storeId") Long storeId) {
 		log.info("Recieved request to getDayClosure:" + storeId);
 		Boolean dayClosure = newSaleService.getDayClosure(storeId);
 		return ResponseEntity.ok(dayClosure);
@@ -649,11 +650,11 @@ public class NewSaleController {
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
 			@ApiResponse(code = 200, message = "Successful retrieval", response = DayClosure.class, responseContainer = "Object") })
 	@GetMapping("/getDates")
-	public ResponseEntity<?> getDates(@RequestParam(required = false) Long storeId) {
+	public ResponseEntity<?> getDates(@RequestParam("storeId") Long storeId) {
 		log.info("Recieved request to getDates:" + storeId);
-		List<String> dayClosures = newSaleService.getDates(storeId);
+		List<DayCloseVO> dayClosures = newSaleService.getDates(storeId);
 		return ResponseEntity.ok(dayClosures);
 
 	}
-	
+
 }

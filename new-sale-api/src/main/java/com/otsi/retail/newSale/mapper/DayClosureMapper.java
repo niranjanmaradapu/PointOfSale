@@ -21,10 +21,9 @@ public class DayClosureMapper {
 
 	public DayClosureVO entityToVO(DayClosure dayClosure) {
 		DayClosureVO dayClosureVO = new DayClosureVO();
-		BeanUtils.copyProperties(dayClosure, dayClosureVO);
 		dayClosureVO.setCreatedDate(dayClosure.getCreatedDate());
 		dayClosureVO.setLastModifiedDate(dayClosure.getLastModifiedDate());
-		dayClosureVO.setDayClose(dayClosure.getDayClose());
+		dayClosureVO.setDayClose(dayClosure.getDayClose().toLocalDate());
 		dayClosureVO.setStoreId(dayClosure.getStoreId());
 		return dayClosureVO;
 
@@ -37,9 +36,8 @@ public class DayClosureMapper {
 
 	public DayClosure voToEntity(DayClosureVO dayClosureVO) {
 		DayClosure dayClosure = new DayClosure();
-		BeanUtils.copyProperties(dayClosureVO, dayClosure);
+		dayClosure.setDayClose(dayClosureVO.getDayClose().atStartOfDay());
 		dayClosure.setCreatedBy(dayClosureVO.getCreatedBy());
-		dayClosure.setDayClose(dayClosureVO.getDayClose());
 		dayClosure.setCreatedDate(LocalDateTime.now());
 		dayClosure.setLastModifiedDate(LocalDateTime.now());
 		dayClosure.setModifiedBy(dayClosureVO.getModifiedBy());

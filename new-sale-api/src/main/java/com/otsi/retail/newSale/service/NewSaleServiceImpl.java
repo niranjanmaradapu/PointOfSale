@@ -25,12 +25,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -82,6 +84,7 @@ import com.otsi.retail.newSale.repository.PaymentAmountTypeRepository;
 import com.otsi.retail.newSale.utils.DateConverters;
 import com.otsi.retail.newSale.vo.BarcodeVo;
 import com.otsi.retail.newSale.vo.CustomerVo;
+import com.otsi.retail.newSale.vo.DayCloseVO;
 import com.otsi.retail.newSale.vo.DayClosureVO;
 import com.otsi.retail.newSale.vo.DeliverySlipVo;
 import com.otsi.retail.newSale.vo.GetUserRequestVo;
@@ -2072,8 +2075,29 @@ public class NewSaleServiceImpl implements NewSaleService {
 	@Override
 	public DayClosureVO saveDayClosure(DayClosureVO dayClosureVO) {
 		DayClosure dayClosure = dayClosureMapper.voToEntity(dayClosureVO);
-		DayClosureVO dayClose = dayClosureMapper.entityToVO(dayClosureRepository.save(dayClosure));
-		return dayClose;
+		// dayClosure.setDayClose(DateConverters.convert(dayClosureVO.getDayClose()));
+		DayClosure dayClose;
+		DayClosure dayCloseSave = null;
+		dayClose = dayClosureRepository.findByStoreIdOrderByDayCloseDesc(dayClosureVO.getStoreId());
+		LocalDate afterDate = dayClose.getDayClose().plusDays(1).toLocalDate();
+		Boolean isDayClose = true;
+		if (afterDate.isEqual(dayClosureVO.getDayClose())) {
+			dayCloseSave = dayClosureRepository.save(dayClosure);
+			dayClosureVO = dayClosureMapper.entityToVO(dayCloseSave);
+			isDayClose = false;
+		}
+
+		while (isDayClose == true) {
+			LocalDateTime createdDate1;
+			createdDate1 = dayClosureVO.getDayClose().minusDays(1).atStartOfDay();
+			DayClosure dayClose1 = dayClosureRepository.findByStoreIdAndDayClose(dayClosureVO.getStoreId(),
+					createdDate1);
+			if (ObjectUtils.isEmpty(dayClose1)) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "please close the date:" + createdDate1);
+			}
+		}
+		return dayClosureVO;
+
 	}
 
 	@Override
@@ -2133,8 +2157,8 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public List<String> getDates(Long storeId) {
-		List<String> dayClosures = new ArrayList<>();
+	public List<DayCloseVO> getDates(Long storeId) {
+		List<DayCloseVO> dayClosures = new ArrayList<>();
 
 		DayClosure dayClosure;
 		LocalDate createdDate = LocalDate.now();
@@ -2146,8 +2170,10 @@ public class NewSaleServiceImpl implements NewSaleService {
 		Boolean isDayClose = true;
 
 		while (isDayClose == true) {
+			DayCloseVO dayCloseVO = new DayCloseVO();
 			createdDate1 = createdDate1.plusDays(1);
-			dayClosures.add(createdDate1.toString());
+			dayCloseVO.setDayClose(createdDate1.atStartOfDay());
+			dayClosures.add(dayCloseVO);
 			if (createdDate1.isEqual(createdDate)) {
 				isDayClose = false;
 				break;
