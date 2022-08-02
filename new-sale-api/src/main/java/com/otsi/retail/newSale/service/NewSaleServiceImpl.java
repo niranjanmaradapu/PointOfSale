@@ -1167,16 +1167,27 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public List<DeliverySlipVo> posDayClose(Long storeId) {
+	public List<DeliverySlipVo> posDayClose(Long storeId, LocalDate fromDate) {
 		log.debug(" debugging posDayClose");
 		List<DeliverySlipVo> dvo = new ArrayList<>();
-		LocalDate createdDate = LocalDate.now();
-		LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(createdDate);
+		List<DeliverySlipEntity> DsList = null;
+		if (fromDate != null) {
+			LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(fromDate);
 
-		LocalDateTime createdDateTo = DateConverters.convertToLocalDateTimeMax(createdDate);
+			LocalDateTime createdDateTo = DateConverters.convertToLocalDateTimeMax(fromDate);
+			DsList = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(DSStatus.Pending, createdDatefrom,
+					createdDateTo, storeId);
+		} else {
+			LocalDate createdDate = LocalDate.now();
 
-		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(DSStatus.Pending,
-				createdDatefrom, createdDateTo, storeId);
+			LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(createdDate);
+
+			LocalDateTime createdDateTo = DateConverters.convertToLocalDateTimeMax(createdDate);
+
+			DsList = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(DSStatus.Pending, createdDatefrom,
+					createdDateTo, storeId);
+		}
+
 		if (!DsList.isEmpty()) {
 
 			List<DeliverySlipVo> dsVo = new ArrayList<>();
@@ -1199,15 +1210,26 @@ public class NewSaleServiceImpl implements NewSaleService {
 	}
 
 	@Override
-	public String posClose(Long storeId) {
-		LocalDate createdDate = LocalDate.now();
-		LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(createdDate);
+	public String posClose(Long storeId, LocalDate fromDate) {
+		List<DeliverySlipEntity> dsList = null;
+		if (fromDate != null) {
 
-		LocalDateTime createdDateTo = DateConverters.convertToLocalDateTimeMax(createdDate);
-		List<DeliverySlipEntity> DsList = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(DSStatus.Pending,
-				createdDatefrom, createdDateTo, storeId);
-		if (DsList != null && !DsList.isEmpty()) {
-			DsList.stream().forEach(d -> {
+			LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(fromDate);
+
+			LocalDateTime createdDateTo = DateConverters.convertToLocalDateTimeMax(fromDate);
+			dsList = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(DSStatus.Pending, createdDatefrom,
+					createdDateTo, storeId);
+		} else {
+			LocalDate createdDate = LocalDate.now();
+			LocalDateTime createdDatefrom = DateConverters.convertLocalDateToLocalDateTime(createdDate);
+
+			LocalDateTime createdDateTo = DateConverters.convertToLocalDateTimeMax(createdDate);
+			dsList = dsRepo.findByStatusAndCreatedDateBetweenAndStoreId(DSStatus.Pending, createdDatefrom,
+					createdDateTo, storeId);
+		}
+
+		if (dsList != null && !dsList.isEmpty()) {
+			dsList.stream().forEach(d -> {
 
 				d.setStatus(DSStatus.Cancelled);
 				dsRepo.save(d);
@@ -1216,7 +1238,7 @@ public class NewSaleServiceImpl implements NewSaleService {
 
 			return "successFully updated deliverySlips";
 		} else
-			return "there is no  pending delivery slips with this storeId:" + storeId;
+			return "there is no  pending delivery slips with this storeId :" + storeId + "and date:" + fromDate;
 
 	}
 

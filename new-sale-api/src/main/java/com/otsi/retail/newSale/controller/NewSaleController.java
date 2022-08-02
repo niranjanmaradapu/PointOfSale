@@ -1,5 +1,6 @@
 package com.otsi.retail.newSale.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.AmqpConnectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -301,10 +303,11 @@ public class NewSaleController {
 	// Method for day closer
 
 	@GetMapping(CommonRequestMappigs.GET_PENDINGDELIVERYSLIPS)
-	public GateWayResponse<?> dayclose(@RequestParam Long storeId) {
+	public GateWayResponse<?> dayclose(@RequestParam Long storeId,
+			@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate) {
 		log.info("Recieved request to dayclose()");
 		try {
-			List<DeliverySlipVo> dayclose = newSaleService.posDayClose(storeId);
+			List<DeliverySlipVo> dayclose = newSaleService.posDayClose(storeId, fromDate);
 			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			log.error("exception :" + e.getMessage());
@@ -315,9 +318,10 @@ public class NewSaleController {
 	}
 
 	@PutMapping(CommonRequestMappigs.CLOSE_PENDINGDELIVERYSLIP)
-	public GateWayResponse<?> posclose(Long storeId) {
+	public GateWayResponse<?> posclose(Long storeId,
+			@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate) {
 		try {
-			String dayclose = newSaleService.posClose(storeId);
+			String dayclose = newSaleService.posClose(storeId, fromDate);
 			return new GateWayResponse<>("Success", dayclose);
 		} catch (Exception e) {
 			return new GateWayResponse<>(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -648,7 +652,7 @@ public class NewSaleController {
 
 	@ApiOperation(value = "/getDates", notes = "fetching day closure activity", response = DayClosure.class)
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
-			@ApiResponse(code = 200, message = "Successful retrieval", response = DayClosure.class, responseContainer = "Object") })
+			@ApiResponse(code = 200, message = "Successful retrieval", response = DayClosure.class, responseContainer = "List") })
 	@GetMapping("/getDates")
 	public ResponseEntity<?> getDates(@RequestParam("storeId") Long storeId) {
 		log.info("Recieved request to getDates:" + storeId);

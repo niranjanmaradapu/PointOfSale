@@ -51,7 +51,7 @@ public interface NewSaleService {
 	ListOfDeliverySlipVo getlistofDeliverySlips(ListOfDeliverySlipVo listOfDeliverySlipVo, Pageable pageable)
 			throws RecordNotFoundException;
 
-	List<DeliverySlipVo> posDayClose(Long storeId);
+	List<DeliverySlipVo> posDayClose(Long storeId, LocalDate fromDate);
 
 	double getNewSaleWithHsn(double netAmt) throws JsonMappingException, JsonProcessingException, DataNotFoundException;
 
@@ -63,7 +63,7 @@ public interface NewSaleService {
 
 	CustomerVo getCustomerFromNewSale(String mobileNo) throws DataNotFoundException;
 
-	String posClose(Long storeId);
+	String posClose(Long storeId, LocalDate fromDate);
 
 	void tagCustomerToExisitingNewSale(String mobileNo, Long invoiceNo) throws CustomerNotFoundExcecption;
 
